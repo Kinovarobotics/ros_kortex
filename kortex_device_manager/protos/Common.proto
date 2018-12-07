@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+package Kinova.Api.Common;
+
+/**
+ * list of possible device types
+ */ 
+enum DeviceTypes {
+    UNSPECIFIED_DEVICE_TYPE = 0;
+    BASE = 1;
+    VISION = 2;
+    BIG_ACTUATOR = 3;
+    SMALL_ACTUATOR = 4;
+    INTERCONNECT = 5;
+    GRIPPER = 6;
+}
+
+/**
+* Message contains information about a device - device type, device identifier, and the order of the device within the robot
+*/
+message DeviceHandle {
+    DeviceTypes device_type = 1;
+    uint32 device_identifier = 2; // Unique device identifier (used with other services)
+    uint32 order = 3; // Unique value indicating the order of that device versus the others to facilitate representation
+}
+
+/**
+ * list of possible safety statuses
+ */ 
+enum SafetyStatusValue {
+    UNSPECIFIED = 0;
+    WARNING = 1; //warning safety reached
+    ERROR = 2; //error safety reached
+    NORMAL = 3;  //safety is off
+}
+
+/**
+ * Enumeration used as bitfields wih permission field
+ */
+enum Permission {
+    NO_PERMISSION = 0;
+    READ_PERMISSION = 1; //refers to a user's capability to read the entity
+    UPDATE_PERMISSION = 2;//refers to a user's capability to write or modify the entity
+    DELETE_PERMISSION = 4; //refers to a user's capability to delete the entity
+}
+
+/**
+ * list of notification types
+ */
+enum NotificationType {
+    UNSPECIFIED_NOTIFICATION_TYPE = 0;
+    THRESHOLD = 1;
+    FIX_RATE = 2;
+    EVENT = 3;  //Event type. Only this one is supported for now
+}
+
+/**
+ * list of units used throughout API methods
+ */
+enum Unit {
+    UNSPECIFIED_UNIT = 0;
+    CELSIUS = 1;
+    AMPERE = 2;
+    VOLT = 3;
+    METER_PER_SECOND = 4;
+    DEGREE_PER_SECOND = 5;
+    METER_PER_SECOND_2 = 6;
+    DEGREE_PER_SECOND_2 = 7;
+    NEWTON = 8;
+    NEWTON_METER =9;
+    KILOGRAM = 10;
+    DEGREE = 11;
+    TICK = 12;
+    DEGREE_PER_MILLISECOND = 13;
+}
+
+/**
+ * Message used when no information needs to be exchanged between client application and robot, and vice versa
+ */
+message Empty {
+}
+
+/**
+ * Notification options
+ */
+message NotificationOptions {
+    NotificationType type = 1; //type of notification
+    uint32 rate_m_sec = 2;
+    float threshold_value = 3;
+}
+
+/**
+ * Handle to a safety
+ */
+message SafetyHandle {
+    uint32 identifier = 1;
+}
+
+/**
+ * Handle to a notification
+ */
+message NotificationHandle {
+    uint32 identifier = 1;
+}
+
+/**
+  * Message that contains a Safety event
+ */
+message SafetyNotification {
+    SafetyHandle safety_handle = 1; //safety handle
+    SafetyStatusValue value = 2; //new safety status
+    Timestamp timestamp = 3; //event timestamp
+    UserProfileHandle user_handle = 4; //user that caused the safety event
+    Connection connection = 5; // connection that caused the safety event
+}
+
+/**
+ * Timestamp based on epoch
+ */
+message Timestamp {
+    uint32 sec = 1; //epoch in seconds since 1970
+    uint32 usec = 2;//microseconds after the second (0-999999)
+}
+
+/**
+ * Handle to an existing User Profile.
+ */
+message UserProfileHandle {
+    uint32 identifier = 1; //User profile identifier
+    fixed32 permission = 2; //must use 'Permission' as bitwise
+}
+
+message Connection {
+    UserProfileHandle user_handle = 1;  //user profile handle, or set to zero if no user logged in
+    string connection_information = 2;  //connection info (ex. IP address with port number)
+    uint32 connection_identifier = 3;   //connection identifier
+}
+
+enum ArmState 
+{
+    UNSPECIFIED_ARM_STATE               = 0;
+    BASE_INITIALIZATION                 = 1; // Cannot be reported as the Base initialization must be completed before allowing user connection
+    IDLE                                = 2;
+    ARM_INITIALIZATION                  = 3;
+    ARM_IN_FAULT                        = 4;
+    ARM_MAINTENANCE                     = 5;
+    ARM_SERVOING_LOW_LEVEL              = 6; 
+    ARM_SERVOING_READY                  = 7;
+    ARM_SERVOING_PLAYING_SEQUENCE       = 8;
+    ARM_SERVOING_MANUALLY_CONTROLLED    = 9;
+    RESERVED                            = 255; // For debugging, this state must never be reported outside the base. this means that a state is not mapped correctly
+}

@@ -1,0 +1,8 @@
+
+uint32 UNSPECIFIED = 0
+
+uint32 WARNING = 1
+
+uint32 ERROR = 2
+
+uint32 NORMAL = 3

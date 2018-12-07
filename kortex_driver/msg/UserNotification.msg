@@ -1,0 +1,11 @@
+
+
+uint32 user_event
+
+UserProfileHandle modified_user
+
+Timestamp timestamp
+
+UserProfileHandle user_handle
+
+Connection connection

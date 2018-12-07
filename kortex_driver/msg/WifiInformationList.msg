@@ -1,0 +1,3 @@
+
+
+WifiInformation[] wifi_information_list

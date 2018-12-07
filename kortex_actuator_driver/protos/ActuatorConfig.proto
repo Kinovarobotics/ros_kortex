@@ -1,0 +1,235 @@
+syntax = "proto3";
+
+import public "Common.proto";
+
+package Kinova.Api.ActuatorConfig;
+
+service ActuatorConfig {//@PROXY_ID=10 @ERROR=Kinova.Api.Error
+    rpc GetAxisOffsets                          (Kinova.Api.Common.Empty)     returns (AxisOffsets);                 //@RPC_ID=1
+    rpc SetAxisOffsets                          (AxisPosition)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=2
+    rpc ReadTorqueCalibration                   (Kinova.Api.Common.Empty)     returns (TorqueCalibration);           //@RPC_ID=3
+    rpc WriteTorqueCalibration                  (TorqueCalibration)           returns (Kinova.Api.Common.Empty);     //@RPC_ID=4
+    rpc SetTorqueOffset                         (TorqueOffset)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=5
+    rpc GetControlMode                          (Kinova.Api.Common.Empty)     returns (ControlModeInformation);      //@RPC_ID=6
+    rpc SetControlMode                          (ControlModeInformation)      returns (Kinova.Api.Common.Empty);     //@RPC_ID=7
+    rpc GetActivatedControlLoop                 (Kinova.Api.Common.Empty)     returns (ControlLoop);                 //@RPC_ID=8
+    rpc SetActivatedControlLoop                 (ControlLoop)                 returns (Kinova.Api.Common.Empty);     //@RPC_ID=9
+    rpc GetVectorDriveParameters                (Kinova.Api.Common.Empty)     returns (VectorDriveParameters);       //@RPC_ID=10
+    rpc SetVectorDriveParameters                (VectorDriveParameters)       returns (Kinova.Api.Common.Empty);     //@RPC_ID=11
+    rpc GetEncoderDerivativeParameters          (Kinova.Api.Common.Empty)     returns (EncoderDerivativeParameters); //@RPC_ID=12
+    rpc SetEncoderDerivativeParameters          (EncoderDerivativeParameters) returns (Kinova.Api.Common.Empty);     //@RPC_ID=13
+    rpc GetControlLoopParameters                (LoopSelection)               returns (ControlLoopParameters);       //@RPC_ID=14
+    rpc SetControlLoopParameters                (ControlLoopParameters)       returns (Kinova.Api.Common.Empty);     //@RPC_ID=15
+    rpc StartFrequencyResponse                  (FrequencyResponse)           returns (Kinova.Api.Common.Empty);     //@RPC_ID=16
+    rpc StopFrequencyResponse                   (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=17
+    rpc StartStepResponse                       (StepResponse)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=18
+    rpc StopStepResponse                        (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=19
+    rpc StartRampResponse                       (RampResponse)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=20
+    rpc StopRampResponse                        (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=21
+    rpc SelectCustomData                        (CustomDataSelection)         returns (Kinova.Api.Common.Empty);     //@RPC_ID=22
+    rpc GetSelectedCustomData                   (Kinova.Api.Common.Empty)     returns (CustomDataSelection);         //@RPC_ID=23
+    rpc SetCommandMode                          (CommandModeInformation)      returns (Kinova.Api.Common.Empty);     //@RPC_ID=24
+    rpc ClearFaults                             (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=25
+    rpc SetServoing                             (Servoing)                    returns (Kinova.Api.Common.Empty);     //@RPC_ID=26
+    rpc MoveToPosition                          (PositionCommand)             returns (Kinova.Api.Common.Empty);     //@RPC_ID=27
+    rpc GetCommandMode                          (Kinova.Api.Common.Empty)     returns (CommandModeInformation);      //@RPC_ID=28
+    rpc GetServoing                             (Kinova.Api.Common.Empty)     returns (Servoing);                    //@RPC_ID=29
+    rpc GetTorqueOffset                         (Kinova.Api.Common.Empty)     returns (TorqueOffset);                //@RPC_ID=30
+}
+
+enum ServiceVersion
+{
+    RESERVED_0 = 0;                   // Reserved
+    CURRENT_VERSION = 1;              // Current Version
+}
+
+/** 
+ * list of limit types 
+ */
+enum SafetyLimitType
+{
+   MAXIMAL_LIMIT = 0;                 // Maximal limit
+   MINIMAL_LIMIT = 1;                 // Minimal limit
+}
+
+/** 
+ * list of control modes 
+ */
+enum ControlMode
+{
+    NONE     = 0;                     // None
+    POSITION = 1;                     // Position mode
+    VELOCITY = 2;                     // Velocity mode
+    TORQUE   = 3;                     // Torque mode
+    CURRENT  = 4;                     // Current mode
+    CUSTOM   = 5;                     // Custom mode
+}
+
+/** 
+ * list of command modes 
+ */
+enum CommandMode
+{
+    CYCLIC                                = 0; // Only cyclic data
+    ASYNC_CYCLIC_FLAGS                    = 1; // Not Supported
+    ASYNC                                 = 2; // Only asynchronous messages
+    CYCLIC_JITTERCOMPENSATED_POSITION     = 3; // Smoothing using only position inputs 
+    CYCLIC_JITTERCOMPENSATED_VELOCITY     = 4; // Smoothing using position and velocity inputs
+    CYCLIC_JITTERCOMPENSATED_ACCELERATION = 5; // Smoothing using position, velocity and acceleration inputs (not supported)
+}
+
+enum ControlLoopSelection
+{
+    RESERVED            = 0;
+    JOINT_POSITION      = 1;            // If available
+    MOTOR_POSITION      = 2;
+    JOINT_VELOCITY      = 4;            // If available
+    MOTOR_VELOCITY      = 8;
+    JOINT_TORQUE        = 16;
+    MOTOR_CURRENT       = 32;
+}
+
+message AxisPosition
+{
+    float position = 1;                // Axis position
+}
+
+message AxisOffsets
+{
+    float absolute_offset = 1;         // Absolute offset value
+    float relative_offset = 2;         // Relative offset value
+}
+
+message TorqueCalibration
+{
+    float    global_gain   = 1;        // Global gain value
+    float    global_offset = 2;        // Global offset value
+    repeated float gain    = 3;        // Gain (index 0 to 3)
+    repeated float offset  = 4;        // Offset (index 0 to 3)
+}
+
+message TorqueOffset
+{
+    float torque_offset = 1;           // Torque offset value
+}
+
+message ControlModeInformation
+{
+    ControlMode control_mode = 1;    // Control mode
+}
+
+/* Control loop bit mask :
+    Bit 0 : JOINT_POSITION     // If available
+    Bit 1 : MOTOR_POSITION
+    Bit 2 : JOINT_VELOCITY     // If available
+    Bit 3 : MOTOR_VELOCITY
+    Bit 4 : JOINT_TORQUE
+    Bit 5 : MOTOR_CURRENT
+ */
+message ControlLoop
+{
+    fixed32 control_loop = 1;         // Use ControlLoopSelection enum values to form bitmask
+}
+
+message LoopSelection
+{
+    ControlLoopSelection loop_selection = 1; // ControlLoopSelection enum
+}
+
+message VectorDriveParameters
+{
+    float kpq = 1;                   // Kpq
+    float kiq = 2;                   // Kiq
+    float kpd = 3;                   // Kpd
+    float kid = 4;                   // Kid
+}
+
+message EncoderDerivativeParameters
+{
+    uint32 max_window_width       = 1;  // Maximum window width
+    uint32 min_encoder_tick_count = 2;  // Minimum encoder tick count
+}
+
+message ControlLoopParameters
+{
+    ControlLoopSelection  loop_selection    = 1;   // ControlLoopSelection enum
+    float                 error_saturation  = 2;   // Error saturation value
+    float                 output_saturation = 3;   // Output saturation value
+    repeated              float kAz         = 4;   // KAz (index 0 to 4)
+    repeated              float kBz         = 5;   // KBz (index 0 to 5)
+}
+
+message FrequencyResponse
+{
+    ControlLoopSelection loop_selection = 1;       // ControlLoopSelection enum
+    float                min_frequency  = 2;       // Minimum frequency value
+    float                max_frequency  = 3;       // Maximum frequency value
+    float                amplitude      = 4;       // Amplitude value
+    float                duration       = 5;       // Duration in seconds
+}
+
+message StepResponse
+{
+    ControlLoopSelection loop_selection = 1;       // ControlLoopSelection enum
+    float                amplitude      = 2;       // Amplitude value
+    float                step_delay     = 3;       // Step delay value
+    float                duration       = 4;       // Duration in seconds
+}
+
+message RampResponse
+{
+    ControlLoopSelection loop_selection = 1;       // ControlLoopSelection enum
+    float                slope          = 2;       // Slope value
+    float                ramp_delay     = 3;       // Ramp delay value
+    float                duration       = 4;       // Duration in seconds
+}
+
+message CustomDataSelection
+{
+    repeated uint32 channel = 1;     // 16 channels maximum
+}
+
+message CommandModeInformation
+{
+    CommandMode command_mode = 1;    // Command mode
+}
+
+message Servoing
+{
+    bool enabled = 1;                // Servoing enabled
+}
+
+message PositionCommand
+{
+    float position     = 1;          // Position value
+    float velocity     = 2;          // Velocity value
+    float acceleration = 3;          // Acceleration value
+}
+
+enum SafetyIdentifier {
+    UNSPECIFIED_ACTUATOR_SAFETY_IDENTIFIER  = 0;       //0x0 
+    FOLLOWING_ERROR                         = 1;       //0x1
+    MAXIMUM_VELOCITY                        = 2;       //0x2 
+    JOINT_LIMIT_HIGH                        = 4;       //0x4 
+    JOINT_LIMIT_LOW                         = 8;       //0x8
+    STRAIN_GAUGE_MISMATCH                   = 16;      //0x10 
+    MAXIMUM_TORQUE                          = 32;      //0x20
+    UNRELIABLE_ABSOLUTE_POSITION            = 64;      //0x40
+    MAGNETIC_POSITION                       = 128;     //0x80
+    HALL_POSITION                           = 256;     //0x100
+    HALL_SEQUENCE                           = 512;     //0x200
+    INPUT_ENCODER_HALL_MISMATCH             = 1024;    //0x400
+    INPUT_ENCODER_INDEX_MISMATCH            = 2048;    //0x800
+    INPUT_ENCODER_MAGNETIC_MISMATCH         = 4096;    //0x1000
+    MAXIMUM_MOTOR_CURRENT                   = 8192;    //0x2000
+    MOTOR_CURRENT_MISMATCH                  = 16384;   //0x4000
+    MAXIMUM_VOLTAGE                         = 32768;   //0x8000
+    MINIMUM_VOLTAGE                         = 65536;   //0x10000
+    MAXIMUM_MOTOR_TEMPERATURE               = 131072;  //0x20000
+    MAXIMUM_CORE_TEMPERATURE                = 262144;  //0x40000
+    NON_VOLATILE_MEMORY_CORRUPTED           = 524288;  //0x80000
+    MOTOR_DRIVER_FAULT                      = 1048576; //0x100000
+    EMERGENCY_LINE_ASSERTED                 = 2097152; //0x200000
+    COMMUNICATION_TICK_LOST                 = 4194304; //0x400000
+    WATCHDOG_TRIGGERED                      = 8388608; //0x800000
+}

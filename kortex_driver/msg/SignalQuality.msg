@@ -1,0 +1,12 @@
+
+uint32 UNSPECIFIED_SIGNAL_QUALITY = 0
+
+uint32 POOR = 1
+
+uint32 FAIR = 2
+
+uint32 GOOD = 3
+
+uint32 EXCELLENT = 4
+
+uint32 NONE = 5

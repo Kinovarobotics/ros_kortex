@@ -1,0 +1,14 @@
+
+uint32 UNSPECIFIED_SEQUENCE_EVENT = 0
+
+uint32 END = 1
+
+uint32 ABORT = 2
+
+uint32 PAUSE = 3
+
+uint32 TASK_START = 4
+
+uint32 TASK_END = 5
+
+uint32 START = 6

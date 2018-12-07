@@ -1,0 +1,8 @@
+
+uint32 UNSPECIFIED_GPIO_STATE = 0
+
+uint32 GPIO_OFF = 1
+
+uint32 GPIO_PULSE = 2
+
+uint32 GPIO_ON = 3

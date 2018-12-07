@@ -1,0 +1,4 @@
+Kinova.Api.Common.DeviceTypes       long_names:false
+Kinova.Api.Common.SafetyStatusValue long_names:false
+Kinova.Api.Common.NotificationType  long_names:false
+Kinova.Api.Common.Unit              long_names:false

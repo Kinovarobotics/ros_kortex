@@ -1,0 +1,5 @@
+
+
+UserProfileHandle user_handle 
+string connection_information 
+uint32 connection_identifier

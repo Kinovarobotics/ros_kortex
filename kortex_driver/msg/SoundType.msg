@@ -1,0 +1,6 @@
+
+uint32 UNSPECIFIED_SOUND_TYPE = 0
+
+uint32 BIP_SERIES = 1
+
+uint32 SINGLE_BIP = 2

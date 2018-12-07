@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+import public "Common.proto";
+
+package Kinova.Api.ActuatorCyclic;
+
+/** 
+ * List of services available via remote procedure call 
+ */
+service ActuatorCyclic {//@PROXY_ID=11 @ERROR=Kinova.Api.Error
+
+// Commands refresh (with feedback)
+    rpc Refresh           (Command)                 returns (Feedback);                //@RPC_ID=1
+
+// Commands refresh (no feedback)
+    rpc RefreshCommand    (Command)                 returns (Kinova.Api.Common.Empty); //@RPC_ID=2
+
+// Gets feedback
+    rpc RefreshFeedback   (MessageId)  returns (Feedback);   //@RPC_ID=3
+
+// Gets custom data
+    rpc RefreshCustomData (MessageId)  returns (CustomData); //@RPC_ID=4
+}
+
+enum ServiceVersion {
+    RESERVED_0 = 0;                 // Reserved
+    CURRENT_VERSION = 1;            // Current Service Version
+}
+
+message MessageId {
+    fixed32 identifier      = 1;      // Message ID (first 2 bytes : device ID, last 2 bytes : sequence number)
+}
+
+message Command {
+    MessageId command_id  = 1;      // MessageId
+    fixed32 flags         = 2;      // Flags
+    float   position      = 3;      // Desired position of the actuator in °
+    float   velocity      = 4;      // Desired velocity of the actuator in °/s
+    float   torque_joint  = 5;      // Desired torque of the actuator in N·m
+    float   current_motor = 6;      // Desired current of the motor in A
+}
+
+message Feedback {
+    MessageId feedback_id       = 1;  // MessageId
+    fixed32   status_flags      = 2;  // Status flags
+    fixed32 jitter_comm       = 3;  // Jitter from the communication in μs
+    float   position          = 4;  // Position of the actuator in °
+    float   velocity          = 5;  // Angular velocity of the actuator in °/s
+    float   torque            = 6;  // Torque of the actuator in N·m
+    float   current_motor     = 7;  // Current of the motor in A
+    float   voltage           = 8;  // Voltage of the main board in V
+    float   temperature_motor = 9;  // Motor temperature (average of the three (3) temperatures in °C)
+    float   temperature_core  = 10; // Microcontroller temperature in °C
+    fixed32 fault_bank_a      = 11; // Bank A Fault (see ActuatorConfig.SafetyIdentifier)
+    fixed32 fault_bank_b      = 12; // Bank B Fault (see ActuatorConfig.SafetyIdentifier)
+    fixed32 warning_bank_a    = 13; // Bank A Warning (see ActuatorConfig.SafetyIdentifier)
+    fixed32 warning_bank_b    = 14; // Bank B Warning (see ActuatorConfig.SafetyIdentifier)
+}
+
+message CustomData {
+    MessageId custom_data_id    = 1;  // MessageId
+    fixed32   custom_data_0     = 2;  // Custom data word 0
+    fixed32   custom_data_1     = 3;  // Custom data word 1
+    fixed32   custom_data_2     = 4;  // Custom data word 2
+    fixed32   custom_data_3     = 5;  // Custom data word 3
+    fixed32   custom_data_4     = 6;  // Custom data word 4
+    fixed32   custom_data_5     = 7;  // Custom data word 5
+    fixed32   custom_data_6     = 8;  // Custom data word 6
+    fixed32   custom_data_7     = 9;  // Custom data word 7
+    fixed32   custom_data_8     = 10; // Custom data word 8
+    fixed32   custom_data_9     = 11; // Custom data word 9
+    fixed32   custom_data_10    = 12; // Custom data word 10
+    fixed32   custom_data_11    = 13; // Custom data word 11
+    fixed32   custom_data_12    = 14; // Custom data word 12
+    fixed32   custom_data_13    = 15; // Custom data word 13
+    fixed32   custom_data_14    = 16; // Custom data word 14
+    fixed32   custom_data_15    = 17; // Custom data word 15
+}

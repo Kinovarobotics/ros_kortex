@@ -1,0 +1,8 @@
+
+uint32 UNSPECIFIED_LED_STATE = 0
+
+uint32 LED_OFF = 1
+
+uint32 LED_PULSE = 2
+
+uint32 LED_ON = 3

@@ -1,0 +1,10 @@
+
+uint32 UNSPECIFIED_NAVIGATION_DIRECTION = 0
+
+uint32 NEXT = 1
+
+uint32 UP = 2
+
+uint32 DOWN = 3
+
+uint32 PREVIOUS = 4
