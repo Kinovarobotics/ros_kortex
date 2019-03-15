@@ -1,88 +1,114 @@
-# ROS KORTEX
-The official ROS package to interact with Kortex and its related products. It is built on top of the Kortex API. Documentation of the Kortex API can be found in the Kortex [repository](https://github.com/Kinovarobotics/kortex).
-
+<!-- 
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed under the 
+ * terms of the BSD 3-Clause license. 
+ *
+ * Refer to the LICENSE file for details.
+ *
+ * -->
+# Kortex Examples
 
 <!-- MarkdownTOC -->
 
-1. [Content](#content)
-    1. [kortex driver](#kortex-driver)
-    1. [kortex actuator](#kortex-actuator)
-    1. [kortex device manager](#kortex-device-manager)
-    1. [kortex vision module driver](#kortex-vision-module-driver)
-    1. [kortex examples](#kortex-examples)
-    1. [kortex description](#kortex-description)
-    1. [kortex api](#kortex-api)
-1. [Setup](#setup)
-    1. [Install protobuf](#install-protobuf)
-1. [kortex gazebo](#kortex-gazebo)
-1. [kortex moveit](#kortex-moveit)
+1. [Get control loop parameters](#get-control-loop-parameters)
+1. [Set control loop parameters](#set-control-loop-parameters)
+1. [Play cartesian](#play-cartesian)
+1. [Play cartesian position](#play-cartesian-position)
+1. [Get sensor settings](#get-sensor-settings)
+1. [Read all devices](#read-all-devices)
 
 <!-- /MarkdownTOC -->
 
-<a id="content"></a>
-## Content
-<a id="kortex-driver"></a>
-### kortex driver
-This package is a ROS node that allows communication with a robotic base from a Gen3 robot. For more details, please read the [documentation](kortex_driver/readme.md) from inside the package. Use this package if you want to:
 
-* Change some basic configuration on the robot.
-* Move the robot in the Cartesian space.
-* Move the robot in the Joint space.
-* Activate the admittance mode.
-* Move the robot using the **LOW\_LEVEL**\ (1 KHz\) control mode.
-* Move the robot using the **LOW\_LEVEL\_BYPASS**\ mode.
-* Access the cyclic data sporadically.
+<a id="get-control-loop-parameters"></a>
+## Get control loop parameters
+<p>
+Gets the control loop parameters from an actuator that is part of a Gen3 robot. 
+</p>
 
-<a id="kortex-actuator"></a>
-### kortex actuator
-This package is a ROS node that allows a direct communication with a Gen3 actuator. A direct communication means that either the computer that is running the node has direct IP connectivity with the actuator or is connected to a robot and using the device routing system to reach the actuator. A more detailed [documentation](kortex_actuator_driver/readme.md) can be found inside the package. Use this package if you want to:
+To run this example, those node need to be running:
+> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
+> - kortex\_actuator\_driver (**rosrun kortex\_actuator\_driver kortex\_actuator\_driver 192.168.1.10 100**)
 
-* Change an advance configuration setting on an actuator.
-* Move an actuator using the cyclic data (1 KHz).
+\* Note here that the address **192.168.1.10** is the default IP address of a robot but you can put any IP address that suits your need.
 
-<a id="kortex-device-manager"></a>
-### kortex device manager
-This package is a ROS node that allows basic communication with every devices supported by the kortex framework. A more detailed [documentation](kortex_device_manager/readme.md) can be found inside the package. Use this package if you want to:
+To run the example:
 
-* List all the devices available on a specific Gen3 robot.
-* Retrieve some generic informations on a specific device.
-* Get the firmware version of a specific device.
-* Get the serial number of a device.
-* Set IPv4 settings on a device.
-* Get safety informations of a device.
+<code>rosrun kortex_examples GetControlLoopParameters</code>
 
-<a id="kortex-vision-module-driver"></a>
-### kortex vision module driver
-This package is a ROS node that allows direct communication with a Gen3 vision module. A direct communication means that either the computer running the node has an ethernet cable directly connected to a vision module or that it is connected to a robot using the device routing system. A more detailed [documentation](kortex_vision_config_driver/readme.md) can be found inside the package. Use this package if you want to:
+<a id="set-control-loop-parameters"></a>
+## Set control loop parameters
+<p>
+Sets the control loop parameters from an actuator that is part of a Gen3 robot. 
+</p>
 
-* Change a configuration setting on a vision module.
-* Get informations about the configuration settings of a vision module.
+This example needs those node to be running:
+> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
+> - kortex\_actuator\_driver (**rosrun kortex\_actuator\_driver kortex\_actuator\_driver 192.168.1.10 100**)
 
-<a id="kortex-examples"></a>
-### kortex examples
-This package holds all the examples needed to understands that basics of ros_kortex. All examples are written in both c++ and python. A more detailed [documentation](kortex_examples/readme.md) can be found inside the package.
+\* Note here that the address **192.168.1.10** is the default IP address of a robot but you can put any IP address that suits your need.
 
-<a id="kortex-description"></a>
-### kortex description
-This package contains the URDF and the STL of a complete Gen3 robot. A more detailed [documentation](kortex_description/readme.md) can be found inside the package.
+<code>rosrun kortex_examples SetControlLoopParameters</code>
 
-<a id="kortex-api"></a>
-### kortex api
-This package contains all the header files and the libraries needed by the kortex C++ API. A more detailed [documentation](kortex_api/readme.md) can be found inside the package.
+<a id="play-cartesian"></a>
+## Play cartesian
+<p>
+Move the end effector of a Gen3 robot in the Z axix by +0,1 meter and rotate around the THETA Z by +60°. 
+</p>
 
-<a id="setup"></a>
-## Setup
-<a id="install-protobuf"></a>
-### Install protobuf
-Protobuf compiler is needed if you want to re-generate the code of a package.
+To run this example, those node need to be running:
+> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
+> - kortex\_driver (**rosrun kortex\_driver kortex\_driver 192.168.1.10 100**)
 
-1. git clone https://github.com/protocolbuffers/protobuf --branch 3.5.1.1   (you absolutely need to use this specific version)
-2. Follow these [instructions](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md) to build and install protobuf and its compiler. 
+\* Note here that the address **192.168.1.10** is the default IP address of a robot but you can put any IP address that suits your need.
 
-<a id="kortex-gazebo"></a>
-## kortex gazebo
-This package is not completed yet but will be available in a future version.
+To run the example:
 
-<a id="kortex-moveit"></a>
-## kortex moveit
-This package is not completed yet but will be available in a future version.
+<code>rosrun kortex_examples PlayCartesian</code>
+
+<a id="play-cartesian-position"></a>
+## Play cartesian position
+
+<p>
+Move the end effector of a Gen3 robot in the Z axix by +0,1. 
+</p>
+
+To run this example, those node need to be running:
+> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
+> - kortex\_driver (**rosrun kortex\_driver kortex\_driver 192.168.1.10 100**)
+
+\* Note here that the address **192.168.1.10** is the default IP address of a robot but you can put any IP address that suits your need.
+
+To run the example:
+
+<code>rosrun kortex_examples PlayCartesianPosition</code>
+
+<a id="get-sensor-settings"></a>
+## Get sensor settings
+<p>
+	Gets the settings of all the sensors from a vision module. In this example, we assume that the targeted vision module is part of a robot and to you want to communicate with through the robot's base using the device routing feature.
+</p>
+
+To run this example, those node need to be running:
+> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
+> - kortex\_vision\_config\_driver (**rosrun kortex\_vision\_config\_driver kortex\_vision\_config\_driver 192.168.1.10**)
+
+Then to run it:
+
+<code>rosrun kortex_examples GetSensorSettings</code>
+
+<a id="read-all-devices"></a>
+## Read all devices
+<p>
+	Get a list of all the devices available on a Gen3 robot's base. This example is useful when you want to communicate with a device that is a part of a robot using the device routin feature.
+</p>
+
+To run this example, those node need to be running:
+> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
+
+Then to run it:
+
+<code>rosrun kortex_examples ReadAllDevices</code>
+
+
