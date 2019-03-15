@@ -25,7 +25,7 @@ def PlayCartesian_client():
         current_theta_y = current_feedback.output.base.tool_pose_theta_y
         current_theta_z = current_feedback.output.base.tool_pose_theta_z
 
-        //Creating our next target (a Cartesian pose)
+        #Creating our next target (a Cartesian pose)
         request.input.target_pose.x = current_x
         request.input.target_pose.y = current_y
         request.input.target_pose.z = current_z + 0.1
@@ -43,7 +43,7 @@ def PlayCartesian_client():
         function_PlayCartesianTrajectory(request)
         
     except rospy.ServiceException as e:
-        print "Service call failed: %s"%e
+        print ("Service call failed: %s"%e)
 
 if __name__ == "__main__":
     PlayCartesian_client()
