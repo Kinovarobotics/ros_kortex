@@ -43,7 +43,7 @@ def PlayCartesian_client():
         function_PlayCartesianTrajectory(request)
         
     except rospy.ServiceException as e:
-        print "Service call failed: %s"%e
+        print ("Service call failed: %s"%e)
 
 if __name__ == "__main__":
     PlayCartesian_client()
