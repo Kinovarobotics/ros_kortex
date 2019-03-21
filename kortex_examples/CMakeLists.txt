@@ -22,19 +22,25 @@ include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/common)
 include_directories(include ${PROJECT_SOURCE_DIR}/src/util)
 
 add_executable(PlayCartesian cpp/example_play_cartesian.cpp)
+add_dependencies(PlayCartesian ${catkin_EXPORTED_TARGETS})
 target_link_libraries(PlayCartesian ${catkin_LIBRARIES} )
 
 add_executable(PlayCartesianPosition cpp/example_play_cartesian_position.cpp)
+add_dependencies(PlayCartesianPosition ${catkin_EXPORTED_TARGETS})
 target_link_libraries(PlayCartesianPosition ${catkin_LIBRARIES} )
 
 add_executable(GetControlLoopParameters cpp/example_get_control_loop_parameters.cpp)
+add_dependencies(GetControlLoopParameters ${catkin_EXPORTED_TARGETS})
 target_link_libraries(GetControlLoopParameters ${catkin_LIBRARIES} )
 
 add_executable(SetControlLoopParameters cpp/example_set_control_loop_parameters.cpp)
+add_dependencies(SetControlLoopParameters ${catkin_EXPORTED_TARGETS})
 target_link_libraries(SetControlLoopParameters ${catkin_LIBRARIES} )
 
 add_executable(GetSensorSettings cpp/example_get_sensor_settings.cpp)
+add_dependencies(GetSensorSettings ${catkin_EXPORTED_TARGETS})
 target_link_libraries(GetSensorSettings ${catkin_LIBRARIES} )
 
 add_executable(ReadAllDevices cpp/example_read_all_devices.cpp)
+add_dependencies(ReadAllDevices ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ReadAllDevices ${catkin_LIBRARIES} )
