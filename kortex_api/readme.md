@@ -26,7 +26,7 @@ This package contains all the C++ files used by the driver nodes and the device 
 ## Install C++ Kortex API and dependencies
 
 > *Manual installation using downloaded archive:*  
-> + Download the archive via the [Kinova drive](https://drive.google.com/file/d/19zfCNlRUfNBbZoMW9LOpLjVrYOO2BwYb/view).
+> + Download the archive via the [Kinova drive](https://drive.google.com/file/d/1ASbEsulf5cByru8Hy1oBZJyNDBa9H22C/view).
 > + Uncompress the content of the archive and copy the content of <br>/kortex_api/cpp/linux_x86/include/ and /kortex_api/cpp/linux_x86/lib/ <br> to<br> kortex_api/include/ and kortex_api/lib/<br> respectively.
 > + Delete the directory /kortex_api/include/google/
 
