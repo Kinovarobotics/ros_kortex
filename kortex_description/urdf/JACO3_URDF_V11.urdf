@@ -22,7 +22,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/base_link.STL" />
+          filename="package://kortex_description/meshes/base_link.STL" />
       </geometry>
       <material
         name="">
@@ -36,7 +36,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/base_link.STL" />
+          filename="package://kortex_description/meshes/base_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -62,7 +62,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/Shoulder_Link.STL" />
+          filename="package://kortex_description/meshes/Shoulder_Link.STL" />
       </geometry>
       <material
         name="">
@@ -76,7 +76,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/Shoulder_Link.STL" />
+          filename="package://kortex_description/meshes/Shoulder_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -118,7 +118,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/HalfArm1_Link.STL" />
+          filename="package://kortex_description/meshes/HalfArm1_Link.STL" />
       </geometry>
       <material
         name="">
@@ -132,7 +132,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/HalfArm1_Link.STL" />
+          filename="package://kortex_description/meshes/HalfArm1_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -176,7 +176,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/HalfArm2_Link.STL" />
+          filename="package://kortex_description/meshes/HalfArm2_Link.STL" />
       </geometry>
       <material
         name="">
@@ -190,7 +190,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/HalfArm2_Link.STL" />
+          filename="package://kortex_description/meshes/HalfArm2_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -232,7 +232,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/ForeArm_Link.STL" />
+          filename="package://kortex_description/meshes/ForeArm_Link.STL" />
       </geometry>
       <material
         name="">
@@ -246,7 +246,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/ForeArm_Link.STL" />
+          filename="package://kortex_description/meshes/ForeArm_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -290,7 +290,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/SphericalWrist1_Link.STL" />
+          filename="package://kortex_description/meshes/SphericalWrist1_Link.STL" />
       </geometry>
       <material
         name="">
@@ -304,7 +304,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/SphericalWrist1_Link.STL" />
+          filename="package://kortex_description/meshes/SphericalWrist1_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -346,7 +346,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/SphericalWrist2_Link.STL" />
+          filename="package://kortex_description/meshes/SphericalWrist2_Link.STL" />
       </geometry>
       <material
         name="">
@@ -360,7 +360,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/SphericalWrist2_Link.STL" />
+          filename="package://kortex_description/meshes/SphericalWrist2_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -404,7 +404,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/Bracelet_Link.STL" />
+          filename="package://kortex_description/meshes/Bracelet_Link.STL" />
       </geometry>
       <material
         name="">
@@ -418,7 +418,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/Bracelet_Link.STL" />
+          filename="package://kortex_description/meshes/Bracelet_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -460,7 +460,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/EndEffector_Link.STL" />
+          filename="package://kortex_description/meshes/EndEffector_Link.STL" />
       </geometry>
       <material
         name="">
@@ -474,7 +474,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V11/meshes/EndEffector_Link.STL" />
+          filename="package://kortex_description/meshes/EndEffector_Link.STL" />
       </geometry>
     </collision>
   </link>

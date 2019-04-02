@@ -1,5 +1,5 @@
 <package>
-  <name>JACO3_URDF_V11</name>
+  <name>kortex_description</name>
   <version>1.0.0</version>
   <description>
     <p>URDF Description package for JACO3_URDF_V11</p>

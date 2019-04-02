@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 
-project(JACO3_URDF_V11)
+project(kortex_description)
 
 find_package(catkin REQUIRED)
 
