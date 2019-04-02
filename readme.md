@@ -52,6 +52,13 @@ The protobuf compiler is required if you need to re-generate the original packag
 1. git clone https://github.com/protocolbuffers/protobuf --branch 3.5.1.1   (you must use this specific version)
 2. Follow these [instructions](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md) to build and install protobuf and its compiler. 
 
+### Download the API and extract it to the kortex_api/include and kortex_api/lib folders
+The build.sh script automates this process. To launch it, go to the root of your catkin_workspace and execute :
+```./src/ros_kortex/build.sh```
+This will download the API, unzip it to the right folder and build the project with ```catkin_make```.
+
+You can also download and unzip the API manually by following these [instructions](kortex_api/readme.md).
+
 ## kortex gazebo
 This package is not completed yet but will be available in a future version.
 
