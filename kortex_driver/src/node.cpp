@@ -32,7 +32,8 @@ BaseServices::BaseServices(char* ip, ros::NodeHandle& n) : m_n(n)
 	m_apiOptions.timeout_ms = 3000;
 
 	m_basecyclic = new BaseCyclic::BaseCyclicClient(m_router);
-	m_base = new Base::BaseClient(m_router);m_SessionManager = new SessionManager(m_router);
+	m_base = new Base::BaseClient(m_router);
+	m_SessionManager = new SessionManager(m_router);
 	auto createSessionInfo = Kinova::Api::Session::CreateSessionInfo();
 
 	createSessionInfo.set_username("admin");
@@ -1913,7 +1914,7 @@ bool BaseServices::Unsubscribe(kortex_driver::Unsubscribe::Request  &req, kortex
 	return true;
 }
 
-bool BaseServices::OnNotificationConfigurationChangeTopic(kortex_driver::ConfigurationChangeTopic::Request  &req, kortex_driver::ConfigurationChangeTopic::Response &res)
+bool BaseServices::OnNotificationConfigurationChangeTopic(kortex_driver::OnNotificationConfigurationChangeTopic::Request  &req, kortex_driver::OnNotificationConfigurationChangeTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -1953,7 +1954,7 @@ void BaseServices::cb_ConfigurationChangeTopic(Base::ConfigurationChangeNotifica
 	m_pub_ConfigurationChangeTopic.publish(ros_msg);
 }
 
-bool BaseServices::OnNotificationMappingInfoTopic(kortex_driver::MappingInfoTopic::Request  &req, kortex_driver::MappingInfoTopic::Response &res)
+bool BaseServices::OnNotificationMappingInfoTopic(kortex_driver::OnNotificationMappingInfoTopic::Request  &req, kortex_driver::OnNotificationMappingInfoTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -1993,7 +1994,7 @@ void BaseServices::cb_MappingInfoTopic(Base::MappingInfoNotification notif)
 	m_pub_MappingInfoTopic.publish(ros_msg);
 }
 
-bool BaseServices::OnNotificationControlModeTopic(kortex_driver::ControlModeTopic::Request  &req, kortex_driver::ControlModeTopic::Response &res)
+bool BaseServices::OnNotificationControlModeTopic(kortex_driver::OnNotificationControlModeTopic::Request  &req, kortex_driver::OnNotificationControlModeTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -2033,7 +2034,7 @@ void BaseServices::cb_ControlModeTopic(Base::ControlModeNotification notif)
 	m_pub_ControlModeTopic.publish(ros_msg);
 }
 
-bool BaseServices::OnNotificationOperatingModeTopic(kortex_driver::OperatingModeTopic::Request  &req, kortex_driver::OperatingModeTopic::Response &res)
+bool BaseServices::OnNotificationOperatingModeTopic(kortex_driver::OnNotificationOperatingModeTopic::Request  &req, kortex_driver::OnNotificationOperatingModeTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -2073,7 +2074,7 @@ void BaseServices::cb_OperatingModeTopic(Base::OperatingModeNotification notif)
 	m_pub_OperatingModeTopic.publish(ros_msg);
 }
 
-bool BaseServices::OnNotificationSequenceInfoTopic(kortex_driver::SequenceInfoTopic::Request  &req, kortex_driver::SequenceInfoTopic::Response &res)
+bool BaseServices::OnNotificationSequenceInfoTopic(kortex_driver::OnNotificationSequenceInfoTopic::Request  &req, kortex_driver::OnNotificationSequenceInfoTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -2113,7 +2114,7 @@ void BaseServices::cb_SequenceInfoTopic(Base::SequenceInfoNotification notif)
 	m_pub_SequenceInfoTopic.publish(ros_msg);
 }
 
-bool BaseServices::OnNotificationProtectionZoneTopic(kortex_driver::ProtectionZoneTopic::Request  &req, kortex_driver::ProtectionZoneTopic::Response &res)
+bool BaseServices::OnNotificationProtectionZoneTopic(kortex_driver::OnNotificationProtectionZoneTopic::Request  &req, kortex_driver::OnNotificationProtectionZoneTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -2153,7 +2154,7 @@ void BaseServices::cb_ProtectionZoneTopic(Base::ProtectionZoneNotification notif
 	m_pub_ProtectionZoneTopic.publish(ros_msg);
 }
 
-bool BaseServices::OnNotificationUserTopic(kortex_driver::UserTopic::Request  &req, kortex_driver::UserTopic::Response &res)
+bool BaseServices::OnNotificationUserTopic(kortex_driver::OnNotificationUserTopic::Request  &req, kortex_driver::OnNotificationUserTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -2193,7 +2194,7 @@ void BaseServices::cb_UserTopic(Base::UserNotification notif)
 	m_pub_UserTopic.publish(ros_msg);
 }
 
-bool BaseServices::OnNotificationControllerTopic(kortex_driver::ControllerTopic::Request  &req, kortex_driver::ControllerTopic::Response &res)
+bool BaseServices::OnNotificationControllerTopic(kortex_driver::OnNotificationControllerTopic::Request  &req, kortex_driver::OnNotificationControllerTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -2233,7 +2234,7 @@ void BaseServices::cb_ControllerTopic(Base::ControllerNotification notif)
 	m_pub_ControllerTopic.publish(ros_msg);
 }
 
-bool BaseServices::OnNotificationActionTopic(kortex_driver::ActionTopic::Request  &req, kortex_driver::ActionTopic::Response &res)
+bool BaseServices::OnNotificationActionTopic(kortex_driver::OnNotificationActionTopic::Request  &req, kortex_driver::OnNotificationActionTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -2273,7 +2274,7 @@ void BaseServices::cb_ActionTopic(Base::ActionNotification notif)
 	m_pub_ActionTopic.publish(ros_msg);
 }
 
-bool BaseServices::OnNotificationRobotEventTopic(kortex_driver::RobotEventTopic::Request  &req, kortex_driver::RobotEventTopic::Response &res)
+bool BaseServices::OnNotificationRobotEventTopic(kortex_driver::OnNotificationRobotEventTopic::Request  &req, kortex_driver::OnNotificationRobotEventTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -3367,7 +3368,7 @@ bool BaseServices::GetServoingMode(kortex_driver::GetServoingMode::Request  &req
 	return true;
 }
 
-bool BaseServices::OnNotificationServoingModeTopic(kortex_driver::ServoingModeTopic::Request  &req, kortex_driver::ServoingModeTopic::Response &res)
+bool BaseServices::OnNotificationServoingModeTopic(kortex_driver::OnNotificationServoingModeTopic::Request  &req, kortex_driver::OnNotificationServoingModeTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -3598,7 +3599,7 @@ bool BaseServices::Reboot(kortex_driver::Reboot::Request  &req, kortex_driver::R
 	return true;
 }
 
-bool BaseServices::OnNotificationFactoryTopic(kortex_driver::FactoryTopic::Request  &req, kortex_driver::FactoryTopic::Response &res)
+bool BaseServices::OnNotificationFactoryTopic(kortex_driver::OnNotificationFactoryTopic::Request  &req, kortex_driver::OnNotificationFactoryTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -3799,7 +3800,7 @@ bool BaseServices::GetConfiguredWifi(kortex_driver::GetConfiguredWifi::Request  
 	return true;
 }
 
-bool BaseServices::OnNotificationNetworkTopic(kortex_driver::NetworkTopic::Request  &req, kortex_driver::NetworkTopic::Response &res)
+bool BaseServices::OnNotificationNetworkTopic(kortex_driver::OnNotificationNetworkTopic::Request  &req, kortex_driver::OnNotificationNetworkTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -3871,7 +3872,7 @@ bool BaseServices::GetArmState(kortex_driver::GetArmState::Request  &req, kortex
 	return true;
 }
 
-bool BaseServices::OnNotificationArmStateTopic(kortex_driver::ArmStateTopic::Request  &req, kortex_driver::ArmStateTopic::Response &res)
+bool BaseServices::OnNotificationArmStateTopic(kortex_driver::OnNotificationArmStateTopic::Request  &req, kortex_driver::OnNotificationArmStateTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -3921,6 +3922,70 @@ bool BaseServices::GetIPv4Information(kortex_driver::GetIPv4Information::Request
 	try
 	{
 		output = m_base->GetIPv4Information(input, m_CurrentDeviceID, m_apiOptions);
+	}
+	catch (KDetailedException& ex)
+
+
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::SetCountryCode(kortex_driver::SetCountryCode::Request  &req, kortex_driver::SetCountryCode::Response &res)
+{
+	CountryCode input;
+	ToProtoData(req.input, &input);
+	Empty output;
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->SetCountryCode(input, m_CurrentDeviceID, m_apiOptions);
+	}
+	catch (KDetailedException& ex)
+
+
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::GetCountryCode(kortex_driver::GetCountryCode::Request  &req, kortex_driver::GetCountryCode::Response &res)
+{
+	Empty input;
+	CountryCode output;
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->GetCountryCode(m_CurrentDeviceID, m_apiOptions);
 	}
 	catch (KDetailedException& ex)
 

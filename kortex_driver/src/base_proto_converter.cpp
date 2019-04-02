@@ -1225,3 +1225,9 @@ int ToProtoData(kortex_driver::ArmStateNotification input, ArmStateNotification 
 
 	return 0;
 }
+int ToProtoData(kortex_driver::CountryCode input, CountryCode *output)
+{
+	output->set_identifier((Kinova::Api::Base::CountryCodeIdentifier)input.identifier);
+
+	return 0;
+}

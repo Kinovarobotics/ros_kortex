@@ -170,6 +170,7 @@
 #include "kortex_driver/ActuatorInformation.h"
 #include "kortex_driver/ArmStateInformation.h"
 #include "kortex_driver/ArmStateNotification.h"
+#include "kortex_driver/CountryCode.h"
 
 
 using namespace Kinova::Api::Base;
@@ -304,5 +305,6 @@ int ToProtoData(kortex_driver::SystemTime intput, SystemTime *output);
 int ToProtoData(kortex_driver::ActuatorInformation intput, ActuatorInformation *output);
 int ToProtoData(kortex_driver::ArmStateInformation intput, ArmStateInformation *output);
 int ToProtoData(kortex_driver::ArmStateNotification intput, ArmStateNotification *output);
+int ToProtoData(kortex_driver::CountryCode intput, CountryCode *output);
 
 #endif

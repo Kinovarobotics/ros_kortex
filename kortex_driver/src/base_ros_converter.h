@@ -170,6 +170,7 @@
 #include "kortex_driver/ActuatorInformation.h"
 #include "kortex_driver/ArmStateInformation.h"
 #include "kortex_driver/ArmStateNotification.h"
+#include "kortex_driver/CountryCode.h"
 
 
 using namespace Kinova::Api::Base;
@@ -304,5 +305,6 @@ int ToRosData(SystemTime input, kortex_driver::SystemTime &output);
 int ToRosData(ActuatorInformation input, kortex_driver::ActuatorInformation &output);
 int ToRosData(ArmStateInformation input, kortex_driver::ArmStateInformation &output);
 int ToRosData(ArmStateNotification input, kortex_driver::ArmStateNotification &output);
+int ToRosData(CountryCode input, kortex_driver::CountryCode &output);
 
 #endif

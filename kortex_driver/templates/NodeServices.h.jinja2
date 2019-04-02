@@ -47,7 +47,12 @@
 
 {%- for package in detailedPackages %}
 {%- for method in package.service.method %}
+{%- if 'Topic' in method.name %}
+#include "kortex_driver/OnNotification{{method.name}}.h"
+#include "kortex_driver/{{method.name|replace("Topic", "")}}Notification.h"
+{%- else %}
 #include "kortex_driver/{{method.name}}.h"
+{%- endif %}
 {%- endfor %}
 {%- endfor %}
 #include "kortex_driver/KortexError.h"
@@ -71,7 +76,7 @@ class BaseServices
 {% for package in detailedPackages %}
 {%- for method in package.service.method %}
 {%- if 'Topic' in method.name %}
-        bool OnNotification{{method.name}}(kortex_driver::{{method.name}}::Request  &req, kortex_driver::{{method.name}}::Response &res);
+        bool OnNotification{{method.name}}(kortex_driver::OnNotification{{method.name}}::Request  &req, kortex_driver::OnNotification{{method.name}}::Response &res);
         void cb_{{method.name}}({{method.name|replace("Topic", "")}}Notification notif);
 {%- else %}
         bool {{method.name}}(kortex_driver::{{method.name}}::Request  &req, kortex_driver::{{method.name}}::Response &res);

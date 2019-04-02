@@ -98,16 +98,26 @@
 #include "kortex_driver/DisconnectWifi.h"
 #include "kortex_driver/GetConnectedWifiInformation.h"
 #include "kortex_driver/Unsubscribe.h"
-#include "kortex_driver/ConfigurationChangeTopic.h"
-#include "kortex_driver/MappingInfoTopic.h"
-#include "kortex_driver/ControlModeTopic.h"
-#include "kortex_driver/OperatingModeTopic.h"
-#include "kortex_driver/SequenceInfoTopic.h"
-#include "kortex_driver/ProtectionZoneTopic.h"
-#include "kortex_driver/UserTopic.h"
-#include "kortex_driver/ControllerTopic.h"
-#include "kortex_driver/ActionTopic.h"
-#include "kortex_driver/RobotEventTopic.h"
+#include "kortex_driver/OnNotificationConfigurationChangeTopic.h"
+#include "kortex_driver/ConfigurationChangeNotification.h"
+#include "kortex_driver/OnNotificationMappingInfoTopic.h"
+#include "kortex_driver/MappingInfoNotification.h"
+#include "kortex_driver/OnNotificationControlModeTopic.h"
+#include "kortex_driver/ControlModeNotification.h"
+#include "kortex_driver/OnNotificationOperatingModeTopic.h"
+#include "kortex_driver/OperatingModeNotification.h"
+#include "kortex_driver/OnNotificationSequenceInfoTopic.h"
+#include "kortex_driver/SequenceInfoNotification.h"
+#include "kortex_driver/OnNotificationProtectionZoneTopic.h"
+#include "kortex_driver/ProtectionZoneNotification.h"
+#include "kortex_driver/OnNotificationUserTopic.h"
+#include "kortex_driver/UserNotification.h"
+#include "kortex_driver/OnNotificationControllerTopic.h"
+#include "kortex_driver/ControllerNotification.h"
+#include "kortex_driver/OnNotificationActionTopic.h"
+#include "kortex_driver/ActionNotification.h"
+#include "kortex_driver/OnNotificationRobotEventTopic.h"
+#include "kortex_driver/RobotEventNotification.h"
 #include "kortex_driver/GetFwdKinematics.h"
 #include "kortex_driver/PlayCartesianTrajectory.h"
 #include "kortex_driver/PlayCartesianTrajectoryPosition.h"
@@ -141,23 +151,29 @@
 #include "kortex_driver/GetOperatingMode.h"
 #include "kortex_driver/SetServoingMode.h"
 #include "kortex_driver/GetServoingMode.h"
-#include "kortex_driver/ServoingModeTopic.h"
+#include "kortex_driver/OnNotificationServoingModeTopic.h"
+#include "kortex_driver/ServoingModeNotification.h"
 #include "kortex_driver/GetSequenceState.h"
 #include "kortex_driver/GetProtectionZoneState.h"
 #include "kortex_driver/GetActionExecutionState.h"
 #include "kortex_driver/RestoreFactorySettings.h"
 #include "kortex_driver/RestoreNetworkFactorySettings.h"
 #include "kortex_driver/Reboot.h"
-#include "kortex_driver/FactoryTopic.h"
+#include "kortex_driver/OnNotificationFactoryTopic.h"
+#include "kortex_driver/FactoryNotification.h"
 #include "kortex_driver/GetAllConnectedControllers.h"
 #include "kortex_driver/GetControllerState.h"
 #include "kortex_driver/GetActuatorCount.h"
 #include "kortex_driver/StartWifiScan.h"
 #include "kortex_driver/GetConfiguredWifi.h"
-#include "kortex_driver/NetworkTopic.h"
+#include "kortex_driver/OnNotificationNetworkTopic.h"
+#include "kortex_driver/NetworkNotification.h"
 #include "kortex_driver/GetArmState.h"
-#include "kortex_driver/ArmStateTopic.h"
+#include "kortex_driver/OnNotificationArmStateTopic.h"
+#include "kortex_driver/ArmStateNotification.h"
 #include "kortex_driver/GetIPv4Information.h"
+#include "kortex_driver/SetCountryCode.h"
+#include "kortex_driver/GetCountryCode.h"
 #include "kortex_driver/KortexError.h"
 #include "kortex_driver/SetDeviceID.h"
 #include "kortex_driver/SetApiOptions.h"
@@ -238,25 +254,25 @@ class BaseServices
         bool DisconnectWifi(kortex_driver::DisconnectWifi::Request  &req, kortex_driver::DisconnectWifi::Response &res);
         bool GetConnectedWifiInformation(kortex_driver::GetConnectedWifiInformation::Request  &req, kortex_driver::GetConnectedWifiInformation::Response &res);
         bool Unsubscribe(kortex_driver::Unsubscribe::Request  &req, kortex_driver::Unsubscribe::Response &res);
-        bool OnNotificationConfigurationChangeTopic(kortex_driver::ConfigurationChangeTopic::Request  &req, kortex_driver::ConfigurationChangeTopic::Response &res);
+        bool OnNotificationConfigurationChangeTopic(kortex_driver::OnNotificationConfigurationChangeTopic::Request  &req, kortex_driver::OnNotificationConfigurationChangeTopic::Response &res);
         void cb_ConfigurationChangeTopic(ConfigurationChangeNotification notif);
-        bool OnNotificationMappingInfoTopic(kortex_driver::MappingInfoTopic::Request  &req, kortex_driver::MappingInfoTopic::Response &res);
+        bool OnNotificationMappingInfoTopic(kortex_driver::OnNotificationMappingInfoTopic::Request  &req, kortex_driver::OnNotificationMappingInfoTopic::Response &res);
         void cb_MappingInfoTopic(MappingInfoNotification notif);
-        bool OnNotificationControlModeTopic(kortex_driver::ControlModeTopic::Request  &req, kortex_driver::ControlModeTopic::Response &res);
+        bool OnNotificationControlModeTopic(kortex_driver::OnNotificationControlModeTopic::Request  &req, kortex_driver::OnNotificationControlModeTopic::Response &res);
         void cb_ControlModeTopic(ControlModeNotification notif);
-        bool OnNotificationOperatingModeTopic(kortex_driver::OperatingModeTopic::Request  &req, kortex_driver::OperatingModeTopic::Response &res);
+        bool OnNotificationOperatingModeTopic(kortex_driver::OnNotificationOperatingModeTopic::Request  &req, kortex_driver::OnNotificationOperatingModeTopic::Response &res);
         void cb_OperatingModeTopic(OperatingModeNotification notif);
-        bool OnNotificationSequenceInfoTopic(kortex_driver::SequenceInfoTopic::Request  &req, kortex_driver::SequenceInfoTopic::Response &res);
+        bool OnNotificationSequenceInfoTopic(kortex_driver::OnNotificationSequenceInfoTopic::Request  &req, kortex_driver::OnNotificationSequenceInfoTopic::Response &res);
         void cb_SequenceInfoTopic(SequenceInfoNotification notif);
-        bool OnNotificationProtectionZoneTopic(kortex_driver::ProtectionZoneTopic::Request  &req, kortex_driver::ProtectionZoneTopic::Response &res);
+        bool OnNotificationProtectionZoneTopic(kortex_driver::OnNotificationProtectionZoneTopic::Request  &req, kortex_driver::OnNotificationProtectionZoneTopic::Response &res);
         void cb_ProtectionZoneTopic(ProtectionZoneNotification notif);
-        bool OnNotificationUserTopic(kortex_driver::UserTopic::Request  &req, kortex_driver::UserTopic::Response &res);
+        bool OnNotificationUserTopic(kortex_driver::OnNotificationUserTopic::Request  &req, kortex_driver::OnNotificationUserTopic::Response &res);
         void cb_UserTopic(UserNotification notif);
-        bool OnNotificationControllerTopic(kortex_driver::ControllerTopic::Request  &req, kortex_driver::ControllerTopic::Response &res);
+        bool OnNotificationControllerTopic(kortex_driver::OnNotificationControllerTopic::Request  &req, kortex_driver::OnNotificationControllerTopic::Response &res);
         void cb_ControllerTopic(ControllerNotification notif);
-        bool OnNotificationActionTopic(kortex_driver::ActionTopic::Request  &req, kortex_driver::ActionTopic::Response &res);
+        bool OnNotificationActionTopic(kortex_driver::OnNotificationActionTopic::Request  &req, kortex_driver::OnNotificationActionTopic::Response &res);
         void cb_ActionTopic(ActionNotification notif);
-        bool OnNotificationRobotEventTopic(kortex_driver::RobotEventTopic::Request  &req, kortex_driver::RobotEventTopic::Response &res);
+        bool OnNotificationRobotEventTopic(kortex_driver::OnNotificationRobotEventTopic::Request  &req, kortex_driver::OnNotificationRobotEventTopic::Response &res);
         void cb_RobotEventTopic(RobotEventNotification notif);
         bool GetFwdKinematics(kortex_driver::GetFwdKinematics::Request  &req, kortex_driver::GetFwdKinematics::Response &res);
         bool PlayCartesianTrajectory(kortex_driver::PlayCartesianTrajectory::Request  &req, kortex_driver::PlayCartesianTrajectory::Response &res);
@@ -291,7 +307,7 @@ class BaseServices
         bool GetOperatingMode(kortex_driver::GetOperatingMode::Request  &req, kortex_driver::GetOperatingMode::Response &res);
         bool SetServoingMode(kortex_driver::SetServoingMode::Request  &req, kortex_driver::SetServoingMode::Response &res);
         bool GetServoingMode(kortex_driver::GetServoingMode::Request  &req, kortex_driver::GetServoingMode::Response &res);
-        bool OnNotificationServoingModeTopic(kortex_driver::ServoingModeTopic::Request  &req, kortex_driver::ServoingModeTopic::Response &res);
+        bool OnNotificationServoingModeTopic(kortex_driver::OnNotificationServoingModeTopic::Request  &req, kortex_driver::OnNotificationServoingModeTopic::Response &res);
         void cb_ServoingModeTopic(ServoingModeNotification notif);
         bool GetSequenceState(kortex_driver::GetSequenceState::Request  &req, kortex_driver::GetSequenceState::Response &res);
         bool GetProtectionZoneState(kortex_driver::GetProtectionZoneState::Request  &req, kortex_driver::GetProtectionZoneState::Response &res);
@@ -299,19 +315,21 @@ class BaseServices
         bool RestoreFactorySettings(kortex_driver::RestoreFactorySettings::Request  &req, kortex_driver::RestoreFactorySettings::Response &res);
         bool RestoreNetworkFactorySettings(kortex_driver::RestoreNetworkFactorySettings::Request  &req, kortex_driver::RestoreNetworkFactorySettings::Response &res);
         bool Reboot(kortex_driver::Reboot::Request  &req, kortex_driver::Reboot::Response &res);
-        bool OnNotificationFactoryTopic(kortex_driver::FactoryTopic::Request  &req, kortex_driver::FactoryTopic::Response &res);
+        bool OnNotificationFactoryTopic(kortex_driver::OnNotificationFactoryTopic::Request  &req, kortex_driver::OnNotificationFactoryTopic::Response &res);
         void cb_FactoryTopic(FactoryNotification notif);
         bool GetAllConnectedControllers(kortex_driver::GetAllConnectedControllers::Request  &req, kortex_driver::GetAllConnectedControllers::Response &res);
         bool GetControllerState(kortex_driver::GetControllerState::Request  &req, kortex_driver::GetControllerState::Response &res);
         bool GetActuatorCount(kortex_driver::GetActuatorCount::Request  &req, kortex_driver::GetActuatorCount::Response &res);
         bool StartWifiScan(kortex_driver::StartWifiScan::Request  &req, kortex_driver::StartWifiScan::Response &res);
         bool GetConfiguredWifi(kortex_driver::GetConfiguredWifi::Request  &req, kortex_driver::GetConfiguredWifi::Response &res);
-        bool OnNotificationNetworkTopic(kortex_driver::NetworkTopic::Request  &req, kortex_driver::NetworkTopic::Response &res);
+        bool OnNotificationNetworkTopic(kortex_driver::OnNotificationNetworkTopic::Request  &req, kortex_driver::OnNotificationNetworkTopic::Response &res);
         void cb_NetworkTopic(NetworkNotification notif);
         bool GetArmState(kortex_driver::GetArmState::Request  &req, kortex_driver::GetArmState::Response &res);
-        bool OnNotificationArmStateTopic(kortex_driver::ArmStateTopic::Request  &req, kortex_driver::ArmStateTopic::Response &res);
+        bool OnNotificationArmStateTopic(kortex_driver::OnNotificationArmStateTopic::Request  &req, kortex_driver::OnNotificationArmStateTopic::Response &res);
         void cb_ArmStateTopic(ArmStateNotification notif);
         bool GetIPv4Information(kortex_driver::GetIPv4Information::Request  &req, kortex_driver::GetIPv4Information::Response &res);
+        bool SetCountryCode(kortex_driver::SetCountryCode::Request  &req, kortex_driver::SetCountryCode::Response &res);
+        bool GetCountryCode(kortex_driver::GetCountryCode::Request  &req, kortex_driver::GetCountryCode::Response &res);
 
 
 private:

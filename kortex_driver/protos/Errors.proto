@@ -1,111 +1,123 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+
 syntax = "proto3";
 
 package Kinova.Api;
 
-
+// List of possible error codes
 enum ErrorCodes {
-    SUCCESS = 0;                //no errors
-    ERROR_PROTOCOL_SERVER = 1;  //protocol server errors
-    ERROR_PROTOCOL_CLIENT = 2;  //protocol client errors
-    ERROR_DEVICE = 3;           //device errors
-    ERROR_INTERNAL = 4;         //internal errors
+    ERROR_NONE = 0;             // No error
+    ERROR_PROTOCOL_SERVER = 1;  // Protocol server error
+    ERROR_PROTOCOL_CLIENT = 2;  // Protocol client error
+    ERROR_DEVICE = 3;           // Device error
+    ERROR_INTERNAL = 4;         // Internal error
 }
 
+// List of possible sub errror codes
 enum SubErrorCodes {
-    
-    SUB_SUCCESS = 0;                        //no sub errors
-    FAILED = 1;                             //failed method
-    UNIMPLEMENTED = 2;                      //unimplemented method
-    INVALID_PARAM = 3;                      //invalid parameter
-    
-    UNSUPPORTED_SERVICE = 4;                //service not recognized
-    UNSUPPORTED_METHOD = 5;                 //method not recognized
-    TOO_LARGE_ENCODED_FRAME_BUFFER = 6;     //encoded frame bigger than what transport permits
-    FRAME_ENCODING_ERR = 7;                 //unable to encode frame
-    FRAME_DECODING_ERR = 8;                 //unable to decode frame
-    INCOMPATIBLE_HEADER_VERSION = 9;        //frame header version differs from what is expected and is considered incompatible
-    UNSUPPORTED_FRAME_TYPE = 10;            //unrecognized frame type
-    UNREGISTERED_NOTIFICATION_RECEIVED = 11;//server receiving unregistered notification 
-    INVALID_SESSION = 12;                   //session not recognized
-    PAYLOAD_DECODING_ERR = 13;              //unable to decode payload
-    UNREGISTERED_FRAME_RECEIVED = 14;       //client received a response for which it did not send an RPC call
-    
-    INVALID_PASSWORD = 15;                  //password does not match specified user
-    USER_NOT_FOUND = 16;                    //unrecognized user
-    
-    ENTITY_NOT_FOUND = 17;                  //cannot find entity
-    
-    ROBOT_MOVEMENT_IN_PROGRESS = 18;        //robot refuses new control command because robot movement in progress
-    ROBOT_NOT_MOVING = 19;                  //robot refuses stop command because robot is not moving
-   
-    NO_MORE_STORAGE_SPACE = 20;             //Unable to execute because no more storage
-    
-    ROBOT_NOT_READY = 21;                   //robot initialization is not complete
-    ROBOT_IN_FAULT = 22;                    //robot in fault
-    ROBOT_IN_MAINTENANCE = 23;              //robot in maintenance
-    ROBOT_IN_UPDATE_MODE = 24;              //robot in update
-    ROBOT_IN_EMERGENCY_STOP = 25;           //robot in emergency stop state
-    
-    SINGLE_LEVEL_SERVOING = 26;             //robot is in single level servoing mode
-    LOW_LEVEL_SERVOING = 27;                //robot is in low level servoing mode
-    
-    MAPPING_GROUP_NON_ROOT = 28;            //trying to add a non-root MapGroup to Mapping
-    MAPPING_INVALID_GROUP = 29;             //trying to add an invalid or non-existent MapGroup to Mapping
-    MAPPING_INVALID_MAP = 30;               //trying to add an invalid or non-existent Map to Mapping
-    MAP_GROUP_INVALID_MAP = 31;             //trying to add an invalid or non-existent Map to MapGroup
-    MAP_GROUP_INVALID_PARENT = 32;          //trying to add a MapGroup under an invalid parent
-    MAP_GROUP_INVALID_CHILD = 33;           //trying to add an invalid or non-existent to MapGroup
-    MAP_GROUP_INVALID_MOVE = 34;            //trying to change a MapGroup's parent: move not supported
-    MAP_IN_USE = 35;                        //deleting a Map used in a Mapping or MapGroup
-    
-    WIFI_CONNECT_ERROR = 36;                //unable to connect to specified Wifi network
-    UNSUPPORTED_NETWORK_TYPE = 37;          //unsupported network type
-    TOO_LARGE_ENCODED_PAYLOAD_BUFFER = 38;  //encoded payload bigger than what transport permits
+    SUB_ERROR_NONE = 0;                     // No sub error
+    METHOD_FAILED = 1;                      // Method returned a failure status (generic error)
+    UNIMPLEMENTED = 2;                      // Unimplemented method
+    INVALID_PARAM = 3;                      // Invalid parameter
 
-    UPDATE_PERMISSION_DENIED = 39;          // attempting update command on non-updatable entity
-    DELETE_PERMISSION_DENIED = 40;          // attempting delete command on non-deletable entity
-    DATABASE_ERROR = 41;                    // internal DB error
-    
-    UNSUPPORTED_OPTION = 42;                // option not supported
-    UNSUPPORTED_RESOLUTION = 43;            // resolution not supported
-    UNSUPPORTED_FRAME_RATE = 44;            // frame rate not supported
-    UNSUPPORTED_BIT_RATE = 45;              // bit rate not supported
-    UNSUPPORTED_ACTION = 46;                // action not supported (generic, when an action is not supported for a particular item)
-    UNSUPPORTED_FOCUS_ACTION = 47;          // focus action not supported
-    VALUE_IS_ABOVE_MAXIMUM = 48;            // specified value is above the supported maximum
-    VALUE_IS_BELOW_MINIMUM = 49;            // specified value is below the supported minimum
-    
-    DEVICE_DISCONNECTED = 50;               // device is not connected
-    DEVICE_NOT_READY = 51;                  // device is not ready
+    UNSUPPORTED_SERVICE = 4;                // Service not recognized
+    UNSUPPORTED_METHOD = 5;                 // Method not recognized
+    TOO_LARGE_ENCODED_FRAME_BUFFER = 6;     // Encoded frame bigger than what transport permits
+    FRAME_ENCODING_ERR = 7;                 // Unable to encode frame
+    FRAME_DECODING_ERR = 8;                 // Unable to decode frame
+    INCOMPATIBLE_HEADER_VERSION = 9;        // Frame header version differs from what is expected and is considered incompatible
+    UNSUPPORTED_FRAME_TYPE = 10;            // Unrecognized frame type
+    UNREGISTERED_NOTIFICATION_RECEIVED = 11;// Server receiving unregistered notification
+    INVALID_SESSION = 12;                   // Session not recognized
+    PAYLOAD_DECODING_ERR = 13;              // Unable to decode payload
+    UNREGISTERED_FRAME_RECEIVED = 14;       // Client received a response for which it did not send an RPC call
 
-    INVALID_DEVICE = 52;                    // device id is invalid during bridging
-    
-    SAFETY_THRESHOLD_REACHED = 53;          // safety threshold is reached therefore safety is on
+    INVALID_PASSWORD = 15;                  // Password does not match specified user
+    USER_NOT_FOUND = 16;                    // Unrecognized user
 
-    INVALID_USER_SESSION_ACCESS = 54;       // service or function access not allowed: out of session or level access
-    
+    ENTITY_NOT_FOUND = 17;                  // Cannot find entity
+
+    ROBOT_MOVEMENT_IN_PROGRESS = 18;        // Robot refuses new control command because robot movement in progress
+    ROBOT_NOT_MOVING = 19;                  // Robot refuses stop command because robot is not moving
+
+    NO_MORE_STORAGE_SPACE = 20;             // Unable to execute because no more storage
+
+    ROBOT_NOT_READY = 21;                   // Robot initialization is not complete
+    ROBOT_IN_FAULT = 22;                    // Robot in fault
+    ROBOT_IN_MAINTENANCE = 23;              // Robot in maintenance
+    ROBOT_IN_UPDATE_MODE = 24;              // Robot in update
+    ROBOT_IN_EMERGENCY_STOP = 25;           // Robot in emergency stop state
+
+    SINGLE_LEVEL_SERVOING = 26;             // Robot is in single-level servoing mode
+    LOW_LEVEL_SERVOING = 27;                // Robot is in low-level servoing mode
+
+    MAPPING_GROUP_NON_ROOT = 28;            // Trying to add a non-root MapGroup to Mapping
+    MAPPING_INVALID_GROUP = 29;             // Trying to add an invalid or non-existent MapGroup to Mapping
+    MAPPING_INVALID_MAP = 30;               // Trying to add an invalid or non-existent Map to Mapping
+    MAP_GROUP_INVALID_MAP = 31;             // Trying to add an invalid or non-existent Map to MapGroup
+    MAP_GROUP_INVALID_PARENT = 32;          // Trying to add a MapGroup under an invalid parent
+    MAP_GROUP_INVALID_CHILD = 33;           // Trying to add an invalid or non-existent to MapGroup
+    MAP_GROUP_INVALID_MOVE = 34;            // Trying to change a MapGroup's parent: move not supported
+    MAP_IN_USE = 35;                        // Deleting a Map used in a Mapping or MapGroup
+
+    WIFI_CONNECT_ERROR = 36;                // Unable to connect to specified Wifi network
+    UNSUPPORTED_NETWORK_TYPE = 37;          // Unsupported network type
+    TOO_LARGE_ENCODED_PAYLOAD_BUFFER = 38;  // Encoded payload bigger than what transport permits
+
+    UPDATE_PERMISSION_DENIED = 39;          // Attempting update command on non-updatable entity
+    DELETE_PERMISSION_DENIED = 40;          // Attempting delete command on non-deletable entity
+    DATABASE_ERROR = 41;                    // Internal DB error
+
+    UNSUPPORTED_OPTION = 42;                // Option not supported
+    UNSUPPORTED_RESOLUTION = 43;            // Resolution not supported
+    UNSUPPORTED_FRAME_RATE = 44;            // Frame rate not supported
+    UNSUPPORTED_BIT_RATE = 45;              // Bit rate not supported
+    UNSUPPORTED_ACTION = 46;                // Action not supported (generic, when an action is not supported for a particular item)
+    UNSUPPORTED_FOCUS_ACTION = 47;          // Focus action not supported
+    VALUE_IS_ABOVE_MAXIMUM = 48;            // Specified value is above the supported maximum
+    VALUE_IS_BELOW_MINIMUM = 49;            // Specified value is below the supported minimum
+
+    DEVICE_DISCONNECTED = 50;               // Device is not connected
+    DEVICE_NOT_READY = 51;                  // Device is not ready
+
+    INVALID_DEVICE = 52;                    // Device id is invalid during bridging
+
+    SAFETY_THRESHOLD_REACHED = 53;          // Safety threshold is reached therefore safety is on
+
+    INVALID_USER_SESSION_ACCESS = 54;       // Service or function access not allowed: out of session or level access
+
     CONTROL_MANUAL_STOP = 55;               // Manually stopped sequence or action
-    CONTROL_OUTSIDE_WORKSPACE = 56;         // Cartesian Position Commanded is outside Robot Workspace
+    CONTROL_OUTSIDE_WORKSPACE = 56;         // Commanded Cartesian position is outside of robot workspace
     CONTROL_ACTUATOR_COUNT_MISMATCH = 57;   // Number of constraint sent does not correspond to number of actuator (ex: joint speed)
     CONTROL_INVALID_DURATION = 58;          // Duration constraint is too short. The robot would need out of limit speeds/accelerations to reach this duration.
-    CONTROL_INVALID_SPEED = 59;             // Speed Constraint is negative
-    CONTROL_LARGE_SPEED = 60;               // Speed Constraint is too high (exceed speed limit of leads to high acceleration)
-    CONTROL_INVALID_ACCELERATION = 61;      // Speed Constraint is too high Or Duration constraint too short and leads to high acceleration
+    CONTROL_INVALID_SPEED = 59;             // Speed constraint is negative
+    CONTROL_LARGE_SPEED = 60;               // Speed constraint is too high (exceed speed limit of leads to high acceleration)
+    CONTROL_INVALID_ACCELERATION = 61;      // Speed constraint is too high or duration constraint too short and leads to high acceleration
     CONTROL_INVALID_TIME_STEP = 62;         // Refresh rate is smaller than the duration of the trajectory
-    CONTROL_LARGE_SIZE = 63;                // Duration of the trajectory is more than 100s. The length of the trajectory is limited to 100000 points to avoid saturating the Base memory
-    CONTROL_WRONG_MODE = 64;                // Control Mode is not a Trajectory Mode
-    CONTROL_JOINT_POSITION_LIMIT = 65;      // The commanded configuration contains at least one actuator which is out of its physical limits
+    CONTROL_LARGE_SIZE = 63;                // Duration of the trajectory is more than 100s. The length of the trajectory is limited to 100000 points to avoid saturating the base memory.
+    CONTROL_WRONG_MODE = 64;                // Control mode is not a trajectory mode
+    CONTROL_JOINT_POSITION_LIMIT = 65;      // Commanded configuration contains at least one actuator which is out of its physical limits
     CONTROL_NO_FILE_IN_MEMORY = 66;         // Trajectory is not computed and try to be started
-    CONTROL_INDEX_OUT_OF_TRAJECTORY = 67;   // Attempting to read a point of the trajectory with an index higher than the number of point in trajectory point list
+    CONTROL_INDEX_OUT_OF_TRAJECTORY = 67;   // Attempting to read a point of the trajectory with an index higher than the number of point in trajectory point list.
     CONTROL_ALREADY_RUNNING = 68;           // Trajectory is already running
-    CONTROL_WRONG_STARTING_POINT = 69;      // Robot is not on the first point of the trajectory when we try to start the trajectory. This can happen if there is a motion between the moment when trajectory is computed and when it is started
-    CONTROL_CARTESIAN_CANNOT_START =  70;   // Cannot start 
-    CONTROL_UNDEFINED_CONSTRAINT = 71;      // Kontrol Library is not initialized
+    CONTROL_WRONG_STARTING_POINT = 69;      // Robot is not on the first point of the trajectory when we try to start the trajectory. This can happen if there is a motion between the moment when trajectory is computed and when it is started.
+    CONTROL_CARTESIAN_CANNOT_START =  70;   // Cannot start
+    CONTROL_UNDEFINED_CONSTRAINT = 71;      // Kontrol library is not initialized
     CONTROL_UNINITIALIZED = 72;             // Contraint sent is not defined
     CONTROL_NO_ACTION = 73;                 // Action does not exist
     CONTROL_UNDEFINED = 74;                 // Undefined error
 
-    WRONG_SERVOING_MODE = 75;               //robot is in not in the right servoing mode
+    WRONG_SERVOING_MODE = 75;               // Robot is in not in the right servoing mode
 
     USERNAME_LENGTH_EXCEEDED = 100;         // User profile username length exceeds maximum allowed length
     FIRSTNAME_LENGTH_EXCEEDED = 101;        // User profile first name length exceeds maximum allowed length
@@ -115,4 +127,7 @@ enum SubErrorCodes {
     USERNAME_EMPTY = 105;                   // User profile empty username not allowed
     PASSWORD_NOT_CHANGED = 106;             // Change password both passwords are the same
     MAXIMUM_USER_PROFILES_USED = 107;       // Maximum number of user profiles in use
+    ROUTER_UNVAILABLE = 108;                // The client router is currently unavailable. This can happen if an API method is called after the router has been deactivated via the method SetActivationStatus.
+
+    ADDRESS_NOT_IN_VALID_RANGE = 120;       // IP Address not valid against netmask
 }

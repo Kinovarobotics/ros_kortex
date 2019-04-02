@@ -114,6 +114,16 @@ int main(int argc, char **argv)
     ros::ServiceServer serviceDisconnectWifi = n.advertiseService("DisconnectWifi", &BaseServices::DisconnectWifi, &services_object);
     ros::ServiceServer serviceGetConnectedWifiInformation = n.advertiseService("GetConnectedWifiInformation", &BaseServices::GetConnectedWifiInformation, &services_object);
     ros::ServiceServer serviceUnsubscribe = n.advertiseService("Unsubscribe", &BaseServices::Unsubscribe, &services_object);
+    ros::ServiceServer serviceOnNotificationConfigurationChangeTopic = n.advertiseService("OnNotificationConfigurationChangeTopic", &BaseServices::OnNotificationConfigurationChangeTopic, &services_object);
+    ros::ServiceServer serviceOnNotificationMappingInfoTopic = n.advertiseService("OnNotificationMappingInfoTopic", &BaseServices::OnNotificationMappingInfoTopic, &services_object);
+    ros::ServiceServer serviceOnNotificationControlModeTopic = n.advertiseService("OnNotificationControlModeTopic", &BaseServices::OnNotificationControlModeTopic, &services_object);
+    ros::ServiceServer serviceOnNotificationOperatingModeTopic = n.advertiseService("OnNotificationOperatingModeTopic", &BaseServices::OnNotificationOperatingModeTopic, &services_object);
+    ros::ServiceServer serviceOnNotificationSequenceInfoTopic = n.advertiseService("OnNotificationSequenceInfoTopic", &BaseServices::OnNotificationSequenceInfoTopic, &services_object);
+    ros::ServiceServer serviceOnNotificationProtectionZoneTopic = n.advertiseService("OnNotificationProtectionZoneTopic", &BaseServices::OnNotificationProtectionZoneTopic, &services_object);
+    ros::ServiceServer serviceOnNotificationUserTopic = n.advertiseService("OnNotificationUserTopic", &BaseServices::OnNotificationUserTopic, &services_object);
+    ros::ServiceServer serviceOnNotificationControllerTopic = n.advertiseService("OnNotificationControllerTopic", &BaseServices::OnNotificationControllerTopic, &services_object);
+    ros::ServiceServer serviceOnNotificationActionTopic = n.advertiseService("OnNotificationActionTopic", &BaseServices::OnNotificationActionTopic, &services_object);
+    ros::ServiceServer serviceOnNotificationRobotEventTopic = n.advertiseService("OnNotificationRobotEventTopic", &BaseServices::OnNotificationRobotEventTopic, &services_object);
     ros::ServiceServer serviceGetFwdKinematics = n.advertiseService("GetFwdKinematics", &BaseServices::GetFwdKinematics, &services_object);
     ros::ServiceServer servicePlayCartesianTrajectory = n.advertiseService("PlayCartesianTrajectory", &BaseServices::PlayCartesianTrajectory, &services_object);
     ros::ServiceServer servicePlayCartesianTrajectoryPosition = n.advertiseService("PlayCartesianTrajectoryPosition", &BaseServices::PlayCartesianTrajectoryPosition, &services_object);
@@ -147,19 +157,25 @@ int main(int argc, char **argv)
     ros::ServiceServer serviceGetOperatingMode = n.advertiseService("GetOperatingMode", &BaseServices::GetOperatingMode, &services_object);
     ros::ServiceServer serviceSetServoingMode = n.advertiseService("SetServoingMode", &BaseServices::SetServoingMode, &services_object);
     ros::ServiceServer serviceGetServoingMode = n.advertiseService("GetServoingMode", &BaseServices::GetServoingMode, &services_object);
+    ros::ServiceServer serviceOnNotificationServoingModeTopic = n.advertiseService("OnNotificationServoingModeTopic", &BaseServices::OnNotificationServoingModeTopic, &services_object);
     ros::ServiceServer serviceGetSequenceState = n.advertiseService("GetSequenceState", &BaseServices::GetSequenceState, &services_object);
     ros::ServiceServer serviceGetProtectionZoneState = n.advertiseService("GetProtectionZoneState", &BaseServices::GetProtectionZoneState, &services_object);
     ros::ServiceServer serviceGetActionExecutionState = n.advertiseService("GetActionExecutionState", &BaseServices::GetActionExecutionState, &services_object);
     ros::ServiceServer serviceRestoreFactorySettings = n.advertiseService("RestoreFactorySettings", &BaseServices::RestoreFactorySettings, &services_object);
     ros::ServiceServer serviceRestoreNetworkFactorySettings = n.advertiseService("RestoreNetworkFactorySettings", &BaseServices::RestoreNetworkFactorySettings, &services_object);
     ros::ServiceServer serviceReboot = n.advertiseService("Reboot", &BaseServices::Reboot, &services_object);
+    ros::ServiceServer serviceOnNotificationFactoryTopic = n.advertiseService("OnNotificationFactoryTopic", &BaseServices::OnNotificationFactoryTopic, &services_object);
     ros::ServiceServer serviceGetAllConnectedControllers = n.advertiseService("GetAllConnectedControllers", &BaseServices::GetAllConnectedControllers, &services_object);
     ros::ServiceServer serviceGetControllerState = n.advertiseService("GetControllerState", &BaseServices::GetControllerState, &services_object);
     ros::ServiceServer serviceGetActuatorCount = n.advertiseService("GetActuatorCount", &BaseServices::GetActuatorCount, &services_object);
     ros::ServiceServer serviceStartWifiScan = n.advertiseService("StartWifiScan", &BaseServices::StartWifiScan, &services_object);
     ros::ServiceServer serviceGetConfiguredWifi = n.advertiseService("GetConfiguredWifi", &BaseServices::GetConfiguredWifi, &services_object);
+    ros::ServiceServer serviceOnNotificationNetworkTopic = n.advertiseService("OnNotificationNetworkTopic", &BaseServices::OnNotificationNetworkTopic, &services_object);
     ros::ServiceServer serviceGetArmState = n.advertiseService("GetArmState", &BaseServices::GetArmState, &services_object);
+    ros::ServiceServer serviceOnNotificationArmStateTopic = n.advertiseService("OnNotificationArmStateTopic", &BaseServices::OnNotificationArmStateTopic, &services_object);
     ros::ServiceServer serviceGetIPv4Information = n.advertiseService("GetIPv4Information", &BaseServices::GetIPv4Information, &services_object);
+    ros::ServiceServer serviceSetCountryCode = n.advertiseService("SetCountryCode", &BaseServices::SetCountryCode, &services_object);
+    ros::ServiceServer serviceGetCountryCode = n.advertiseService("GetCountryCode", &BaseServices::GetCountryCode, &services_object);
     
 
     ROS_INFO("Node's services initialized correctly.");

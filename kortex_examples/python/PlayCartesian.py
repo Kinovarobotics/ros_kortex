@@ -1,4 +1,15 @@
 #!/usr/bin/env python
+###
+# KINOVA (R) KORTEX (TM)
+#
+# Copyright (c) 2018 Kinova inc. All rights reserved.
+#
+# This software may be modified and distributed 
+# under the terms of the BSD 3-Clause license.
+#
+# Refer to the LICENSE file for details.
+#
+###
 
 import sys
 import rospy
@@ -32,7 +43,7 @@ def PlayCartesian_client():
 
         request.input.target_pose.theta_x = current_theta_x
         request.input.target_pose.theta_y = current_theta_y
-        request.input.target_pose.theta_z = current_theta_z + 60
+        request.input.target_pose.theta_z = current_theta_z
 
         poseSpeed = CartesianSpeed()
         poseSpeed.translation = 0.1
@@ -43,7 +54,7 @@ def PlayCartesian_client():
         function_PlayCartesianTrajectory(request)
         
     except rospy.ServiceException as e:
-        print ("Service call failed: %s"%e)
+        print "Service call failed: %s"%e
 
 if __name__ == "__main__":
     PlayCartesian_client()

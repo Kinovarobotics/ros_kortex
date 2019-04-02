@@ -64,6 +64,7 @@ int main(int argc, char **argv)
     ros::ServiceServer serviceGetAllSafetyConfiguration = n.advertiseService("GetAllSafetyConfiguration", &KortexDeviceManager::GetAllSafetyConfiguration, &services_object);
     ros::ServiceServer serviceGetAllSafetyInformation = n.advertiseService("GetAllSafetyInformation", &KortexDeviceManager::GetAllSafetyInformation, &services_object);
     ros::ServiceServer serviceResetSafetyDefaults = n.advertiseService("ResetSafetyDefaults", &KortexDeviceManager::ResetSafetyDefaults, &services_object);
+    ros::ServiceServer serviceOnNotificationSafetyTopic = n.advertiseService("OnNotificationSafetyTopic", &KortexDeviceManager::OnNotificationSafetyTopic, &services_object);
     ros::ServiceServer serviceSetModelNumber = n.advertiseService("SetModelNumber", &KortexDeviceManager::SetModelNumber, &services_object);
     ros::ServiceServer serviceSetPartNumber = n.advertiseService("SetPartNumber", &KortexDeviceManager::SetPartNumber, &services_object);
     ros::ServiceServer serviceSetPartNumberRevision = n.advertiseService("SetPartNumberRevision", &KortexDeviceManager::SetPartNumberRevision, &services_object);

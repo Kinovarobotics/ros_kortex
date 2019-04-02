@@ -1,3 +1,15 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+
 #include "ros/ros.h"
 #include <kortex_driver/PlayCartesianTrajectory.h>
 #include <kortex_driver/CartesianSpeed.h>
@@ -49,7 +61,7 @@ int main(int argc, char **argv)
 
   srvPlayCartesianTrajectory.request.input.target_pose.theta_x = current_theta_x;
   srvPlayCartesianTrajectory.request.input.target_pose.theta_y = current_theta_y;
-  srvPlayCartesianTrajectory.request.input.target_pose.theta_z = current_theta_z + 60;
+  srvPlayCartesianTrajectory.request.input.target_pose.theta_z = current_theta_z;
 
   kortex_driver::CartesianSpeed poseSpeed;
   poseSpeed.translation = 0.1;

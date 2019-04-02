@@ -43,7 +43,8 @@
 #include "kortex_vision_config_driver/GetOptionValue.h"
 #include "kortex_vision_config_driver/SetOptionValue.h"
 #include "kortex_vision_config_driver/GetOptionInformation.h"
-#include "kortex_vision_config_driver/VisionTopic.h"
+#include "kortex_vision_config_driver/OnNotificationVisionTopic.h"
+#include "kortex_vision_config_driver/VisionNotification.h"
 #include "kortex_vision_config_driver/DoSensorFocusAction.h"
 #include "kortex_vision_config_driver/GetIntrinsicParameters.h"
 #include "kortex_vision_config_driver/KortexError.h"
@@ -70,7 +71,7 @@ class VisionConfig_Services
         bool GetOptionValue(kortex_vision_config_driver::GetOptionValue::Request  &req, kortex_vision_config_driver::GetOptionValue::Response &res);
         bool SetOptionValue(kortex_vision_config_driver::SetOptionValue::Request  &req, kortex_vision_config_driver::SetOptionValue::Response &res);
         bool GetOptionInformation(kortex_vision_config_driver::GetOptionInformation::Request  &req, kortex_vision_config_driver::GetOptionInformation::Response &res);
-        bool OnNotificationVisionTopic(kortex_vision_config_driver::VisionTopic::Request  &req, kortex_vision_config_driver::VisionTopic::Response &res);
+        bool OnNotificationVisionTopic(kortex_vision_config_driver::OnNotificationVisionTopic::Request  &req, kortex_vision_config_driver::OnNotificationVisionTopic::Response &res);
         void cb_VisionTopic(VisionNotification notif);
         bool DoSensorFocusAction(kortex_vision_config_driver::DoSensorFocusAction::Request  &req, kortex_vision_config_driver::DoSensorFocusAction::Response &res);
         bool GetIntrinsicParameters(kortex_vision_config_driver::GetIntrinsicParameters::Request  &req, kortex_vision_config_driver::GetIntrinsicParameters::Response &res);

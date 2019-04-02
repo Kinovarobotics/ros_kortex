@@ -31,6 +31,13 @@ int ToProtoData(kortex_actuator_driver::{{detailed_message.message.name}} input,
 	{
 		ToProtoData(input.{{field.name}}[i], output->add_{{field.name|lower}}());
 	}
+	{%- elif field.type == 14 %} {# ENUM #}
+	output->clear_{{field.name|lower}}();
+	for(int i = 0; i < input.{{field.name}}.size(); i++)
+	{
+		{%- set list1 = field.type_name.split('.') -%} {# Cette ligne sert à enlever les namespace dans le nom du type #}
+		output->add_{{field.name|lower}}({{list1[4]}}(input.{{field.name}}[i]));
+	}	
 	{%- else %}
 	output->clear_{{field.name|lower}}();
 	for(int i = 0; i < input.{{field.name}}.size(); i++)

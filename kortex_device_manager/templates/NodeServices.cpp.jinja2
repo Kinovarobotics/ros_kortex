@@ -34,7 +34,7 @@ KortexDeviceManager::KortexDeviceManager(char* ip, ros::NodeHandle& n) : m_n(n)
 	m_{{package.name|lower}} = new {{package.name}}::{{package.name}}Client(m_router);
 	{%- endif -%}
 
-{% endfor -%}
+{% endfor %}
 	m_SessionManager = new SessionManager(m_router);
 	auto createSessionInfo = Kinova::Api::Session::CreateSessionInfo();
 	
@@ -60,7 +60,7 @@ KortexDeviceManager::KortexDeviceManager(char* ip, ros::NodeHandle& n) : m_n(n)
 {% for package in detailedPackages %}
 {% for method in package.service.method %}
 {%- if 'Topic' in method.name %}
-bool KortexDeviceManager::OnNotification{{method.name}}(kortex_device_manager::{{method.name}}::Request  &req, kortex_device_manager::{{method.name}}::Response &res)
+bool KortexDeviceManager::OnNotification{{method.name}}(kortex_device_manager::OnNotification{{method.name}}::Request  &req, kortex_device_manager::OnNotification{{method.name}}::Response &res)
 {%- else %}
 bool KortexDeviceManager::{{method.name}}(kortex_device_manager::{{method.name}}::Request  &req, kortex_device_manager::{{method.name}}::Response &res)
 {%- endif %}
@@ -102,7 +102,10 @@ bool KortexDeviceManager::{{method.name}}(kortex_device_manager::{{method.name}}
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)

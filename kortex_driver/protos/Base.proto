@@ -1,7 +1,15 @@
-/**
- * Base related messages.
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
  *
  */
+
 syntax = "proto3";
 
 import public "Common.proto";
@@ -9,1758 +17,1761 @@ import public "Errors.proto";
 
 package Kinova.Api.Base;
 
-/**
- * Service providing Base commands
- */
+// Base module service
 service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
-    
-    //Creates a User Profile
+
+    // Creates a user profile
     rpc CreateUserProfile (FullUserProfile) returns (Kinova.Api.Common.UserProfileHandle);//@RPC_ID=1
-    
-    //Updates an existing User Profile
+
+    // Updates an existing user profile
     rpc UpdateUserProfile (UserProfile) returns (Kinova.Api.Common.Empty);//@RPC_ID=2
-    
-    //Retrieves an existing User Profile
+
+    // Retrieves an existing user profile
     rpc ReadUserProfile (Kinova.Api.Common.UserProfileHandle) returns (UserProfile);//@RPC_ID=3
-    
-    //Deletes an existing User Profile
+
+    // Deletes an existing user profile
     rpc DeleteUserProfile (Kinova.Api.Common.UserProfileHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=4
-    
-    //Retrieves all User Profiles
+
+    // Retrieves all user profiles
     rpc ReadAllUserProfiles (Kinova.Api.Common.Empty) returns (UserProfileList);//@RPC_ID=5
-    
-    //Retrieves the list of Usernames
+
+    // Retrieves the list of user handles
     rpc ReadAllUsers (Kinova.Api.Common.Empty) returns (UserList);//@RPC_ID=6
-    
-    //Changes password of an existing user
+
+    // Changes the password of an existing user
     rpc ChangePassword (PasswordChange) returns (Kinova.Api.Common.Empty);//@RPC_ID=7
-    
-    //Creates a new Sequence
+
+    // Creates a new sequence
     rpc CreateSequence (Sequence) returns (SequenceHandle);//@RPC_ID=8
-    
-    //Updates an existing Sequence
+
+    // Updates an existing sequence
     rpc UpdateSequence (Sequence) returns (Kinova.Api.Common.Empty);//@RPC_ID=9
-      
-    //Updates an existing Sequence
+
+    // Reads an existing sequence
     rpc ReadSequence (SequenceHandle) returns (Sequence);//@RPC_ID=10
-    
-    //Deletes an existing sequence
+
+    // Deletes an existing sequence
     rpc DeleteSequence (SequenceHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=11
-    
-    //Retrieves all existing sequences
+
+    // Retrieves all existing sequences
     rpc ReadAllSequences (Kinova.Api.Common.Empty) returns (SequenceList);//@RPC_ID=12
-    
-    //Deletes a specific task from the specified sequence
+
+    // Deletes a specific task from the specified sequence
     rpc DeleteSequenceTask (SequenceTaskHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=13
-    
-    //Deletes all tasks from the specified sequence
+
+    // Deletes all tasks from the specified sequence
     rpc DeleteAllSequenceTasks (SequenceHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=14
-    
-    //Plays an existing sequence
+
+    // Plays an existing sequence
     rpc PlaySequence (SequenceHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=15
-    
-    //Plays an existing sequence with options
+
+    // Plays an existing sequence with options
     rpc PlayAdvancedSequence (AdvancedSequenceHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=16
-    
-    //Stops execution of currently played sequence
+
+    // Stops execution of currently playing sequence
     rpc StopSequence (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=17
-    
-    //Pauses execution of currently played sequence
+
+    // Pauses execution of currently playing sequence
     rpc PauseSequence (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=18
-    
-    //Resumes execution of currently paused sequence
+
+    // Resumes execution of currently paused sequence
     rpc ResumeSequence (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=19
-    
-    //Creates a Protection zone
+
+    // Creates a protection zone
     rpc CreateProtectionZone (ProtectionZone) returns (ProtectionZoneHandle);//@RPC_ID=20
-    
-    //Updates an existing Protection zone
+
+    // Updates an existing protection zone
     rpc UpdateProtectionZone (ProtectionZone) returns (Kinova.Api.Common.Empty);//@RPC_ID=21
-    
-    //Retrieve an existing protection zone
+
+    // Retrieves an existing protection zone
     rpc ReadProtectionZone (ProtectionZoneHandle) returns (ProtectionZone);//@RPC_ID=22
-    
-    //Deletes an existing protection zone
+
+    // Deletes an existing protection zone
     rpc DeleteProtectionZone (ProtectionZoneHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=23
-    
-    //Retrieves all protection zones
+
+    // Retrieves all protection zones
     rpc ReadAllProtectionZones (Kinova.Api.Common.Empty) returns (ProtectionZoneList);//@RPC_ID=24
-           
-    //Creates a Mapping
+
+    // Creates a mapping (future)
     rpc CreateMapping (Mapping) returns (MappingHandle);//@RPC_ID=26
-    
-    //Retrieves an existing mapping
+
+    // Retrieves an existing mapping
     rpc ReadMapping (MappingHandle) returns (Mapping);//@RPC_ID=27
-    
-    //Retrieves all mappings
+
+    // Retrieves all mappings
     rpc ReadAllMappings (Kinova.Api.Common.Empty) returns (MappingList);//@RPC_ID=30
-    
-    //Creates a new map
+
+    // Creates a new map (future)
     rpc CreateMap (Map) returns (MapHandle);//@RPC_ID=36
-        
-    //Retrieves all maps associated to the specified mapping
-    rpc ReadAllMaps (MappingHandle) returns (MapList);//@RPC_ID=40    
-    
-    //Makes the specified Map active within the specified Map group and Mapping
+
+    // Retrieves all maps associated to the specified mapping
+    rpc ReadAllMaps (MappingHandle) returns (MapList);//@RPC_ID=40
+
+    // Makes the specified map active within the specified map group and mapping
     rpc ActivateMap (ActivateMapHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=41
-    
-    //Creates an action
+
+    // Creates an action
     rpc CreateAction (Action) returns (ActionHandle);//@RPC_ID=42
-    
-    //Retrieves an existing action
+
+    // Retrieves an existing action
     rpc ReadAction (ActionHandle) returns (Action);//@RPC_ID=43
-    
-    //Retrieves all existing actions
+
+    // Retrieves all existing actions
     rpc ReadAllActions (RequestedActionType) returns (ActionList);//@RPC_ID=44
-    
-    //Deletes an existing action
+
+    // Deletes an existing action
     rpc DeleteAction (ActionHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=45
-    
-    //Update an existing action
+
+    // Update an existing action
     rpc UpdateAction (Action) returns (Kinova.Api.Common.Empty);//@RPC_ID=46
-    
-    //Asks the robot to executes the specified existing action
+
+    // Asks the robot to execute the specified existing action
     rpc ExecuteActionFromReference (ActionHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=47
-    
-    //Asks the robot to execute the specified action
+
+    // Asks the robot to execute the specified action
     rpc ExecuteAction (Action) returns (Kinova.Api.Common.Empty);//@RPC_ID=48
-    
-    //Pauses the execution of the currently executed action. ResumeAction can be invoked afterwards.
+
+    // Pauses the currently executed action. ResumeAction can be invoked afterwards
     rpc PauseAction (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=49
-    
-    //Stops the execution of the currently executed action. ResumeAction cannot be invoked afterwards.
+
+    // Stops the currently executed action. ResumeAction cannot be invoked afterwards
     rpc StopAction (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=50
-    
-    //Resumes the execution of the currently paused action
+
+    // Resumes execution of the currently paused action
     rpc ResumeAction (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=51
-      
-    //Retrieves the IPv4 network configuration for the specified Network adapter
+
+    // Retrieves the IPv4 network configuration for the specified network adapter
     rpc GetIPv4Configuration (NetworkHandle) returns (IPv4Configuration);//@RPC_ID=59
-    
-    //Modifies the IPv4 network configuration for the specified Network adapter
+
+    // Modifies the IPv4 network configuration for the specified network adapter
     rpc SetIPv4Configuration (FullIPv4Configuration) returns (Kinova.Api.Common.Empty);//@RPC_ID=60
-    
-    //Enables (or disables) the specified communication interface
+
+    // Enables (or disables) the specified communication interface
     rpc SetCommunicationInterfaceEnable (CommunicationInterfaceConfiguration) returns (Kinova.Api.Common.Empty);//@RPC_ID=61
-   
-    //Determines if the specified communication interface is enabled (or disabled)
+
+    // Determines if the specified communication interface is enabled (or disabled)
     rpc IsCommunicationInterfaceEnable (NetworkHandle) returns (CommunicationInterfaceConfiguration);//@RPC_ID=62
-        
-    //Retrieves the list of available Wifi networks
+
+    // Retrieves the list of available Wi-Fi networks
     rpc GetAvailableWifi (Kinova.Api.Common.Empty) returns (WifiInformationList);//@RPC_ID=63
-    
-    //Retrieves information about a specific Wifi network
+
+    // Retrieves information about a specific Wi-Fi network
     rpc GetWifiInformation (Ssid) returns (WifiInformation);//@RPC_ID=64
-    
-    //Configures a specific Wifi network
+
+    // Configures a specific Wi-Fi network
     rpc AddWifiConfiguration (WifiConfiguration) returns (Kinova.Api.Common.Empty);//@RPC_ID=65
-    
-    //Deletes a specific Wifi network
+
+    // Deletes a specific Wi-Fi network
     rpc DeleteWifiConfiguration (Ssid) returns (Kinova.Api.Common.Empty);//@RPC_ID=66
-    
-    //Retrieves the list of configured Wifi networks
+
+    // Retrieves the list of configured Wi-Fi networks
     rpc GetAllConfiguredWifis (Kinova.Api.Common.Empty) returns (WifiConfigurationList);//@RPC_ID=67
-    
-    //Connects robot to specified Wifi network
+
+    // Connects robot to specified Wi-Fi network
     rpc ConnectWifi (Ssid) returns (Kinova.Api.Common.Empty);//@RPC_ID=68
-    
-    //Disconnects the robot from currently connected Wifi network
+
+    // Disconnects the robot from currently connected Wi-Fi network
     rpc DisconnectWifi (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=69
-    
-    //Gets information about the connected Wifi network
+
+    // Gets information about the connected Wi-Fi network
     rpc GetConnectedWifiInformation (Kinova.Api.Common.Empty) returns (WifiInformation);//@RPC_ID=70
 
-    //Unsubscribes client from receiving specified types of notifications
+    // Unsubscribes client from receiving specified types of notifications
     rpc Unsubscribe (Kinova.Api.Common.NotificationHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=97 @UNSUB
-    
-    //Subscribes to configuration change notifications
+
+    // Subscribes to configuration change notifications
     rpc ConfigurationChangeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=98 @PUB_SUB=ConfigurationChangeNotification
-    
-    //Subscribes to mapping information notifications
+
+    // Subscribes to mapping information notifications
     rpc MappingInfoTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=99 @PUB_SUB=MappingInfoNotification
-    
-    //Subscribes to control mode notifications
+
+    // Subscribes to control mode notifications
     rpc ControlModeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=100 @PUB_SUB=ControlModeNotification
-    
-    //Subscribes to operating mode notifications
+
+    // Subscribes to operating mode notifications
     rpc OperatingModeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=101 @PUB_SUB=OperatingModeNotification
-    
-    //Subscribes to sequence information notifications
+
+    // Subscribes to sequence information notifications
     rpc SequenceInfoTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=102 @PUB_SUB=SequenceInfoNotification
-    
-    //Subscribes to protection zone notifications
+
+    // Subscribes to protection zone notifications (future)
     rpc ProtectionZoneTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=103 @PUB_SUB=ProtectionZoneNotification
-    
-    //Subscribes to user notifications
+
+    // Subscribes to user notifications
     rpc UserTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=104 @PUB_SUB=UserNotification
-   
-    //Subscribes to controller notifications
+
+    // Subscribes to controller notifications
     rpc ControllerTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=105 @PUB_SUB=ControllerNotification
-    
-    //Subscribes to action notifications
+
+    // Subscribes to action notifications
     rpc ActionTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=106 @PUB_SUB=ActionNotification
-    
-    //Subscribes to robot event notifications
+
+    // Subscribes to robot event notifications
     rpc RobotEventTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=107 @PUB_SUB=RobotEventNotification
-       
-    //Retrieves the forward kinematics that corresponds to specified transformation matrix
+
+    // Retrieves the forward kinematics that corresponds to specified transformation matrix (future)
     rpc GetFwdKinematics (Kinova.Api.Common.Empty) returns (TransformationMatrix);//@RPC_ID=108
-    
-    //Reaches the specifed pose
+
+    // Moves to the specifed pose
     rpc PlayCartesianTrajectory (ConstrainedPose) returns (Kinova.Api.Common.Empty);//@RPC_ID=109
-    
-    //Reaches the specified position
+
+    // Moves to the specifed position
     rpc PlayCartesianTrajectoryPosition (ConstrainedPosition) returns (Kinova.Api.Common.Empty);//@RPC_ID=110
-    
-    //Reaches the specified orientation
+
+    // Moves to the specifed orientation
     rpc PlayCartesianTrajectoryOrientation (ConstrainedOrientation) returns (Kinova.Api.Common.Empty);//@RPC_ID=111
-    
-    //Pauses robot movement
+
+    // Pauses robot movement (future)
     rpc Pause (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=113
-    
-    //Resumes robot movement
+
+    // Resumes robot movement (future)
     rpc Resume (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=114
-    
-    //Retrieves the currently measured Pose, that is the position and orientation that the robot is currently in
+
+    // Retrieves the currently measured pose, that is the position and orientation that the robot is currently in
     rpc GetMeasuredCartesianPose (Kinova.Api.Common.Empty) returns (Pose);//@RPC_ID=115
-    
-    //Retrieves the commanded cartesian pose
+
+    // Retrieves the commanded Cartesian pose (future)
     rpc GetCommandedCartesianPose (Kinova.Api.Common.Empty) returns (Pose);//@RPC_ID=116
-    
-    //Retrieves the targeted cartesian pose
+
+    // Retrieves the targeted Cartesian pose (future)
     rpc GetTargetedCartesianPose (Kinova.Api.Common.Empty) returns (Pose);//@RPC_ID=117
-        
-    //Sends a twist command
+
+    // Sends a twist command
     rpc SendTwistCommand (TwistCommand) returns (Kinova.Api.Common.Empty);//@RPC_ID=121
-    
-    //Retrieves the currently measured Twist Command, that is the current linear and angular robot velocity
+
+    // Retrieves the currently measured twist command, that is the current linear and angular robot velocity  (future)
     rpc GetMeasuredTwist (Kinova.Api.Common.Empty) returns (Twist);//@RPC_ID=122
- 
-    //Retrieves the desired Twist Command
+
+    // Retrieves the desired twist command (future)
     rpc GetCommandedTwist (Kinova.Api.Common.Empty) returns (Twist);//@RPC_ID=123
-    
-    //Reaches the specified Joint angles
+
+    // Moves to the specifed joint angles
     rpc PlayJointTrajectory (ConstrainedJointAngles) returns (Kinova.Api.Common.Empty);//@RPC_ID=124
-    
-    //Reaches the specified Joint angle
+
+    // Moves specifed joint to the specifed joint angle
     rpc PlaySelectedJointTrajectory (ConstrainedJointAngle) returns (Kinova.Api.Common.Empty);//@RPC_ID=125
-    
-    //Retrieves the currently measured joint angles, that is the current position of each joint
+
+    // Retrieves the currently measured joint angles, that is the current position of each joint
     rpc GetMeasuredJointAngles (Kinova.Api.Common.Empty) returns (JointAngles);//@RPC_ID=126
- 
-    //Retrieves the desired Joint angles Command
+
+    // Retrieves the desired joint angles, that is the desired joint angle for each joint (future)
     rpc GetCommandedJointAngles (Kinova.Api.Common.Empty) returns (JointAngles);//@RPC_ID=127
-        
-    //Sends a joint speed command
+
+    // Sends a joint speeds command, that is the desired speed of one or many joints
     rpc SendJointSpeedsCommmand (JointSpeeds) returns (Kinova.Api.Common.Empty);//@RPC_ID=132
-    
-    //Sends a speed command for a specific joint
+
+    // Sends a speed command for a specific joint
     rpc SendSelectedJointSpeedCommand (JointSpeed) returns (Kinova.Api.Common.Empty);//@RPC_ID=133
-    
-    //Retrieves the currently measured Joint speeds Command, that is the current speed of each joint
+
+    // Retrieves the currently measured joint speeds, that is the current speed of each joint (future)
     rpc GetMeasuredJointSpeeds (Kinova.Api.Common.Empty) returns (JointSpeeds);//@RPC_ID=134
- 
-    //Retrieves the desired Joint speeds Command
+
+    // Retrieves the desired joint speeds, that is the desired speed for each joint (future)
     rpc GetCommandedJointSpeeds (Kinova.Api.Common.Empty) returns (JointSpeeds);//@RPC_ID=135
-    
-    //Sends a command to move the gripper
+
+    // Sends a command to move the gripper
     rpc SendGripperCommand (GripperCommand) returns (Kinova.Api.Common.Empty);//@RPC_ID=136
-    
-    //Retrieves the current gripper movement, that is the current gripper position, force or speed
+
+    // Retrieves the current gripper movement, that is the current gripper position, force or speed (future)
     rpc GetMeasuredGripperMovement (GripperRequest) returns (Gripper);//@RPC_ID=137
- 
-    //Retrieves the desired gripper Command
+
+    // Retrieves the desired gripper movement (future)
     rpc GetCommandedGripperMovement (GripperRequest) returns (Gripper);//@RPC_ID=138
-    
-    //Sets the robot in admittance mode
+
+    // Sets the robot in admittance mode
     rpc SetAdmittance (Admittance) returns (Kinova.Api.Common.Empty);//@RPC_ID=139
 
-    //Defines the reference frame to use with Twist and Wrench commands
+    // Defines the reference frame to use with twist and wrench commands
     rpc SetTwistWrenchReferenceFrame (CartesianReferenceFrameRequest) returns (Kinova.Api.Common.Empty);//@RPC_ID=140
 
-    //sets a new operating mode. Only Maintenance, Update and Run mode are permitted
+    // Sets a new operating mode. Only Maintenance, Update and Run modes are permitted.
     rpc SetOperatingMode (OperatingModeInformation) returns (Kinova.Api.Common.Empty);//@RPC_ID=141
-       
-    //stops robot movement
+
+    // Stops robot movement
     rpc ApplyEmergencyStop (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=145
-    
-    //resets robot stop. Robot is now permitted to move again
+
+    // Clears robot stop. Robot is permitted to move again.
     rpc ClearFaults (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=146
-        
-    //retrieves currently active map associate to specified mapping.
+
+    // Retrieves currently active map associated with specified mapping (future)
     rpc GetActiveMap (MappingHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=149
 
-    //retrieves current control mode
+    // Retrieves current control mode
     rpc GetControlMode (Kinova.Api.Common.Empty) returns (ControlModeInformation);//@RPC_ID=150
-    
-    //retreieves current operating mode
+
+    // Retrieves current operating mode
     rpc GetOperatingMode (Kinova.Api.Common.Empty) returns (OperatingModeInformation);//@RPC_ID=151
- 
-    //sets the servoing mode    
+
+    // Sets the servoing mode
     rpc SetServoingMode (ServoingModeInformation) returns (Kinova.Api.Common.Empty);//@RPC_ID=152
-    
-    //retrieves current servoing mode
+
+    // Retrieves current servoing mode
     rpc GetServoingMode (Kinova.Api.Common.Empty) returns (ServoingModeInformation);//@RPC_ID=153
-    
-    //Subscribes to servoing mode notifications
+
+    // Subscribes to servoing mode notifications
     rpc ServoingModeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=154 @PUB_SUB=ServoingModeNotification
-      
-    //retrieves the last sequence state
+
+    // Retrieves the last sequence state (future)
     rpc GetSequenceState (SequenceHandle) returns (SequenceInformation);//@RPC_ID=156
-    
-    //retrieves the last state of the robot versus the specified protection zone
+
+    // Retrieves the last state of the robot versus the specified protection zone (future)
     rpc GetProtectionZoneState (ProtectionZoneHandle) returns (ProtectionZoneInformation);//@RPC_ID=157
-    
-    //retrieves the action execution state
+
+    // Retrieves the action execution state (future)
     rpc GetActionExecutionState (Kinova.Api.Common.Empty) returns (ActionExecutionState);//@RPC_ID=158
-      
-    //Deletes all configuration and put back factory content only (except Network settings)
+
+    // Deletes all configurations and reverts settings to their factory defaults (except network settings)
     rpc RestoreFactorySettings (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=160
-    
-    //Puts back Network settings to their factory defaults and predefined users to default password
+
+    // Reverts network settings to their factory defaults and predefined user profiles to their default passwords (future)
     rpc RestoreNetworkFactorySettings (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=161
 
-    //allows to reboot robot
+    // Reboots robot
     rpc Reboot (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=162
-    
-    //Subscribes to factory notifications
+
+    // Subscribes to factory notifications
     rpc FactoryTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=164 @PUB_SUB=FactoryNotification
-       
-    //Retrieves the list of all connected controllers 
+
+    // Retrieves the list of all connected controllers
     rpc GetAllConnectedControllers (Kinova.Api.Common.Empty) returns (ControllerList);//@RPC_ID=166
-    
-    //retrieves the state of a specific controller 
+
+    // Retrieves the state of a specific controller
     rpc GetControllerState (ControllerHandle) returns (ControllerState);//@RPC_ID=167
 
-    //Retrieves the number of Actuators
+    // Retrieves the number of actuators
     rpc GetActuatorCount (Kinova.Api.Common.Empty) returns (ActuatorInformation);//@RPC_ID=171
 
-    //Initiates wifi scanning
+    // Initiates wifi scanning
     rpc StartWifiScan (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=172
-	
-    //Retrieves a configured Wifi network
+
+    // Retrieves a configured Wi-Fi network
     rpc GetConfiguredWifi (Ssid) returns (WifiConfiguration);//@RPC_ID=173
-    
-    //Subscribes to network event notifications
+
+    // Subscribes to network event notifications
     rpc NetworkTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=174 @PUB_SUB=NetworkNotification
 
-    //Retrieves current arm state
+    // Retrieves current arm state
     rpc GetArmState (Kinova.Api.Common.Empty) returns (ArmStateInformation);//@RPC_ID=175
 
-    //Subscribes to arm state notifications
+    // Subscribes to arm state notifications
     rpc ArmStateTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=176 @PUB_SUB=ArmStateNotification
 
-    //Retrieves the IPv4 network information for the specified Network adapter
+    // Retrieves the IPv4 network information for the specified network adapter
     rpc GetIPv4Information (NetworkHandle) returns (IPv4Information);//@RPC_ID=177
+    
+    // Sets country code
+    rpc SetCountryCode (CountryCode) returns (Kinova.Api.Common.Empty);//@RPC_ID=178
+    
+    // Retrieves country code
+    rpc GetCountryCode (Kinova.Api.Common.Empty) returns (CountryCode);//@RPC_ID=179
 }
 
+// Enumeration used to identify Base service current version
 enum ServiceVersion {
-    RESERVED_0 = 0;
-    CURRENT_VERSION = 1;  // Current Version
+    RESERVED_0 = 0;         // Reserved
+    CURRENT_VERSION = 1;    // Current version
 }
 
-/**
- * Message used to create a new User Profile in robot
- */ 
-message FullUserProfile { 
-    UserProfile user_profile = 1; //User Profile, which includes username
-    string password = 2; //User's password
+
+// Provides complete infomation about a user. Used when creating a user profile.
+message FullUserProfile {
+    UserProfile user_profile = 1; // Information about the user, including its username.
+    string password = 2;          // User's password
 }
 
-/**
- * Information about a user
- */
+
+// Provides information about a user
 message UserProfile {
-    Kinova.Api.Common.UserProfileHandle handle = 1; //User handle (no need to set it with CreateUserProfile()
-    string username = 2; // username, which is used to connect to robot (or login via Web App)
-    string firstname = 3; //user first name
-    string lastname = 4; //user last name
-    string application_data = 5; //other application data (used by Web App)
+    Kinova.Api.Common.UserProfileHandle handle = 1; // User handle (no need to set it with CreateUserProfile()
+    string username = 2;                            // Username, which is used to connect to robot (or login via Web App)
+    string firstname = 3;                           // User's first name
+    string lastname = 4;                            // User's last name
+    string application_data = 5;                    // Application data (reserved for use by Web App)
 }
 
-/**
- * List of user profiles
- */
+// Array of user profiles
 message UserProfileList {
-    repeated UserProfile user_profiles = 1;  //user profiles
+    repeated UserProfile user_profiles = 1;  // User profile
 }
 
-/**
- * Message used to retrieve a list of users along with their username
- */
+// Array of user handles
 message UserList {
-    repeated Kinova.Api.Common.UserProfileHandle user_handles = 1; //user handles
+    repeated Kinova.Api.Common.UserProfileHandle user_handles = 1; // User handle
 }
 
-/**
- * Message used to change a User's password
- */
+// Provides information to change a user's password
 message PasswordChange {
-    Kinova.Api.Common.UserProfileHandle handle = 1;   // user handle
-    string old_password = 2; // current user's password
-    string new_password = 3; // new user's password
+    Kinova.Api.Common.UserProfileHandle handle = 1; // User handle
+    string old_password = 2;                        // Current password
+    string new_password = 3;                        // New password
 }
 
-/**
- * Handle to an existing Sequence
- */
+// Identifies a sequence
 message SequenceHandle {
-    uint32 identifier = 1; //sequence identifier
-    fixed32 permission = 2; //must use 'Permission' enum
-} 
+    uint32 identifier = 1;  // Sequence identifier
+    fixed32 permission = 2; // Sequence permission. See 'Kinova.Api.Common.Permission' enum.
+}
 
-/**
- * Message used to pass options when executing a sequence
- */
+// Associates execution options to a sequence
 message AdvancedSequenceHandle {
-    SequenceHandle handle = 1; // sequence handle
-    /**
-     * set to true to play the sequence in loop, false otherwise. When a sequence is executed in loop, it will automatically 
+    SequenceHandle handle = 1; // Sequence handle
+    /*
+     * Loop execution. Set to true to play the sequence in loop, false otherwise. When a sequence is executed in loop, it will automatically 
      * go back to first task within the sequence after completing execution of last task and continue execution forever 
      * unless the sequence is explicitely stopped
      */
     bool in_loop = 2;
 }
 
-/**
- * Message used to delete a specific task within a sequence
- */
+// Identifies a task inside a sequence
 message SequenceTaskHandle {
-    SequenceHandle sequence_handle = 1; // sequence handle
-    uint32 task_index = 2; //specified task to delete within sequence
+    SequenceHandle sequence_handle = 1; // Sequence handle
+    uint32 task_index = 2;              // Task index inside the sequence
 }
- 
-/**
- * Definition of a specific task within a sequence
- */ 
+
+// Provides information about a task inside a sequence
 message SequenceTask {
-    uint32 group_identifier = 1; //specifies the order in which this task must be executed
-    Action action = 2; 
-    string application_data = 3; //application data (used by Web App)
+    uint32 group_identifier = 1;    // Specifies the order in which this task must be executed
+    Action action = 2;              // Specifies the action to execute
+    string application_data = 3;    // Application data (reserved for use by Web App)
 }
 
-/**
- * Sequence definition
- */
+// Provides information about a sequence
 message Sequence {
-    SequenceHandle handle = 1; //sequence handle
-    string name = 2; //sequence name
-    string application_data = 3; // application data (used by Web App)
-    repeated SequenceTask tasks = 4; // list of tasks that this sequence contains
+    SequenceHandle handle = 1;          // Sequence handle
+    string name = 2;                    // Sequence name
+    string application_data = 3;        // Application data (reserved for use by Web App)
+    repeated SequenceTask tasks = 4;    // Array of tasks that this sequence contains
 }
 
-/**
- * List of sequences
- */
+// Array of sequences
 message SequenceList {
-    repeated Sequence sequence_list = 1;  //sequences
+    repeated Sequence sequence_list = 1; // Sequence
 }
 
-//action to append an action to an existing trajectory (which can be already playing)
+// Appends an action to an existing sequence (future)
 message AppendActionInformation {
-    SequenceHandle sequence_handle = 1;
-    Action action = 2;
+    SequenceHandle sequence_handle = 1; // Sequence to which action must be appended
+    Action action = 2;                  // Action to append
 }
 
-/**
- * Action handle
- */
+// Identifies an action
 message ActionHandle {
-    uint32 identifier = 1;    
-    ActionType action_type = 2; //allows to know the type of action that is affected (ex. on a notification)
-    fixed32 permission = 3; //must use 'Permission' enum
-} 
-
-message RequestedActionType {
-    ActionType action_type = 1; 
+    uint32 identifier = 1;      // Action identifier
+    ActionType action_type = 2; // Action type
+    fixed32 permission = 3;     // Permission of specified Action entity. Must use 'Kinova.Api.Common.Permission' enum.
 }
 
-/**
- * Definition of an Action
- */ 
-message Action {    
-    ActionHandle handle = 1; // action handle (useful when updating an existing action)
-    string name = 2; // action friendly name
-    string application_data = 3; // application data (used by Web App)
+// Message used to request all action instances of a specific action type
+message RequestedActionType {
+    ActionType action_type = 1; // Action type
+}
+
+// Defines an action
+message Action {
+    ActionHandle handle = 1;                                            // Action handle (useful when updating an existing action)
+    string name = 2;                                                    // Action friendly name
+    string application_data = 3;                                        // Application data (reserved for use by Web App)
     oneof action_parameters {
-        TwistCommand send_twist_command = 4;                            //action to control the robot in velocity
-        JointSpeeds send_joint_speeds = 7;                              //action to control each joint speed
-        ConstrainedPose reach_pose = 9;                                 //action to reach a pose
-        ConstrainedJointAngles reach_joint_angles = 10;                 //action to reach a joint angles 
-        AdmittanceMode toggle_admittance_mode = 16;                     //action to enable or disable the admittance mode
-        SwitchControlMapping switch_control_mapping = 19;               //action to switch the active controller map
-        JointNavigationDirection navigate_joints = 20;                  //action to select the next actuator to control in a map
-        NavigationDirection navigate_mappings = 21;                     //action to select a different map
-        ChangeTwist change_twist = 25;                                  //action to change twist
-        ChangeJointSpeeds change_joint_speeds = 26;                     //action to change the joint speeds per joint
-        EmergencyStop apply_emergency_stop = 31;                        //action to apply robot emergency stop
-        Faults clear_faults = 32;                                       //action to clear faults. robot will be able to move is no more error safeties 
-        Delay delay = 34;                                               //action to apply a delay      
-        ActionHandle execute_action = 35;                               //action to execute an existing action
-        GripperCommand send_gripper_command = 36;                       //action to execute a gripper movement
-        Stop stop_action = 38;                                          //action to stop movement
+        TwistCommand send_twist_command = 4;                            // Action to control the robot in velocity
+        JointSpeeds send_joint_speeds = 7;                              // Action to control each joint speed
+        ConstrainedPose reach_pose = 9;                                 // Action to reach a pose
+        ConstrainedJointAngles reach_joint_angles = 10;                 // Action to reach a series of joint angles
+        AdmittanceMode toggle_admittance_mode = 16;                     // Action to enable or disable the admittance mode
+        SwitchControlMapping switch_control_mapping = 19;               // Action to switch the active controller map
+        JointNavigationDirection navigate_joints = 20;                  // Action to select the next actuator to control in a map
+        NavigationDirection navigate_mappings = 21;                     // Action to select a different map
+        ChangeTwist change_twist = 25;                                  // Action to change twist
+        ChangeJointSpeeds change_joint_speeds = 26;                     // Action to change the joint speeds individually
+        EmergencyStop apply_emergency_stop = 31;                        // Action to apply robot emergency stop
+        Faults clear_faults = 32;                                       // Action to clear faults. Robot will be able to move if there is no more fault (see BaseCyclic.BaseFeedback.[fault_bank_a | fault_bank_b])
+
+        Delay delay = 34;                                               // Action to apply a delay
+        ActionHandle execute_action = 35;                               // Action to execute an existing action
+        GripperCommand send_gripper_command = 36;                       // Action to execute a gripper movement
+        Stop stop_action = 38;                                          // Action to stop movement
     }
 }
 
-/**
- * List of all supported action types
- */ 
+// List of admissible action types
 enum ActionType {
-    UNSPECIFIED_ACTION = 0;  //unspecified action type
-    SEND_TWIST_COMMAND = 1; //action to control the robot in velocity
-    SEND_JOINT_SPEEDS = 4; //action to control each joint speed
-    REACH_POSE = 6; //action to reach a pose
-    REACH_JOINT_ANGLES = 7; //action to reach a joint angles 
-    TOGGLE_ADMITTANCE_MODE = 13; //action to enable or disable the admittance mode
-    SWITCH_CONTROL_MAPPING = 16; //action to switch the active controller map
-    NAVIGATE_JOINTS = 17; //action to select the next actuator to control from control mapping
-    NAVIGATE_MAPPINGS = 18; //action to select a different map
-    CHANGE_TWIST = 22; //action to change the twist
-    CHANGE_JOINT_SPEEDS = 23; //action to change the joint speeds per joint
-    APPLY_EMERGENCY_STOP = 28; //action to apply robot emergency stop
-    CLEAR_FAULTS = 29; //action to clear faults. robot will be able to move is no more error safeties 
-    DELAY = 31; //action to apply a delay 
-    EXECUTE_ACTION = 32; //action to execute an existing action
-    SEND_GRIPPER_COMMAND = 33; //action to execute a gripper command
-    STOP_ACTION = 35; // action to stop movement
+    UNSPECIFIED_ACTION = 0;         // Unspecified action type
+    SEND_TWIST_COMMAND = 1;         // Action to control the robot in velocity
+    SEND_JOINT_SPEEDS = 4;          // Action to control each joint speed
+    REACH_POSE = 6;                 // Action to reach a pose
+    REACH_JOINT_ANGLES = 7;         // Action to reach a series of joint angles
+    TOGGLE_ADMITTANCE_MODE = 13;    // Action to enable or disable the admittance mode
+    SWITCH_CONTROL_MAPPING = 16;    // Action to switch the active controller map
+    NAVIGATE_JOINTS = 17;           // Action to select the next actuator to control from control mapping
+    NAVIGATE_MAPPINGS = 18;         // Action to select a different map
+    CHANGE_TWIST = 22;              // Action to change the twist
+    CHANGE_JOINT_SPEEDS = 23;       // Action to change the joint speeds individually
+    APPLY_EMERGENCY_STOP = 28;      // Action to apply robot emergency stop
+    CLEAR_FAULTS = 29;              // Action to clear faults. Robot will be able to move if there is no more fault (see BaseCyclic.BaseFeedback.[fault_bank_a | fault_bank_b])
+    TIME_DELAY = 31;                // Action to apply a delay
+    EXECUTE_ACTION = 32;            // Action to execute an existing action
+    SEND_GRIPPER_COMMAND = 33;      // Action to execute a gripper command
+    STOP_ACTION = 35;               // Action to stop movement
 }
 
-//action to switch the active controller map
+// Defines an action to switch the active controller map
 message SwitchControlMapping {
-    uint32 controller_identifier = 1;    
-    MapGroupHandle map_group_handle = 2;
-    MapHandle map_handle = 3;
+    uint32 controller_identifier = 1;       // Identifier of the controller for which changing the active map is requested
+    MapGroupHandle map_group_handle = 2;    // Identifier of the map group for which the active map needs to change
+    MapHandle map_handle = 3;               // New active map
 }
 
-//action to change the maximum cartesian velocity
+// Defines an action to increase (or reduce) the maximum Cartesian velocity by a specific increment
 message ChangeTwist {
-    float linear = 1;
-    float angular = 2;
+    float linear = 1;   // Linear Cartesian velocity increment (in meters per second)
+    float angular = 2;  // Angular Cartesian velocity increment (in degrees per second)
 }
 
-//action to change the maximum angular velocity per joint
+// Defines an action to increase (or reduce) the maximum angular velocity per joint by a specific increment
 message ChangeJointSpeeds {
-   JointSpeeds joint_speeds = 1;
+   JointSpeeds joint_speeds = 1; // Joint speeds
 }
 
-//action to apply robot emergency stop
+// Defines an action to force an emergency of the robot
 message EmergencyStop {
 }
 
-//Faults message
+// Defines an action to clear faults
 message Faults {
 }
 
-//action to apply a delay
+// Defines an action to apply a delay
 message Delay {
-    uint32 duration = 1;
+    uint32 duration = 1; // Delay (in seconds)
 }
 
-//action to stop movement
+// Defines an action to stop robot movement
 message Stop {
 }
 
-/**
- * List of actions
- */
+// Array of actions
 message ActionList {
-    repeated Action action_list = 1;
+    repeated Action action_list = 1; // Action
 }
 
-/**
- * Message to specify a timeout
- */
+// Defines a specific timeout
 message Timeout {
-    uint32 value = 1; //timeout value
-}  
+    uint32 value = 1; // Timeout value (future)
+}
 
-/**
- * Ssid handle
- */ 
+// Identifies a Wi-Fi SSID
 message Ssid {
-    string identifier = 1; //SSID value
+    string identifier = 1; // Wi-Fi Service Set Identifier
 }
 
-/**
- * Message to enable (or disable) a specific communication interface
- */ 
+// Enables or disables a specific communication interface (e.g. Wi-Fi, Wired Ethernet)
 message CommunicationInterfaceConfiguration {
-    NetworkType type = 1;  //network type
-    bool enable = 2; //true if network is enabled, false otherwise
+    NetworkType type = 1;   // Network type (e.g. Wi-Fi, Wired Ethernet)
+    bool enable = 2;        // Enable configuration. Set to true to enable network, false otherwise
 }
 
-/**
- * Message to identify the type of network
- */ 
+// List of admissible network types
 enum NetworkType {
-    UNSPECIFIED_NETWORK_TYPE = 0; //unspecified network type
-    WIFI = 1;  //Wifi network
-    WIRED_ETHERNET = 2; //wired Ethernet network
+    UNSPECIFIED_NETWORK_TYPE = 0;   // Unspecified network type
+    WIFI = 1;                       // Wi-Fi network
+    WIRED_ETHERNET = 2;             // Wired Ethernet network
 }
 
-/**
- * Network handle
- */  
+// Identifies a network
 message NetworkHandle {
-    NetworkType type = 1;  //network type
+    NetworkType type = 1;  // Network type
 }
 
-/**
- * IPv4 configuration
- */  
+// Provides an IPv4 configuration
 message IPv4Configuration {
-    uint32 ip_address = 1;  //IPv4 address
-    uint32 subnet_mask = 2;  //IPv4 subnet mask
-    uint32 default_gateway = 3; //Gateway IPv4 address
-    bool dhcp_enabled = 4; //set to true to use dhcp instead of static ip configuration
+    uint32 ip_address = 1;      // IPv4 address
+    uint32 subnet_mask = 2;     // IPv4 subnet mask
+    uint32 default_gateway = 3; // Gateway IPv4 address
+    bool dhcp_enabled = 4;      // Enable automatic (DHCP) IPv4 configuration. Set to true to enable DHCP instead of static configuration.
 }
 
-/**
- * IPv4 information
- */  
+// Provides information about an IPv4 endpoint
 message IPv4Information {
-    uint32 ip_address = 1;  //IPv4 address
-    uint32 subnet_mask = 2;  //IPv4 subnet mask
-    uint32 default_gateway = 3; //Gateway IPv4 address
+    uint32 ip_address = 1;      // IPv4 address
+    uint32 subnet_mask = 2;     // IPv4 subnet mask
+    uint32 default_gateway = 3; // Gateway IPv4 address
 }
 
-/**
- * Message to specify the IPv4 configuration for a specific type of network
- */
+// Provides an IPv4 configuration for a specific network
 message FullIPv4Configuration {
- 
-    NetworkHandle handle = 1; //network handle
-    IPv4Configuration ipv4_configuration = 2; //IPv4 configuration  
+    NetworkHandle handle = 1;                   // Network handle
+    IPv4Configuration ipv4_configuration = 2;   // IPv4 configuration
 }
 
 
-/**
- * Wifi Security type
- */
+// List of admissible Wi-Fi Security types
 enum WifiSecurityType {
-    UNSPECIFIED_AUTHENTICATION = 0; //unspecified wifi security type
-
-    WEP = 1; //WEP authentication required
-    WPA2_PERSONAL = 2; //WPA2 Personal authentication required
-    WPA_PERSONAL = 4; //WPA Personal authentication required
-    NO_AUTHENTICATION = 8;  //no authentication required
+    UNSPECIFIED_AUTHENTICATION = 0; // Unspecified wifi security type
+    WEP = 1;                        // WEP authentication required
+    WPA2_PERSONAL = 2;              // WPA2 Personal authentication required
+    WPA_PERSONAL = 4;               // WPA Personal authentication required
+    NO_AUTHENTICATION = 8;          // No authentication required
 }
 
-/**
- * Wifi encryption type
- */
+// List of admissible Wi-Fi encryption types
 enum WifiEncryptionType {
-
-    UNSPECIFIED_ENCRYPTION = 0; //unspecified wifi encryption type
-    AES_ENCRYPTION = 1; //AES encryption
-    TKIP_ENCRYPTION = 2; // TKIP encryption
-    WEP_ENCRYPTION = 4; //WEP encryption
+    UNSPECIFIED_ENCRYPTION = 0; // Unspecified wifi encryption type
+    AES_ENCRYPTION = 1;         // AES encryption
+    TKIP_ENCRYPTION = 2;        // TKIP encryption
+    WEP_ENCRYPTION = 4;         // WEP encryption
 }
 
-/**
- * Signal quality
- */
+// List of admissible signal quality values
 enum SignalQuality {
- 
-    UNSPECIFIED_SIGNAL_QUALITY = 0; //unspecified signal quality
-    POOR = 1; //Poor signal quality
-    FAIR = 2; //Fair signal quality
-    GOOD = 3; //Good signal quality
-    EXCELLENT = 4; //Excellent signal quality
-    NONE = 5; //No signal
+    UNSPECIFIED_SIGNAL_QUALITY = 0; // Unspecified signal quality
+    POOR = 1;                       // Poor signal quality
+    FAIR = 2;                       // Fair signal quality
+    GOOD = 3;                       // Good signal quality
+    EXCELLENT = 4;                  // Excellent signal quality
+    NONE = 5;                       // No signal
 }
 
-/**
- * Message to provide Information about a specific Wifi network
- */ 
+// Provides information about a specific Wi-Fi network
 message WifiInformation {
-    Ssid ssid = 1; //SSID
-    fixed32 security_type = 2; //Wifi Security type
-    fixed32 encryption_type = 3; //Wifi Encryption type
-    SignalQuality signal_quality = 4; //Wifi signal quality
-    int32 signal_strength = 5; //Wifi signal power in dBm
-    uint32 frequency = 6; //Wifi operating frequency (channel) in MHz
-    uint32 channel = 7; //Wifi operating channel
+    Ssid ssid = 1;                      // SSID
+    fixed32 security_type = 2;          // Wi-Fi security type
+    fixed32 encryption_type = 3;        // Wi-Fi encryption type
+    SignalQuality signal_quality = 4;   // Wi-Fi signal quality
+    int32 signal_strength = 5;          // Wi-Fi signal power in dBm
+    uint32 frequency = 6;               // Wi-Fi operating frequency (channel) in MHz
+    uint32 channel = 7;                 // Wi-Fi operating channel
 }
 
-/**
- * Wifi information list
- */
+// Array of Wi-Fi information
 message WifiInformationList {
-    repeated WifiInformation wifi_information_list = 1; //wifi informations
+    repeated WifiInformation wifi_information_list = 1; // Wi-Fi information
 }
 
-/**
- * Wifi Configuration
- */ 
+// Provides a Wi-Fi Configuration
 message WifiConfiguration {
-    Ssid ssid = 1; // SSID
-    string security_key = 2; //security key to used when connecting to Wifi network
-    bool connect_automatically = 3; //set to true so robot automatically connects to this Wifi network at bootup, false otherwise
+    Ssid ssid = 1;                  // SSID
+    string security_key = 2;        // Security key to used when connecting to Wi-Fi network
+    bool connect_automatically = 3; // Connection mode. Set to true so robot automatically connects to this Wi-Fi network at bootup, false otherwise
 }
 
-/**
- * Wifi configuration list
- */
+// Array of Wi-Fi configuration
 message WifiConfigurationList {
-    repeated WifiConfiguration wifi_configuration_list   = 1; //wifi configurations
+    repeated WifiConfiguration wifi_configuration_list   = 1; // Wi-Fi configurations
 }
 
-/**
- * Protection zone handle
- */
+// Identifies a protection zone
 message ProtectionZoneHandle {
-    uint32 identifier = 1;  //protection zone identifier
-    fixed32 permission = 2; //must use 'Permission' enum
-} 
+    uint32 identifier = 1;  // Protection zone identifier
+    fixed32 permission = 2; // Permission of specified Proctection zone entity. Must use 'Kinova.Api.Common.Permission' enum.
+}
 
-/**
- * Single rotation matrix row
- */ 
+// Provides the rotation matrix configuration of a single row
 message RotationMatrixRow {
-    float column1 = 1;
-    float column2 = 2; 
-    float column3 = 3;
+    float column1 = 1;  // Value between -1.0 and 1.0
+    float column2 = 2;  // Value between -1.0 and 1.0
+    float column3 = 3;  // Value between -1.0 and 1.0
 }
 
-/**
- * 3x3 rotation matrix
- */
+// Provides a 3x3 rotation matrix configuration
 message RotationMatrix {
-    RotationMatrixRow row1 = 1; //first rotation matrix row
-    RotationMatrixRow row2 = 2; //
-    RotationMatrixRow row3 = 3;
+    RotationMatrixRow row1 = 1; // First rotation matrix row
+    RotationMatrixRow row2 = 2; // Second rotation matrix row
+    RotationMatrixRow row3 = 3; // Third rotation matrix row
 }
 
-/**
- * Cartesian point
- */
+// Identifies a Cartesian point
 message Point {
-    float x = 1;  //x
-    float y = 2;  //y
-    float z = 3;  //z
+    float x = 1;  // x (in meters)
+    float y = 2;  // y (in meters)
+    float z = 3;  // z (in meters)
 }
 
-/**
- * List of Protection zone shape types
- */
+// List of admissible protection zone shape types
 enum ShapeType {
-    UNSPECIFIED_SHAPE = 0; //unspecified shape type
-    CYLINDER = 1;
-    SPHERE = 2;
-    RECTANGULAR_PRISM = 3;    
+    UNSPECIFIED_SHAPE = 0;  // Unspecified shape type
+    CYLINDER = 1;           // Cylinder shape type
+    SPHERE = 2;             // Sphere shape type
+    RECTANGULAR_PRISM = 3;  // Rectangular prism shape type
 }
 
-/**
- * Protection zone shape
- */
+// Provides a protection zone shape description
 message ZoneShape {
-    ShapeType shape_type = 1; //shape type
-    Point origin = 2; //origin of the protection zone shape from reference
-    RotationMatrix orientation = 3; //rotation matrix to provide shape orientation
-    repeated float dimensions = 4; //shape size measurement. if rectangular prism: x, y and z dimensions. if cylinder: radius and height. if sphere: radius
-    float envelope_thickness = 5; //thickness of envelop around shape. The envelop is of same shape type as the shape at its center
+    ShapeType shape_type = 1;       // Shape type
+    Point origin = 2;               // Origin of the protection zone shape from reference (in meters)
+    RotationMatrix orientation = 3; // Rotation matrix to provide shape orientation
+    repeated float dimensions = 4;  // Shape size measurement (in meters). If rectangular prism: x, y and z dimensions. If cylinder: radius and height. If sphere: radius
+    float envelope_thickness = 5;   // Thickness of envelop around shape (in meters). The envelop is of same shape type as the shape at its center.
 }
 
-/**
- * Protection zone configuration
- */
+// Provides a protection zone configuration
 message ProtectionZone {
-    ProtectionZoneHandle handle = 1; //protection zone handle
-    string name = 2; //protection zone friendly name
-    string application_data = 3; //application data (used by Web App)
-    bool is_enabled = 4; //true if protection zone is enabled, false otherwise
-    ZoneShape shape = 5; //protection zone shape
-    repeated CartesianLimitation limitations = 6;  //list of cartesian limitation (i.e. force)
-    repeated CartesianLimitation envelope_limitations = 7; //list of cartesian limitation of the envelop (i.e. velocity and force)
+    ProtectionZoneHandle handle = 1;                        // Protection zone handle
+    string name = 2;                                        // Protection zone friendly name
+    string application_data = 3;                            // Application data (reserved for use by Web App)
+    bool is_enabled = 4;                                    // True if protection zone is enabled, false otherwise
+    ZoneShape shape = 5;                                    // Protection zone shape
+    repeated CartesianLimitation limitations = 6;           // List of Cartesian limitation
+    repeated CartesianLimitation envelope_limitations = 7;  // List of Cartesian limitation of the envelop
 }
 
-/**
- * list of protection zones
- */
+// Array of protection zones
 message ProtectionZoneList {
-    repeated ProtectionZone protection_zones = 1; //protection zones
+    repeated ProtectionZone protection_zones = 1; // Protection zone
 }
 
-/**
- * List of limitation types
- */
+// List of admisible limitation types
 enum LimitationType {
-    UNSPECIFIED_LIMITATION = 0; //unspecified limitation
-    FORCE_LIMITATION = 1; //force limitation
-    ACCELERATION_LIMITATION = 2; //acceleration limitation
-    VELOCITY_LIMITATION = 3; //velocity limitation
+    UNSPECIFIED_LIMITATION = 0;     // Unspecified limitation
+    FORCE_LIMITATION = 1;           // Force limitation (future)
+    ACCELERATION_LIMITATION = 2;    // Acceleration limitation (future)
+    VELOCITY_LIMITATION = 3;        // Velocity limitation
 }
 
 
-/**
- * Limitation identifier
- */
-message LimitationTypeIdentifier { 
-    LimitationType type = 1; //limitation type
+// Identifies a limitation
+message LimitationTypeIdentifier {
+    LimitationType type = 1;    // Limitation type
 }
 
-/**
- * Cartesian limitation configuration
- */ 
+// Provides a Cartesian limitation configuration
 message CartesianLimitation {
-    LimitationType type = 1; //limitation type
-    float translation = 2; //translation limitation
-    float orientation = 3; //orientation limitation
-}  
+    LimitationType type = 1;    // Limitation type
+    float translation = 2;      // Translation limitation
+    float orientation = 3;      // Orientation limitation
+}
 
-/**
- * List of cartesian limitations
- */
+// Array of Cartesian limitations
 message CartesianLimitationList {
-    repeated CartesianLimitation limitations = 1; //limitations
+    repeated CartesianLimitation limitations = 1; // Limitation
 }
 
-/**
- * Joint limitation
- */
+// Defines joint limitation value
 message JointLimitationValue {
-    LimitationType type = 1;  //limitation type
-    float value = 2; //limitation value
+    LimitationType type = 1;    // Limitation type
+    float value = 2;            // Limitation value
 }
 
-/**
- * List of joint limitations
- */
+// List of joint limitations
 message JointLimitationValueList {
-    repeated JointLimitationValue joint_limitation_values = 1; //joint limitations
+    repeated JointLimitationValue joint_limitation_values = 1; // Joint limitation
 }
 
-/**
- * Joint limitation
- */
+// Defines a joint limitation
 message JointLimitation {
-    uint32 device_identifier = 1; //joint device identifier
-    JointLimitationValue limitation_value = 2; //joint limitation value
+    uint32 device_identifier = 1;               // Joint device identifier
+    JointLimitationValue limitation_value = 2;  // Joint limitation value
 }
 
-/**
- * message to specify a specific limitation type for a specific joint
- */
+// Identifies a joint limitation for a specific joint
 message JointLimitationTypeIdentifier {
-    uint32 device_identifier = 1; //joint device identifier 
-    LimitationType type = 2; //joint limitation type
+    uint32 device_identifier = 1;   // Joint device identifier
+    LimitationType type = 2;        // Joint limitation type
 }
 
-/**
- * Message to specify the parameters of a a event log query
- */
+// Specifies the parameters of an event log query (future)
 message Query {
-    Kinova.Api.Common.Timestamp start_timestamp = 1;  //start timestamp (set to zero to specify it)
-    Kinova.Api.Common.Timestamp end_timestamp = 2; //end timestamp (set to zero to not specify it)
-    string username = 3; //queried username (set to "" to not specify it)
+    Kinova.Api.Common.Timestamp start_timestamp = 1;    // Start timestamp (set to zero to specify it)
+    Kinova.Api.Common.Timestamp end_timestamp = 2;      // End timestamp (set to zero to not specify it)
+    string username = 3;                                // Queried username (set to "" to not specify it)
 }
 
-/**
-  * Configuration events
- */
+// List of admissible configuration events
 enum ConfigurationNotificationEvent {
- 
-    UNSPECIFIED_CONFIGURATION_EVENT = 0; //unspecified configuration event
-    UPDATE = 1; //delete configuration
-    DELETE = 2; //update configuration
-    DELETE_ALL = 3; //delete all configuration
-    CREATE = 4; //create configuration
+    UNSPECIFIED_CONFIGURATION_EVENT = 0;    // Unspecified configuration event
+    CONFIGURATION_UPDATED = 1;              // Configuration deleted
+    CONFIGURATION_DELETED = 2;              // Configuration updated
+    CONFIGURATION_DELETED_ALL = 3;          // All configurations deleted
+    CONFIGURATION_CREATED = 4;              // Configuration created
 }
 
-/**
-  * Message that contains a Configuration change event
- */
+// Message that contains a configuration change event
 message ConfigurationChangeNotification {
-    ConfigurationNotificationEvent event = 1; //configuration event
-    Kinova.Api.Common.Timestamp timestamp = 2; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 3; //user that caused the configuration event
+    ConfigurationNotificationEvent event = 1;                           // Configuration event
+    Kinova.Api.Common.Timestamp timestamp = 2;                          // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 3;                // User that caused the configuration event
     oneof configuration_change {
-        SequenceHandle sequence_handle = 4;
-        ActionHandle action_handle = 5;
-        MappingHandle mapping_handle = 6;
-        MapGroupHandle map_group_handle = 7;
-        MapHandle map_handle = 8;
-        Kinova.Api.Common.UserProfileHandle user_profile_handle = 9;
-        ProtectionZoneHandle protection_zone_handle = 10;
-        Kinova.Api.Common.SafetyHandle safety_handle = 11;
-        NetworkHandle network_handle = 12;
-        Ssid ssid = 14;
+        SequenceHandle sequence_handle = 4;                             // Sequence for which the configuration changed
+        ActionHandle action_handle = 5;                                 // Action for which the configuration changed
+        MappingHandle mapping_handle = 6;                               // Mapping for which the configuration changed
+        MapGroupHandle map_group_handle = 7;                            // Map group for which the configuration changed
+        MapHandle map_handle = 8;                                       // Map for which the configuration changed
+        Kinova.Api.Common.UserProfileHandle user_profile_handle = 9;    // User Profile for which the configuration changed
+        ProtectionZoneHandle protection_zone_handle = 10;               // Protection zone for which the configuration changed
+        Kinova.Api.Common.SafetyHandle safety_handle = 11;              // Safety for which the configuration changed
+        NetworkHandle network_handle = 12;                              // Network element for which the configuration changed
+        Ssid ssid = 14;                                                 // Wi-Fi instance for which the configuration changed
     }
-    Kinova.Api.Common.Connection connection = 15; // connection that caused the configuration event
+    Kinova.Api.Common.Connection connection = 15;                       // Connection that caused the configuration event
 }
 
-/**
-  * Message that contains a Mapping information event
- */
+// Message that contains a mapping information event
 message MappingInfoNotification {
-    uint32 controller_identifier = 1; //identifier of the controller 
-    MapHandle active_map_handle = 2;
-    Kinova.Api.Common.Timestamp timestamp = 3; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 4; //user that caused the mapping information event
-    Kinova.Api.Common.Connection connection = 5; // connection that caused the mapping information event
+    uint32 controller_identifier = 1;                       // Identifier of the controller
+    MapHandle active_map_handle = 2;                        // New active map
+    Kinova.Api.Common.Timestamp timestamp = 3;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 4;    // User that caused the mapping information event
+    Kinova.Api.Common.Connection connection = 5;            // Connection that caused the mapping information event
 }
 
-/**
-  * list of possible robot control modes
- */
+// List of admissible robot control modes
 enum ControlMode {
-    UNSPECIFIED_CONTROL_MODE = 0; //unspecified control mode
-    ANGULAR_JOYSTICK = 1; //angular joystick mode
-    CARTESIAN_JOYSTICK = 2; //cartesian joystick mode
-    VISION_JOYSTICK = 3; //vision joystick mode
-    ANGULAR_TRAJECTORY = 4; //angular trajectory mode
-    CARTESIAN_TRAJECTORY = 5; //cartesian trajectory mode
-    CARTESIAN_ADMITTANCE = 6; //cartesian admittance mode
-    JOINT_ADMITTANCE = 7; //joint admittance mode
-    NULL_SPACE_ADMITTANCE = 8; //null space mode
-    IDLE = 13; //Idle    
+    UNSPECIFIED_CONTROL_MODE = 0;   // Unspecified control mode
+    ANGULAR_JOYSTICK = 1;           // Angular joystick mode
+    CARTESIAN_JOYSTICK = 2;         // Cartesian joystick mode
+    VISION_JOYSTICK = 3;            // Vision joystick mode
+    ANGULAR_TRAJECTORY = 4;         // Angular trajectory mode
+    CARTESIAN_TRAJECTORY = 5;       // Cartesian trajectory mode
+    CARTESIAN_ADMITTANCE = 6;       // Cartesian admittance mode
+    JOINT_ADMITTANCE = 7;           // Joint admittance mode
+    NULL_SPACE_ADMITTANCE = 8;      // Null space mode
+    IDLE = 13;                      // Idle
 };
 
+// Provides control mode information
 message ControlModeInformation {
-    ControlMode mode = 1;
+    ControlMode mode = 1; // Control mode
 }
 
-/**
-  * Message that contains a Control mode event
- */
+// Message that contains a control mode event
 message ControlModeNotification {
-    ControlMode control_mode = 1; //new control mode
-    Kinova.Api.Common.Timestamp timestamp = 2; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 3; //user that caused the control mode event
-    Kinova.Api.Common.Connection connection = 4; // connection that caused the control mode event
+    ControlMode control_mode = 1;                           // New control mode
+    Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 3;    // User that caused the control mode event
+    Kinova.Api.Common.Connection connection = 4;            // Connection that caused the control mode event
 }
 
-/**
-  * list of robot operating modes which are used to manage robot firmware upgrade
- */
+// List of admissible robot operating modes (used to report robot firmware upgrade current state)
 enum OperatingMode {
-    UNSPECIFIED_OPERATING_MODE = 0; //unspecified operating mode
-    MAINTENANCE_MODE = 1; //robot in maintenance mode
-    UPDATE_MODE = 2; //robot waiting for upgrade package
-    UPDATE_COMPLETED_MODE = 3; //robot update successfully completed
-    UPDATE_FAILED_MODE = 4; //robot update failed
-    SHUTTING_DOWN_MODE = 5; //robot about to shutdown
-    RUN_MODE = 6; //robot properly running (or normal operation mode)
-    UPDATING_DEVICE_MODE = 7; //robot updating device
+    UNSPECIFIED_OPERATING_MODE = 0; // Unspecified operating mode
+    MAINTENANCE_MODE = 1;           // Robot in maintenance mode
+    UPDATE_MODE = 2;                // Robot waiting for upgrade package
+    UPDATE_COMPLETED_MODE = 3;      // Robot update successfully completed
+    UPDATE_FAILED_MODE = 4;         // Robot update failed
+    SHUTTING_DOWN_MODE = 5;         // Robot about to shutdown
+    RUN_MODE = 6;                   // Robot properly running (or normal operation mode)
+    UPDATING_DEVICE_MODE = 7;       // Robot updating device
 }
 
-// enum used to configure the servoing mode
+// List of admissible servoing modes
 enum ServoingMode {
-    UNSPECIFIED_SERVOING_MODE = 0; //unspecified servoing mode
-    MULTI_LEVEL_SERVOING = 1; //multi-level servoing
-    SINGLE_LEVEL_SERVOING = 2; //single-level servoing
-    LOW_LEVEL_SERVOING = 3; //low-level servoing
-    BYPASS_SERVOING = 4; //bypass mode
+    UNSPECIFIED_SERVOING_MODE = 0;  // Unspecified servoing mode
+    MULTI_LEVEL_SERVOING = 1;       // Multi-level servoing
+    SINGLE_LEVEL_SERVOING = 2;      // Single-level servoing
+    LOW_LEVEL_SERVOING = 3;         // Low-level servoing
+    BYPASS_SERVOING = 4;            // Bypass mode
 }
 
+// Provides information about the servoing mode
 message ServoingModeInformation {
-    ServoingMode servoing_mode = 1;
+    ServoingMode servoing_mode = 1; // Servoing mode
 }
 
+// Provides information about the operating mode
 message OperatingModeInformation {
-    OperatingMode operating_mode = 1; //operating mode
-    Kinova.Api.Common.DeviceHandle device_handle = 2; //device matching operating mode (if applicable)
+    OperatingMode operating_mode = 1;                   // Operating mode
+    Kinova.Api.Common.DeviceHandle device_handle = 2;   // Device matching operating mode (if applicable)
 }
 
-/**
-  * Message that contains Operating mode event
- */
+// Message that contains an operating mode event
 message OperatingModeNotification {
-    OperatingMode operating_mode = 1; //new operating mode
-    Kinova.Api.Common.Timestamp timestamp = 2; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 3; //user that caused the Operating mode event
-    Kinova.Api.Common.Connection connection = 4; // connection that caused the Operating mode event
-    Kinova.Api.Common.DeviceHandle device_handle = 5; //device matching operating mode (if applicable)
+    OperatingMode operating_mode = 1;                       // New operating mode
+    Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 3;    // User that caused the operating mode event
+    Kinova.Api.Common.Connection connection = 4;            // Connection that caused the operating mode event
+    Kinova.Api.Common.DeviceHandle device_handle = 5;       // Device matching operating mode (if applicable)
 }
 
-/**
-  * Message that contains Servoing mode event
- */
+// Message that contains a servoing mode event
 message ServoingModeNotification {
-    ServoingMode servoing_mode = 1; //new operating mode
-    Kinova.Api.Common.Timestamp timestamp = 2; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 3; //user that caused the Operating mode event
-    Kinova.Api.Common.Connection connection = 4; // connection that caused the Servoing mode event        
+    ServoingMode servoing_mode = 1;                         // New servoing mode
+    Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 3;    // User that caused the servoing mode event
+    Kinova.Api.Common.Connection connection = 4;            // Connection that caused the servoing mode event
 }
 
-/**
-  * list of possible sequence event types
- */
+// List of admissible sequence event types
 enum EventIdSequenceInfoNotification {
- 
-    UNSPECIFIED_SEQUENCE_EVENT = 0; //unspecified sequence event
-    END = 1;   //sequence end reached
-    ABORT = 2; //sequence aborted     
-    PAUSE = 3; //sequence paused
-    TASK_START = 4; //sequence task started
-    TASK_END = 5; //sequence task ended   
-    START = 6; //sequence started
+    UNSPECIFIED_SEQUENCE_EVENT = 0; // Unspecified sequence event
+    SEQUENCE_COMPLETED = 1;         // Sequence completed successfully
+    SEQUENCE_ABORTED = 2;           // Sequence aborted
+    SEQUENCE_PAUSED = 3;            // Sequence paused
+    SEQUENCE_TASK_STARTED = 4;      // Sequence task started
+    SEQUENCE_TASK_COMPLETED = 5;    // Sequence task completed
+    SEQUENCE_STARTED = 6;           // Sequence started
 }
 
-/**
-  * Message that contains Sequence information event
- */
+// Message that contains a sequence information event
 message SequenceInfoNotification {
-    EventIdSequenceInfoNotification event_identifier = 1; //sequence event type
-    SequenceHandle sequence_handle = 2;
-    uint32 task_index = 3; //task index
-    uint32 group_identifier = 4; //specifies the order in which this task must be executed
-    Kinova.Api.Common.Timestamp timestamp = 5; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 6; //user that caused the sequence event
-    SubErrorCodes abort_details = 7; //details if event_identifier is equal to ABORT
-    Kinova.Api.Common.Connection connection = 8; // connection that caused the sequence event            
+    EventIdSequenceInfoNotification event_identifier = 1;   // Sequence event type
+    SequenceHandle sequence_handle = 2;                     // Handle of the sequence that this event refers to
+    uint32 task_index = 3;                                  // Task index
+    uint32 group_identifier = 4;                            // Specifies the order in which this task must be executed
+    Kinova.Api.Common.Timestamp timestamp = 5;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 6;    // User that caused the sequence event
+    SubErrorCodes abort_details = 7;                        // Details if event_identifier is equal to ABORT
+    Kinova.Api.Common.Connection connection = 8;            // Connection that caused the sequence event
 }
 
-
+// Provides information about a sequence
 message SequenceInformation {
-    EventIdSequenceInfoNotification event_identifier = 1; //sequence event type
-    uint32 task_index = 2;  //task index
-    uint32 task_identifier = 3; //task identifier 
+    EventIdSequenceInfoNotification event_identifier = 1;   // Sequence event type
+    uint32 task_index = 2;                                  // Task index
+    uint32 task_identifier = 3;                             // Task identifier
 }
 
-/**
-  * list of protection zone event types
- */
+// List of admissible protection zone events
 enum ProtectionZoneEvent {
-    UNSPECIFIED_PROTECTION_ZONE_EVENT = 0;
-                                                 
-    REACHED = 1; //protection zone limit is reached
-    ENTERED = 2; //protection zone limit is entered
-    EXITED = 3; //protection zone limit is exited
+    UNSPECIFIED_PROTECTION_ZONE_EVENT = 0;  // Unspecified protection zone event
+    REACHED = 1;                            // Protection zone limit is reached
+    ENTERED = 2;                            // Protection zone limit is entered
+    EXITED = 3;                             // Protection zone limit is exited
 };
 
-/**
-  * Message that contains a protection zone event
- */
+// Message that contains a protection zone event
 message ProtectionZoneNotification {
-    ProtectionZoneEvent event = 1; //event type
-    ProtectionZoneHandle handle = 2;
-    Kinova.Api.Common.Timestamp timestamp = 3; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 4; //user that caused the protection zone event to occur
-    Kinova.Api.Common.Connection connection = 5; // connection that caused the protection zone event to occur
+    ProtectionZoneEvent event = 1;                          // Event type
+    ProtectionZoneHandle handle = 2;                        // Handle of the protection zone that this event refers to
+    Kinova.Api.Common.Timestamp timestamp = 3;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 4;    // User that caused the protection zone event to occur
+    Kinova.Api.Common.Connection connection = 5;            // Connection that caused the protection zone event to occur
 }
 
+// Provides information about a protection zone
 message ProtectionZoneInformation {
-    ProtectionZoneEvent event = 1; //event type
+    ProtectionZoneEvent event = 1; // Event type
 }
 
-/**
-  * List of User event types
- */
+// List of admissible user event types
 enum UserEvent {
-    UNSPECIFIED_USER_EVENT = 0; //unspecified user event
-    LOGGED_OUT = 1; //user logged out
-    LOGGED_IN = 2; //user logged in
+    UNSPECIFIED_USER_EVENT = 0; // Unspecified user event
+    LOGGED_OUT = 1;             // User logged out
+    LOGGED_IN = 2;              // User logged in
 };
 
-/**
-  * Message that contains a User event
- */
+// Message that contains a user event
 message UserNotification {
-    UserEvent user_event = 1; //user event type
-    Kinova.Api.Common.UserProfileHandle modified_user = 2; //user profile that was modified
-    Kinova.Api.Common.Timestamp timestamp = 3; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 4; //user that caused the user profile event (i.e.  user who changed the user profile)
-    Kinova.Api.Common.Connection connection = 5; // connection that caused the user profile event (i.e.  user who changed the user profile)
+    UserEvent user_event = 1;                               // User event type
+    Kinova.Api.Common.UserProfileHandle modified_user = 2;  // User profile that was modified
+    Kinova.Api.Common.Timestamp timestamp = 3;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 4;    // User that caused the user profile event (i.e.  user who changed the user profile)
+    Kinova.Api.Common.Connection connection = 5;            // Connection that caused the user profile event (i.e.  user who changed the user profile)
 }
 
-/**
- * List of possible controller types
- */
+// List of admissible controller types
 enum ControllerType {
-    UNSPECIFIED_CONTROLLER_TYPE = 0; //unspecified controller type
-    XBOX_CONTROLLER = 1; //XBOX controller
-    WRIST_CONTROLLER = 2; //Wrist controller on Kinova Arm
+    UNSPECIFIED_CONTROLLER_TYPE = 0;    // Unspecified controller type
+    XBOX_CONTROLLER = 1;                // Xbox controller
+    WRIST_CONTROLLER = 2;               // Wrist controller on Kinova Arm
 }
 
-/**
- * Handle on a specific controller
- */
+// Identifies a specific controller
 message ControllerHandle {
-    ControllerType type = 1; //controller type
-    uint32 controller_identifier = 2; //controller identifier
+    ControllerType type = 1;            // Controller type
+    uint32 controller_identifier = 2;   // Controller identifier
 }
 
-/**
- * Handle on a specific button (or axis) of a controller
- */
+// Identifies a specific button (or axis) of a controller
 message ControllerElementHandle {
-    ControllerHandle controller_handle = 1; //controller handle
+    ControllerHandle controller_handle = 1; // Controller handle
     oneof identifier {
-        uint32 button = 2; //button identifier (only set if 'button' controller event, otherwise zero)
-        uint32 axis = 3; //axis identifier (only set if 'axis' controller event, otherwise zero)
+        uint32 button = 2;                  // Button identifier (only set if 'button' controller event, otherwise zero)
+        uint32 axis = 3;                    // Axis identifier (only set if 'axis' controller event, otherwise zero)
     }
 }
 
-/**
-  * Message that contains controller event
- */
+// Message that contains a controller event
 message ControllerNotification {
-    
     oneof state {
-        ControllerState controller_state = 1;
-        ControllerElementState controller_element = 2;
+        ControllerState controller_state = 1;               // Used to indicate if a controller connection or disconnection event occured
+        ControllerElementState controller_element = 2;      // Used to indicate if a specifif button (or axis) was pressed (or moved) (future)
     }
-    
-    Kinova.Api.Common.Timestamp timestamp = 3; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 4; //user that caused the controller event
-    Kinova.Api.Common.Connection connection = 5; // connection that caused the controller event
+    Kinova.Api.Common.Timestamp timestamp = 3;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 4;    // User that caused the controller event
+    Kinova.Api.Common.Connection connection = 5;            // Connection that caused the controller event
 }
 
-/**
- * Message that allows to retrieve a list of controller handles
- */
+// Array of controllers
 message ControllerList {
-    repeated ControllerHandle handles = 1;
+    repeated ControllerHandle handles = 1;  // Controller handle
 }
 
+// Indicates if a controller is connected (or disconnected)
 message ControllerState {
-    ControllerHandle handle = 1; 
-    ControllerEventType event_type = 2;
+    ControllerHandle handle = 1;        // Controller identifier
+    ControllerEventType event_type = 2; // Type of controller event that occured
 }
 
+// Indicates if a specific button (or axis) was pressed (or moved)
 message ControllerElementState {
-    ControllerElementHandle handle = 1; //controller element
-    ControllerElementEventType event_type = 2;
-    float axis_value = 3; //axis value (set between -1.0 and +1.0); only set if 'axis' controller element, otherwise zero
+    ControllerElementHandle handle = 1;         // Controller element handle
+    ControllerElementEventType event_type = 2;  // Type of controller element event that occured
+    float axis_value = 3;                       // Axis value (set between -1.0 and 1.0); only set if 'axis' controller element, otherwise set to zero
 }
 
-/**
- * Controller event type
- */
-enum ControllerEventType { 
-    UNSPECIFIED_CONTROLLER_EVENT = 0; //unspecified controller event
-    CONTROLLER_DISCONNECTED = 1; //controller was disconnected
-    CONTROLLER_CONNECTED = 2; //controler was connected
+// List of admissible controller event types
+enum ControllerEventType {
+    UNSPECIFIED_CONTROLLER_EVENT = 0;   // Unspecified controller event
+    CONTROLLER_DISCONNECTED = 1;        // Controller is disconnected
+    CONTROLLER_CONNECTED = 2;           // Controller is connected
 }
 
+// List of admissible controller element event types
+enum ControllerElementEventType {
+    UNSPECIFIED_CONTROLLER_ELEMENT_EVENT = 0;   // Unspecified controller element event
+    AXIS_MOVED = 1;                             // Controller axis moved
+    BUTTON_DOWN = 2;                            // Controller button pressed
+    BUTTON_UP = 3;                              // Controller button released
+}
+
+// List of admissible action event types
+enum ActionEvent {
+    UNSPECIFIED_ACTION_EVENT = 0;   // Unspecified action event
+    ACTION_END = 1;                 // Action execution end reached
+    ACTION_ABORT = 2;               // Action execution aborted
+    ACTION_PAUSE = 3;               // Action execution paused
+    ACTION_START = 4;               // Action execution started
+}
+
+// Message that contains an action event
+message ActionNotification {
+    ActionEvent action_event = 1;                           // Action event type
+    ActionHandle handle = 2;                                // Identifies the action for which this event occured
+    Kinova.Api.Common.Timestamp timestamp = 3;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 4;    // User that caused the action event
+    SubErrorCodes abort_details = 5;                        // Details if action_event is equal to ACTION_ABORT
+    Kinova.Api.Common.Connection connection = 6;            // Connection that caused the action event
+}
+
+// Indicates the execution state of an action (future)
+message ActionExecutionState {
+    ActionEvent action_event = 1;   // Action event type
+    ActionHandle handle = 2;        // Identifies the action for which this event occured
+}
+
+// List of admissible robot events
+enum RobotEvent {
+    UNSPECIFIED_ROBOT_EVENT = 0;    // Unspecified robot event
+    ARM_CONNECTED = 1;              // Arm is connected
+    ARM_DISCONNECTED = 2;           // Arm is disconnected
+    TOOL_CONNECTED = 5;             // Tool is connected to the end effector (future)
+    TOOL_DISCONNECTED = 6;          // Tool is disconnected from end effector (future)
+}
+
+// Message that contains a robot event
+message RobotEventNotification {
+    RobotEvent event = 1;                                   // Robot event type
+    Kinova.Api.Common.DeviceHandle handle = 2;              // Identifier of the hardware device connected or disconnected
+    Kinova.Api.Common.Timestamp timestamp = 3;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 4;    // User that caused the robot event to occur
+    Kinova.Api.Common.Connection connection = 6;            // Connection that caused the robot event to occur
+}
+
+// List of admissible backup events (future)
+enum BackupEvent {
+    UNSPECIFIED_BACKUP_EVENT = 0;   // Unspecified backup event
+    BACKUP_RESTORED = 1;            // Configuration backup restored
+    BACKUP_UPLOADED = 2;            // Configuration backup uploaded on robot
+}
+
+// List of admissible factory events
+enum FactoryEvent {
+    UNSPECIFIED_FACTORY_EVENT = 0;          // Unspecified factory event
+    FACTORY_DEFAULT_RESTORED = 1;           // Factory defaults restored on robot
+    NETWORK_FACTORY_DEFAULT_RESTORED = 2;   // Network factory defaults restored on robot (future)
+}
+
+// Message that contains a factory event
+message FactoryNotification {
+    FactoryEvent event = 1;                                 // Event type
+    Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 3;    // User that caused the factory event to occur
+    Kinova.Api.Common.Connection connection = 4;            // Connection that caused the factory event to occur
+}
+
+// List of admissible network events
+enum NetworkEvent {
+    UNSPECIFIED_NETWORK_EVENT = 0;          // Unspecified network event
+    WIFI_CONNECTED = 1;                     // Wi-Fi connected
+    WIFI_DISCONNECTED = 2;                  // Wi-Fi Disconnected
+    WIFI_SCAN_STARTED = 3;                  // Wi-Fi scan was initiated
+    WIFI_SCAN_RESULTS = 4;                  // Wi-Fi scan results are available
+    WIFI_SCAN_FAILED = 5;                   // Wi-Fi scan failed
+    WIFI_NOT_FOUND = 6;                     // Wi-Fi selected network not found
+    WIFI_ASSOC_REJECTED = 7;                // Wi-Fi AP rejected association
+    WIFI_AUTH_WRONG_KEY = 8;                // Wi-Fi wrong PSK supplied
+    WIFI_AUTH_CONN_FAILED = 9;              // Wi-Fi connection failure during auth
+    WIFI_AUTH_FAILED = 10;                  // Wi-Fi authentication failure
+}
+
+// Message that contains a network event
+message NetworkNotification {
+    NetworkEvent event = 1;                                 // Event type
+    Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 3;    // User that caused the network event to occur
+    Kinova.Api.Common.Connection connection = 4;            // Connection that caused the network event to occur
+}
+
+// Array of configuration change notifications
+message ConfigurationChangeNotificationList {
+    repeated ConfigurationChangeNotification notifications = 1; // Notification
+}
+
+// Array of mapping information notifications
+message MappingInfoNotificationList {
+    repeated MappingInfoNotification notifications = 1;         // Notification
+}
+
+// Array of control mode notifications
+message ControlModeNotificationList {
+    repeated ControlModeNotification notifications = 1;         // Notification
+}
+
+// Array of Operating mode notifications
+message OperatingModeNotificationList {
+    repeated OperatingModeNotification notifications = 1;       // Notification
+}
+
+// Array of servoing mode notifications
+message ServoingModeNotificationList {
+    repeated ServoingModeNotification notifications = 1;        // Notification
+}
+
+// Array of sequence information notifications
+message SequenceInfoNotificationList {
+    repeated SequenceInfoNotification notifications = 1;        // Notification
+}
+
+// Array of protection zone notifications
+message ProtectionZoneNotificationList {
+    repeated ProtectionZoneNotification notifications = 1;      // Notification
+}
+
+// Array of user notifications
+message UserNotificationList {
+    repeated UserNotification notifications = 1;                // Notification
+}
+
+// Array of safety notifications
+message SafetyNotificationList {
+    repeated Kinova.Api.Common.SafetyNotification notifications = 1; // Notification
+}
+
+// Array of controller notifications
+message ControllerNotificationList {
+    repeated ControllerNotification notifications = 1;          // Notifications
+}
+
+// Array of action notifications
+message ActionNotificationList {
+    repeated ActionNotification notifications = 1;              // Notification
+}
+
+// Array of robot event notifications
+message RobotEventNotificationList {
+    repeated RobotEventNotification notifications = 1;          // Notification
+}
+
+// Array of network event notifications
+message NetworkNotificationList {
+    repeated NetworkNotification notifications = 1;             // Notification
+}
+
+// Identifies a Mapping
+message MappingHandle {
+    uint32 identifier = 1;  // Mapping identifier
+    fixed32 permission = 2; // Permission of specified mapping entity. Must use 'Kinova.Api.Common.Permission' enum.
+}
+
+// List of admissible controller input types
+enum ControllerInputType {
+    UNSPECIFIED_CONTROLLER_INPUT_TYPE = 0;  // Unspecified controller input type
+    ANALOG = 1;                             // Analog controller input type
+    DIGITAL = 2;                            // Digital controller input type
+}
+
+// List of admissible controller input behaviors
+enum ControllerBehavior {
+    UNSPECIFIED_CONTROLLER_BEHAVIOR = 0;    // Unspecified controller behavior
+    CONTROLLER_BUTTON_DOWN = 1;             // Pushing button down
+    CONTROLLER_BUTTON_UP = 2;               // Releasing button
+    CONTROLLER_AXIS_POSITIVE = 3;           // Positive axis movement
+    CONTROLLER_AXIS_NEGATIVE = 4;           // Negative axis movement
+    CONTROLLER_BUTTON_CLICK = 5;            // Button down and up within X msec
+}
+
+// Identifies a Safety event (future)
+message SafetyEvent {
+    Kinova.Api.Common.SafetyHandle safety_handle = 1;   // Safety that caused the event to occur
+}
+
+// Identifies a controller event
+message ControllerEvent {
+    ControllerInputType input_type = 1; // Type of controller input that caused the event_identifier
+    ControllerBehavior behavior = 2;    // Controller behavior that occured
+    uint32 input_identifier = 3;        // Controller input that caused the event
+}
+
+// Identifies a GPIO event (future)
+message GpioEvent {
+    GpioState gpio_state = 1;       // New GPIO state
+    uint32 device_identifier = 2;   // GPIO device identifier for which this event occured
+}
+
+// Defines a map event
+message MapEvent {
+    oneof events {
+        SafetyEvent safety_event = 1;           // Mapped safety event (future)
+        GpioEvent gpio_event = 2;               // Mapped GPIO event (future)
+        ControllerEvent controller_event = 3;   // Mapped controller event
+    }
+    string name = 4;                            // Map event friendly name
+}
+
+// Associates a map event to map action
+message MapElement {
+    MapEvent event = 1; // Map event that occured
+    Action action = 2;  // Action to invoke upon event occurence
+}
+
+// Specifies a new active map for the specified mapping and map group
+message ActivateMapHandle {
+    MappingHandle mapping_handle = 1;       // Mapping that the active map is asked for
+    MapGroupHandle map_group_handle = 2;    // Map group that the active map is asked for (future)
+    MapHandle map_handle = 3;               // New active map
+}
+
+// Defines a map as an array of map elements
+message Map {
+    MapHandle handle = 1;               // Map handle (do not set on createMap() call)
+    string name = 2;                    // Map friendly name
+    repeated MapElement elements = 3;   // Array of map elements
+}
+
+// Identifies a map
+message MapHandle {
+    uint32 identifier = 1;  // Identifier
+    fixed32 permission = 2; // Permission of specified map entity. Must use 'Kinova.Api.Common.Permission' enum.
+}
+
+// Array of maps
+message MapList {
+    repeated Map map_list = 1;  // map
+}
+
+// Identifies a map group (future)
+message MapGroupHandle {
+    uint32 identifier = 1;  // Identifier
+    fixed32 permission = 2; // Permission of specified map group entity. Must use 'Kinova.Api.Common.Permission' enum.
+}
 
 /*
- * Controller element event type
+ * Message that contains all information about a map group including the list of maps that it contains and its
+ * relationship versus other map groups (future)
  */
-enum ControllerElementEventType { 
-    UNSPECIFIED_CONTROLLER_ELEMENT_EVENT = 0; //unspecified controller element event
-    AXIS_MOVED = 1; //controller axis moved
-    BUTTON_DOWN = 2; //controller button pressed
-    BUTTON_UP = 3; //controller button released
-}
-
-
-
-/**
- * Action event type
- */
-enum ActionEvent {
-    UNSPECIFIED_ACTION_EVENT = 0; //unspecified action event
-    ACTION_END = 1; //Action execution end reached
-    ACTION_ABORT = 2; //Action execution aborted
-    ACTION_PAUSE = 3; //Action execution paused
-    ACTION_START = 4; //Action execution started
-}
-
-/**
- * Message that contains an Action event
- */
-message ActionNotification {
-    ActionEvent action_event = 1; //Action event type
-    ActionHandle handle = 2;
-    Kinova.Api.Common.Timestamp timestamp = 3; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 4; //user that caused the action event
-    SubErrorCodes abort_details = 5; //details if action_event is equal to ACTION_ABORT
-    Kinova.Api.Common.Connection connection = 6; // connection that caused the action event
-    
-}
-
-message ActionExecutionState {
-    ActionEvent action_event = 1; //Action event type
-    ActionHandle handle = 2;
-}
-
-/**
- * list of robot events
- */
-enum RobotEvent {
- 
-    UNSPECIFIED_ROBOT_EVENT = 0;  //unspecified robot event
-    ARM_CONNECTED = 1; //arm connected
-    ARM_DISCONNECTED = 2; //arm disconnected
-    TOOL_CONNECTED = 5; //tool connected to the end effector
-    TOOL_DISCONNECTED = 6; //tool disconnected from end effector
-}
-
-/**
- * Message that contains robot event
- */
-message RobotEventNotification {
-    RobotEvent event = 1;  //robot event type
-    Kinova.Api.Common.DeviceHandle handle = 2; //identifier of the hardware device connected or disconnected
-    Kinova.Api.Common.Timestamp timestamp = 3; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 4; //user that caused the robot event to occur
-    Kinova.Api.Common.Connection connection = 6; // connection that caused the robot event to occur
-}
-
-/**
- * list of backup events
- */
-enum BackupEvent { 
-    UNSPECIFIED_BACKUP_EVENT = 0;  //unspecified backup event
-    BACKUP_RESTORED = 1; //configuration backup restored
-    BACKUP_UPLOADED = 2; //configuration backup uploaded on robot
-}
-
-/**
- * list of factory events
- */
-enum FactoryEvent { 
-    UNSPECIFIED_FACTORY_EVENT = 0;          //unspecified factory event
-    FACTORY_DEFAULT_RESTORED = 1;           // factory defaults restored on robot
-    NETWORK_FACTORY_DEFAULT_RESTORED = 2;   //network factory defaults restored on robot
-}
-
-/**
- * Message that contains a factory event
- */
-message FactoryNotification {
-    FactoryEvent event = 1;
-    Kinova.Api.Common.Timestamp timestamp = 2; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 3; //user that caused the factory event to occur
-    Kinova.Api.Common.Connection connection = 4; // connection that caused the factory event to occur
-}
-
-/**
- * list of network events
- */
-enum NetworkEvent { 
-    UNSPECIFIED_NETWORK_EVENT = 0;          //unspecified network event
-    WIFI_CONNECTED = 1;                     //WiFi connected
-    WIFI_DISCONNECTED = 2;                  //Wifi Disconnected
-    WIFI_SCAN_STARTED = 3;                  //Wifi scan was initiated
-    WIFI_SCAN_RESULTS = 4;                  //Wifi scan results are available
-    WIFI_SCAN_FAILED = 5;                   //Wifi scan failed
-    WIFI_NOT_FOUND = 6;                     //Wifi selected network not found
-    WIFI_ASSOC_REJECTED = 7;                //Wifi AP rejected association
-    WIFI_AUTH_WRONG_KEY = 8;                //Wifi wrong PSK supplied
-    WIFI_AUTH_CONN_FAILED = 9;              //Wifi connection failure during auth
-    WIFI_AUTH_FAILED = 10;                  //Wifi authentication failure
-}
-
-/**
- * Message that contains a network event
- */
-message NetworkNotification {
-    NetworkEvent event = 1;
-    Kinova.Api.Common.Timestamp timestamp = 2; //event timestamp
-    Kinova.Api.Common.UserProfileHandle user_handle = 3; //user that caused the network event to occur
-    Kinova.Api.Common.Connection connection = 4; // connection that caused the network event to occur
-}
-
-/**
- * list of configuration change notifications
- */
-message ConfigurationChangeNotificationList {
-    repeated ConfigurationChangeNotification notifications = 1; //notifications
-}
-
-/**
- * list of Mapping information notifications
- */
-message MappingInfoNotificationList {
-    repeated MappingInfoNotification notifications = 1; //notifications
-}
-
-/**
- * list of Control mode notifications
- */
-message ControlModeNotificationList {
-    repeated ControlModeNotification notifications = 1; //notifications
-}
-
-/**
- * list of Operating mode notifications
- */
-message OperatingModeNotificationList {
-    repeated OperatingModeNotification notifications = 1; //notifications
-}
-
-/**
- * list of Servoing mode notifications
- */
-message ServoingModeNotificationList {
-    repeated ServoingModeNotification notifications = 1; //notifications
-}
-
-/**
- * list of Sequence information notifications
- */    
-message SequenceInfoNotificationList {    
-    repeated SequenceInfoNotification notifications = 1; //notifications
-}
-
-/**
- * list of Protection zone notifications
- */
-message ProtectionZoneNotificationList {
-    repeated ProtectionZoneNotification notifications = 1; //notifications
-}
-
-/**
- * list of User notifications
- */
-message UserNotificationList {
-    repeated UserNotification notifications = 1; //notifications
-}
-
-/**
- * list of safety notifications
- */
-message SafetyNotificationList {
-    repeated Kinova.Api.Common.SafetyNotification notifications = 1; //notifications
-}
-
-/**
- * list of controller notifications
- */   
-message ControllerNotificationList {
-    repeated ControllerNotification notifications = 1; //notifications
-}
-
-/**
- * list of Action notifications
- */
-message ActionNotificationList {
-    repeated ActionNotification notifications = 1; //notifications
-}
-
-/**
- * list of Robot event notifications
- */
-message RobotEventNotificationList {
-    repeated RobotEventNotification notifications = 1; //notifications
-}
-
-/**
- * list of Network event notifications
- */
-message NetworkNotificationList {
-    repeated NetworkNotification notifications = 1; //notifications
-}
-
-/**
- * Mapping handle
- */
-message MappingHandle {
-    uint32 identifier = 1; //mapping identifier
-    fixed32 permission = 2; //must use 'Permission' enum
-} 
-
-/**
- * list of possible controller input types
- */
-enum ControllerInputType {
-    UNSPECIFIED_CONTROLLER_INPUT_TYPE = 0;
-    ANALOG = 1; //axis
-    DIGITAL = 2; //button
-}
-
-/**
- * List of possible controller input behaviors
- */
-enum ControllerBehavior {
-    UNSPECIFIED_CONTROLLER_BEHAVIOR = 0;
-    CONTROLLER_BUTTON_DOWN = 1; //pushing button down
-    CONTROLLER_BUTTON_UP = 2; //releasing button
-    CONTROLLER_AXIS_POSITIVE = 3; //positive axis movement
-    CONTROLLER_AXIS_NEGATIVE = 4; //negative axis movement
-    CONTROLLER_BUTTON_CLICK = 5; //button down and up within X msec
-}
-
-message SafetyEvent {
-    Kinova.Api.Common.SafetyHandle safety_handle = 1;
-}
-
-message ControllerEvent {
-    ControllerInputType input_type = 1;
-    ControllerBehavior behavior = 2;
-    uint32 input_identifier = 3;
-}
-
-message GpioEvent {
-    GpioState gpio_state = 1;
-    uint32 device_identifier = 2;
-} 
-
-/**
- * List of Map events
- */ 
-message MapEvent {    
-    oneof events {
-        SafetyEvent safety_event = 1;
-        GpioEvent gpio_event = 2;
-        ControllerEvent controller_event = 3;
-    }
-    string name = 4;//event friendly name
-}
-
-/**
- * message to associate an event to an action
- */ 
-message MapElement {
-    MapEvent event = 1;
-    Action action = 2;
-}
-
-message ActivateMapHandle {
-    MappingHandle mapping_handle = 1;
-    MapGroupHandle map_group_handle = 2;
-    MapHandle map_handle = 3;
-}
-
-message Map {
-    MapHandle handle = 1; //not set on createMap call
-    string name = 2;
-    repeated MapElement elements = 3;
-}
-
-message MapHandle {
-    uint32 identifier = 1;
-    fixed32 permission = 2; //must use 'Permission' enum
-}
-
-message MapList {
-    repeated Map map_list = 1;
-}
-
-message MapGroupHandle {
-    uint32 identifier = 1;
-    fixed32 permission = 2; //must use 'Permission' enum
-}
-
 message MapGroup {
-    MapGroupHandle group_handle = 1; //not set on createMapGroup call
-    string name = 2;
-    MappingHandle related_mapping_handle = 3;
-    MapGroupHandle parent_group_handle = 4;
-    repeated MapGroupHandle children_map_group_handles = 5;
-    repeated MapHandle map_handles = 6;
-    string application_data = 7;
+    MapGroupHandle group_handle = 1;                        // Map group handle (do not set on createMapGroup() call)
+    string name = 2;                                        // Map group friendly name
+    MappingHandle related_mapping_handle = 3;               // Mapping that this map group belongs to
+    MapGroupHandle parent_group_handle = 4;                 // Parent map group (if any)
+    repeated MapGroupHandle children_map_group_handles = 5; // Children map groups (if any)
+    repeated MapHandle map_handles = 6;                     // Array of maps that are included in this map group
+    string application_data = 7;                            // Application data (reserved for use by Web App)
 }
 
+// Array of map groups (future)
 message MapGroupList {
-    repeated MapGroup map_groups = 1;
+    repeated MapGroup map_groups = 1;   // Map group
 }
 
+/*
+ * Message that contains all information about a mapping including the controller to which it is associated,
+ * the array of map groups it contains, the currently active map group, the array of maps it contains
+ * and the currently active map
+ */
 message Mapping {
-    MappingHandle handle = 1; //not set on createMapping call
-    string name = 2;
-    uint32 controller_identifier = 3;    
-    MapGroupHandle active_map_group_handle = 4;
-    repeated MapGroupHandle map_group_handles = 5;
-    MapHandle active_map_handle = 6;
-    repeated MapHandle map_handles = 7;
-    string application_data = 8;
+    MappingHandle handle = 1;                       // Mapping handle (do not set on createMapping() call)
+    string name = 2;                                // Mapping friendly name
+    uint32 controller_identifier = 3;               // Associated controller identifier
+    MapGroupHandle active_map_group_handle = 4;     // Currently active map group (future)
+    repeated MapGroupHandle map_group_handles = 5;  // Array of associated map groups (future)
+    MapHandle active_map_handle = 6;                // Currently active map
+    repeated MapHandle map_handles = 7;             // Array of associated maps
+    string application_data = 8;                    // Application data (reserved for use by Web App)
 }
 
+// Array of mappings
 message MappingList {
-    repeated Mapping mappings = 1;
+    repeated Mapping mappings = 1;  // Mapping
 }
 
+/*
+ * List of admissible Base safeties.
+ * Used with BaseCyclic.BaseFeedback.[fault_bank_a | fault_bank_b | warning_bank_a | warning_bank_b]
+ */
 enum SafetyIdentifier {
-    UNSPECIFIED_BASE_SAFETY_IDENTIFIER              = 0;         //0x0
-    FIRMWARE_UPDATE_FAILURE                         = 1;         //0x1
-    EXTERNAL_COMMUNICATION_ERROR                    = 2;         //0x2
-    MAXIMUM_AMBIENT_TEMPERATURE                     = 4;         //0x4
-    MAXIMUM_CORE_TEMPERATURE                        = 8;         //0x8 
-    JOINT_FAULT                                     = 16;        //0x10
-    CYCLIC_DATA_JITTER                              = 32;        //0x20
-    REACHED_MAXIMUM_EVENT_LOGS                      = 64;        //0x40
-    NO_KINEMATICS_SUPPORT                           = 128;       //0x80
-    ABOVE_MAXIMUM_DOF                               = 256;       //0x100
-    NETWORK_ERROR                                   = 512;       //0x200
-    UNABLE_TO_REACH_POSE                            = 1024;      //0x400
-    JOINT_DETECTION_ERROR                           = 2048;      //0x800
-    NETWORK_INITIALIZATION_ERROR                    = 4096;      //0x1000
-    MAXIMUM_CURRENT                                 = 8192;      //0x2000 
-    MAXIMUM_VOLTAGE                                 = 16384;     //0x4000 
-    MINIMUM_VOLTAGE                                 = 32768;     //0x8000 
-    MAXIMUM_END_EFFECTOR_TRANSLATION_VELOCITY       = 65536;     //0x10000
-    MAXIMUM_END_EFFECTOR_ORIENTATION_VELOCITY       = 131072;    //0x20000
-    MAXIMUM_END_EFFECTOR_TRANSLATION_ACCELERATION   = 262144;    //0x40000
-    MAXIMUM_END_EFFECTOR_ORIENTATION_ACCELERATION   = 524288;    //0x80000
-    MAXIMUM_END_EFFECTOR_TRANSLATION_FORCE          = 1048576;   //0x100000
-    MAXIMUM_END_EFFECTOR_ORIENTATION_FORCE          = 2097152;   //0x200000
-    MAXIMUM_END_EFFECTOR_PAYLOAD                    = 4194304;   //0x400000
-    EMERGENCY_STOP_ACTIVATED                        = 8388608;   //0x800000
-    EMERGENCY_LINE_ACTIVATED                        = 16777216;  //0x1000000
-    INRUSH_CURRENT_LIMITER_FAULT                    = 33554432;  //0x2000000
-    NVRAM_CORRUPTED                                 = 67108864;  //0x4000000
-    INCOMPATIBLE_FIRMWARE_VERSION                   = 134217728; //0x8000000
-    POWERON_SELF_TEST_FAILURE                       = 268435456; //0x10000000
+    UNSPECIFIED_BASE_SAFETY_IDENTIFIER              = 0;         // 0x0 - Unspecified base safety
+    FIRMWARE_UPDATE_FAILURE                         = 1;         // 0x1 - Firmware update failure
+    EXTERNAL_COMMUNICATION_ERROR                    = 2;         // 0x2 - External communication error (future)
+    MAXIMUM_AMBIENT_TEMPERATURE                     = 4;         // 0x4 - Maximum ambient temperature reached
+    MAXIMUM_CORE_TEMPERATURE                        = 8;         // 0x8 - Maximum core temperature reached
+    JOINT_FAULT                                     = 16;        // 0x10 - Joint fault
+    CYCLIC_DATA_JITTER                              = 32;        // 0x20 - Cyclic data jitter (future)
+    REACHED_MAXIMUM_EVENT_LOGS                      = 64;        // 0x40 - Reached Maximum number of event log entries (future)
+    NO_KINEMATICS_SUPPORT                           = 128;       // 0x80 - No kinematics support (future)
+    ABOVE_MAXIMUM_DOF                               = 256;       // 0x100 - Above maximum DoF
+    NETWORK_ERROR                                   = 512;       // 0x200 - Network error (future)
+    UNABLE_TO_REACH_POSE                            = 1024;      // 0x400 - Unable to reach pose
+    JOINT_DETECTION_ERROR                           = 2048;      // 0x800 - Joint detection error
+    NETWORK_INITIALIZATION_ERROR                    = 4096;      // 0x1000 - Network initialization error
+    MAXIMUM_CURRENT                                 = 8192;      // 0x2000 - Maximum current reached
+    MAXIMUM_VOLTAGE                                 = 16384;     // 0x4000 - Maximum voltage reached
+    MINIMUM_VOLTAGE                                 = 32768;     // 0x8000 - Minimum voltage reached
+    MAXIMUM_END_EFFECTOR_TRANSLATION_VELOCITY       = 65536;     // 0x10000 - Maximum end effector translation velocity reached (future)
+    MAXIMUM_END_EFFECTOR_ORIENTATION_VELOCITY       = 131072;    // 0x20000 - Maximum end effector orientation velocity reached (future)
+    MAXIMUM_END_EFFECTOR_TRANSLATION_ACCELERATION   = 262144;    // 0x40000 - Maximum end effector translation acceleration reached (future)
+    MAXIMUM_END_EFFECTOR_ORIENTATION_ACCELERATION   = 524288;    // 0x80000 - Maximum end effector orientation acceleration reached (future)
+    MAXIMUM_END_EFFECTOR_TRANSLATION_FORCE          = 1048576;   // 0x100000 - Maximum end effector translation force reached (future)
+    MAXIMUM_END_EFFECTOR_ORIENTATION_FORCE          = 2097152;   // 0x200000 - Maximum end effector orientation force reached (future)
+    MAXIMUM_END_EFFECTOR_PAYLOAD                    = 4194304;   // 0x400000 - Maximum end effector payload reached (future)
+    EMERGENCY_STOP_ACTIVATED                        = 8388608;   // 0x800000 - Emergency stop activated
+    EMERGENCY_LINE_ACTIVATED                        = 16777216;  // 0x1000000 - Emergency line activated
+    INRUSH_CURRENT_LIMITER_FAULT                    = 33554432;  // 0x2000000 - In rush current limiter fault
+    NVRAM_CORRUPTED                                 = 67108864;  // 0x4000000 - NVRAM corrupted (future)
+    INCOMPATIBLE_FIRMWARE_VERSION                   = 134217728; // 0x8000000 - Incompatible firmware version
+    POWERON_SELF_TEST_FAILURE                       = 268435456; // 0x10000000 - Power on seflt test failure
 }
 
+// Defines a transformation matrix
 message TransformationMatrix {
-    TransformationRow r0 = 1;
-    TransformationRow r1 = 2;
-    TransformationRow r2 = 3;
-    TransformationRow r3 = 4;
+    TransformationRow r0 = 1;   // First transformation row
+    TransformationRow r1 = 2;   // Second transformation row
+    TransformationRow r2 = 3;   // Third transformation row
+    TransformationRow r3 = 4;   // Fourth transformation row
 }
 
+// Defines a transformation matrix row
 message TransformationRow {
-    float c0 = 1;
-    float c1 = 2;
-    float c2 = 3;
-    float c3 = 4;
+    float c0 = 1;   // First column value
+    float c1 = 2;   // Second column value
+    float c2 = 3;   // Third column value
+    float c3 = 4;   // Fourth column value
 }
 
+// Defines a Cartesian pose
 message Pose {
-    float x = 1;
-    float y = 2;
-    float z = 3;
-    float theta_x = 4;
-    float theta_y = 5;
-    float theta_z = 6;
+    float x = 1;        // X position (in meters)
+    float y = 2;        // Y position (in meters)
+    float z = 3;        // Z position (in meters)
+    float theta_x = 4;  // Theta X orientation (in degrees)
+    float theta_y = 5;  // Theta Y orienation (in degrees)
+    float theta_z = 6;  // Theta Z orientation (in degrees)
 }
-
+// Defines a Cartesian position
 message Position {
-    float x = 1;
-    float y = 2;
-    float z = 3;
+    float x = 1;    // X position (in meters)
+    float y = 2;    // Y position (in meters)
+    float z = 3;    // Z position (in meters)
 }
 
+// Defines a Cartesian orientation
 message Orientation {
-    float theta_x = 1;
-    float theta_y = 2;
-    float theta_z = 3;
+    float theta_x = 1;  // Theta X orientation (in degrees)
+    float theta_y = 2;  // Theta Y orientation (in degrees)
+    float theta_z = 3;  // Theta Z orientation (in degrees)
 }
 
+// List of admissible constraint types that can be applied when controlling a joint in trajectory mode
 enum JointTrajectoryConstraintType {
-    UNSPECIFIED_JOINT_CONSTRAINT = 0;
-    JOINT_CONSTRAINT_DURATION = 1;
-    JOINT_CONSTRAINT_SPEED = 2;
+    UNSPECIFIED_JOINT_CONSTRAINT = 0;   // Unspecified joint constraint
+    JOINT_CONSTRAINT_DURATION = 1;      // Duration constraint (in second)
+    JOINT_CONSTRAINT_SPEED = 2;         // Speed constraint (in meters per second) (future)
 }
 
+// Defines a Cartesian speed
 message CartesianSpeed {
-    float translation = 1;
-    float orientation = 2;
+    float translation = 1; // Translation speed (in meters per second)
+    float orientation = 2; // Orientation speed (in degrees per second)
 }
 
+// Defines a Cartesian trajectory constraint that can be applied when controlling in Cartesian trajectory mode
 message CartesianTrajectoryConstraint {
-    oneof type { 
-        CartesianSpeed speed = 1;
-        float duration = 2;
+    oneof type {
+        CartesianSpeed speed = 1;   // Speed constraint (in meters per second)
+        float duration = 2;         // Duration constraint (in meters per second) (future)
     }
 }
 
+// Defines a joint trajectory constraint that can be applied when controlling a joint in trajectory mode
 message JointTrajectoryConstraint {
-    JointTrajectoryConstraintType type = 1;
-    float value = 2;
+    JointTrajectoryConstraintType type = 1; // Joint trajectory constraint type
+    float value = 2;                        // Constraint value (in seconds or in meters per second depending on constraint type)
 }
 
+// List of admissible twist (velocity) modes
 enum TwistMode {
-    UNSPECIFIED_TWIST_MODE = 0;
-    TWIST_TOOL_JOYSTICK = 1;
-    TWIST_BASE_FRAME_JOYSTICK = 2;
-    TWIST_CARTESIAN_JOYSTICK = 3;
+    UNSPECIFIED_TWIST_MODE = 0;     // Unspecified twist mode
+    TWIST_TOOL_JOYSTICK = 1;        // Twist tool joystick mode
+    TWIST_BASE_FRAME_JOYSTICK = 2;  // Twist base frame joystick mode
+    TWIST_CARTESIAN_JOYSTICK = 3;   // Twist Cartesian joystick mode
 }
 
+// Defines a twist (velocity)
 message Twist {
-    float linear_x = 1;
-    float linear_y = 2;
-    float linear_z = 3;
-    float angular_x = 4;
-    float angular_y = 5;
-    float angular_z = 6;
+    float linear_x = 1;     // Linear X velocity
+    float linear_y = 2;     // Linear Y velocity
+    float linear_z = 3;     // Linear Z velocity
+    float angular_x = 4;    // Angular X velocity
+    float angular_y = 5;    // Angular Y velocity
+    float angular_z = 6;    // Angular Z velocity
 }
 
+// Defines the admittance mode
 message Admittance {
-    AdmittanceMode admittance_mode = 1;
+    AdmittanceMode admittance_mode = 1; // mode
 }
 
+// List of admissible admittance modes
 enum AdmittanceMode {
-    UNSPECIFIED_ADMITTANCE_MODE = 0;
-    CARTESIAN = 1;
-    JOINT = 2;
-    NULL_SPACE = 3;
-    DISABLED = 4;
+    UNSPECIFIED_ADMITTANCE_MODE = 0;    // Unspecified admittance mode
+    CARTESIAN = 1;                      // Cartesian admittance mode
+    JOINT = 2;                          // Joint admittance mode
+    NULL_SPACE = 3;                     // Null space admittance mode
+    DISABLED = 4;                       // No admittance
 }
 
+// Defines a Cartesian reference frame
 message CartesianReferenceFrameRequest {
-    CartesianReferenceFrame reference_frame = 1;
+    CartesianReferenceFrame reference_frame = 1;    // Reference frame
 }
 
+//  List of admissible Cartesian reference frame modes
 enum CartesianReferenceFrame {
-    UNSPECIFIED_CARTESIAN_REFERENCE_FRAME = 0;
-    MIXED = 1;     // translation = base, orientation = tool
-    TOOL = 2;     // translation = tool, orientation = tool
+    UNSPECIFIED_CARTESIAN_REFERENCE_FRAME = 0;  // Unspecified Cartesian reference frame
+    MIXED = 1;                                  // Mixed reference frame where translation reference = base and  orientation reference = tool
+    TOOL = 2;                                   // Tool reference frame where translation reference = tool and orientation reference = tool
 }
 
-message ConstrainedPose { 
-    Pose target_pose = 1;
-    CartesianTrajectoryConstraint constraint = 2;
+// Defines a Cartesian pose with constraint
+message ConstrainedPose {
+    Pose target_pose = 1;                           // Cartesian pose
+    CartesianTrajectoryConstraint constraint = 2;   // Constraint to apply to the target pose
 }
 
-message ConstrainedPosition { 
-    Position target_position = 1;
-    CartesianTrajectoryConstraint constraint = 2;
+// Defines a Cartesian position with constraint
+message ConstrainedPosition {
+    Position target_position = 1;                   // Cartesian position
+    CartesianTrajectoryConstraint constraint = 2;   // Constraint to apply to the target position
 }
 
+// Defines a Cartesian orientation with constraint
 message ConstrainedOrientation {
-    Orientation target_orientation = 1;
-    CartesianTrajectoryConstraint constraint = 2;
+    Orientation target_orientation = 1;             // Cartesian orientation
+    CartesianTrajectoryConstraint constraint = 2;   // Constraint to apply to the target orientation
 }
 
+// Defines a twist (velocity) command
 message TwistCommand {
-    TwistMode mode = 1;
-    Twist twist = 2;
-    uint32 duration = 3; //if not 0, allows to set a limit in seconds to the TwistCommand
+    TwistMode mode = 1;     // Mode in which the command is executed
+    Twist twist = 2;        // Twist value
+    uint32 duration = 3;    // Duration constrant. If not 0, allows to set a limit (in seconds) to the TwistCommand (future)
 }
 
+// Defines a series of joint angles value with constraint
 message ConstrainedJointAngles {
-    JointAngles joint_angles = 1;
-    JointTrajectoryConstraint constraint = 2;
+    JointAngles joint_angles = 1;               // Joint angles value
+    JointTrajectoryConstraint constraint = 2;   // Constraint to apply to all the joint angles (optional)
 }
 
+// Defines a single joint angle value with constraint
 message ConstrainedJointAngle {
-    uint32 joint_identifier = 1;
-    float value = 2;
-    JointTrajectoryConstraint constraint = 3;
+    uint32 joint_identifier = 1;                // Joint identifier (use device_identifier)
+    float value = 2;                            // Joint value (in degrees)
+    JointTrajectoryConstraint constraint = 3;   // Constraint to apply to the joint angle (optional)
 }
 
+// Position of a series of joints
 message JointAngles {
-    repeated JointAngle joint_angles = 1;
+    repeated JointAngle joint_angles = 1; // Array of joint angle
 }
 
+// Position of a specific joint
 message JointAngle {
-    uint32 joint_identifier = 1;
-    float value = 2;
+    uint32 joint_identifier = 1;    // Joint identifier
+    float value = 2;                // Position (in degrees)
 }
 
+// Defines a series of joint speeds
 message JointSpeeds {
-    repeated JointSpeed joint_speeds = 1;
-    uint32 duration = 2; //if not 0, allows to set a limit in seconds to the JointsSpeed
+    repeated JointSpeed joint_speeds = 1;   // Array of joint speed
+    uint32 duration = 2;                    // Duration constraint. If not 0, allows to set a limit (in seconds) common to every joint specified in 'joint_speeds' (future)
 }
 
-message JointSpeed {    
-    uint32 joint_identifier = 1;
-    float value = 2;
-    uint32 duration = 3; //if not 0, allows to set a limit in seconds to the JointsSpeed
+// Defines the speed of a specific joint
+message JointSpeed {
+    uint32 joint_identifier = 1;    // Joint identifier
+    float value = 2;                // Joint speed (in degrees per second)
+    uint32 duration = 3;            // Duration constraint. If not 0, allows to set a limit (in seconds) to the JointsSpeed (future)
 }
 
+// List of admissible gripper control mode
 enum GripperMode {
-    UNSPECIFIED_GRIPPER_MODE = 0;
-    GRIPPER_FORCE = 1;
-    GRIPPER_SPEED = 2;
-    GRIPPER_POSITION = 3;
+    UNSPECIFIED_GRIPPER_MODE = 0;   // Unspecified gripper mode
+    GRIPPER_FORCE = 1;              // Force control (in Newton) (future)
+    GRIPPER_SPEED = 2;              // Speed control (in meters per second) (future)
+    GRIPPER_POSITION = 3; // position control (in meters)
 }
 
+// Defines a command to control the gripper movement
 message GripperCommand {
-    GripperMode mode = 1;
-    //in position, admissible values for each finger is between 0...+1.0, where 0 is closed ans 1.0 is fully open
-    //in speed or torque, admissible values for each finger is between -1.0 and +1.0, where +1.0 corresponds
-    //to maximum opening speed and -1.0 corresponds to maximum closing speed
-    Gripper gripper = 2;
-    uint32 duration = 3;//if not 0, allows to set a limit in seconds to the GripperCommand
+    GripperMode mode = 1;   // Mode in which to control the gripper
+    /*
+     * In position, admissible values for each finger is between 0 and 1.0, where 0 is closed and 1.0 is fully open.
+     * In speed or torque, admissible values for each finger is between -1.0 and 1.0, where 1.0 corresponds
+     * to maximum opening speed and -1.0 corresponds to maximum closing speed.
+     */
+    Gripper gripper = 2;    // Gripper movement values
+    uint32 duration = 3;    // Duration constraint. If not 0, allows to set a limit (in seconds) to the GripperCommand
 }
 
+// Message used to request the current gripper movement in either position, force or speed
 message GripperRequest {
-    GripperMode mode = 1;
+    GripperMode mode = 1;   // Mode for which the gripper movement status is requested
 }
 
+// Defines a gripper movement, which is composed of a series of fingers movement
 message Gripper {
-    repeated Finger finger = 1;
+    repeated Finger finger = 1; // Finger movements
 }
 
-message Finger {    
-    uint32 finger_identifier = 1;
+// Defines a finger movement
+message Finger {
+    uint32 finger_identifier = 1;   // Finger identifier
+
+    /*
+     * In position, admissible values for each finger is between 0 and 1.0, where 0 is closed and 1.0 is fully open.
+     * In speed or torque, admissible values for each finger is between -1.0 and 1.0, where 1.0 corresponds
+     * to maximum opening speed and -1.0 corresponds to maximum closing speed.
+     */
     float value = 2;
 }
 
+
+// List of admissible map navigation directions
 enum NavigationDirection {
-    UNSPECIFIED_NAVIGATION_DIRECTION = 0;
-    NEXT = 1;
-    UP = 2;
-    DOWN = 3;
-    PREVIOUS = 4;
+    UNSPECIFIED_NAVIGATION_DIRECTION = 0;   // Unspecified navigation direction
+    NEXT = 1;                               // Go to next map
+    UP = 2;                                 // Go to parent map group (future)
+    DOWN = 3;                               // Go to children map group (future)
+    PREVIOUS = 4;                           // Go to previous map
 }
 
-enum JointNavigationDirection {  
-    UNSPECIFIED_JOINT_NAVIGATION_DIRECTION = 0;
-    JOINT_NEXT = 1;  
-    JOINT_PREVIOUS = 2;
+// List of admissible joint navigation directions
+enum JointNavigationDirection {
+    UNSPECIFIED_JOINT_NAVIGATION_DIRECTION = 0; // Unspecified joint navigation direction
+    JOINT_NEXT = 1;                             // Go to next joint
+    JOINT_PREVIOUS = 2;                         // Go to previous joint
 }
 
+// List of admissible sound types (future)
 enum SoundType {
-    UNSPECIFIED_SOUND_TYPE = 0;
-    BIP_SERIES = 1;
-    SINGLE_BIP = 2;
+    UNSPECIFIED_SOUND_TYPE = 0; // Unspecified sound types
+    BIP_SERIES = 1;             // Bip series sound type
+    SINGLE_BIP = 2;             // Single bin sound type
 }
 
+// List of admissible LED states (future)
 enum LedState {
-    UNSPECIFIED_LED_STATE = 0;
-    LED_OFF = 1;
-    LED_PULSE = 2;
-    LED_ON = 3;
-}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+    UNSPECIFIED_LED_STATE = 0;  // Unspecified LED state
+    LED_OFF = 1;                // LED is off
+    LED_PULSE = 2;              // LED is in pulse state
+    LED_ON = 3;                 // LED is one
+}
 
+// List of admissible GPIO states (future)
 enum GpioState {
-    UNSPECIFIED_GPIO_STATE = 0;
-    GPIO_OFF = 1;
-    GPIO_PULSE = 2;
-    GPIO_ON = 3;
+    UNSPECIFIED_GPIO_STATE = 0; // Unspecified GPIO state
+    GPIO_OFF = 1;               // GPIO is off
+    GPIO_PULSE = 2;             // GPIO is in pulse state
+    GPIO_ON = 3;                // GPIO is on
 }
 
+// Identifies the system time (future)
 message SystemTime {
-    uint32 sec = 1; //seconds after the minute(0-59)
-    uint32 min = 2; //minutes after the hour (0-59)
-    uint32 hour = 3;//hours since mignight (0-23)
-    uint32 mday = 4;//day of the month (1-31)
-    uint32 mon = 5; //months since January (0-11)
-    uint32 year = 6;//years since 1900
+    uint32 sec = 1;     // Seconds after the minute(0-59)
+    uint32 min = 2;     // Minutes after the hour (0-59)
+    uint32 hour = 3;    // Hours since midnight (0-23)
+    uint32 mday = 4;    // Day of the month (1-31)
+    uint32 mon = 5;     // Months since January (0-11)
+    uint32 year = 6;    // Years since 1900
 }
 
-enum Xbox360DigitalInputIdentifier {  
-    UNSPECIFIED_XBOX360_DIGITAL = 0;
-    XBOX360_PAD_UP = 1;  
-    XBOX360_PAD_DOWN = 2;
-    XBOX360_PAD_LEFT = 3;
-    XBOX360_PAD_RIGHT = 4;
-    XBOX360_FILE_BUTTON_START = 5;
-    XBOX360_DOCUMENT_BUTTON_BACK = 6;
-    XBOX360_LEFT_THUMB_BUTTON = 7;
-    XBOX360_RIGHT_THUMB_BUTTON = 8;
-    XBOX360_LEFT_SHOULDER = 9;
-    XBOX360_RIGHT_SHOULDER = 10;
-    XBOX360_BUTTON_A = 13;
-    XBOX360_BUTTON_B = 14;
-    XBOX360_BUTTON_X = 15;
-    XBOX360_BUTTON_Y = 16;   
+// List of admissible XBOX360 digital inputs
+enum Xbox360DigitalInputIdentifier {
+    UNSPECIFIED_XBOX360_DIGITAL = 0;    // Unspecified  digital input
+    XBOX360_PAD_UP = 1;                 // Pad up input
+    XBOX360_PAD_DOWN = 2;               // Pad down input
+    XBOX360_PAD_LEFT = 3;               // Pad left input
+    XBOX360_PAD_RIGHT = 4;              // Pad right input
+    XBOX360_FILE_BUTTON_START = 5;      // File button start input
+    XBOX360_DOCUMENT_BUTTON_BACK = 6;   // Document button back input
+    XBOX360_LEFT_THUMB_BUTTON = 7;      // Left thumb button input
+    XBOX360_RIGHT_THUMB_BUTTON = 8;     // Right thumb button input
+    XBOX360_LEFT_SHOULDER = 9;          // Left shoulder input
+    XBOX360_RIGHT_SHOULDER = 10;        // Right shoulder input
+    XBOX360_BUTTON_A = 13;              // Button A input
+    XBOX360_BUTTON_B = 14;              // Button B input
+    XBOX360_BUTTON_X = 15;              // Button X input
+    XBOX360_BUTTON_Y = 16;              // Button Y input
 }
 
+// List of admissible XBOX360 analog inputs
 enum Xbox360AnalogInputIdentifier {
-    UNSPECIFIED_XBOX360_ANALOG = 0;
-    XBOX360_THUMB_LEFT_X = 1;
-    XBOX360_THUMB_LEFT_Y = 2;
-    XBOX360_THUMB_RIGHT_X = 3;
-    XBOX360_THUMB_RIGHT_Y = 4;
-    XBOX360_TRIGGER_LEFT = 5;
-    XBOX360_TRIGGER_RIGHT = 6;
+    UNSPECIFIED_XBOX360_ANALOG = 0; // Unspecified analog input
+    XBOX360_THUMB_LEFT_X = 1;       // Thumb left X input
+    XBOX360_THUMB_LEFT_Y = 2;       // Thumb left Y input
+    XBOX360_THUMB_RIGHT_X = 3;      // Thumb right X input
+    XBOX360_THUMB_RIGHT_Y = 4;      // Thumb right Y input
+    XBOX360_TRIGGER_LEFT = 5;       // Trigger left input
+    XBOX360_TRIGGER_RIGHT = 6;      // Trigger right input
 }
 
+
+// Provides information about actuators
 message ActuatorInformation {
-    uint32 count = 1;
+    uint32 count = 1;   // Number of actuators
 }
 
+// Provides information about the arm state
 message ArmStateInformation {
-    Kinova.Api.Common.ArmState active_state = 1;
-    Kinova.Api.Common.Connection connection = 2; //connection information of the last processed command which triggered an arm state change
+    Kinova.Api.Common.ArmState active_state = 1; // Arm active state
+    Kinova.Api.Common.Connection connection = 2; // Connection information of the last processed command which triggered an arm state change
 }
 
-/**
-  * Message that contains a arm state event
- */
- message ArmStateNotification {
-    Kinova.Api.Common.ArmState active_state = 1; //new arm state
-    Kinova.Api.Common.Timestamp timestamp = 2; //event timestamp
-    Kinova.Api.Common.Connection connection = 3; //connection that caused the arm state event
+// Message that contains a arm state event
+message ArmStateNotification {
+    Kinova.Api.Common.ArmState active_state = 1;    // New arm state
+    Kinova.Api.Common.Timestamp timestamp = 2;      // Event timestamp
+    Kinova.Api.Common.Connection connection = 3;    // Connection that caused the arm state event
 }
 
+// Country code
+message CountryCode {
+    CountryCodeIdentifier identifier = 1; // ISO3166 country code identifier
+}
+
+// List of supported ISO3166 country identifiers
+enum CountryCodeIdentifier {
+    UNSPECIFIED_COUNTRY_CODE = 0;
+    UNITED_ARAB_EMIRATES_AE = 1;
+    ANTIGUA_AND_BARBUDA_AG = 2;
+    ANGUILLA_AI = 3;
+    ALBANIA_AL = 4;
+    AMERICAN_SAMOA_AS = 5;
+    AUSTRIA_AT = 6;
+    AUSTRALIA_AU = 7;
+    ARUBA_AW = 8;
+    AZERBAIJAN_AZ =  9;
+    BOSNIA_AND_HERZEGOVINA_BA = 10;
+    BANGLADESH_BD = 11;
+    BELGIUM_BE = 12;
+    BULGARIA_BG = 13;
+    BAHRAIN_BH = 14;
+    BERMUDA_BM = 15;
+    BRUNEI_DARUSSALAM_BN = 16;
+    BRAZIL_BR = 17;
+    BAHAMAS_BS = 18;
+    BELARUS_BY = 19;
+    SWITZERLAND_CH = 20;
+    CANADA_CA = 21;
+    CHINA_CN = 22;
+    COLOMBIA_CO = 23;
+    COSTA_RICA_CR = 24;
+    CYPRUS_CY = 25;
+    CZECH_REPUBLIC_CZ = 26;
+    GERMANY_DE = 27;
+    DENMARK_DK = 28;
+    ECUADOR_EC = 29;
+    ESTONIA_EE = 30;
+    EGYPT_EG = 31;
+    SPAIN_ES = 32;
+    ETHIOPIA_ET = 33;
+    FINLAND_FI = 34;
+    FRANCE_FR = 35;
+    UNITED_KINGDOM_GB = 36;
+    GRENADA_GD = 37;
+    FRENCH_GUIANA_GF = 38;
+    GUADELOUPE_GP = 39;
+    GREECE_GR = 40;
+    GUATEMALA_GT = 41;
+    GUAM_GU = 42;
+    HONG_KONG_HK = 43;
+    CROATIA_HR = 44;
+    HUNGARY_HU = 45;
+    INDIA_IN = 46;
+    INDONESIA_ID = 47;
+    IRELAND_IE = 48;
+    ISRAEL_IL = 49;
+    ICELAND_IS = 50;
+    ITALY_IT = 51;
+    JORDAN_JO = 52;
+    JAPAN_JP = 53;
+    CAMBODIA_KH = 54;
+    REPUBLIC_OF_KOREA_KR = 55;
+    KUWAIT_KW = 56;
+    CAYMAN_ISLANDS_KY = 57;
+    LAO_PDR_LA = 58;
+    LEBANON_LB = 59;
+    LIECHTENSTEIN_LI = 60;
+    SRI_LANKA_LK = 61;
+    LESOTHO_LS = 62;
+    LITHUANIA_LT = 63;
+    LUXEMBOURG_LU = 64;
+    LATVIA_LV = 65;
+    MOROCCO_MA = 66;
+    MONACO_MC = 67;
+    MOLDOVA_MD = 68;
+    MONTENEGRO_ME = 69;
+    REPUBLIC_OF_MACEDONIA_MK = 70;
+    MONGOLIA_MN = 71;
+    MARTINIQUE_MQ = 72;
+    MAURITANIA_MR = 73;
+    MALTA_MT = 74;
+    MAURITIUS_MU = 75;
+    MALDIVES_MV = 76;
+    MALAWI_MW = 77;
+    MEXICO_MX = 78;
+    MALAYSIA_MY = 79;
+    NICARAGUA_NI = 80;
+    NETHERLANDS_NL = 81;
+    NORWAY_NO = 82;
+    NEW_ZEALAND_NZ = 83;
+    OMAN_OM = 84;
+    PANAMA_PA = 85;
+    PERU_PE = 86;
+    PHILIPPINES_PH = 87;
+    POLAND_PL = 88;
+    PUERTO_RICO_PR = 89;
+    PORTUGAL_PT = 90;
+    PARAGUAY_PY = 91;
+    REUNION_RE = 92;
+    ROMANIA_RO = 93;
+    SERBIA_RS = 94;
+    RUSSIAN_FEDERATION_RU = 95;
+    SWEDEN_SE = 96;
+    SINGAPORE_SI = 97;
+    SLOVAKIA_SK = 98;
+    EL_SALVADOR_SV = 99;
+    THAILAND_TH = 100;
+    TUNISIA_TN = 101;
+    TURKEY_TR = 102;
+    TRINIDAD_AND_TOBAGO_TT = 103;
+    TAIWAN_PROVINCE_OF_CHINA_TW = 104;
+    UKRAINE_UA = 105;
+    UNITED_STATES_US = 106;
+    HOLY_SEE_VATICAN_CITY_STATE_VA = 107;
+    BOLIVARIAN_REPUBLIC_OF_VENEZUELA_VE = 108;
+    BRITISH_VIRGIN_ISLANDS_VG = 109;
+    VIETNAM_VN = 110;
+    MAYOTTE_YT = 111;
+    SOUTH_AFRICA_ZA = 112;
+}

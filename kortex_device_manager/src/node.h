@@ -67,7 +67,8 @@
 #include "kortex_device_manager/GetAllSafetyConfiguration.h"
 #include "kortex_device_manager/GetAllSafetyInformation.h"
 #include "kortex_device_manager/ResetSafetyDefaults.h"
-#include "kortex_device_manager/SafetyTopic.h"
+#include "kortex_device_manager/OnNotificationSafetyTopic.h"
+#include "kortex_device_manager/SafetyNotification.h"
 #include "kortex_device_manager/SetModelNumber.h"
 #include "kortex_device_manager/SetPartNumber.h"
 #include "kortex_device_manager/SetPartNumberRevision.h"
@@ -115,7 +116,7 @@ class KortexDeviceManager
         bool GetAllSafetyConfiguration(kortex_device_manager::GetAllSafetyConfiguration::Request  &req, kortex_device_manager::GetAllSafetyConfiguration::Response &res);
         bool GetAllSafetyInformation(kortex_device_manager::GetAllSafetyInformation::Request  &req, kortex_device_manager::GetAllSafetyInformation::Response &res);
         bool ResetSafetyDefaults(kortex_device_manager::ResetSafetyDefaults::Request  &req, kortex_device_manager::ResetSafetyDefaults::Response &res);
-        bool OnNotificationSafetyTopic(kortex_device_manager::SafetyTopic::Request  &req, kortex_device_manager::SafetyTopic::Response &res);
+        bool OnNotificationSafetyTopic(kortex_device_manager::OnNotificationSafetyTopic::Request  &req, kortex_device_manager::OnNotificationSafetyTopic::Response &res);
         void cb_SafetyTopic(SafetyNotification notif);
         bool SetModelNumber(kortex_device_manager::SetModelNumber::Request  &req, kortex_device_manager::SetModelNumber::Response &res);
         bool SetPartNumber(kortex_device_manager::SetPartNumber::Request  &req, kortex_device_manager::SetPartNumber::Response &res);

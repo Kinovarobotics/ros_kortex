@@ -140,13 +140,12 @@ int ToProtoData(kortex_actuator_driver::RampResponse input, RampResponse *output
 	return 0;
 }
 int ToProtoData(kortex_actuator_driver::CustomDataSelection input, CustomDataSelection *output)
-{ 
+{  
 	output->clear_channel();
 	for(int i = 0; i < input.channel.size(); i++)
 	{
-		output->add_channel(input.channel[i]);
-	}	
-	
+		output->add_channel(CustomDataIndex(input.channel[i]));
+	}
 
 	return 0;
 }

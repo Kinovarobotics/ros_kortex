@@ -1376,3 +1376,9 @@ int ToRosData(ArmStateNotification input, kortex_driver::ArmStateNotification &o
 	
 	return 0;
 }
+int ToRosData(CountryCode input, kortex_driver::CountryCode &output)
+{
+	output.identifier = input.identifier();
+	
+	return 0;
+}

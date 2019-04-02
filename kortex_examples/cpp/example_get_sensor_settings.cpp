@@ -1,3 +1,15 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+
 #include "ros/ros.h"
 #include "kortex_vision_config_driver/GetSensorSettings.h"
 #include "kortex_vision_config_driver/Sensor.h"

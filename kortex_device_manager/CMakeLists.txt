@@ -5,21 +5,20 @@ project(kortex_device_manager)
 add_compile_options(-std=c++11)
 add_definitions(-D_OS_UNIX)
 
-## Find catkin and any catkin packages
+## find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation)
 
-file(GLOB_RECURSE msg_list RELATIVE ${PROJECT_SOURCE_DIR}/msg "*.msg")
-file(GLOB_RECURSE srv_list RELATIVE ${PROJECT_SOURCE_DIR}/srv "*.srv")
 file(GLOB_RECURSE cpp_list RELATIVE ${PROJECT_SOURCE_DIR} "src/*.cpp")
 
-## Declare ROS messages and services
-add_message_files(DIRECTORY msg FILES ${msg_list})
-add_service_files(DIRECTORY srv FILES ${srv_list})
+## declare ROS messages and services
+add_message_files(DIRECTORY msg)
+add_message_files(DIRECTORY msg/non_generated)
+add_service_files(DIRECTORY srv)
 
-## Generate added messages and services
+## generate added messages and services
 generate_messages(DEPENDENCIES std_msgs)
 
-## Declare a catkin package
+## declare a catkin package
 catkin_package()
 
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -34,7 +33,6 @@ link_directories(${PROJECT_SOURCE_DIR}/../kortex_api/lib/release)
 
 add_executable(${PROJECT_NAME} ${cpp_list})
 
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} CppKinovaApi gcov)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} KortexApi gcov)
 
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencpp)
-

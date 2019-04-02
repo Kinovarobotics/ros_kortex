@@ -47,7 +47,12 @@
 
 {%- for package in detailedPackages %}
 {%- for method in package.service.method %}
+{%- if 'Topic' in method.name %}
+#include "kortex_device_manager/OnNotification{{method.name}}.h"
+#include "kortex_device_manager/{{method.name|replace("Topic", "")}}Notification.h"
+{%- else %}
 #include "kortex_device_manager/{{method.name}}.h"
+{%- endif %}
 {%- endfor %}
 {%- endfor %}
 #include "kortex_device_manager/KortexError.h"
@@ -65,7 +70,7 @@ class KortexDeviceManager
 {% for package in detailedPackages %}
 {%- for method in package.service.method %}
 {%- if 'Topic' in method.name %}
-        bool OnNotification{{method.name}}(kortex_device_manager::{{method.name}}::Request  &req, kortex_device_manager::{{method.name}}::Response &res);
+        bool OnNotification{{method.name}}(kortex_device_manager::OnNotification{{method.name}}::Request  &req, kortex_device_manager::OnNotification{{method.name}}::Response &res);
         void cb_{{method.name}}({{method.name|replace("Topic", "")}}Notification notif);
 {%- else %}
         bool {{method.name}}(kortex_device_manager::{{method.name}}::Request  &req, kortex_device_manager::{{method.name}}::Response &res);

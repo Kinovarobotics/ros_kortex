@@ -30,7 +30,7 @@ int ToRosData({{detailed_message.message.name}} input, kortex_actuator_driver::{
 	output.{{field.name}}.clear();
 	for(int i = 0; i < input.{{field.name|lower}}_size(); i++)
 	{
-		gen3_actuator::{{splitTypeName[4]}} temp;
+		kortex_actuator_driver::{{splitTypeName[4]}} temp;
 		ToRosData(input.{{field.name}}(i), temp);
 		output.{{field.name}}.push_back(temp);
 	}
@@ -68,7 +68,7 @@ int ToRosData({{detailed_message.message.name}} input, kortex_actuator_driver::{
 		case {{detailed_message.message.name}}::k{{EnumName}}:
 		{
 	{%- if field.type == 11 %}
-			gen3_actuator::{{splitTypeName[4]}} temp;
+			kortex_actuator_driver::{{splitTypeName[4]}} temp;
 			ToRosData(input.{{field.name}}(), temp);
 			output.oneof_{{detailed_message.message.ListFields()[-1][1][0].name}}.{{field.name}}.push_back(temp);
 	{%- elif field.type == 14 %}

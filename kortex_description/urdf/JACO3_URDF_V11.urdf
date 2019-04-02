@@ -1,20 +1,20 @@
 <robot
-  name="JACO3_URDF_V10" version="1.0">
+  name="JACO3_URDF_V11" version="1.0">
   <link
     name="base_link">
     <inertial>
       <origin
-        xyz="-0.00077898 -4.2629E-05 0.077301"
+        xyz="-0.000648 -0.000166 0.084487"
         rpy="0 0 0" />
       <mass
-        value="1.661" />
+        value="1.697353" />
       <inertia
-        ixx="0.0046774"
-        ixy="-2.8192E-07"
-        ixz="-4.8238E-05"
-        iyy="0.0047194"
-        iyz="-4.2299E-06"
-        izz="0.0019958" />
+        ixx="0.004622"
+        ixy="9E-06"
+        ixz="6E-05"
+        iyy="0.004495"
+        iyz="9E-06"
+        izz="0.002079" />
     </inertial>
     <visual>
       <origin
@@ -22,7 +22,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/base_link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/base_link.STL" />
       </geometry>
       <material
         name="">
@@ -36,7 +36,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/base_link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/base_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -44,17 +44,17 @@
     name="Shoulder_Link">
     <inertial>
       <origin
-        xyz="-2.2888E-05 -0.010511 -0.075159"
+        xyz="-2.3E-05 -0.010364 -0.07336"
         rpy="0 0 0" />
       <mass
-        value="2.009" />
+        value="1.377353" />
       <inertia
-        ixx="0.0045081"
-        ixy="-8.5826E-07"
-        ixz="-1.8997E-06"
-        iyy="0.0047695"
-        iyz="-0.00045534"
-        izz="0.0013903" />
+        ixx="0.00457"
+        ixy="1E-06"
+        ixz="2E-06"
+        iyy="0.004831"
+        iyz="0.000448"
+        izz="0.001409" />
     </inertial>
     <visual>
       <origin
@@ -62,12 +62,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/Shoulder_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/Shoulder_Link.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.86667 0.86667 0.8902 1" />
+          rgba="0.75294 0.75294 0.75294 1" />
       </material>
     </visual>
     <collision>
@@ -76,7 +76,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/Shoulder_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/Shoulder_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -84,8 +84,8 @@
     name="Actuator1"
     type="continuous">
     <origin
-      xyz="0 0 0.15643"
-      rpy="3.1416 0 0" />
+      xyz="6.1995E-05 0 0.15643"
+      rpy="-3.1416 3.2891E-18 1.9637E-50" />
     <parent
       link="base_link" />
     <child
@@ -100,17 +100,17 @@
     name="HalfArm1_Link">
     <inertial>
       <origin
-        xyz="-2.7821E-05 -0.097298 -0.012693"
+        xyz="-4.4E-05 -0.09958 -0.013278"
         rpy="0 0 0" />
       <mass
-        value="1.106" />
+        value="1.163667" />
       <inertia
-        ixx="0.0089168"
-        ixy="-2.8995E-06"
-        ixz="-1.6642E-07"
-        iyy="0.00073106"
-        iyz="0.00051768"
-        izz="0.0090416" />
+        ixx="0.011088"
+        ixy="5E-06"
+        ixz="0"
+        iyy="0.001072"
+        iyz="-0.000691"
+        izz="0.011255" />
     </inertial>
     <visual>
       <origin
@@ -118,12 +118,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/HalfArm1_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/HalfArm1_Link.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.89804 0.91765 0.92941 1" />
+          rgba="0.75294 0.75294 0.75294 1" />
       </material>
     </visual>
     <collision>
@@ -132,7 +132,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/HalfArm1_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/HalfArm1_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -141,7 +141,7 @@
     type="revolute">
     <origin
       xyz="0 0.005375 -0.12838"
-      rpy="1.5708 0 0" />
+      rpy="1.5708 2.4106E-17 3.1919E-16" />
     <parent
       link="Shoulder_Link" />
     <child
@@ -149,8 +149,8 @@
     <axis
       xyz="0 0 1" />
     <limit
-      lower="-2.2000"
-      upper="2.2000"
+      lower="-2.2"
+      upper="2.2"
       effort="39"
       velocity="0.8727" />
   </joint>
@@ -158,17 +158,17 @@
     name="HalfArm2_Link">
     <inertial>
       <origin
-        xyz="2.9808E-05 -0.0062391 -0.11552"
+        xyz="-4.4E-05 -0.006641 -0.117892"
         rpy="0 0 0" />
       <mass
-        value="1.106" />
+        value="1.16366" />
       <inertia
-        ixx="0.0088707"
-        ixy="2.3435E-07"
-        ixz="-3.3202E-06"
-        iyy="0.0090034"
-        iyz="-0.00050415"
-        izz="0.00071859" />
+        ixx="0.010932"
+        ixy="0"
+        ixz="-7E-06"
+        iyy="0.011127"
+        iyz="0.000606"
+        izz="0.001043" />
     </inertial>
     <visual>
       <origin
@@ -176,12 +176,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/HalfArm2_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/HalfArm2_Link.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.89804 0.91765 0.92941 1" />
+          rgba="0.75294 0.75294 0.75294 1" />
       </material>
     </visual>
     <collision>
@@ -190,7 +190,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/HalfArm2_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/HalfArm2_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -199,7 +199,7 @@
     type="continuous">
     <origin
       xyz="0 -0.21038 -0.006375"
-      rpy="-1.5708 0 0" />
+      rpy="-1.5708 9.8608E-32 -2.7983E-16" />
     <parent
       link="HalfArm1_Link" />
     <child
@@ -214,17 +214,17 @@
     name="ForeArm_Link">
     <inertial>
       <origin
-        xyz="-1.1024E-05 -0.075357 -0.014085"
+        xyz="-1.8E-05 -0.075478 -0.015006"
         rpy="0 0 0" />
       <mass
-        value="0.895" />
+        value="0.930287" />
       <inertia
-        ixx="0.0067339"
-        ixy="6.9646E-07"
-        ixz="-2.2424E-08"
-        iyy="0.00045088"
-        iyz="0.00038999"
-        izz="0.0068613" />
+        ixx="0.008147"
+        ixy="-1E-06"
+        ixz="0"
+        iyy="0.000631"
+        iyz="-0.0005"
+        izz="0.008316" />
     </inertial>
     <visual>
       <origin
@@ -232,12 +232,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/ForeArm_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/ForeArm_Link.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.79216 0.81961 0.93333 1" />
+          rgba="0.75294 0.75294 0.75294 1" />
       </material>
     </visual>
     <collision>
@@ -246,7 +246,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/ForeArm_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/ForeArm_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -255,7 +255,7 @@
     type="revolute">
     <origin
       xyz="0 0.006375 -0.21038"
-      rpy="1.5708 0 0" />
+      rpy="1.5708 3.0688E-17 -6.9389E-18" />
     <parent
       link="HalfArm2_Link" />
     <child
@@ -269,20 +269,20 @@
       velocity="0.8727" />
   </joint>
   <link
-    name="Wrist1_Link">
+    name="SphericalWrist1_Link">
     <inertial>
       <origin
-        xyz="-3.2964E-07 -0.009617 -0.062968"
+        xyz="1E-06 -0.009432 -0.063883"
         rpy="0 0 0" />
       <mass
-        value="0.654" />
+        value="0.678106" />
       <inertia
-        ixx="0.0013311"
-        ixy="-4.5849E-10"
-        ixz="-4.2678E-10"
-        iyy="0.0013282"
-        iyz="-0.00022936"
-        izz="0.00030696" />
+        ixx="0.001596"
+        ixy="0"
+        ixz="0"
+        iyy="0.001607"
+        iyz="0.000256"
+        izz="0.000399" />
     </inertial>
     <visual>
       <origin
@@ -290,12 +290,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/Wrist1_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/SphericalWrist1_Link.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.79216 0.81961 0.93333 1" />
+          rgba="0.75294 0.75294 0.75294 1" />
       </material>
     </visual>
     <collision>
@@ -304,7 +304,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/Wrist1_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/SphericalWrist1_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -313,11 +313,11 @@
     type="continuous">
     <origin
       xyz="0 -0.20843 -0.006375"
-      rpy="-1.5708 0 0" />
+      rpy="-1.5708 1.497E-17 7.6501E-17" />
     <parent
       link="ForeArm_Link" />
     <child
-      link="Wrist1_Link" />
+      link="SphericalWrist1_Link" />
     <axis
       xyz="0 0 1" />
     <limit
@@ -325,20 +325,20 @@
       velocity="0.8727" />
   </joint>
   <link
-    name="Wrist2_Link">
+    name="SphericalWrist2_Link">
     <inertial>
       <origin
-        xyz="-3.4377E-07 -0.044043 -0.0097804"
+        xyz="1E-06 -0.045483 -0.00965"
         rpy="0 0 0" />
       <mass
-        value="0.654" />
+        value="0.678106" />
       <inertia
-        ixx="0.0013422"
-        ixy="4.9596E-10"
-        ixz="-7.3382E-10"
-        iyy="0.00031025"
-        iyz="0.00023506"
-        izz="0.001336" />
+        ixx="0.001641"
+        ixy="0"
+        ixz="0"
+        iyy="0.00041"
+        iyz="-0.000278"
+        izz="0.001641" />
     </inertial>
     <visual>
       <origin
@@ -346,12 +346,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/Wrist2_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/SphericalWrist2_Link.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.79216 0.81961 0.93333 1" />
+          rgba="0.75294 0.75294 0.75294 1" />
       </material>
     </visual>
     <collision>
@@ -360,7 +360,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/Wrist2_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/SphericalWrist2_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -369,16 +369,16 @@
     type="revolute">
     <origin
       xyz="0 0.00017505 -0.10593"
-      rpy="1.5708 0 0" />
+      rpy="1.5708 3.3255E-17 -8.0962E-15" />
     <parent
-      link="Wrist1_Link" />
+      link="SphericalWrist1_Link" />
     <child
-      link="Wrist2_Link" />
+      link="SphericalWrist2_Link" />
     <axis
       xyz="0 0 1" />
     <limit
-      lower="-2.0500"
-      upper="2.0500"
+      lower="-2.05"
+      upper="2.05"
       effort="9"
       velocity="0.8727" />
   </joint>
@@ -386,17 +386,17 @@
     name="Bracelet_Link">
     <inertial>
       <origin
-        xyz="-2.788E-05 -0.0052162 -0.022692"
+        xyz="-0.000281 -0.011402 -0.03108"
         rpy="0 0 0" />
       <mass
-        value="0.31408" />
+        value="0.500657" />
       <inertia
-        ixx="0.0002264"
-        ixy="-4.9091E-07"
-        ixz="-2.6238E-07"
-        iyy="0.00015697"
-        iyz="-4.5614E-05"
-        izz="0.00025981" />
+        ixx="0.00057"
+        ixy="2E-06"
+        ixz="3E-06"
+        iyy="0.000352"
+        iyz="0.000111"
+        izz="0.000609" />
     </inertial>
     <visual>
       <origin
@@ -404,12 +404,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/Bracelet_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/Bracelet_Link.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.79216 0.81961 0.93333 1" />
+          rgba="0.75294 0.75294 0.75294 1" />
       </material>
     </visual>
     <collision>
@@ -418,7 +418,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/Bracelet_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/Bracelet_Link.STL" />
       </geometry>
     </collision>
   </link>
@@ -427,9 +427,9 @@
     type="continuous">
     <origin
       xyz="0 -0.10593 -0.00017505"
-      rpy="-1.5708 0 0" />
+      rpy="-1.5708 -2.3419E-17 1.52E-17" />
     <parent
-      link="Wrist2_Link" />
+      link="SphericalWrist2_Link" />
     <child
       link="Bracelet_Link" />
     <axis
@@ -442,7 +442,7 @@
     name="EndEffector_Link">
     <inertial>
       <origin
-        xyz="-0.00017492 0.014824 -0.62969"
+        xyz="0 0 0"
         rpy="0 0 0" />
       <mass
         value="0" />
@@ -460,7 +460,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/EndEffector_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/EndEffector_Link.STL" />
       </geometry>
       <material
         name="">
@@ -474,16 +474,16 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://JACO3_URDF_V10/meshes/EndEffector_Link.STL" />
+          filename="package://JACO3_URDF_V11/meshes/EndEffector_Link.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Endeffector"
+    name="EndEffector"
     type="fixed">
     <origin
-      xyz="0 0 -0.059525"
-      rpy="3.1416 0 0" />
+      xyz="0 0 -0.061525"
+      rpy="3.1416 1.0815E-32 0" />
     <parent
       link="Bracelet_Link" />
     <child

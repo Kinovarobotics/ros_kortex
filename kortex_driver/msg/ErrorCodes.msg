@@ -1,5 +1,5 @@
 
-uint32 SUCCESS = 0
+uint32 ERROR_NONE = 0
 
 uint32 ERROR_PROTOCOL_SERVER = 1
 

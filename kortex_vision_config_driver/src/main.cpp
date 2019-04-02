@@ -63,6 +63,7 @@ int main(int argc, char **argv)
     ros::ServiceServer serviceGetOptionValue = n.advertiseService("GetOptionValue", &VisionConfig_Services::GetOptionValue, &services_object);
     ros::ServiceServer serviceSetOptionValue = n.advertiseService("SetOptionValue", &VisionConfig_Services::SetOptionValue, &services_object);
     ros::ServiceServer serviceGetOptionInformation = n.advertiseService("GetOptionInformation", &VisionConfig_Services::GetOptionInformation, &services_object);
+    ros::ServiceServer serviceOnNotificationVisionTopic = n.advertiseService("OnNotificationVisionTopic", &VisionConfig_Services::OnNotificationVisionTopic, &services_object);
     ros::ServiceServer serviceDoSensorFocusAction = n.advertiseService("DoSensorFocusAction", &VisionConfig_Services::DoSensorFocusAction, &services_object);
     ros::ServiceServer serviceGetIntrinsicParameters = n.advertiseService("GetIntrinsicParameters", &VisionConfig_Services::GetIntrinsicParameters, &services_object);
     

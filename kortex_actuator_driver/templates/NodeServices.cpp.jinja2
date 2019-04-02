@@ -34,7 +34,7 @@ Actuator_Services::Actuator_Services(char* ip, ros::NodeHandle& n, uint32_t devi
 	{%- if package.HasRPC == 1 %}
 	m_{{package.name|lower}} = new {{package.name}}::{{package.name}}Client(m_router);
 	{%- endif -%}
-{% endfor -%}
+{% endfor %}
 	//If the Device ID is different than 0, it means that we are using the feature DEVICE ROUTING.
 	if(m_CurrentDeviceID != 0)
 	{
@@ -102,7 +102,7 @@ bool Actuator_Services::IsCyclicActive()
 {% for package in detailedPackages %}
 {% for method in package.service.method %}
 {%- if 'Topic' in method.name %}
-bool Actuator_Services::OnNotification{{method.name}}(kortex_actuator_driver::{{method.name}}::Request  &req, kortex_actuator_driver::{{method.name}}::Response &res)
+bool Actuator_Services::OnNotification{{method.name}}(kortex_actuator_driver::OnNotification{{method.name}}::Request  &req, kortex_actuator_driver::OnNotification{{method.name}}::Response &res)
 {%- else %}
 bool Actuator_Services::{{method.name}}(kortex_actuator_driver::{{method.name}}::Request  &req, kortex_actuator_driver::{{method.name}}::Response &res)
 {%- endif %}
@@ -141,9 +141,12 @@ bool Actuator_Services::{{method.name}}(kortex_actuator_driver::{{method.name}}:
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)

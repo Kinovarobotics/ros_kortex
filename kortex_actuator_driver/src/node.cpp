@@ -31,7 +31,8 @@ Actuator_Services::Actuator_Services(char* ip, ros::NodeHandle& n, uint32_t devi
 	m_apiOptions.timeout_ms = 3000;
 
 	m_actuatorconfig = new ActuatorConfig::ActuatorConfigClient(m_router);
-	m_actuatorcyclic = new ActuatorCyclic::ActuatorCyclicClient(m_router);//If the Device ID is different than 0, it means that we are using the feature DEVICE ROUTING.
+	m_actuatorcyclic = new ActuatorCyclic::ActuatorCyclicClient(m_router);
+	//If the Device ID is different than 0, it means that we are using the feature DEVICE ROUTING.
 	if(m_CurrentDeviceID != 0)
 	{
 		m_SessionManager = new SessionManager(m_router);
@@ -103,9 +104,12 @@ bool Actuator_Services::GetAxisOffsets(kortex_actuator_driver::GetAxisOffsets::R
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -131,9 +135,12 @@ bool Actuator_Services::SetAxisOffsets(kortex_actuator_driver::SetAxisOffsets::R
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -157,9 +164,12 @@ bool Actuator_Services::ReadTorqueCalibration(kortex_actuator_driver::ReadTorque
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -185,9 +195,12 @@ bool Actuator_Services::WriteTorqueCalibration(kortex_actuator_driver::WriteTorq
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -212,9 +225,12 @@ bool Actuator_Services::SetTorqueOffset(kortex_actuator_driver::SetTorqueOffset:
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -238,9 +254,12 @@ bool Actuator_Services::GetControlMode(kortex_actuator_driver::GetControlMode::R
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -266,9 +285,12 @@ bool Actuator_Services::SetControlMode(kortex_actuator_driver::SetControlMode::R
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -292,9 +314,12 @@ bool Actuator_Services::GetActivatedControlLoop(kortex_actuator_driver::GetActiv
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -320,9 +345,12 @@ bool Actuator_Services::SetActivatedControlLoop(kortex_actuator_driver::SetActiv
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -346,9 +374,12 @@ bool Actuator_Services::GetVectorDriveParameters(kortex_actuator_driver::GetVect
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -374,9 +405,12 @@ bool Actuator_Services::SetVectorDriveParameters(kortex_actuator_driver::SetVect
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -400,9 +434,12 @@ bool Actuator_Services::GetEncoderDerivativeParameters(kortex_actuator_driver::G
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -428,9 +465,12 @@ bool Actuator_Services::SetEncoderDerivativeParameters(kortex_actuator_driver::S
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -455,9 +495,12 @@ bool Actuator_Services::GetControlLoopParameters(kortex_actuator_driver::GetCont
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -483,9 +526,12 @@ bool Actuator_Services::SetControlLoopParameters(kortex_actuator_driver::SetCont
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -510,9 +556,12 @@ bool Actuator_Services::StartFrequencyResponse(kortex_actuator_driver::StartFreq
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -536,9 +585,12 @@ bool Actuator_Services::StopFrequencyResponse(kortex_actuator_driver::StopFreque
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -563,9 +615,12 @@ bool Actuator_Services::StartStepResponse(kortex_actuator_driver::StartStepRespo
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -589,9 +644,12 @@ bool Actuator_Services::StopStepResponse(kortex_actuator_driver::StopStepRespons
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -616,9 +674,12 @@ bool Actuator_Services::StartRampResponse(kortex_actuator_driver::StartRampRespo
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -642,9 +703,12 @@ bool Actuator_Services::StopRampResponse(kortex_actuator_driver::StopRampRespons
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -669,9 +733,12 @@ bool Actuator_Services::SelectCustomData(kortex_actuator_driver::SelectCustomDat
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -695,9 +762,12 @@ bool Actuator_Services::GetSelectedCustomData(kortex_actuator_driver::GetSelecte
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -723,9 +793,12 @@ bool Actuator_Services::SetCommandMode(kortex_actuator_driver::SetCommandMode::R
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -749,9 +822,12 @@ bool Actuator_Services::ClearFaults(kortex_actuator_driver::ClearFaults::Request
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -776,9 +852,12 @@ bool Actuator_Services::SetServoing(kortex_actuator_driver::SetServoing::Request
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -803,9 +882,12 @@ bool Actuator_Services::MoveToPosition(kortex_actuator_driver::MoveToPosition::R
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -829,9 +911,12 @@ bool Actuator_Services::GetCommandMode(kortex_actuator_driver::GetCommandMode::R
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -856,9 +941,12 @@ bool Actuator_Services::GetServoing(kortex_actuator_driver::GetServoing::Request
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -883,9 +971,12 @@ bool Actuator_Services::GetTorqueOffset(kortex_actuator_driver::GetTorqueOffset:
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -912,9 +1003,12 @@ bool Actuator_Services::Refresh(kortex_actuator_driver::Refresh::Request  &req, 
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -940,9 +1034,12 @@ bool Actuator_Services::RefreshCommand(kortex_actuator_driver::RefreshCommand::R
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -967,9 +1064,12 @@ bool Actuator_Services::RefreshFeedback(kortex_actuator_driver::RefreshFeedback:
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -995,9 +1095,12 @@ bool Actuator_Services::RefreshCustomData(kortex_actuator_driver::RefreshCustomD
 	{
 		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
 		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.what();
+		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)

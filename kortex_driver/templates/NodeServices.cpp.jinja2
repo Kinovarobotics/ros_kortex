@@ -35,7 +35,7 @@ BaseServices::BaseServices(char* ip, ros::NodeHandle& n) : m_n(n)
 	m_{{package.name|lower}} = new {{package.name}}::{{package.name}}Client(m_router);
 	{%- endif -%}
 
-{% endfor -%}
+{% endfor %}
 	m_SessionManager = new SessionManager(m_router);
 	auto createSessionInfo = Kinova::Api::Session::CreateSessionInfo();
 
@@ -75,7 +75,7 @@ bool BaseServices::SetApiOptions(kortex_driver::SetApiOptions::Request  &req, ko
 {% for package in detailedPackages %}
 {% for method in package.service.method %}
 {%- if 'Topic' in method.name %}
-bool BaseServices::OnNotification{{method.name}}(kortex_driver::{{method.name}}::Request  &req, kortex_driver::{{method.name}}::Response &res)
+bool BaseServices::OnNotification{{method.name}}(kortex_driver::OnNotification{{method.name}}::Request  &req, kortex_driver::OnNotification{{method.name}}::Response &res)
 {%- else %}
 bool BaseServices::{{method.name}}(kortex_driver::{{method.name}}::Request  &req, kortex_driver::{{method.name}}::Response &res)
 {%- endif %}

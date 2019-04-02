@@ -30,7 +30,8 @@ KortexDeviceManager::KortexDeviceManager(char* ip, ros::NodeHandle& n) : m_n(n)
 
 
 	m_deviceconfig = new DeviceConfig::DeviceConfigClient(m_router);
-	m_devicemanager = new DeviceManager::DeviceManagerClient(m_router);m_SessionManager = new SessionManager(m_router);
+	m_devicemanager = new DeviceManager::DeviceManagerClient(m_router);
+	m_SessionManager = new SessionManager(m_router);
 	auto createSessionInfo = Kinova::Api::Session::CreateSessionInfo();
 	
 	createSessionInfo.set_username("admin");
@@ -63,7 +64,10 @@ bool KortexDeviceManager::GetRunMode(kortex_device_manager::GetRunMode::Request 
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -91,7 +95,10 @@ bool KortexDeviceManager::SetRunMode(kortex_device_manager::SetRunMode::Request 
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -117,7 +124,10 @@ bool KortexDeviceManager::GetDeviceType(kortex_device_manager::GetDeviceType::Re
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -144,7 +154,10 @@ bool KortexDeviceManager::GetFirmwareVersion(kortex_device_manager::GetFirmwareV
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -171,7 +184,10 @@ bool KortexDeviceManager::GetBootloaderVersion(kortex_device_manager::GetBootloa
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -198,7 +214,10 @@ bool KortexDeviceManager::GetModelNumber(kortex_device_manager::GetModelNumber::
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -225,7 +244,10 @@ bool KortexDeviceManager::GetPartNumber(kortex_device_manager::GetPartNumber::Re
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -252,7 +274,10 @@ bool KortexDeviceManager::GetSerialNumber(kortex_device_manager::GetSerialNumber
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -279,7 +304,10 @@ bool KortexDeviceManager::GetMACAddress(kortex_device_manager::GetMACAddress::Re
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -306,7 +334,10 @@ bool KortexDeviceManager::GetIPv4Settings(kortex_device_manager::GetIPv4Settings
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -334,7 +365,10 @@ bool KortexDeviceManager::SetIPv4Settings(kortex_device_manager::SetIPv4Settings
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -360,7 +394,10 @@ bool KortexDeviceManager::GetPartNumberRevision(kortex_device_manager::GetPartNu
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -387,7 +424,10 @@ bool KortexDeviceManager::GetPowerOnSelfTestResult(kortex_device_manager::GetPow
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -415,7 +455,10 @@ bool KortexDeviceManager::RebootRequest(kortex_device_manager::RebootRequest::Re
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -442,7 +485,10 @@ bool KortexDeviceManager::SetSafetyEnable(kortex_device_manager::SetSafetyEnable
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -469,7 +515,10 @@ bool KortexDeviceManager::SetSafetyErrorThreshold(kortex_device_manager::SetSafe
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -496,7 +545,10 @@ bool KortexDeviceManager::SetSafetyWarningThreshold(kortex_device_manager::SetSa
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -523,7 +575,10 @@ bool KortexDeviceManager::SetSafetyConfiguration(kortex_device_manager::SetSafet
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -550,7 +605,10 @@ bool KortexDeviceManager::GetSafetyConfiguration(kortex_device_manager::GetSafet
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -578,7 +636,10 @@ bool KortexDeviceManager::GetSafetyInformation(kortex_device_manager::GetSafetyI
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -606,7 +667,10 @@ bool KortexDeviceManager::GetSafetyEnable(kortex_device_manager::GetSafetyEnable
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -634,7 +698,10 @@ bool KortexDeviceManager::GetSafetyStatus(kortex_device_manager::GetSafetyStatus
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -661,7 +728,10 @@ bool KortexDeviceManager::ClearAllSafetyStatus(kortex_device_manager::ClearAllSa
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -688,7 +758,10 @@ bool KortexDeviceManager::ClearSafetyStatus(kortex_device_manager::ClearSafetySt
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -714,7 +787,10 @@ bool KortexDeviceManager::GetAllSafetyConfiguration(kortex_device_manager::GetAl
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -741,7 +817,10 @@ bool KortexDeviceManager::GetAllSafetyInformation(kortex_device_manager::GetAllS
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -768,7 +847,10 @@ bool KortexDeviceManager::ResetSafetyDefaults(kortex_device_manager::ResetSafety
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -778,7 +860,7 @@ bool KortexDeviceManager::ResetSafetyDefaults(kortex_device_manager::ResetSafety
 	return true;
 }
 
-bool KortexDeviceManager::OnNotificationSafetyTopic(kortex_device_manager::SafetyTopic::Request  &req, kortex_device_manager::SafetyTopic::Response &res)
+bool KortexDeviceManager::OnNotificationSafetyTopic(kortex_device_manager::OnNotificationSafetyTopic::Request  &req, kortex_device_manager::OnNotificationSafetyTopic::Response &res)
 {
 	NotificationOptions input;
 	ToProtoData(req.input, &input);
@@ -797,7 +879,10 @@ bool KortexDeviceManager::OnNotificationSafetyTopic(kortex_device_manager::Safet
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -831,7 +916,10 @@ bool KortexDeviceManager::SetModelNumber(kortex_device_manager::SetModelNumber::
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -858,7 +946,10 @@ bool KortexDeviceManager::SetPartNumber(kortex_device_manager::SetPartNumber::Re
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -885,7 +976,10 @@ bool KortexDeviceManager::SetPartNumberRevision(kortex_device_manager::SetPartNu
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -912,7 +1006,10 @@ bool KortexDeviceManager::SetSerialNumber(kortex_device_manager::SetSerialNumber
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -939,7 +1036,10 @@ bool KortexDeviceManager::SetMACAddress(kortex_device_manager::SetMACAddress::Re
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)
@@ -966,7 +1066,10 @@ bool KortexDeviceManager::ReadAllDevices(kortex_device_manager::ReadAllDevices::
 		result_error.code = ex.getErrorInfo().getError().error_code();
 		result_error.description = ex.toString();
 		m_pub_Error.publish(result_error);
-		ROS_INFO("KINOVA exception: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
 		return false;
 	}
 	catch (std::runtime_error& ex2)

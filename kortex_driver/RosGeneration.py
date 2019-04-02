@@ -1,4 +1,15 @@
 #!/usr/bin/env python
+###
+# KINOVA (R) KORTEX (TM)
+#
+# Copyright (c) 2018 Kinova inc. All rights reserved.
+#
+# This software may be modified and distributed 
+# under the terms of the BSD 3-Clause license.
+#
+# Refer to the LICENSE file for details.
+#
+###
 
 import sys
 
@@ -13,30 +24,32 @@ import types
 import os
 import sys
 
+from collections import OrderedDict
+
 from google.protobuf.descriptor_pb2 import DescriptorProto, EnumDescriptorProto, ServiceDescriptorProto, FieldDescriptorProto, OneofDescriptorProto
 
-#Class that holds a protobuf message and some other details needed by the generator(jinja2 template).
+# Class that holds a protobuf message and other details needed by the generator(Jinja2 template)
 class DetailedMessage:
     def __init__(self, message=None):
         self.message = message
         self.HasOneOf = "false"
         self.oneOfList = []
 
-#Class that holds a protobuf service and some other details needed by the generator(jinja2 template).
+# Class that holds a protobuf service and some other details needed by the generator(Jinja2 template)
 class DetailedPackage:
     def __init__(self, service=None):
         self.name = "NoName"
         self.service = service
         
-#JINJA2 function to render a file from a template.
+# Jinja2 function to render a file from a template
 def render(tpl_path, context):
     path, filename = os.path.split(tpl_path)
     return jinja2.Environment(loader=jinja2.FileSystemLoader(path or './')).get_template(filename).render(**context)
 
-#Main plugin function
+# main plugin function
 def generate_code(request, response):
     
-    #The context is the object sent to the JINJA2 template
+    # The context is the object sent to the Jinja2 template.
     context = types.SimpleNamespace()
     context.serviceVersion = 1
 
@@ -45,8 +58,12 @@ def generate_code(request, response):
     MainFilePath = os.path.join(".", "src/main.cpp")
     function_list = []
     fileIndex = 0
-    
+    file_map = OrderedDict()
+
     for proto_file in request.proto_file:
+        file_map[proto_file.name] = proto_file
+
+    for filename, proto_file in file_map.items():
         context.detailedPackages.append(DetailedPackage())
         context.detailedPackages[fileIndex].name = proto_file.package.split(".")[-1]
         context.detailedPackages[fileIndex].filename = proto_file.name.split(".")[0]
@@ -57,11 +74,7 @@ def generate_code(request, response):
         HeaderFilePath = os.path.join(".", "src/node.h")
         CppFilePath = os.path.join(".", "src/node.cpp")
 
-        package_name = str(proto_file.package)
-
-        service_name = proto_file.package.split('.')[-1] + '/'
-
-        #We lower the case to respect ROS coding standard style
+        # We use lower case to respect ROS standard coding style.
         CppProtoConverterFilePath = os.path.join(".", "src/{}_proto_converter.cpp".format(proto_file.name.split(".")[0].lower()))
         HeaderProtoConverterFilePath = os.path.join(".", "src/{}_proto_converter.h".format(proto_file.name.split(".")[0].lower()))
         CppRosConverterFilePath = os.path.join(".", "src/{}_ros_converter.cpp".format(proto_file.name.split(".")[0].lower()))
@@ -70,9 +83,10 @@ def generate_code(request, response):
         list_detailedMessage = []
         list_detailedMethod = []
 
-        # For every item in the current proto file
+        # for every item in the current proto file
         for item, package in traverse(proto_file):
             context.HasOneOf = 0
+            
             
             if isinstance(item, EnumDescriptorProto):
                 context.item = item
@@ -81,13 +95,13 @@ def generate_code(request, response):
                 
                 with open(ros_enumPath, 'wt') as serviceFile:
                     serviceFile.write(render("./templates/ros_enum.jinja2", context.__dict__))
-            #If this it a message
+            # if this is a message
             if isinstance(item, DescriptorProto):
                 tempMessage = DetailedMessage(item)
                 context.detailedPackages[fileIndex].HasMessage = 1
-
+                
                 for member in item.field:
-                    #If a member is part of a oneof, it will have this additional field
+                    # If a member is part of a oneof, it will have this additional field.
                     if member.HasField("oneof_index"):
                         context.HasOneOf = 1
                         tempMessage.HasOneOf = "true"
@@ -97,10 +111,10 @@ def generate_code(request, response):
                 
                 context.item = item
 
-                #If the proto file contains a ONEOF we need to generate a separate file to handle it.
+                # If the proto file contains a ONEOF we need to generate a separate file to handle it.
                 if context.HasOneOf == 1:
 
-                    #This line gets the list of ONEOF that is in the current message.
+                    # This line gets the list of ONEOF that is in the current message.
                     oneOfList = item.ListFields()[-1][1]
                     
                     tempMessage.oneOfList = item.ListFields()[-1][1]
@@ -113,17 +127,21 @@ def generate_code(request, response):
                 list_detailedMessage.append(tempMessage)
                 ros_messagePath = os.path.join(".", "msg/{}.msg".format(item.name))
                 
-                #We call jinja2 to generate a ROS message.
+                # We call Jinja2 to generate a ROS message.
                 with open(ros_messagePath, 'wt') as serviceFile:
                     serviceFile.write(render("./templates/ros_message.jinja2", context.__dict__))
                 
-            #If this is a service (A group of method)
+            # if this is a service (a group of methods)
             if isinstance(item, ServiceDescriptorProto):
                 for idx, method in enumerate(item.method):
                     context.item = method
                     if "Topic" not in method.name:
                         function_list.append(method.name)
-                    ros_servicePath = os.path.join(".", "srv/{}.srv".format(method.name))
+                        ros_servicePath = os.path.join(".", "srv/{}.srv".format(method.name))
+                    else:
+                        function_list.append("OnNotification{}".format(method.name))
+                        ros_servicePath = os.path.join(".", "srv/OnNotification{}.srv".format(method.name))
+                    
                     with open(ros_servicePath, 'wt') as serviceFile:  
                         serviceFile.write(render("./templates/ros_service.jinja2", context.__dict__))
                 
@@ -136,7 +154,7 @@ def generate_code(request, response):
         context.item = list_detailedMessage
 
         if context.detailedPackages[fileIndex].HasMessage == 1:
-            #Wecall jinja2 to generate a prot/ROS converter for every protobuf message.
+            # We call Jinja2 to generate a proto/ROS converter for every protobuf message.
             with open(CppProtoConverterFilePath, 'wt') as converterFile:
                 converterFile.write(render("./templates/proto_converter.cpp.jinja2", context.__dict__))
             with open(HeaderProtoConverterFilePath, 'wt') as converterFile:
@@ -150,7 +168,7 @@ def generate_code(request, response):
 
     context.list_function = function_list
 
-    #We jinja2 to generate the ROS node.
+    # We use Jinja2 to generate the ROS node.
     with open(HeaderFilePath, 'wt') as nodeFile:  
         nodeFile.write(render("./templates/NodeServices.h.jinja2", context.__dict__))    
     with open(CppFilePath, 'wt') as nodeFile:  
@@ -159,7 +177,7 @@ def generate_code(request, response):
         mainFile.write(render("./templates/main.jinja2", context.__dict__))
 
 def traverse(proto_file):
-    #recursive function that browse a protobof item
+    # recursive function that browses a protobof item
     def _traverse(package, items):
         for item in items:
             yield item, package
@@ -177,7 +195,7 @@ def traverse(proto_file):
                 for rpc in item.method:
                     yield rpc, package
 
-    #return a list of everything found in the proto file
+    # returns a list of everything found in the proto file
     return itertools.chain(
       _traverse(proto_file.package, proto_file.enum_type),
       _traverse(proto_file.package, proto_file.message_type),
@@ -185,21 +203,21 @@ def traverse(proto_file):
   )
 
 if __name__ == '__main__':
-    # Read request message from stdin
+    # reads request message from stdin
     data = sys.stdin.buffer.read()
 
-    # Parse request
+    # parses request
     request = plugin.CodeGeneratorRequest()
     request.ParseFromString(data)
 
-    # Create response
+    # creates response
     response = plugin.CodeGeneratorResponse()
 
-    # Generate code
+    # generates code
     generate_code(request, response)
 
-    # Serialise response message
+    # serialises response message
     output = response.SerializeToString()
 
-    # Write to stdout
+    # writes to stdout
     sys.stdout.buffer.write(output)
