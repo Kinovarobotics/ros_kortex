@@ -2,9 +2,9 @@
   <name>kortex_description</name>
   <version>1.0.0</version>
   <description>
-    <p>URDF Description package for JACO3_URDF_V11</p>
+    <p>URDF Description package for Kortex-compatible robots</p>
     <p>This package contains configuration data, 3D models and launch files
-for JACO3_URDF_V11 robot</p>
+for Kortex-compatible arms and grippers</p>
   </description>
   <author>me</author>
   <maintainer email="support@kinova.ca" />
@@ -15,6 +15,7 @@ for JACO3_URDF_V11 robot</p>
   <run_depend>rviz</run_depend>
   <run_depend>joint_state_publisher</run_depend>
   <run_depend>gazebo</run_depend>
+  <run_depend>xacro</run_depend>
   <export>
     <architecture_independent />
   </export>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<robot name="gen3" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <!-- Arguments -->
+    <xacro:arg name="arm" default="gen3" />
+    <xacro:arg name="gripper" default="" />
+
+    <xacro:include filename="$(find kortex_description)/robots/kortex_robot.xacro" />
+    <xacro:load_robot arm="$(arg arm)" gripper="$(arg gripper)"/>
+
+</robot>

@@ -250,7 +250,7 @@ int main(int argc, char **argv)
 
             base_feedback.actuators.push_back(temp);
 
-            joint_state.name[i] = "Actuator" + std::to_string(i + 1);
+            joint_state.name[i] = "joint_" + std::to_string(i + 1);
             joint_state.position[i] =  TO_RAD(res.output.actuators[i].position);
             joint_state.velocity[i] = TO_RAD(res.output.actuators[i].velocity);
             joint_state.effort[i] = res.output.actuators[i].torque;
