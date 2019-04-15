@@ -2,7 +2,6 @@
   <name>kortex_bringup</name>
   <version>1.0.0</version>
   <description>
-    <p>Gazebo Simulation package for ultra_lightweight</p>
     <p>This package contains the launch files for the Gen3 Kortex drivers</p>
   </description>
     <author>KINOVA</author>
