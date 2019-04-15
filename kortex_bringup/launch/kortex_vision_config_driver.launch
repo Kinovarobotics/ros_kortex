@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <arg name="robot_name" default="my_vision_device"/>
+
+    <arg name="ip_address"/>
+    <arg name="cycle_rate" default="60"/> <!--Hz-->
+    <arg name="device_id" default=""/>
+
+    <arg name="start_device_manager" default="true"/>
+
+    <group ns="$(arg robot_name)">
+
+        <!-- kortex_vision_config node -->
+        <node name="$(arg robot_name)_vision_config" pkg="kortex_vision_config_driver" type="kortex_vision_config_driver" args="$(arg ip_address) $(arg device_id)" output="screen"/>
+
+        <!-- kortex_device_manager node -->
+        <node name="$(arg robot_name)_device_manager" pkg="kortex_device_manager" type="kortex_device_manager" args="$(arg ip_address)" output="screen"
+            if="$(arg start_device_manager)"/>
+
+    </group>
+</launch>

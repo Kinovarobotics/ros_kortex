@@ -53,6 +53,11 @@ To build from source, clone the latest version from this repository into your ca
 
 ## Usage
 
+### Launch file
+The launch file for this node can be found in the [kortex_bringup](../kortex_bringup/readme.md) package.
+
+### Starting with rosrun
+
 <code>rosrun kortex\_vision\_config\_driver kortex\_vision\_config\_driver 192.168.1.10</code>
 
 In the command above, you would be running the kortex\_vision\_config\_driver node on a Gen3 robot with IP address 192.168.1.10. 

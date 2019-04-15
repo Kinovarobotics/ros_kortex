@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <arg name="arm" default="gen3"/> <!-- gen3 is the only supported arm for now -->
+    <arg name="gripper" default=""/> <!-- "" is the only supported gripper for now (none) -->
+    <arg name="robot_name" default="my_$(arg arm)"/>
+
+    <arg name="ip_address"/>
+    <arg name="cycle_rate" default="60"/> <!--Hz-->
+
+    <arg name="start_device_manager" default="true"/>
+
+    <arg name="start_rviz" default="true"/>
+
+    <group ns="$(arg robot_name)">
+
+        <!-- Load the description for the robot -->
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro arm:=$(arg arm)"
+            if="$(eval not arg('gripper'))"/>
+
+        <!-- Start the kortex_driver node -->
+        <node name="$(arg robot_name)_driver" pkg="kortex_driver" type="kortex_driver" args="$(arg ip_address) $(arg cycle_rate)" output="screen"/>
+        
+        <!-- Start the kortex_device_manager node -->
+        <node name="$(arg robot_name)_device_manager" pkg="kortex_device_manager" type="kortex_device_manager" args="$(arg ip_address)" output="screen"
+            if="$(arg start_device_manager)"/>
+
+        <!-- Start joint and robot state publisher -->
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+            <rosparam param="source_list">[base_feedback/joint_state]</rosparam>
+        </node>
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+        <!-- Start RViz -->
+        <node name="rviz" pkg="rviz" type="rviz" output="log" args="-f base_link" if="$(arg start_rviz)"/> 
+
+    </group>
+</launch>

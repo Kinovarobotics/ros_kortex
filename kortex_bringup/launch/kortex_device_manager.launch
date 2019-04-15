@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <arg name="ip_address"/>
+
+    <!-- kortex_device_manager node -->
+    <node name="kortex_device_manager" pkg="kortex_device_manager" type="kortex_device_manager" args="$(arg ip_address)"/>
+
+</launch>
