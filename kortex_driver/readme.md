@@ -58,6 +58,12 @@ To build from source, clone the latest version from this repository into your ca
 
 ## Usage
 
+### Launch file
+The launch file for this node can be found in the [kortex_bringup](../kortex_bringup/readme.md) package.
+
+
+### Starting with rosrun
+
 <code>rosrun kortex\_driver kortex\_driver 192.168.1.10 100</code>
 
 In the command above, you would be running the kortex_driver node on an Gen3 robot with IP address 192.168.1.10. The cyclic data would be refreshed at 100 Hz.

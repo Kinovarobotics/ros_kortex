@@ -54,6 +54,9 @@ To build from source, clone the latest version from this repository into your ca
 
 ## Usage
 
+### Launch file
+The launch file for this node can be found in the [kortex_bringup](../kortex_bringup/readme.md) package.
+
 ### Normal mode
 Use this mode if you are directly (Ethernet cable between computer and actuator) connected to the actuator, i.e. if you are using Wi-Fi or your cable is connected in the robot base, don't use this mode.
 

@@ -1,0 +1,21 @@
+<package>
+  <name>kortex_bringup</name>
+  <version>1.0.0</version>
+  <description>
+    <p>This package contains the launch files for the Gen3 Kortex drivers</p>
+  </description>
+    <author>KINOVA</author>
+  <maintainer email="ros@kinova.ca" />
+  <license>BSD</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roslaunch</build_depend>
+  <run_depend>joint_state_publisher</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
+  <run_depend>rviz</run_depend>
+  <run_depend>joint_state_publisher</run_depend>
+  <run_depend>xacro</run_depend>
+  <run_depend>kortex_description</run_depend>
+  <export>
+    <architecture_independent />
+  </export>
+</package>

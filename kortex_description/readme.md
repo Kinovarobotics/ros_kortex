@@ -11,7 +11,7 @@
 * -->
 
 # Kortex Description
-This package contains the URDF (Unified Robot Description Format) and STL files for the Gen3 robot.
+This package contains the URDF (Unified Robot Description Format) and STL files for the Kortex-compatible robots and end-effectors.
 
 <!-- MarkdownTOC -->
 

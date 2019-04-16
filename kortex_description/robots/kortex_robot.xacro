@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:macro name="load_robot" params="arm gripper">
+    
+        <!-- Arguments -->
+        <xacro:property name="arm" value="$(arg arm)" />
+        <xacro:property name="gripper" default="$(arg gripper)" />
+        
+        <!-- Files to include -->
+        <xacro:include filename="$(find kortex_description)/arms/$(arg arm)/urdf/$(arg arm)_macro.xacro" />
+        <xacro:unless value="${not gripper}">
+            <xacro:include filename="$(find kortex_description)/grippers/$(arg gripper)/urdf/$(arg gripper)_macro.xacro" />
+        </xacro:unless>
+        
+        <!-- Run the macros -->        
+        <!-- Load the arm -->
+        <xacro:load_arm parent="">
+            <origin xyz="0 0 0" rpy="0 0 0"/> 
+        </xacro:load_arm>
+
+        <!-- Load the gripper -->
+        <!-- URDF files and support for gripper still to be added -->
+        <!-- <xacro:unless value="${not gripper}">
+            <xacro:load_gripper parent="${last_arm_link}"/> --> <!-- last_arm_link is defined in "$(find kortex_description)/arms/$(arg arm)/urdf/$(arg arm)_macro.xacro" -->
+        <!-- </xacro:unless>  -->
+
+    </xacro:macro>
+</robot>
