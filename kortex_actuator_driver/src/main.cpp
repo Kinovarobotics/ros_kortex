@@ -124,7 +124,7 @@ int main(int argc, char **argv)
     joint_state.effort.resize(1);
     joint_state.name.resize(1);
 
-    ros::Rate rate(cyclic_data_rate); // 100 hz
+    ros::Rate rate(cyclic_data_rate);
     while (!ros::isShuttingDown())
     {
         try
