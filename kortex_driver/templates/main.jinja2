@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
     sensor_msgs::JointState joint_state;
 
-    ros::Rate rate(cyclic_data_rate); // 100 hz
+    ros::Rate rate(cyclic_data_rate);
     while (!ros::isShuttingDown())
     {
         services_object.RefreshFeedback(req, res);
