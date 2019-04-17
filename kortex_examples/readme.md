@@ -59,8 +59,7 @@ Move the end effector of a Gen3 robot along the z axis by +0,1 meter and rotate 
 </p>
 
 To run this example, the following nodes need to be running:
-> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
-> - kortex\_actuator\_driver (**rosrun kortex\_actuator\_driver kortex\_actuator\_driver 192.168.1.10 100**)
+> - kortex\_driver (**rosrun kortex\_driver kortex\_driver 192.168.1.10 100**)
 
 \* Note here that the address **192.168.1.10** is the default robot IP address - you can use any IP address that suits you.
 
@@ -76,8 +75,7 @@ Move the end effector of a Gen3 robot along the z axis by +0,1.
 </p>
 
 To run this example, the following nodes need to be running:
-> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
-> - kortex\_actuator\_driver (**rosrun kortex\_actuator\_driver kortex\_actuator\_driver 192.168.1.10 100**)
+> - kortex\_driver (**rosrun kortex\_driver kortex\_driver 192.168.1.10 100**)
 
 \* Note here that the address **192.168.1.10** is the default robot IP address - you can use any IP address that suits you.
 
