@@ -3,7 +3,7 @@
 <robot name="gen3_arm" xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- Propagate last link name information because it is the gripper's parent link -->
-  <xacro:property name="last_arm_link" value="EndEffector_Link"/>
+  <xacro:property name="last_arm_link" value="end_effector_link"/>
 
   <xacro:macro name="load_arm" params="parent:='' *origin">
     <link
@@ -446,11 +446,11 @@
     </joint>
     <link name="end_effector_link" />
     <joint
-      name="EndEffector"
+      name="end_effector"
       type="fixed">
       <origin
         xyz="0 0 -0.061525"
-        rpy="1.57 1.57 0" />
+        rpy="3.1416 1.0815E-32 0" />
       <parent
         link="bracelet_link" />
       <child
