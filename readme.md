@@ -58,9 +58,6 @@ This will download the API, unzip it to the right folder and build the project w
 
 You can also download and unzip the API manually by following these [instructions](kortex_api/readme.md).
 
-<<<<<<< HEAD
-## kortex_gazebo
-=======
 ### Install protobuf [OPTIONAL]
 The protobuf compiler is not required if you want to use the package as is, but is required if you need to [re-generate](./generate_all.sh) the .MSG, .SRV and auto-generated Kortex-ROS C++ wrapper files.
 
@@ -68,7 +65,6 @@ The protobuf compiler is not required if you want to use the package as is, but 
 2. Follow these [instructions](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md) to build and install protobuf and its compiler. 
 
 ## kortex gazebo
->>>>>>> feature/build-workspace-without-protobuf-installed
 This package is not completed yet but will be available in a future version.
 
 ## kortex_moveit_config
