@@ -24,6 +24,7 @@ catkin_package()
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(include ${PROJECT_SOURCE_DIR}/src)
+include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include)
 include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/client)
 include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/client_stubs)
 include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/messages)
