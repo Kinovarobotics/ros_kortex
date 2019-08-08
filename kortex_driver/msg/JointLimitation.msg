@@ -1,4 +1,0 @@
- 
-uint32 device_identifier
-
-JointLimitationValue limitation_value

@@ -1,5 +1,0 @@
-
-
-MapEvent event
-
-Action action

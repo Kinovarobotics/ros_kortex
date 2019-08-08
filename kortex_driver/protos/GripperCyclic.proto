@@ -1,0 +1,39 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+ 
+ syntax = "proto3";
+
+import public "Common.proto";
+import public "GripperCyclicMessage.proto";
+
+package Kinova.Api.GripperCyclic;
+
+// Service to exchange cyclic data with gripper 
+service GripperCyclic {//@PROXY_ID=17 @ERROR=Kinova.Api.Error
+
+    // Sends a command to the gripper and receives feedback about the actual status of the gripper
+    rpc Refresh           (Kinova.Api.GripperCyclic.Command)    returns (Kinova.Api.GripperCyclic.Feedback);   //@RPC_ID=1
+    
+    // Sends a command to the gripper without receiving feedback
+    rpc RefreshCommand    (Kinova.Api.GripperCyclic.Command)    returns (Kinova.Api.Common.Empty);      //@RPC_ID=2
+    
+    // Obtains feedback from the gripper on its status
+    rpc RefreshFeedback   (Kinova.Api.GripperCyclic.MessageId)  returns (Kinova.Api.GripperCyclic.Feedback);   //@RPC_ID=3
+    
+	// Obtains custom data from the gripper
+    rpc RefreshCustomData (Kinova.Api.GripperCyclic.MessageId)  returns (Kinova.Api.GripperCyclic.CustomData); //@RPC_ID=4
+}
+
+enum ServiceVersion {
+    RESERVED_0 = 0;
+    CURRENT_VERSION = 1; // Current Version
+}

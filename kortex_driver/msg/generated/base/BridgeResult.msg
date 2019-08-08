@@ -1,0 +1,3 @@
+
+BridgeIdentifier bridge_id
+uint32 status

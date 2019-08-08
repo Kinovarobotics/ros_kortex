@@ -1,0 +1,4 @@
+
+GripperCyclic_MessageId custom_data_id
+CustomDataUnit gripper_custom_data
+CustomDataUnit[] motor_custom_data

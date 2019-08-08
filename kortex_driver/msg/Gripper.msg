@@ -1,3 +1,0 @@
-
-
-Finger[] finger

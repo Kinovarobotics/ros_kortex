@@ -1,5 +1,0 @@
-
-
-JointAngles joint_angles
-
-JointTrajectoryConstraint constraint

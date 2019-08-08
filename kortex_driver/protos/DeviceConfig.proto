@@ -1,0 +1,337 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+
+syntax = "proto3";
+
+import public "Common.proto";
+
+package Kinova.Api.DeviceConfig;
+
+// Service to get and set device configuration information
+service DeviceConfig {//@PROXY_ID=9 @ERROR=Kinova.Api.Error
+
+    // Returns the run mode for the device
+    rpc GetRunMode (Kinova.Api.Common.Empty) returns (RunMode); //@RPC_ID=1
+
+    // Sets the run mode for the device
+    rpc SetRunMode (RunMode) returns (Kinova.Api.Common.Empty); //@RPC_ID=2
+    
+    // Retrieves the type for the device
+    rpc GetDeviceType (Kinova.Api.Common.Empty) returns (DeviceType); //@RPC_ID=3
+    
+    // Retrieves the device firmware version
+    rpc GetFirmwareVersion (Kinova.Api.Common.Empty) returns (FirmwareVersion); //@RPC_ID=4
+    
+    // Retrieves the device bootloader version 
+    rpc GetBootloaderVersion (Kinova.Api.Common.Empty) returns (BootloaderVersion); //@RPC_ID=5
+    
+    // Retrieves the device model number
+    rpc GetModelNumber (Kinova.Api.Common.Empty) returns (ModelNumber); //@RPC_ID=6
+    
+    // Retrieves the device part number
+    rpc GetPartNumber (Kinova.Api.Common.Empty) returns (PartNumber);	//@RPC_ID=7
+    
+    // Retrieves the device serial number
+    rpc GetSerialNumber (Kinova.Api.Common.Empty) returns (SerialNumber); //@RPC_ID=8
+    
+    // Retrieves the device MAC address
+    rpc GetMACAddress (Kinova.Api.Common.Empty) returns (MACAddress); //@RPC_ID=9
+    
+    // Retrieves the device IPv4 settings (not implemented on Base)
+    rpc GetIPv4Settings (Kinova.Api.Common.Empty) returns (IPv4Settings); //@RPC_ID=10
+    
+    // Sets the device IPv4 settings (not implemented on Base)
+    rpc SetIPv4Settings (IPv4Settings) returns (Kinova.Api.Common.Empty); //@RPC_ID=11
+    
+    // Retrieves the device part number revision
+    rpc GetPartNumberRevision (Kinova.Api.Common.Empty) returns (PartNumberRevision);	//@RPC_ID=12
+    
+    // Sends a request to the device to reboot
+    rpc RebootRequest (RebootRqst) returns (Kinova.Api.Common.Empty); //@RPC_ID=14
+
+    // Enables (disable) the specified safety
+    rpc SetSafetyEnable (SafetyEnable) returns (Kinova.Api.Common.Empty); //@RPC_ID=15
+    
+    // Sets the error threshold for the specified safety
+    rpc SetSafetyErrorThreshold (SafetyThreshold) returns (Kinova.Api.Common.Empty); //@RPC_ID=16
+    
+    // Sets the warning threshold for the specified safety
+    rpc SetSafetyWarningThreshold (SafetyThreshold) returns (Kinova.Api.Common.Empty); //@RPC_ID=17
+    
+    // Configures the specified safety (i.e. sets error and warning thresholds)
+    rpc SetSafetyConfiguration (SafetyConfiguration) returns (Kinova.Api.Common.Empty); //@RPC_ID=18
+    
+    // Retrieves configuration about the specified safety
+    rpc GetSafetyConfiguration (Kinova.Api.Common.SafetyHandle) returns (SafetyConfiguration); //@RPC_ID=19
+    
+    // Retrieves information about the specified safety
+    rpc GetSafetyInformation (Kinova.Api.Common.SafetyHandle) returns (SafetyInformation); //@RPC_ID=20
+    
+    // Indicates if specified safety is enabled (or disabled)
+    rpc GetSafetyEnable (Kinova.Api.Common.SafetyHandle) returns (SafetyEnable); //@RPC_ID=21
+    
+    // Indicates if the specified safety is raised
+    rpc GetSafetyStatus (Kinova.Api.Common.SafetyHandle) returns (SafetyStatus); //@RPC_ID=22
+    
+    // Clear all safety status for this device if they are no longer raised
+    rpc ClearAllSafetyStatus (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty); //@RPC_ID=23    
+
+    // Clear a specific safety status if it is no longer raised
+    rpc ClearSafetyStatus (Kinova.Api.Common.SafetyHandle) returns (Kinova.Api.Common.Empty); //@RPC_ID=24
+    
+    // Retrieves configuration on all safeties 
+    rpc GetAllSafetyConfiguration (Kinova.Api.Common.Empty) returns (SafetyConfigurationList); //@RPC_ID=25
+    
+    // Retrieves information on all safeties
+    rpc GetAllSafetyInformation (Kinova.Api.Common.Empty) returns (SafetyInformationList); //@RPC_ID=26
+
+    // Restores all safety configurations to factory defaults
+    rpc ResetSafetyDefaults (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty); //@RPC_ID=27
+    
+    // Subscribes to safety notifications
+    rpc SafetyTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle); //@RPC_ID=28 @PUB_SUB=Kinova.Api.Common.SafetyNotification
+
+    // Starts device calibration (intended for Kinova Production of Pico)
+    rpc ExecuteCalibration (Calibration) returns (Kinova.Api.Common.Empty);     //@RPC_ID=34
+    
+    // Retrieves the status/result of device calibration (intended for Kinova Production of Pico)
+    rpc GetCalibrationResult (CalibrationElement) returns (CalibrationResult);          //@RPC_ID=35
+    
+    // Stop calibration in progress
+    rpc StopCalibration (Calibration) returns (CalibrationResult);                //@RPC_ID=36
+        
+    // Sets the capacitive sensor calibration
+    rpc SetCapSenseConfig (CapSenseConfig)  returns (Kinova.Api.Common.Empty);          //@RPC_ID=37
+    
+    // Retrieves the capacitive sensor calibration
+    rpc GetCapSenseConfig (Kinova.Api.Common.Empty) returns (CapSenseConfig);           //@RPC_ID=38
+    
+    // Reads low-level register from the capacitive sensor (for Kinova internal use ony, not to be used in the field)
+    rpc ReadCapSenseRegister (CapSenseRegister)     returns (CapSenseRegister);         //@RPC_ID=39
+    
+    // Writes to low-level register of the capacitive sensor (for Kinova internal use ony, not to be used in the field)
+    rpc WriteCapSenseRegister (CapSenseRegister)    returns (Kinova.Api.Common.Empty);  //@RPC_ID=40
+}
+
+// Identifies DeviceConfig current version
+enum ServiceVersion {
+    RESERVED_0 = 0;         // Reserved
+    CURRENT_VERSION = 1;    // Current version
+}
+
+// Options for the run mode for the device
+enum RunModes {
+    RUN_MODE           = 0;
+    CALIBRATION_MODE   = 1; // calibration mode
+    CONFIGURATION_MODE = 2; // configuration mode
+    DEBUG_MODE         = 3; // debug mode
+    TUNING_MODE        = 4; // tuning mode
+}
+
+// Device type
+message DeviceType {
+    Kinova.Api.Common.DeviceTypes device_type = 1;             // Device type
+}
+
+
+// Run mode
+message RunMode {
+    RunModes run_mode = 1;                   // Run mode
+}
+
+// Firmware version for the device
+message FirmwareVersion {
+    uint32 firmware_version = 1;            // Firmware version
+}
+
+// Bootloader version for the device
+message BootloaderVersion {
+    uint32 bootloader_version = 1;          // Bootloader version
+}
+
+// Model number for the device
+message ModelNumber {
+    string model_number = 1;                // Model number of size 25 including null character
+}
+
+// Part number for the device
+message PartNumber {
+    string part_number = 1;                 // Part number of size 25 including null character
+}
+
+// Serial number for the device
+message SerialNumber {
+    string serial_number = 1;               // Serial number of size 25 including null character
+}
+
+// MAC address for the device
+message MACAddress {
+    bytes mac_address = 1;                  // MAC address
+}
+
+// IPv4 settings for the device, including address, subnet mask, and default gateway
+message IPv4Settings {
+    uint32 ipv4_address         = 1;        // IPv4Address
+    uint32 ipv4_subnet_mask     = 2;        // IPv4SubnetMask
+    uint32 ipv4_default_gateway = 3;        // IPv4DefaultGateway
+}
+
+// Part number revision for the device
+message PartNumberRevision {
+    string part_number_revision = 1;        // Part number revision
+}
+
+// Result of power on self test
+message PowerOnSelfTestResult {
+    uint32 power_on_self_test_result = 1;   // Power on self test result
+}
+
+// Reboot request with bootloader delay
+message RebootRqst {
+    uint32 delay = 1;                       // Bootloader delay
+}
+
+// Admissible calibration items
+enum CalibrationItem 
+{
+   UNSPECIFIED_CALIBRATION_ITEM = 0; // Unspecified calibration item
+   COGGING                      = 1; // Cogging calibration
+   MAGNETIC                     = 2; // Magnetic sensors calibration
+   MOTOR                        = 3; // Motor calibration
+   POSITION_RANGE               = 4; // Position range calibration
+}
+
+// Admissible calibration status
+enum CalibrationStatus 
+{
+   UNSPECIFIED_CALIBRATION_STATUS = 0; // Unspecified calibration status
+   NOT_CALIBRATED                 = 1; // Calibration is not done
+   IN_PROGRESS                    = 2; // Calibration is in progress
+   CALIBRATED                     = 3; // Calibration was successfully completed
+   IN_FAULT                       = 4; // Calibration failed
+}
+
+// Types of safeties limits
+enum SafetyLimitType {
+    UNSPECIFIED_SAFETY_LIMIT_TYPE = 0;      
+    MINIMAL_LIMIT = 1;                  // Safety that will kick in below a certain Minimum threshold (e.g. Minimum temperature safety)
+    MAXIMAL_LIMIT = 2;                  // Safety that will kick in above a certain Maximum threshold (e.g. Maximum voltage safety)
+    EVENT_LIMIT = 3;                    // Safety that will kick in in reaction to a specific event (e.g. motor drive fault)
+
+}
+
+// Admissible capacitive sensor mode 
+enum CapSenseMode
+{
+    RESERVED                    = 0; // Reserved, do not use.
+    INACTIVE                    = 1; // Cap sensor is inactive.
+    ACTIVE_AUTO_THRESHOLD       = 2; // Cap sensor is active in automatic threshold mode.
+    ACTIVE_NOISE_ATT            = 4; // Cap sensor is active with noise mitigation enabled.
+    ACTIVE_NORMAL               = 5; // Cap sensor is active in normal mode.
+    CONFIGURATION               = 6; // Configuration mode.
+}
+
+// Information about a specific safety
+message SafetyInformation {
+    Kinova.Api.Common.SafetyHandle handle = 1;      // Safety handle that this information is about
+    bool can_change_safety_state = 2;               // True if related safety configuration can be modified
+    bool has_warning_threshold = 3;                 // True if safety status can go in Warning
+    bool has_error_threshold = 4;                   // True if safety status can go in Error
+    SafetyLimitType limit_type = 5;                 // Safety limit type
+    float default_warning_threshold = 6;            // Default warning threshold (if 'limit_type' is either MINIMAL_LIMIT or MAXIMAL_LIMIT and 'has_warning_threshold' is true)
+    float default_error_threshold = 7;              // Default error threshold (if 'limit_type' is either MINIMAL_LIMIT or MAXIMAL_LIMIT and 'has_error_threshold' is true)
+    float upper_hard_limit = 8;                     // Maximal threshold value (if 'limit_type' is either MINIMAL_LIMIT or MAXIMAL_LIMIT)
+    float lower_hard_limit = 9;                     // Minimal threshold value (if 'limit_type' is either MINIMAL_LIMIT or MAXIMAL_LIMIT)
+    Kinova.Api.Common.SafetyStatusValue status = 11;// Current Safety status
+    Kinova.Api.Common.Unit unit = 12;               // Unit that the safety status is in
+}
+
+// Array of safety information
+message SafetyInformationList {
+    repeated SafetyInformation information = 1;
+}
+
+// Enable or disable a specific safety
+message SafetyEnable {
+    Kinova.Api.Common.SafetyHandle handle = 1;  // Handle to safety to enable or disable
+    bool enable = 2;                            // Safety enable state
+}
+
+// Configure threshold of a specific safety
+message SafetyThreshold {
+    Kinova.Api.Common.SafetyHandle handle = 1;  // Identifies safety to configure
+    float value = 2;                            // Safety threshold value
+}
+
+// Configuration for a safety
+message SafetyConfiguration {
+    Kinova.Api.Common.SafetyHandle handle = 1;  // Handle to safety to configure
+    float error_threshold = 2;                  // Safety error threshold value
+    float warning_threshold = 3;                // Safety warning threshold value
+    SafetyEnable enable = 4;                    // Safety enable state
+}
+
+// Array of safety configurations
+message SafetyConfigurationList {
+    repeated SafetyConfiguration configuration = 1; // Safety configuration
+}
+
+// Safety status
+message SafetyStatus {
+    Kinova.Api.Common.SafetyStatusValue value = 1; // Safety status (e.g. in error, warning or normal state)
+}
+
+// Single calibration parameter information
+message CalibrationParameter 
+{
+  uint32 calibration_parameter_identifier = 1; // Calibration parameter identifier
+  oneof value {
+    int32 signedIntValue = 2;                  // Signed int calibration value.
+    uint32 unsignedIntValue = 3;               // Unsigned int calibration value.
+    float floatValue = 4;                      // Float calibration value.
+  }
+}
+
+// Calibration information to push to device
+message Calibration
+{
+   CalibrationItem calibration_item                    = 1; // Item to calibrate
+   repeated CalibrationParameter calibration_parameter = 2; // Parameters associated to calibration item
+}
+
+// Calibration element
+message CalibrationElement
+{
+    CalibrationItem calibration_item                    = 1; // Item to get status
+}
+
+// Result of a calibration
+message CalibrationResult
+{
+   CalibrationStatus calibration_status = 1; // Calibration status
+   uint32 calibration_details = 2;           // Additional information (used when status is in fault)
+}
+
+// Capacitive sensor configuration message
+message CapSenseConfig
+{
+    CapSenseMode        mode            = 1; // Operational mode of the sensor
+    float               threshold_a     = 2; // Sensitivity of the sensor A (0-100%).
+    float               threshold_b     = 3; // Sensitivity of the sensor B (0-100%).
+}
+
+// Message used to address a register
+message CapSenseRegister
+{
+    uint32      address         = 1; // Register address
+    uint32      value           = 2; // Register value
+}

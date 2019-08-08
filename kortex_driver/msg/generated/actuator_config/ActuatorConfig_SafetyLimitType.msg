@@ -1,0 +1,4 @@
+
+uint32 MAXIMAL_LIMIT = 0
+
+uint32 MINIMAL_LIMIT = 1

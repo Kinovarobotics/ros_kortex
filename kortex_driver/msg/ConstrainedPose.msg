@@ -1,5 +1,0 @@
-
-
-Pose target_pose
-
-CartesianTrajectoryConstraint constraint

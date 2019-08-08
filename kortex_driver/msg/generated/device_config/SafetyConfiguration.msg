@@ -1,0 +1,5 @@
+
+SafetyHandle handle
+float32 error_threshold
+float32 warning_threshold
+SafetyEnable enable

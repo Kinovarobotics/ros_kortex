@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<launch>
+    
+    <!-- Arm and tool configuration -->
+    <arg name="arm" default="gen3"/> <!-- gen3 is the only supported arm for now -->
+    <arg name="gripper" default=""/> <!-- "robotiq_2f_85" is the only supported gripper for now, as well as no gripper ("") -->
+    <arg name="robot_name" default="my_$(arg arm)"/>
+
+    <!-- Kortex API options -->
+    <arg name="ip_address" default="192.168.1.10"/>
+    <arg name="cyclic_data_publish_rate" default="100"/> <!--Hz-->
+    <arg name="api_rpc_timeout_ms" default="2000"/> <!--milliseconds-->
+    <arg name="api_session_inactivity_timeout_ms" default="35000"/> <!--milliseconds-->
+    <arg name="api_connection_inactivity_timeout_ms" default="20000"/> <!--milliseconds-->
+
+    <!-- Automatically start other modules -->
+    <arg name="start_rviz" default="true"/>
+    <arg name="start_moveit" default="true"/>
+
+    <!-- Action server params -->
+    <arg name="default_goal_time_tolerance" default="0.5"/> <!--seconds-->
+    <arg name="default_goal_tolerance" default="0.5"/> <!--degrees-->
+
+    <group ns="$(arg robot_name)">
+
+        <!-- Load the description for the robot -->
+        <!-- Without gripper -->
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro sim:=false"
+            if="$(eval not arg('gripper'))"/>
+        <!-- With gripper -->
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro sim:=false"
+            unless="$(eval not arg('gripper'))"/>
+
+        <!-- Start the kortex_driver node -->
+        <node name="$(arg robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver" output="screen"> <!--launch-prefix="gdb -ex run args"-->
+            <param name="ip_address" value="$(arg ip_address)"/>
+            <param name="cyclic_data_publish_rate" value="$(arg cyclic_data_publish_rate)"/>
+            <param name="api_rpc_timeout_ms" value="$(arg api_rpc_timeout_ms)"/>
+            <param name="api_session_inactivity_timeout_ms" value="$(arg api_session_inactivity_timeout_ms)"/>
+            <param name="api_connection_inactivity_timeout_ms" value="$(arg api_connection_inactivity_timeout_ms)"/>
+            <param name="default_goal_time_tolerance" value="$(arg default_goal_time_tolerance)"/>
+            <param name="default_goal_tolerance" value="$(arg default_goal_tolerance)"/>
+            <param name="arm" value="$(arg arm)"/>
+            <param name="gripper" value="$(arg gripper)"/>
+            <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/config/joint_limits.yaml"/>
+            <!-- If there is a gripper, load the active joint names for it -->
+            <rosparam command="load" file="$(find kortex_description)/grippers/$(arg gripper)/config/joint_limits.yaml" unless="$(eval not arg('gripper'))"/>
+        </node>
+        
+        <!-- Start MoveIt! main executable -->
+        <group if="$(arg start_moveit)">
+
+            <!-- TODO Find cleaner way to do that and that will work with other arms -->
+            <!-- Without gripper -->
+            <include file="$(find gen3_move_it_config)/launch/move_group.launch"
+                if="$(eval not arg('gripper'))"/> 
+            <!-- With gripper -->
+            <include file="$(find gen3_robotiq_2f_85_move_it_config)/launch/move_group.launch"
+                unless="$(eval not arg('gripper'))"/> 
+
+        </group>
+
+        <!-- Start joint and robot state publisher -->
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+            <rosparam param="source_list">[base_feedback/joint_state]</rosparam>
+        </node>
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+        <!-- Start RViz -->
+        <node name="rviz" pkg="rviz" type="rviz" output="log" args="-f base_link" if="$(arg start_rviz)"/> 
+
+    </group>
+</launch>

@@ -1,0 +1,3 @@
+
+float32 payload_mass
+ControlConfig_Position payload_mass_center

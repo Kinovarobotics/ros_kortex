@@ -1,0 +1,4 @@
+
+uint32 RESERVED_0 = 0
+
+uint32 CURRENT_VERSION = 1

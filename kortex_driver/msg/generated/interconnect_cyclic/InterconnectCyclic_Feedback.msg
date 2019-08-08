@@ -1,0 +1,17 @@
+
+InterconnectCyclic_MessageId feedback_id
+uint32 status_flags
+uint32 jitter_comm
+float32 imu_acceleration_x
+float32 imu_acceleration_y
+float32 imu_acceleration_z
+float32 imu_angular_velocity_x
+float32 imu_angular_velocity_y
+float32 imu_angular_velocity_z
+float32 voltage
+float32 temperature_core
+uint32 fault_bank_a
+uint32 fault_bank_b
+uint32 warning_bank_a
+uint32 warning_bank_b
+InterconnectCyclic_Feedback_tool_feedback oneof_tool_feedback

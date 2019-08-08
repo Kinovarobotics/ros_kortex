@@ -1,0 +1,2 @@
+
+uint32 degree_of_freedom

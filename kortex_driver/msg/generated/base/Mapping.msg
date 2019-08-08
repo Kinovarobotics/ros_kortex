@@ -1,0 +1,9 @@
+
+MappingHandle handle
+string name
+uint32 controller_identifier
+MapGroupHandle active_map_group_handle
+MapGroupHandle[] map_group_handles
+MapHandle active_map_handle
+MapHandle[] map_handles
+string application_data

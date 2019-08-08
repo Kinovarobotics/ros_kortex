@@ -1,0 +1,6 @@
+
+uint32 event
+ProtectionZoneHandle handle
+Timestamp timestamp
+UserProfileHandle user_handle
+Connection connection

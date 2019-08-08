@@ -1,3 +1,0 @@
-
-
-WifiConfiguration[] wifi_configuration_list

@@ -1,0 +1,2 @@
+
+uint32 end_effector_type

@@ -13,33 +13,34 @@
 syntax = "proto3";
 
 import public "Common.proto";
+import public "InterconnectCyclicMessage.proto";
 
 package Kinova.Api.BaseCyclic;
 
-// Service to exchange cyclic data with base module
+// Service to exchange cyclic data with base
 service BaseCyclic { //@PROXY_ID=3 @ERROR=Kinova.Api.Error
 
-    // Commands refresh (with feedback)
+    // Sends a command to actuators and interface and returns feedback from base, actuators, and interface on actual status
     rpc Refresh (Command)                         returns (Feedback);                //@RPC_ID=1
 
-    // Commands refresh (no feedback)
+    // Sends a command to actuators and interface without receiving feedback
     rpc RefreshCommand (Command)                  returns (Kinova.Api.Common.Empty); //@RPC_ID=2
 
-    // Gets feedback
+    // Obtains feedback from base, actuators, and interface on their status
     rpc RefreshFeedback (Kinova.Api.Common.Empty) returns (Feedback);                //@RPC_ID=3
 
-    // Gets custom data   
+    // Retrieves custom data
     rpc RefreshCustomData (CustomData)            returns (CustomData);              //@RPC_ID=4
 }
 
-// Enumeration used to identify BaseCyclic current version
-enum ServiceVersion 
+// Identifies BaseCyclic current version
+enum ServiceVersion
 {
     RESERVED_0      = 0;        // Reserved
     CURRENT_VERSION = 1;        // Current version
 }
 
-// Defines an actuator module command
+// Defines an actuator command
 message ActuatorCommand         // @NOTE=copied from ActuatorCyclic.proto
 {
     fixed32  command_id    = 1; // Command ID (first 2 bytes: device ID, last 2 bytes: sequence number)
@@ -50,59 +51,26 @@ message ActuatorCommand         // @NOTE=copied from ActuatorCyclic.proto
     float    current_motor = 6; // Desired current of the motor (in Amperes)
 }
 
-// Defines an interconnect module command
-message InterconnectCommand          // @NOTE=copied from InterconnectCyclic.proto
-{
-    fixed32 command_id    = 1;       // Command ID (first 2 bytes: device ID, last 2 bytes: sequence number)
-    fixed32 flags         = 2;       // Flags
-    float   position      = 3;       // Desired position of the gripper fingers (0-100%)
-    float   velocity      = 4;       // Desired velocity of the gripper fingers (0-100%)
-    float   force         = 5;       // Desired force of the gripper fingers (0-100%)
-}
-
-// Defines the feedback provided by an actuator module
+// Defines the feedback provided by an actuator
 message ActuatorFeedback             // @NOTE=copied from ActuatorCyclic.proto
 {
-    fixed32  command_id        = 1;  // Command ID (first 2 bytes: device ID, last 2 bytes: sequence number)
-    fixed32  status_flags      = 2;  // Status flags
-    fixed32  jitter_comm       = 3;  // Jitter from the communication (in microseconds)
-    float    position          = 4;  // Position of the actuator (in degrees)
-    float    velocity          = 5;  // Velocity of the actuator (in degrees per second)
-    float    torque            = 6;  // Torque of the actuator (in Newton * meters)
-    float    current_motor     = 7;  // Current of the motor (in Amperes)
-    float    voltage           = 8;  // Voltage of the main board (in Volts)
-    float    temperature_motor = 9;  // Motor temperature (maximum of the three (3) phase temperatures in °C)
-    float    temperature_core  = 10; // Microcontroller temperature (in degrees Celsius)
-    fixed32  fault_bank_a      = 11; // Fault bank A
-    fixed32  fault_bank_b      = 12; // Fault bank B
-    fixed32  warning_bank_a    = 13; // Warning bank A
-    fixed32  warning_bank_b    = 14; // Warning bank B
+    fixed32  command_id             = 1;  // Command ID (first 2 bytes: device ID, last 2 bytes: sequence number)
+    fixed32  status_flags           = 2;  // Status flags
+    fixed32  jitter_comm            = 3;  // Jitter from the communication (in microseconds)
+    float    position               = 4;  // Position of the actuator (in degrees)
+    float    velocity               = 5;  // Velocity of the actuator (in degrees per second)
+    float    torque                 = 6;  // Torque of the actuator (in Newton * meters)
+    float    current_motor          = 7;  // Current of the motor (in Amperes)
+    float    voltage                = 8;  // Voltage of the main board (in Volts)
+    float    temperature_motor      = 9;  // Motor temperature (maximum of the three (3) phase temperatures in °C)
+    float    temperature_core       = 10; // Microcontroller temperature (in degrees Celsius)
+    fixed32  fault_bank_a           = 11; // Fault bank A
+    fixed32  fault_bank_b           = 12; // Fault bank B
+    fixed32  warning_bank_a         = 13; // Warning bank A
+    fixed32  warning_bank_b         = 14; // Warning bank B
 }
 
-// Defines the feedback provided by an interconnect module
-message InterconnectFeedback             // @NOTE=copied from InterconnectCyclic.proto
-{
-    fixed32 command_id             = 1;  // Command ID (first 2 bytes: device ID, last 2 bytes: sequence number)
-    fixed32 status_flags           = 2;  // Status flags
-    fixed32 jitter_comm            = 3;  // Jitter from the communication (in microseconds)
-    float   position               = 4;  // Position of the gripper fingers (0-100%)
-    float   velocity               = 5;  // Velocity of the gripper fingers (0-100%)
-    float   force                  = 6;  // Force of the gripper fingers (0-100%)
-    float   imu_acceleration_x     = 7;  // IMU Measured acceleration (X-Axis) of the interconnect (in meters per second ^ squared)
-    float   imu_acceleration_y     = 8;  // IMU Measured acceleration (Y-Axis) of the interconnect (in meters per second ^ squared)
-    float   imu_acceleration_z     = 9;  // IMU Measured acceleration (Z-Axis) of the interconnect (in meters per second ^ squared)
-    float   imu_angular_velocity_x = 10; // IMU Measured angular velocity (X-Axis) of the interconnect (in degrees per second)
-    float   imu_angular_velocity_y = 11; // IMU Measured angular velocity (Y-Axis) of the interconnect (in degrees per second)
-    float   imu_angular_velocity_z = 12; // IMU Measured angular velocity (Z-Axis) of the interconnect (in degrees per second)
-    float   voltage                = 13; // Voltage of the main board (in Volt)
-    float   temperature_core       = 14; // Microcontroller temperature (in degrees Celsius)
-    fixed32 fault_bank_a           = 15; // Fault bank A
-    fixed32 fault_bank_b           = 16; // Fault bank B
-    fixed32 warning_bank_a         = 17; // Warning bank A
-    fixed32 warning_bank_b         = 18; // Warning bank B
-}
-
-// Custom development data from an actuator module, content varies according to debug needs
+// Custom development data from an actuator, content varies according to debug needs
 message ActuatorCustomData           // @NOTE=copied from ActuatorCyclic.proto
 {
     fixed32  command_id     = 1;     // Command ID (first 2 bytes: device ID, last 2 bytes: sequence number)
@@ -124,96 +92,81 @@ message ActuatorCustomData           // @NOTE=copied from ActuatorCyclic.proto
     fixed32  custom_data_15 = 17;    // Custom data word 15
 }
 
-// Custom development data from an interconnect module, content varies according to debug needs
-message InterconnectCustomData      // @NOTE=copied from InterconnectCyclic.proto
+// Defines the feedback provided by the base
+message BaseFeedback
 {
-    fixed32 command_id     = 1;     // Command ID (first 2 bytes: device ID, last 2 bytes: sequence number)
-    fixed32 custom_data_0  = 2;     // Custom data word 0
-    fixed32 custom_data_1  = 3;     // Custom data word 1
-    fixed32 custom_data_2  = 4;     // Custom data word 2
-    fixed32 custom_data_3  = 5;     // Custom data word 3
-    fixed32 custom_data_4  = 6;     // Custom data word 4
-    fixed32 custom_data_5  = 7;     // Custom data word 5
-    fixed32 custom_data_6  = 8;     // Custom data word 6
-    fixed32 custom_data_7  = 9;     // Custom data word 7
-    fixed32 custom_data_8  = 10;    // Custom data word 8
-    fixed32 custom_data_9  = 11;    // Custom data word 9
-    fixed32 custom_data_10 = 12;    // Custom data word 10
-    fixed32 custom_data_11 = 13;    // Custom data word 11
-    fixed32 custom_data_12 = 14;    // Custom data word 12
-    fixed32 custom_data_13 = 15;    // Custom data word 13
-    fixed32 custom_data_14 = 16;    // Custom data word 14
-    fixed32 custom_data_15 = 17;    // Custom data word 15
-}
-
-// Defines the feedback provided by the base module
-message BaseFeedback 
-{
-    uint32  active_state_connection_identifier= 1;  // Connection identifier of the last processed command which triggered an arm state change
-    Kinova.Api.Common.ArmState active_state   = 2;  // Active state of the arm
-    float   arm_voltage                       = 3;  // Arm voltage (in Volts)
-    float   arm_current                       = 4;  // Arm current (in Amperes)
-    float   temperature_cpu                   = 5;  // CPU temperature (in degree Celcius)
-    float   temperature_ambient               = 6;  // Ambient temperature (in degree Celcius)
-    float   imu_acceleration_x                = 7;  // IMU Measured acceleration (X-Axis) of the base (in meters per second squared)
-    float   imu_acceleration_y                = 8;  // IMU Measured acceleration (Y-Axis) of the base (in meters per second squared)
-    float   imu_acceleration_z                = 9;  // IMU Measured acceleration (Z-Axis) of the base (in meters per second squared)
-    float   imu_angular_velocity_x            = 10; // IMU Measured angular velocity (X-Axis) of the base (in degrees per second)
-    float   imu_angular_velocity_y            = 11; // IMU Measured angular velocity (Y-Axis) of the base (in degrees per second)
-    float   imu_angular_velocity_z            = 12; // IMU Measured angular velocity (Z-Axis) of the base (in degrees per second)
-    float   tool_pose_x                       = 13; // Measured Cartesian position (X-Axis) of the End Effector (EE) (in meters)
-    float   tool_pose_y                       = 14; // Measured Cartesian position (Y-Axis) of the End Effector (EE) (in meters)
-    float   tool_pose_z                       = 15; // Measured Cartesian position (Z-Axis) of the End Effector (EE) (in meters)
-    float   tool_pose_theta_x                 = 16; // Measured Cartesian orientation (X-Axis) of the End Effector (EE) (in degrees)
-    float   tool_pose_theta_y                 = 17; // Measured Cartesian orientation (Y-Axis) of the End Effector (EE) (in degrees)
-    float   tool_pose_theta_z                 = 18; // Measured Cartesian orientation (Z-Axis) of the End Effector (EE) (in degrees)
-    float   tool_twist_linear_x               = 19; // Measured Cartesian linear velocity (X-Axis) of the End Effector (EE) (in meters)
-    float   tool_twist_linear_y               = 20; // Measured Cartesian linear velocity (Y-Axis) of the End Effector (EE) (in meters)
-    float   tool_twist_linear_z               = 21; // Measured Cartesian linear velocity (Z-Axis) of the End Effector (EE) (in meters)
-    float   tool_twist_angular_x              = 22; // Measured Cartesian angular velocity (X-Axis) of the End Effector (EE) (in degrees per second)
-    float   tool_twist_angular_y              = 23; // Measured Cartesian angular velocity (Y-Axis) of the End Effector (EE) (in degrees per second)
-    float   tool_twist_angular_z              = 24; // Measured Cartesian angular velocity (Z-Axis) of the End Effector (EE) (in degrees per second)
-    float   tool_external_wrench_force_x      = 25; // Calculated force in X-Axis from external wrench (in Newton)
-    float   tool_external_wrench_force_y      = 26; // Calculated force in Y-Axis from external wrench (in Newton)
-    float   tool_external_wrench_force_z      = 27; // Calculated force in Z-Axis from external wrench (in Newton)
-    float   tool_external_wrench_torque_x     = 28; // Calculated torque about X-axis from external wrench (in Newton * meters)
-    float   tool_external_wrench_torque_y     = 29; // Calculated torque about Y-axis from external wrench (in Newton * meters)
-    float   tool_external_wrench_torque_z     = 30; // Calculated torque about Z-axis from external wrench (in Newton * meters)
-    fixed32 fault_bank_a                      = 31; // The arm fault flags bank A (0 if no fault) see Base.SafetyIdentifier
-    fixed32 fault_bank_b                      = 32; // The arm fault flags bank B (0 if no fault) see Base.SafetyIdentifier
-    fixed32 warning_bank_a                    = 33; // The arm warning flags bank A (0 if no warning) see Base.SafetyIdentifier
-    fixed32 warning_bank_b                    = 34; // The arm warning flags bank B (0 if no warning) see Base.SafetyIdentifier
+    uint32  active_state_connection_identifier      = 1;  // Connection identifier of the last processed command which triggered an arm state change
+    Kinova.Api.Common.ArmState active_state         = 2;  // Active state of the arm
+    float   arm_voltage                             = 3;  // Arm voltage (in Volts)
+    float   arm_current                             = 4;  // Arm current (in Amperes)
+    float   temperature_cpu                         = 5;  // CPU temperature (in degree Celsius)
+    float   temperature_ambient                     = 6;  // Ambient temperature (in degree Celsius)
+    float   imu_acceleration_x                      = 7;  // IMU Measured acceleration (X-Axis) of the base (in meters per second squared)
+    float   imu_acceleration_y                      = 8;  // IMU Measured acceleration (Y-Axis) of the base (in meters per second squared)
+    float   imu_acceleration_z                      = 9;  // IMU Measured acceleration (Z-Axis) of the base (in meters per second squared)
+    float   imu_angular_velocity_x                  = 10; // IMU Measured angular velocity (X-Axis) of the base (in degrees per second)
+    float   imu_angular_velocity_y                  = 11; // IMU Measured angular velocity (Y-Axis) of the base (in degrees per second)
+    float   imu_angular_velocity_z                  = 12; // IMU Measured angular velocity (Z-Axis) of the base (in degrees per second)
+    float   tool_pose_x                             = 13; // Measured Cartesian position (X-Axis) of the tool (in meters)
+    float   tool_pose_y                             = 14; // Measured Cartesian position (Y-Axis) of the tool (in meters)
+    float   tool_pose_z                             = 15; // Measured Cartesian position (Z-Axis) of the tool (in meters)
+    float   tool_pose_theta_x                       = 16; // Measured Cartesian orientation (X-Axis) of the tool (in degrees)
+    float   tool_pose_theta_y                       = 17; // Measured Cartesian orientation (Y-Axis) of the tool (in degrees)
+    float   tool_pose_theta_z                       = 18; // Measured Cartesian orientation (Z-Axis) of the tool (in degrees)
+    float   tool_twist_linear_x                     = 19; // Measured Cartesian linear velocity (X-Axis) of the tool (in meters)
+    float   tool_twist_linear_y                     = 20; // Measured Cartesian linear velocity (Y-Axis) of the tool (in meters)
+    float   tool_twist_linear_z                     = 21; // Measured Cartesian linear velocity (Z-Axis) of the tool (in meters)
+    float   tool_twist_angular_x                    = 22; // Measured Cartesian angular velocity (X-Axis) of the tool (in degrees per second)
+    float   tool_twist_angular_y                    = 23; // Measured Cartesian angular velocity (Y-Axis) of the tool (in degrees per second)
+    float   tool_twist_angular_z                    = 24; // Measured Cartesian angular velocity (Z-Axis) of the tool (in degrees per second)
+    float   tool_external_wrench_force_x            = 25; // Computed force in X-Axis from external wrench (in Newton)
+    float   tool_external_wrench_force_y            = 26; // Computed force in Y-Axis from external wrench (in Newton)
+    float   tool_external_wrench_force_z            = 27; // Computed force in Z-Axis from external wrench (in Newton)
+    float   tool_external_wrench_torque_x           = 28; // Computed torque about X-axis from external wrench (in Newton-meters)
+    float   tool_external_wrench_torque_y           = 29; // Computed torque about Y-axis from external wrench (in Newton-meters)
+    float   tool_external_wrench_torque_z           = 30; // Computed torque about Z-axis from external wrench (in Newton-meters)
+    fixed32 fault_bank_a                            = 31; // The arm fault flags bank A (0 if no fault) see Base.SafetyIdentifier
+    fixed32 fault_bank_b                            = 32; // The arm fault flags bank B (0 if no fault) see Base.SafetyIdentifier
+    fixed32 warning_bank_a                          = 33; // The arm warning flags bank A (0 if no warning) see Base.SafetyIdentifier
+    fixed32 warning_bank_b                          = 34; // The arm warning flags bank B (0 if no warning) see Base.SafetyIdentifier
+    float commanded_tool_pose_x                     = 35; // Commanded Cartesian position (X-Axis) of the tool (in meters)
+    float commanded_tool_pose_y                     = 36; // Commanded Cartesian position (Y-Axis) of the tool (in meters)
+    float commanded_tool_pose_z                     = 37; // Commanded Cartesian position (Z-Axis) of the tool (in meters)
+    float commanded_tool_pose_theta_x               = 38; // Commanded Cartesian orientation (X-Axis) of the tool (in degrees)
+    float commanded_tool_pose_theta_y               = 39; // Commanded Cartesian orientation (Y-Axis) of the tool (in degrees)
+    float commanded_tool_pose_theta_z               = 40; // Commanded Cartesian orientation (Z-Axis) of the tool (in degrees)
 }
 
 // Custom development data, content varies according to debug needs
 message CustomData
 {
-    fixed32  frame_id                                 = 1;  // Frame ID
-    fixed32  custom_data_0                            = 2;  // Custom data word 0
-    fixed32  custom_data_1                            = 3;  // Custom data word 1
-    fixed32  custom_data_2                            = 4;  // Custom data word 2
-    fixed32  custom_data_3                            = 5;  // Custom data word 3
-    fixed32  custom_data_4                            = 6;  // Custom data word 4
-    fixed32  custom_data_5                            = 7;  // Custom data word 5
-    fixed32  custom_data_6                            = 8;  // Custom data word 6
-    fixed32  custom_data_7                            = 9;  // Custom data word 7
-    repeated ActuatorCustomData actuators_custom_data = 10; // Actuator custom data (repeated) 
-    InterconnectCustomData interconnect_custom_data   = 11; // Interconnect custom data
+    fixed32  frame_id                                                   = 1;  // Frame ID
+    fixed32  custom_data_0                                              = 2;  // Custom data word 0
+    fixed32  custom_data_1                                              = 3;  // Custom data word 1
+    fixed32  custom_data_2                                              = 4;  // Custom data word 2
+    fixed32  custom_data_3                                              = 5;  // Custom data word 3
+    fixed32  custom_data_4                                              = 6;  // Custom data word 4
+    fixed32  custom_data_5                                              = 7;  // Custom data word 5
+    fixed32  custom_data_6                                              = 8;  // Custom data word 6
+    fixed32  custom_data_7                                              = 9;  // Custom data word 7
+    repeated ActuatorCustomData actuators_custom_data                   = 10; // Actuator custom data (repeated) 
+    Kinova.Api.InterconnectCyclic.CustomData interconnect_custom_data   = 11; // Interconnect custom data
 }
 
-// Defines a command for many modules (actuactors and interconnect)
+
+// Defines a command provided to robot devices (actuators and interface)
 message Command 
 {
-    fixed32 frame_id                   = 1;                 // Frame ID
-    repeated ActuatorCommand actuators = 2;                 // Actuator command (repeated)
-    InterconnectCommand interconnect   = 3;                 // Interconnect command
+    fixed32 frame_id                                           = 1;                 // Frame ID
+    repeated ActuatorCommand actuators                         = 2;                 // Actuator command (repeated)
+    Kinova.Api.InterconnectCyclic.Command interconnect         = 3;                 // Interface command    
 }
 
-// Defines the feedback provided by many modules (base, actuactors and interconnect)
+// Defines the feedback provided by robot devices (base, actuators and interface)
 message Feedback 
 {  
-    fixed32 frame_id                    = 1;                // Frame ID
-    BaseFeedback base                   = 2;                // Base feedback
-    repeated ActuatorFeedback actuators = 3;                // Actuator feedback
-    InterconnectFeedback interconnect   = 4;                // Interconnect feedback
+    fixed32 frame_id                                             = 1;                // Frame ID
+    BaseFeedback base                                            = 2;                // Base feedback
+    repeated ActuatorFeedback actuators                          = 3;                // Actuator feedback
+    Kinova.Api.InterconnectCyclic.Feedback interconnect          = 4;                // Interface feedback
 }

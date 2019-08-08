@@ -1,0 +1,8 @@
+
+MapGroupHandle group_handle
+string name
+MappingHandle related_mapping_handle
+MapGroupHandle parent_group_handle
+MapGroupHandle[] children_map_group_handles
+MapHandle[] map_handles
+string application_data
