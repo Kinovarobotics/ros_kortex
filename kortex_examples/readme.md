@@ -14,100 +14,74 @@
 
 <!-- MarkdownTOC -->
 
-1. [Get control loop parameters](#get-control-loop-parameters)
-1. [Set control loop parameters](#set-control-loop-parameters)
-1. [Play Cartesian](#play-cartesian)
-1. [Play Cartesian position](#play-cartesian-position)
-1. [Get sensor settings](#get-sensor-settings)
-1. [Read all devices](#read-all-devices)
+1. [Before running an example](#first_of_all)
+2. [Actuator configuration examples](#actuator_config)
+3. [Full arm movement examples](#full_arm)
+4. [Vision module configuration examples](#vision_config)
+5. [MoveIt! examples](#move_it)
 
 <!-- /MarkdownTOC -->
 
+<a id="first_of_all"></a>
+## Before running an example
 
-<a id="get-control-loop-parameters"></a>
-## Get control loop parameters
-<p>
-Gets the control loop parameters from a Gen3 robot actuator. 
-</p>
-
-To run this example, the following nodes need to be running:
-> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
-> - kortex\_actuator\_driver (**rosrun kortex\_actuator\_driver kortex\_actuator\_driver 192.168.1.10 100**)
-
-\* Note here that the address **192.168.1.10** is the default robot IP address - you can use any IP address that suits you.
-
-To run the example:
-
-<code>rosrun kortex_examples GetControlLoopParameters</code>
-
-<a id="set-control-loop-parameters"></a>
-## Set control loop parameters
-<p>
-Sets the control loop parameters from a Gen3 robot actuator. 
-</p>
-
-This example needs the following nodes to be running:
-> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
-> - kortex\_actuator\_driver (**rosrun kortex\_actuator\_driver kortex\_actuator\_driver 192.168.1.10 100**)
-
-\* Note here that the address **192.168.1.10** is the default robot IP address - you can use any IP address that suits you.
-
-<a id="play-cartesian"></a>
-## Play Cartesian
-<p>
-Move the end effector of a Gen3 robot along the z axis by +0,1 meter and rotate around the Theta Z axis by +60°. 
-</p>
-
-To run this example, the following nodes need to be running:
-> - kortex\_driver (**rosrun kortex\_driver kortex\_driver 192.168.1.10 100**)
-
-\* Note here that the address **192.168.1.10** is the default robot IP address - you can use any IP address that suits you.
-
-To run the example:
-
-<code>rosrun kortex_examples PlayCartesian</code>
-
-<a id="play-cartesian-position"></a>
-## Play cartesian position
-
-<p>
-Move the end effector of a Gen3 robot along the z axis by +0,1. 
-</p>
-
-To run this example, the following nodes need to be running:
-> - kortex\_driver (**rosrun kortex\_driver kortex\_driver 192.168.1.10 100**)
-
-\* Note here that the address **192.168.1.10** is the default robot IP address - you can use any IP address that suits you.
-
-To run the example:
-
-<code>rosrun kortex_examples PlayCartesianPosition</code>
-
-<a id="get-sensor-settings"></a>
-## Get sensor settings
-<p>
-	Gets the settings of all the sensors from the Vision module. In this example, we assume that the targeted Vision module is part of a robot and you want to communicate with it via the base device routing feature.
-</p>
-
-To run this example, the following nodes need to be running:
-> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
-> - kortex\_vision\_config\_driver (**rosrun kortex\_vision\_config\_driver kortex\_vision\_config\_driver 192.168.1.10**)
-
-Then to run it:
-
-<code>rosrun kortex_examples GetSensorSettings</code>
-
-<a id="read-all-devices"></a>
-## Read all devices
-<p>
-	Get a list of all the devices available on a Gen3 robot base. This example is useful when you want to communicate with a device that is a part of a robot using the device routing feature.
-</p>
-
-To run this example, the following nodes need to be running:
-> - kortex\_device\_manager (**rosrun kortex\_device\_manager kortex\_device\_manager 192.168.1.10**)
-
-Then to run it:
-
-<code>rosrun kortex_examples ReadAllDevices</code>
+Before you run any example, make sure :
+- You have already built the packages using `catkin_make`.
+- You are physically connected to an arm (or you are connected over Wi-Fi).
+- You have started the `kortex_driver` node by following the [instructions](../kortex_driver/readme.md). 
+- The node started correctly and without errors.
 
 
+<a id="actuator_config"></a>
+## Actuator configuration examples
+*Examples to show how to use actuator_config ROS services to configure a given actuator.*
+
+The examples look for advertised services in the **my_gen3** namespace by default and configures the first actuator.
+
+To run the C++ example: `rosrun kortex_examples example_actuator_configuration_cpp`
+
+To run the Python example: `rosrun kortex_examples example_actuator_configuration.py`
+
+If you started the `kortex_driver` node in a non-default namespace (not **my_gen3**) or if you want to test the example on another actuator than the first one, you will have to supply node parameters in the command line (the syntax doesn't change if you run the C++ or Python example) : 
+
+`rosrun kortex_examples example_actuator_configuration_cpp _robot_name:=<your_own_namespace> _device_id:=<your_device_id>`
+
+<a id="full_arm"></a>
+## Full arm examples
+*Examples to show how to use the base ROS services to move and configure the arm.*
+
+The examples look for advertised services in the **my_gen3** namespace by default.
+
+To run the C++ example: `rosrun kortex_examples example_full_arm_movement_cpp`
+
+To run the Python example: `rosrun kortex_examples example_full_arm_movement.py`
+
+If you started the `kortex_driver` node in a non-default namespace (not **my_gen3**), you will have to supply the node a parameter in the command line (the syntax doesn't change if you run the C++ or Python example) : 
+
+`rosrun kortex_examples example_full_arm_movement_cpp _robot_name:=<your_own_namespace>`
+
+<a id="vision_config"></a>
+## Vision module configuration examples
+*Examples to show how to use the vision_config ROS services to configure the vision module.*
+
+The examples look for advertised services in the **my_gen3** namespace by default.
+
+To run the C++ example: `rosrun kortex_examples example_vision_configuration_cpp`
+
+To run the Python example: `rosrun kortex_examples example_vision_configuration.py`
+
+If you started the `kortex_driver` node in a non-default namespace (not **my_gen3**), you will have to supply the node a parameter in the command line (the syntax doesn't change if you run the C++ or Python example) : 
+
+`rosrun kortex_examples example_full_arm_movement_cpp _robot_name:=<your_own_namespace>`
+
+<a id="move_it"></a>
+## MoveIt! example
+*Example to show how to use the Python MoveIt! API to move the arm.*
+
+The example looks for advertised services and topics in the **my_gen3** namespace by default.
+
+To run the example: `rosrun kortex_examples example_move_it_trajectories.py`
+
+If you started the `kortex_driver` node in a non-default namespace (not **my_gen3**), you will have to supply the node your own namespace in the command line : 
+
+`rosrun kortex_examples example_full_arm_movement_cpp __ns:=<your_own_namespace>`
