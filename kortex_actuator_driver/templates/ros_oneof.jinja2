@@ -1,9 +1,0 @@
-{%- for member in item.field -%}
-{% if member.HasField("oneof_index") %}
-{% if member.type == 11 %}
-{% set list1 = member.type_name.split('.') %}{{list1[4]}}[] {{member.name}}
-{%- else -%}
-uint32[] {{member.name}}
-{%- endif -%}
-{%- endif -%}
-{% endfor %}

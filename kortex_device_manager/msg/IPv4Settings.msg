@@ -1,4 +1,0 @@
- 
-uint32 ipv4_address 
-uint32 ipv4_subnet_mask 
-uint32 ipv4_default_gateway

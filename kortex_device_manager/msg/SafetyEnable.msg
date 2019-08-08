@@ -1,4 +1,0 @@
-
-
-SafetyHandle handle 
-bool enable
