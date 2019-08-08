@@ -1,0 +1,335 @@
+<?xml version="1.0"?>
+
+
+<robot name="robotiq_85_gripper" xmlns:xacro="http://ros.org/wiki/xacro">
+    <xacro:property name="M_PI" value="3.14159"/>
+    
+    <xacro:macro name="load_gripper" params="parent">       
+        
+        <joint name="gripper_base_joint" type="fixed">
+            <parent link="${parent}"/>
+            <child link="gripper_base_link"/>
+            <origin rpy="1.57 -1.57 0.0" xyz="0.0 0.0 0.0"/>
+        </joint>
+        
+        
+        <link name="gripper_base_link">
+            <visual>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_base_link.dae"/>
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/collision/robotiq_85_base_link.stl"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.636951" />
+                <origin xyz="0.0 0.0 0.0" />
+                <inertia ixx = "0.000380" ixy = "0.000000" ixz = "0.000000"
+                         iyx = "0.000000" iyy = "0.001110" iyz = "0.000000"
+                         izx = "0.000000" izy = "0.000000" izz = "0.001171" />
+            </inertial>
+        </link>
+
+        <gazebo reference="gripper_base_link">
+            <implicitSpringDamper>1</implicitSpringDamper>
+            <mu1>100000</mu1>
+            <mu2>100000</mu2>
+            <kp>100000000.0</kp>
+            <kd>1.0</kd>
+        </gazebo>   
+
+        <joint name="gripper_finger1_joint" type="revolute">
+            <parent link="gripper_base_link"/>
+            <child link="gripper_finger1_knuckle_link"/>
+            <axis xyz="0 0 1"/>
+            <origin rpy="${M_PI} 0.0 0.0" xyz="0.05490451627 0.03060114443 0.0"/>
+            <limit lower="0.0" upper="0.804" velocity="2.0" effort="1000"/>
+        </joint>
+
+        <joint name="gripper_finger2_joint" type="revolute">
+            <parent link="gripper_base_link"/>
+            <child link="gripper_finger2_knuckle_link"/>
+            <axis xyz="0 0 1"/>
+            <origin rpy="0.0 0.0 0.0" xyz="0.05490451627 -0.03060114443 0.0"/>
+            <limit lower="0.0" upper="0.804" velocity="2.0" effort="1000"/>
+            <mimic joint="gripper_finger1_joint"/>
+        </joint>
+
+        <link name="gripper_finger1_knuckle_link">
+            <visual>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_knuckle_link.dae"/>
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/collision/robotiq_85_knuckle_link.stl"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.018491" />
+                <origin xyz="0.0 0.0 0.0" />
+                <inertia ixx = "0.000009" ixy = "-0.000001" ixz = "0.000000"
+                         iyx = "-0.000001" iyy = "0.000001" iyz = "0.000000"
+                         izx = "0.000000" izy = "0.000000" izz = "0.000010" />
+            </inertial>
+        </link>
+        
+        <gazebo reference="gripper_finger1_knuckle_link">
+            <implicitSpringDamper>1</implicitSpringDamper>
+            <mu1>100000</mu1>
+            <mu2>100000</mu2>
+            <kp>100000000.0</kp>
+            <kd>1.0</kd>
+        </gazebo>   
+
+        <link name="gripper_finger2_knuckle_link">
+            <visual>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_knuckle_link.dae"/>
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/collision/robotiq_85_knuckle_link.stl"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.018491" />
+                <origin xyz="0.0 0.0 0.0" />
+                <inertia ixx = "0.000009" ixy = "-0.000001" ixz = "0.000000"
+                         iyx = "-0.000001" iyy = "0.000001" iyz = "0.000000"
+                         izx = "0.000000" izy = "0.000000" izz = "0.000010" />
+            </inertial>
+        </link>
+
+        <gazebo reference="gripper_finger2_knuckle_link">
+            <implicitSpringDamper>1</implicitSpringDamper>
+            <mu1>100000</mu1>
+            <mu2>100000</mu2>
+            <kp>100000000.0</kp>
+            <kd>1.0</kd>
+        </gazebo> 
+
+        <joint name="gripper_finger1_finger_joint" type="fixed">
+            <parent link="gripper_finger1_knuckle_link"/>
+            <child link="gripper_finger1_finger_link"/>
+            <origin xyz="-0.00408552455 -0.03148604435 0.0" rpy="0 0 0" />
+        </joint>
+
+        <joint name="gripper_finger2_finger_joint" type="fixed">
+            <parent link="gripper_finger2_knuckle_link"/>
+            <child link="gripper_finger2_finger_link"/>
+            <origin xyz="-0.00408552455 -0.03148604435 0.0" rpy="0 0 0" />
+        </joint>
+
+        <link name="gripper_finger1_finger_link">
+            <visual>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_finger_link.dae"/>
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/collision/robotiq_85_finger_link.stl"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.027309" />
+                <origin xyz="0.0 0.0 0.0" />
+                <inertia ixx = "0.000003" ixy = "-0.000002" ixz = "0.000000"
+                         iyx = "-0.000002" iyy = "0.000021" iyz = "0.000000"
+                         izx = "0.000000" izy = "0.000000" izz = "0.000020" />
+            </inertial>
+        </link>
+
+        <gazebo reference="gripper_finger1_finger_link">
+            <implicitSpringDamper>1</implicitSpringDamper>
+            <mu1>100000</mu1>
+            <mu2>100000</mu2>
+            <kp>100000000.0</kp>
+            <kd>1.0</kd>
+        </gazebo>  
+
+        <link name="gripper_finger2_finger_link">
+            <visual>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_finger_link.dae"/>
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/collision/robotiq_85_finger_link.stl"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.027309" />
+                <origin xyz="0.0 0.0 0.0" />
+                <inertia ixx = "0.000003" ixy = "-0.000002" ixz = "0.000000"
+                         iyx = "-0.000002" iyy = "0.000021" iyz = "0.000000"
+                         izx = "0.000000" izy = "0.000000" izz = "0.000020" />
+            </inertial>
+        </link>
+
+        <gazebo reference="gripper_finger2_finger_link">
+            <implicitSpringDamper>1</implicitSpringDamper>
+            <mu1>100000</mu1>
+            <mu2>100000</mu2>
+            <kp>100000000.0</kp>
+            <kd>1.0</kd>
+        </gazebo>  
+
+        <joint name="gripper_finger1_inner_knuckle_joint" type="continuous">
+            <parent link="gripper_base_link"/>
+            <child link="gripper_finger1_inner_knuckle_link"/>
+            <axis xyz="0 0 1"/>
+            <origin xyz="0.06142 0.0127 0" rpy="${M_PI} 0.0 0.0" />
+            <limit lower="0.0" upper="0.804" velocity="2.0" effort="0.1"/>
+            <mimic joint="gripper_finger1_joint" offset="0"/>
+        </joint>
+
+        <joint name="gripper_finger2_inner_knuckle_joint" type="continuous">
+            <parent link="gripper_base_link"/>
+            <child link="gripper_finger2_inner_knuckle_link"/>
+            <axis xyz="0 0 1"/>
+            <origin xyz="0.06142 -0.0127 0" rpy="0 0 0"/>
+            <limit lower="0.0" upper="0.804" velocity="2.0" effort="0.1"/>
+            <mimic joint="gripper_finger1_joint" offset="0"/>
+        </joint>
+
+        <link name="gripper_finger1_inner_knuckle_link">
+            <visual>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_inner_knuckle_link.dae"/>
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/collision/robotiq_85_inner_knuckle_link.stl"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.029951" />
+                <origin xyz="0.0 0.0 0.0" />
+                <inertia ixx = "0.000039" ixy = "0.000000" ixz = "0.000000"
+                         iyx = "0.000000" iyy = "0.000005" iyz = "0.000000"
+                         izx = "0.000000" izy = "0.000000" izz = "0.000035" />
+            </inertial>
+        </link>
+
+        <gazebo reference="gripper_finger1_inner_knuckle_link">
+            <implicitSpringDamper>1</implicitSpringDamper>
+            <mu1>100000</mu1>
+            <mu2>100000</mu2>
+            <kp>100000000.0</kp>
+            <kd>1.0</kd>
+        </gazebo> 
+        
+        <link name="gripper_finger2_inner_knuckle_link">
+            <visual>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_inner_knuckle_link.dae"/>
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/collision/robotiq_85_inner_knuckle_link.stl"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.029951" />
+                <origin xyz="0.0 0.0 0.0" />
+                <inertia ixx = "0.000039" ixy = "0.000000" ixz = "0.000000"
+                         iyx = "0.000000" iyy = "0.000005" iyz = "0.000000"
+                         izx = "0.000000" izy = "0.000000" izz = "0.000035" />
+            </inertial>
+        </link>
+
+        <gazebo reference="gripper_finger2_inner_knuckle_link">
+            <implicitSpringDamper>1</implicitSpringDamper>
+            <mu1>100000</mu1>
+            <mu2>100000</mu2>
+            <kp>100000000.0</kp>
+            <kd>1.0</kd>
+        </gazebo> 
+
+        <joint name="gripper_finger1_finger_tip_joint" type="continuous">
+            <parent link="gripper_finger1_inner_knuckle_link"/>
+            <child link="gripper_finger1_finger_tip_link"/>
+            <axis xyz="0 0 1"/>
+            <origin xyz="0.04303959807 -0.03759940821 0.0" rpy="0.0 0.0 0.0"/>
+            <limit lower="0.0" upper="0.804" velocity="2.0" effort="0.1"/>
+            <mimic joint="gripper_finger1_joint" multiplier="-1"/>
+        </joint>
+
+        <joint name="gripper_finger2_finger_tip_joint" type="continuous">
+            <parent link="gripper_finger2_inner_knuckle_link"/>
+            <child link="gripper_finger2_finger_tip_link"/>
+            <axis xyz="0 0 1"/>
+            <origin rpy="0.0 0.0 0.0" xyz="0.04303959807 -0.03759940821  0.0"/>
+            <limit lower="0.0" upper="0.804" velocity="2.0" effort="0.1"/>
+            <mimic joint="gripper_finger1_joint" multiplier="-1"/>
+        </joint>
+
+
+        <link name="gripper_finger1_finger_tip_link">
+            <visual>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_finger_tip_link.dae"/>
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/collision/robotiq_85_finger_tip_link.stl"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.019555" />
+                <origin xyz="0.0 0.0 0.0" />
+                <inertia ixx = "0.000002" ixy = "0.000000" ixz = "0.000000"
+                         iyx = "0.000000" iyy = "0.000005" iyz = "0.000000"
+                         izx = "0.000000" izy = "0.000000" izz = "0.000006" />
+            </inertial>
+        </link> 
+        
+        <gazebo reference="gripper_finger1_finger_tip_link">
+            <implicitSpringDamper>1</implicitSpringDamper>
+            <mu1>100000</mu1>
+            <mu2>100000</mu2>
+            <kp>100000000.0</kp>
+            <kd>1.0</kd>
+        </gazebo> 
+
+        <link name="gripper_finger2_finger_tip_link">
+            <visual>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_finger_tip_link.dae"/>
+                </geometry>
+            </visual>
+            <collision>
+                <geometry>
+                    <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/collision/robotiq_85_finger_tip_link.stl"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="0.019555" />
+                <origin xyz="0.0 0.0 0.0" />
+                <inertia ixx = "0.000002" ixy = "0.000000" ixz = "0.000000"
+                         iyx = "0.000000" iyy = "0.000005" iyz = "0.000000"
+                         izx = "0.000000" izy = "0.000000" izz = "0.000006" />
+            </inertial>
+        </link>
+        
+        <gazebo reference="gripper_finger2_finger_tip_link">
+            <implicitSpringDamper>1</implicitSpringDamper>
+            <mu1>100000</mu1>
+            <mu2>100000</mu2>
+            <kp>100000000.0</kp>
+            <kd>1.0</kd>
+        </gazebo> 
+        
+    </xacro:macro>
+</robot>

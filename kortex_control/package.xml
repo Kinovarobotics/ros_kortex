@@ -1,11 +1,11 @@
 <package>
-  <name>kortex_description</name>
+  <name>kortex_control</name>
   <version>2.0.0</version>
   <description>
-    <p>URDF Description package for Kortex-compatible robots</p>
-    <p>This package contains configuration data, 3D models and launch files
-for Kortex-compatible arms and grippers</p>
+    <p>Gazebo Ros Control package for Kortex robots</p>
+    <p>This package contains launch and configuration files for the ros_control controllers for simulation</p>
   </description>
+  <author email="avannobel@kinova.ca">Alexandre Vannobel</author>
   <maintainer email="support@kinova.ca" />
   <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>
@@ -15,6 +15,10 @@ for Kortex-compatible arms and grippers</p>
   <run_depend>joint_state_publisher</run_depend>
   <run_depend>gazebo</run_depend>
   <run_depend>xacro</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>gazebo_ros_control</run_depend>
+  <run_depend>ros_control</run_depend>
+  <run_depend>ros_controllers</run_depend>
   <export>
     <architecture_independent />
   </export>

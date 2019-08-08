@@ -11,8 +11,15 @@
 * -->
 
 # Kortex Description
-This package contains the URDF (Unified Robot Description Format) and STL files for the Kortex-compatible robots and end-effectors.
+This package contains the URDF (Unified Robot Description Format), STL and configuration files for the Kortex-compatible robots.
 
-<!-- MarkdownTOC -->
+## Usage 
 
-<!-- /MarkdownTOC -->
+To load the description of a robot, you simply have to load the **ARM.xacro** or the **ARM_GRIPPER.xacro** file, with **ARM** being your arm's name (gen3), and if you have a gripper, **GRIPPER** being your gripper's name (robotiq_2f_85).
+
+**Arguments**:
+- **sim** : If this argument is true, the Gazebo-specific files will be loaded. The default value is **false **.
+
+For example, if you want to load for simulation the Gen3 description with a Robotiq 2-F 85 gripper as the gripper, you would put in your launch file : 
+
+<code><param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/gen3_robotiq_2f_85.xacro sim:=false"\/></code>
