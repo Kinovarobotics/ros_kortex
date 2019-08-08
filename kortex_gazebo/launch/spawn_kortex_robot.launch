@@ -1,0 +1,140 @@
+<launch>
+
+    <!-- Arguments -->
+    <!-- Start the GUIs -->
+    <arg name="start_gazebo" default="true"/>
+    <arg name="gazebo_gui"   default ="true"/>
+    <arg name="start_rviz" default="true"/>
+    
+    <!-- Initial position in Gazebo -->
+    <arg name="x0" default="0"/>
+    <arg name="y0" default="0"/>
+    <arg name="z0" default="0"/>
+
+    <!-- Arm and gripper type -->
+    <arg name="arm" default="gen3"/>
+    <arg name="gripper" default="" />
+    <arg name="robot_name" default="my_$(arg arm)"/>
+
+    <!-- Use trajectory controllers and MoveIt! -->
+    <arg name="use_trajectory_controller" default="true"/>
+
+    <!-- Gazebo parameters -->
+    <arg name="use_sim_time" default="true"/>
+    <arg name="debug" default="false" />
+    <arg name="paused" default="$(arg use_trajectory_controller)"/>
+    
+    <!-- Start Gazebo -->
+    <include file="$(find kortex_gazebo)/launch/start_gazebo.launch" if="$(arg start_gazebo)">
+            <arg name="gui" value="$(arg gazebo_gui)"/>
+            <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+            <arg name="debug" value="$(arg debug)"/>
+            <arg name="paused" value="$(arg paused)"/>
+    </include>
+
+    <group ns="$(arg robot_name)">
+
+        <!-- Load the description for the robot -->
+        <!-- Without gripper -->
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro sim:=true"
+            if="$(eval not arg('gripper'))"/>
+        <!-- With gripper -->
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro sim:=true"
+            unless="$(eval not arg('gripper'))"/>
+
+        <!-- Spawn the robot in Gazebo -->
+        <!-- TODO Find cleaner way to set the starting position and that will work for other arms -->
+        <!-- Without gripper -->
+        <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+            args="-urdf -param robot_description -model $(arg robot_name) -x $(arg x0) -y $(arg y0) -z $(arg z0)
+                  -robot_namespace $(arg robot_name)
+                -J joint_1 1.57
+                -J joint_2 -0.35
+                -J joint_3 3.14
+                -J joint_4 -2.00
+                -J joint_5 0
+                -J joint_6 -1.00
+                -J joint_7 1.57 "
+            if="$(eval not arg('gripper'))"/>
+        <!-- With gripper -->
+        <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+            args="-urdf -param robot_description -model $(arg robot_name) -x $(arg x0) -y $(arg y0) -z $(arg z0)
+                  -robot_namespace $(arg robot_name)
+                -J joint_1 1.57
+                -J joint_2 -0.35
+                -J joint_3 3.14
+                -J joint_4 -2.00
+                -J joint_5 0
+                -J joint_6 -1.00
+                -J joint_7 1.57 "
+            unless="$(eval not arg('gripper'))"/>
+
+        <!-- Load controller configuration file from kortex_control package -->
+        <rosparam file="$(find kortex_control)/arms/$(arg arm)/config/joint_position_controllers.yaml" command="load"/>
+        <rosparam file="$(find kortex_control)/grippers/$(arg gripper)/config/gripper_action_controller_parameters.yaml" command="load"
+            unless="$(eval not arg('gripper'))"/>
+
+        <!-- Start the controllers -->
+
+        <!-- The trajectory controller -->
+        <group if="$(arg use_trajectory_controller)">
+        
+            <!-- Without gripper -->
+            <node name="$(arg arm)_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+                output="screen" args="$(arg arm)_joint_trajectory_controller joint_state_controller"
+                if="$(eval not arg('gripper'))"/>
+
+            <!-- With gripper -->
+            <node name="$(arg arm)_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+                output="screen" args="$(arg arm)_joint_trajectory_controller joint_state_controller $(arg gripper)_gripper_controller"
+                unless="$(eval not arg('gripper'))"/>
+
+        </group>
+
+        <!-- Without the trajectory controller (individual controllers) -->
+        <group unless="$(arg use_trajectory_controller)">
+
+            <!-- Without gripper -->
+            <node name="$(arg arm)_controller_spawner" pkg="controller_manager" type="spawner" respawn="false" if="$(eval not arg('gripper'))"
+                output="screen" args="joint_1_position_controller
+                                      joint_2_position_controller
+                                      joint_3_position_controller
+                                      joint_4_position_controller
+                                      joint_5_position_controller
+                                      joint_6_position_controller
+                                      joint_7_position_controller
+                                      joint_state_controller" />
+            
+            <!-- With gripper -->
+            <node name="$(arg arm)_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+                output="screen" args="$(arg arm)_joint_trajectory_controller joint_state_controller $(arg gripper)_gripper_controller"
+                unless="$(eval not arg('gripper'))"/>
+
+        </group>
+
+        <!-- Start robot state publisher -->
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+        respawn="false" output="screen" />
+
+        <group if="$(arg use_trajectory_controller)">
+
+            <!-- Start MoveIt! main executable -->
+            <!-- TODO Find cleaner way to do that and that will work with other arms -->
+            <!-- Without gripper -->
+            <include file="$(find gen3_move_it_config)/launch/move_group.launch"
+                if="$(eval not arg('gripper'))"/> 
+            <!-- With gripper -->
+            <include file="$(find gen3_robotiq_2f_85_move_it_config)/launch/move_group.launch"
+                unless="$(eval not arg('gripper'))"/> 
+
+            <!-- Unpause the physics in Gazebo and home the robot -->
+            <node name="home_the_arm" pkg="kortex_gazebo" type="home_robot.py" output="log" respawn="false" />
+
+        </group>
+
+        <!-- Start RViz -->
+        <node name="rviz" pkg="rviz" type="rviz" if="$(arg start_rviz)"/> 
+    
+    </group>
+
+</launch>

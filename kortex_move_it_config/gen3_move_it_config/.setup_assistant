@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: kortex_description
+    relative_path: robots/gen3.xacro
+    xacro_args: --inorder arm:=gen3
+  SRDF:
+    relative_path: config/gen3.srdf
+  CONFIG:
+    author_name: Alexandre Vannobel
+    author_email: avannobel@kinova.ca
+    generated_timestamp: 1551811297
