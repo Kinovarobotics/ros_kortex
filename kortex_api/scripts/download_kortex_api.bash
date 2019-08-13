@@ -29,10 +29,7 @@ fi
 
 # Download the API from Google Drive
 echo "Downloading the Kortex API from the Web..."
-echo "Username : "
-read USERNAME
-echo "Encrypted Password : "
-curl -v -O -u "${USERNAME}" "" # To modify for the right Artifactory path
+wget -q -O kortex_api.zip https://artifactory.kinovaapps.com/artifactory/generic-local-public/kortex/API/2.0.0/kortex_api_2.0.0.zip
 RESULT=$?
 if [ "${RESULT}" -ne 0 ]; then
     echo "ERROR while fetching the kortex api. code = ${RESULT}"
@@ -40,7 +37,7 @@ if [ "${RESULT}" -ne 0 ]; then
 fi
 
 # Unzip it
-unzip -d kortex_api kortex_api_2.0.0-14.zip > /dev/null
+unzip -d kortex_api kortex_api.zip > /dev/null
 RESULT=$?
 if [ "${RESULT}" -ne 0 ]; then
     echo "ERROR while extracting the kortex api. code = ${RESULT}"
@@ -79,6 +76,6 @@ if [ "${RESULT}" -ne 0 ]; then
 fi
 
 # Cleanup
-rm -rf kortex_api/ kortex_api_2.0.0-14.zip
+rm -rf kortex_api/ kortex_api.zip
 
 exit ${RESULT}

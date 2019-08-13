@@ -17,7 +17,7 @@ This package contains all the C++ files used by the driver node. This package is
 
 When you use `catkin_make` to build `ros_kortex`, the [download_kortex_api](./scripts/download_kortex_api.bash) script automatically checks whether or not the API was downloaded. If it is not present, the script downloads and extracts it in the correct folders.
 
-You can also manually download the API, extract it and copy the contents of the include and lib folders: 
+You can also manually download the API [from here](https://artifactory.kinovaapps.com/artifactory/generic-local-public/kortex/API/2.0.0/kortex_api_2.0.0.zip), extract it and copy the contents of the include and lib folders: 
  - ```cpp/linux_gcc_x86-64/lib``` to the ```kortex_api/lib``` folder
  - ```cpp/linux_gcc_x86-64/include``` to the ```kortex_api/include``` folder
  
