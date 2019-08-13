@@ -1,0 +1,8 @@
+
+GripperCyclic_MessageId feedback_id
+uint32 status_flags
+uint32 fault_bank_a
+uint32 fault_bank_b
+uint32 warning_bank_a
+uint32 warning_bank_b
+MotorFeedback[] motor

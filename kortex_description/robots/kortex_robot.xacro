@@ -2,11 +2,12 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-    <xacro:macro name="load_robot" params="arm gripper">
+    <xacro:macro name="load_robot" params="arm gripper sim">
     
         <!-- Arguments -->
         <xacro:property name="arm" value="$(arg arm)" />
         <xacro:property name="gripper" default="$(arg gripper)" />
+        <xacro:property name="sim" default="$(arg sim)" />
         
         <!-- Files to include -->
         <xacro:include filename="$(find kortex_description)/arms/$(arg arm)/urdf/$(arg arm)_macro.xacro" />
@@ -14,17 +15,52 @@
             <xacro:include filename="$(find kortex_description)/grippers/$(arg gripper)/urdf/$(arg gripper)_macro.xacro" />
         </xacro:unless>
         
-        <!-- Run the macros -->        
+        <xacro:if value="$(arg sim)">
+            <!-- Arm transmission elements-->
+            <xacro:include filename="$(find kortex_description)/arms/$(arg arm)/urdf/$(arg arm)_transmission_macro.xacro" />
+            <!-- Gripper transmission elements if there is a gripper-->
+            <xacro:unless value="${not gripper}">
+                <xacro:include filename="$(find kortex_description)/grippers/$(arg gripper)/urdf/$(arg gripper)_transmission_macro.xacro" />
+            </xacro:unless>
+        </xacro:if>
+
+        <!-- Run the macros -->
+
+        <!-- For gazebo-->
+        <xacro:if value="$(arg sim)">
+            <link name="world" />
+            <joint name="world_to_root" type="fixed">
+                <child link="base_link" />
+                <parent link="world" />
+                <origin xyz="0 0 0" rpy="0 0 0" />    
+            </joint> 
+        </xacro:if>
+        
         <!-- Load the arm -->
         <xacro:load_arm parent="">
             <origin xyz="0 0 0" rpy="0 0 0"/> 
         </xacro:load_arm>
 
         <!-- Load the gripper -->
-        <!-- URDF files and support for gripper still to be added -->
-        <!-- <xacro:unless value="${not gripper}">
-            <xacro:load_gripper parent="${last_arm_link}"/> --> <!-- last_arm_link is defined in "$(find kortex_description)/arms/$(arg arm)/urdf/$(arg arm)_macro.xacro" -->
-        <!-- </xacro:unless>  -->
+        <xacro:unless value="${not gripper}">
+            <xacro:load_gripper parent="${last_arm_link}"/> <!-- last_arm_link is defined in "$(find kortex_description)/arms/$(arg arm)/urdf/$(arg arm)_macro.xacro" -->
+        </xacro:unless>
 
+        <!-- Load the Gazebo transmissions and gazebo_ros_control plugin -->
+        <xacro:if value="$(arg sim)">
+
+            <xacro:load_gazebo_arm_transmissions/>
+
+            <xacro:unless value="${not gripper}">
+                <xacro:load_gazebo_gripper_transmissions/>
+            </xacro:unless>
+
+            <gazebo>
+                <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+                    <legacyModeNS>true</legacyModeNS>
+                </plugin>
+            </gazebo>
+
+        </xacro:if>
     </xacro:macro>
 </robot>

@@ -1,0 +1,47 @@
+{%- for member in item.message.field -%}
+{%- if not member.HasField("oneof_index") -%}
+{%- if member.type == field_descriptor_class.TYPE_STRING %}
+string{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_BYTES %}
+uint8[] {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_DOUBLE %}
+float64{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_FIXED32 %}
+uint32{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_FIXED64 %}
+uint64{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_FLOAT %}
+float32{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_INT32 %}
+int32{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_INT64 %}
+int64{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_SFIXED32 %}
+int32{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_SFIXED64 %}
+int64{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_SINT32 %}
+int32{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_SINT64 %}
+int64{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_UINT32 %}
+uint32{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_UINT64 %}
+uint64{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_ENUM %}
+uint32{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_BOOL %}
+bool {{member.name}}
+{%- elif member.type == field_descriptor_class.TYPE_MESSAGE %}
+{% set split_message_type = member.type_name.split('.') -%}
+{%- if split_message_type[-1] in item.duplicated_fields -%}
+{{split_message_type[-2]}}_{{split_message_type[-1]}}{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- else -%}
+{{split_message_type[-1]}}{%- if member.label == field_descriptor_class.LABEL_REPEATED -%}[]{% endif %} {{member.name}}
+{%- endif %}
+{%- endif -%}
+{%- endif -%}
+{%- endfor -%}
+{% for one_of in item.one_of_list %}
+{{item.prepend_message_name}}{{item.name}}_{{one_of.name}} oneof_{{one_of.name}}
+{%- endfor -%}

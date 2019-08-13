@@ -1,0 +1,3 @@
+
+uint32 mode
+PreComputedJointTrajectoryElement[] trajectory_elements

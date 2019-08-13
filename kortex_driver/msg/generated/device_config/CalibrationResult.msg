@@ -1,0 +1,3 @@
+
+uint32 calibration_status
+uint32 calibration_details

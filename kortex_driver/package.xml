@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>kortex_driver</name>
-  <version>1.0.0</version>
+  <version>2.0.0</version>
   <description>THe kortex package that act as a robot's driver.</description>
 
-  <maintainer email="ros@kinova.ca">KINOVA</maintainer>
+  <maintainer email="support@kinova.ca" />
 
   <license>BSD</license>
 
@@ -12,6 +12,8 @@
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
   <build_depend>std_msgs</build_depend>
+  <build_depend>control_msgs</build_depend>
+  <build_depend>actionlib</build_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>

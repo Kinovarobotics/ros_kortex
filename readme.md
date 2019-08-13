@@ -1,71 +1,76 @@
-# ROS KORTEX
-The official ROS package to interact with Kortex and its related products is built upon the Kortex API, documentation for which can be found in the [GitHub Kortex repository](https://github.com/Kinovarobotics/kortex).
+# ros_kortex
+ROS Kortex is the official ROS package to interact with Kortex and its related products. It is built upon the Kortex API, documentation for which can be found in the [GitHub Kortex repository](https://github.com/Kinovarobotics/kortex).
 
-## Content
-### kortex_bringup
-This package contains the launch files that start the nodes and load the correct parameters and robot description to the Parameter Server.
-For more details, please consult the [README](kortex_bringup/readme.md)
+## Download links
 
-### kortex_driver
-This package implements a ROS node that allows communication between a node and a Gen3 robot. For more details, please consult the [README](kortex_driver/readme.md) from in the package subdirectory. Use this package if you want to:
+You can download the latest Gen3 firmware [from here](https://artifactory.kinovaapps.com/artifactory/generic-local-public/kortex/gen3/2.0.0/Gen3-2.0.0.swu) and you can download the release notes [from here](https://artifactory.kinovaapps.com/artifactory/generic-local-public/kortex/gen3/2.0.0/RN-001_KINOVA_Gen3_Ultra_lightweight_robot-Release_Notes_EN_R04.pdf).
 
-* Change basic robot configuration.
-* Move the robot in Cartesian space.
-* Move the robot in joint space.
-* Activate admittance mode.
-* Move the robot using **LOW\_LEVEL**\ (1 kHz\) control mode.
-* Move the robot using **LOW\_LEVEL\_BYPASS**\ mode.
-* Access cyclic data sporadically.
+## Installation
+
+### Setup
+
+- [Robot Operating System (ROS)](http://wiki.ros.org) (middleware for robotics)
+
+You can find the instructions to install ROS Kinetic (for Ubuntu 16.04) [here](http://wiki.ros.org/kinetic/Installation/Ubuntu).
+
+[Google Protocol Buffers](https://developers.google.com/protocol-buffers/) is used by Kinova to define the Kortex APIs and to automatically generate ROS messages, services and C++ classes from the Kortex API `.proto` files. The installation of Google Protocol Buffers is required by developers implementing new APIs with the robot. However, since we already provide all the necessary generated files on GitHub, this is not required for most end users of the robot.
+
+If you have a specific use case that requires you to install it, you can follow the instructions provided [at the end of this readme file](#protobuf-installation). We recommend that you contact Kinova if you have any specific questions about this.
 
 
-### kortex_actuator_driver
-This package implements a ROS node that allows direct communication with a Gen3 actuator. Direct communication means that either the computer running the node is directly connected to the actuator or that it is connected to a robot using the device routing system. A more detailed [description](kortex_actuator_driver/readme.md) can be found in the package subdirectory. Use this package if you would like to:
+### Build
 
-* Change an advance configuration setting on an actuator.
-* Move an actuator using the cyclic data (1 kHz).
+These are the instructions to run in a terminal to create the workspace, clone the `ros_kortex` repository, install the necessary ROS dependencies and build the package:
 
-### kortex_device_manager
-This package implements a ROS node that allows basic communication with every device supported by the Kortex framework. A more detailed [description](kortex_device_manager/readme.md) can be found in the package subdirectory. Use this package if you would like to:
+        mkdir -p catkin_workspace/src
+        cd catkin_workspace/src
+        git clone https://github.com/Kinovarobotics/ros_kortex.git
+        cd ../
+        rosdep install --from-paths src --ignore-src
+        catkin_make
+        source devel/setup.bash
 
-* List all devices available on a specific Gen3 robot.
-* Retrieve generic information of a given device.
-* Get the firmware version of a given device.
-* Get the serial number of a given device.
-* Set IPv4 settings on a given device.
-* Get safety information of a given device.
+## Contents
 
-### kortex_vision_config_driver
-This package implements a ROS node that allows direct communication with a Gen3 Vision module. Direct communication means that either the computer running the node has an Ethernet cable directly connected to a Vision module or that it is connected to a robot using the device routing system. A more detailed [description](kortex_vision_config_driver/readme.md) can be found in the package subdirectory. Use this package if you would like to:
-
-* Change a configuration setting on a vision module.
-* Get informations about the configuration settings of a vision module.
-
-### kortex_examples
-This package holds all the examples needed to understands that basics of ros_kortex. All examples are written in both c++ and python. A more detailed [description](kortex_examples/readme.md) can be found in the package subdirectory.
-
-### kortex_description
-This package contains the URDF and the STL of a complete Gen3 robot. A more detailed [description](kortex_description/readme.md) can be found in the package directory.
+The following is a description of the packages included in this repository.
 
 ### kortex_api
-This package contains all the header files and the libraries required by the Kortex C++ API. A more detailed [description](kortex_api/readme.md) can be found in the package subdirectory.
+This package contains all the header files and the libraries of the C++ Kortex API. The files are automatically downloaded from the Web and extracted when you `catkin_make` if the `kortex_api/include` and `kortex_api/lib` folders are empty. 
 
-## Setup
+**Note:**  Upon a new release of the API, it is important to delete the content of these two folders to make sure the new API gets downloaded and you don't get build errors when you `catkin_make`.
 
-### Download the API and extract it to the kortex_api/include and kortex_api/lib folders
-The build.sh script automates this process. To launch it, go to the root of your catkin_workspace and execute :
-```./src/ros_kortex/build.sh```
-This will download the API, unzip it to the right folder and build the project with ```catkin_make```.
+A more detailed [description](kortex_api/readme.md) can be found in the package subdirectory.
 
-You can also download and unzip the API manually by following these [instructions](kortex_api/readme.md).
+### kortex_control
+This package implements the simulation controllers that control the arm in Gazebo. For more details, please consult the [README](kortex_control/readme.md) from the package subdirectory.
 
-### Install protobuf [OPTIONAL]
-The protobuf compiler is not required if you want to use the package as is, but is required if you need to [re-generate](./generate_all.sh) the .MSG, .SRV and auto-generated Kortex-ROS C++ wrapper files.
+**Note** The `ros_control` controllers for the real arm are not yet implemented and will be in a future release of `ros_kortex`.
 
-1. git clone https://github.com/protocolbuffers/protobuf --branch 3.5.1.1   (you must use this specific version)
-2. Follow these [instructions](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md) to build and install protobuf and its compiler. 
+### kortex_description
+This package contains the URDF (Unified Robot Description Format), STL and configuration files for the Kortex-compatible robots. For more details, please consult the [README](kortex_description/readme.md) from the package subdirectory.
 
-## kortex gazebo
-This package is not completed yet but will be available in a future version.
+### kortex_driver
+This package implements a ROS node that allows communication between a node and a Kinova Gen3 Ultra lightweight robot. For more details, please consult the [README](kortex_driver/readme.md) from the package subdirectory.
 
-## kortex_moveit_config
-This package is not completed yet but will be available in a future version.
+### kortex_examples
+This package holds all the examples needed to understand the basics of `ros_kortex`. Most of the examples are written in both C++ and Python. Only the MoveIt! example is available exclusively in Python for now.
+A more detailed [description](kortex_examples/readme.md) can be found in the package subdirectory.
+
+### kortex_gazebo
+This package contains files to simulate the Kinova Gen3 Ultra lightweight robot in Gazebo. For more details, please consult the [README](kortex_gazebo/readme.md) from the package subdirectory.
+
+### kortex_move_it_config
+This metapackage contains the auto-generated MoveIt! files to use the Kinova Gen3 arm with the MoveIt! motion planning framework. For more details, please consult the [README](kortex_move_it_config/readme.md) from the package subdirectory.
+
+### third_party
+This folder contains the third-party packages we use with the ROS Kortex packages. Currently, it consists of two packages used for the simulation of the Robotiq Gripper in Gazebo. We use [gazebo-pkgs](third_party/gazebo-pkgs/README.md) for grasping support in Gazebo and [roboticsgroup_gazebo_plugins](third_party/roboticsgroup_gazebo_plugins/README.md) to mimic joint support in Gazebo.
+
+<a id="protobuf-installation"></a>
+## Instructions to install Protocol Buffers (optional)
+
+You can clone the Protocol Buffers repository from GitHub with this command: 
+
+```cpp
+git clone https://github.com/protocolbuffers/protobuf --branch 3.5.1.1   (you must use this specific version)
+```
+You can install Protocol Buffers by following these [instructions](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md).

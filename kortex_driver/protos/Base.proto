@@ -14,13 +14,17 @@ syntax = "proto3";
 
 import public "Common.proto";
 import public "Errors.proto";
+import public "ProductConfiguration.proto";
 
 package Kinova.Api.Base;
 
-// Base module service
+/*
+ * Base service. Broadly useful service. 
+ * Provides functions for configuring a range of base-related functionalities and for enabling high-level control for the robot.
+ */
 service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
 
-    // Creates a user profile
+    // Creates a user profile and returns a handle to the profile
     rpc CreateUserProfile (FullUserProfile) returns (Kinova.Api.Common.UserProfileHandle);//@RPC_ID=1
 
     // Updates an existing user profile
@@ -35,25 +39,25 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Retrieves all user profiles
     rpc ReadAllUserProfiles (Kinova.Api.Common.Empty) returns (UserProfileList);//@RPC_ID=5
 
-    // Retrieves the list of user handles
+    // Retrieves the list of all user profile handles
     rpc ReadAllUsers (Kinova.Api.Common.Empty) returns (UserList);//@RPC_ID=6
 
     // Changes the password of an existing user
     rpc ChangePassword (PasswordChange) returns (Kinova.Api.Common.Empty);//@RPC_ID=7
 
-    // Creates a new sequence
+    // Creates a new sequence and returns a handle to the sequence
     rpc CreateSequence (Sequence) returns (SequenceHandle);//@RPC_ID=8
 
     // Updates an existing sequence
     rpc UpdateSequence (Sequence) returns (Kinova.Api.Common.Empty);//@RPC_ID=9
 
-    // Reads an existing sequence
+    // Retrieves an existing sequence
     rpc ReadSequence (SequenceHandle) returns (Sequence);//@RPC_ID=10
 
     // Deletes an existing sequence
     rpc DeleteSequence (SequenceHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=11
 
-    // Retrieves all existing sequences
+    // Retrieves the list of all existing sequences
     rpc ReadAllSequences (Kinova.Api.Common.Empty) returns (SequenceList);//@RPC_ID=12
 
     // Deletes a specific task from the specified sequence
@@ -77,7 +81,7 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Resumes execution of currently paused sequence
     rpc ResumeSequence (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=19
 
-    // Creates a protection zone
+    // Creates a new protection zone and returns a handle to the protection zone
     rpc CreateProtectionZone (ProtectionZone) returns (ProtectionZoneHandle);//@RPC_ID=20
 
     // Updates an existing protection zone
@@ -89,46 +93,46 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Deletes an existing protection zone
     rpc DeleteProtectionZone (ProtectionZoneHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=23
 
-    // Retrieves all protection zones
+    // Retrieves a list of all protection zones
     rpc ReadAllProtectionZones (Kinova.Api.Common.Empty) returns (ProtectionZoneList);//@RPC_ID=24
 
-    // Creates a mapping (future)
+    // Creates a new mapping
     rpc CreateMapping (Mapping) returns (MappingHandle);//@RPC_ID=26
 
     // Retrieves an existing mapping
     rpc ReadMapping (MappingHandle) returns (Mapping);//@RPC_ID=27
 
-    // Retrieves all mappings
+    // Retrieves a list of all mappings
     rpc ReadAllMappings (Kinova.Api.Common.Empty) returns (MappingList);//@RPC_ID=30
 
-    // Creates a new map (future)
+    // Creates a new map
     rpc CreateMap (Map) returns (MapHandle);//@RPC_ID=36
 
-    // Retrieves all maps associated to the specified mapping
+    // Retrieves a list of all maps associated to the specified mapping
     rpc ReadAllMaps (MappingHandle) returns (MapList);//@RPC_ID=40
 
-    // Makes the specified map active within the specified map group and mapping
+    // Activates the specified map within the specified map group and mapping
     rpc ActivateMap (ActivateMapHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=41
 
-    // Creates an action
+    // Creates a new action
     rpc CreateAction (Action) returns (ActionHandle);//@RPC_ID=42
 
     // Retrieves an existing action
     rpc ReadAction (ActionHandle) returns (Action);//@RPC_ID=43
 
-    // Retrieves all existing actions
+    // Retrieves a list of all existing actions
     rpc ReadAllActions (RequestedActionType) returns (ActionList);//@RPC_ID=44
 
     // Deletes an existing action
     rpc DeleteAction (ActionHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=45
 
-    // Update an existing action
+    // Updates an existing action
     rpc UpdateAction (Action) returns (Kinova.Api.Common.Empty);//@RPC_ID=46
 
-    // Asks the robot to execute the specified existing action
+    // Commands the robot to execute the specified existing action
     rpc ExecuteActionFromReference (ActionHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=47
 
-    // Asks the robot to execute the specified action
+    // Commands the robot to execute the specified action
     rpc ExecuteAction (Action) returns (Kinova.Api.Common.Empty);//@RPC_ID=48
 
     // Pauses the currently executed action. ResumeAction can be invoked afterwards
@@ -146,7 +150,7 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Modifies the IPv4 network configuration for the specified network adapter
     rpc SetIPv4Configuration (FullIPv4Configuration) returns (Kinova.Api.Common.Empty);//@RPC_ID=60
 
-    // Enables (or disables) the specified communication interface
+    // Enables (or disables) the specified communication interface 
     rpc SetCommunicationInterfaceEnable (CommunicationInterfaceConfiguration) returns (Kinova.Api.Common.Empty);//@RPC_ID=61
 
     // Determines if the specified communication interface is enabled (or disabled)
@@ -170,131 +174,113 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Connects robot to specified Wi-Fi network
     rpc ConnectWifi (Ssid) returns (Kinova.Api.Common.Empty);//@RPC_ID=68
 
-    // Disconnects the robot from currently connected Wi-Fi network
+    // Disconnects the robot from the currently connected Wi-Fi network
     rpc DisconnectWifi (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=69
 
-    // Gets information about the connected Wi-Fi network
+    // Retrieves information about the connected Wi-Fi network
     rpc GetConnectedWifiInformation (Kinova.Api.Common.Empty) returns (WifiInformation);//@RPC_ID=70
 
-    // Unsubscribes client from receiving specified types of notifications
+    // Unsubscribes client from receiving notifications for the specified topic
     rpc Unsubscribe (Kinova.Api.Common.NotificationHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=97 @UNSUB
 
-    // Subscribes to configuration change notifications
+    // Subscribes to configuration change topic for notifications
     rpc ConfigurationChangeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=98 @PUB_SUB=ConfigurationChangeNotification
 
-    // Subscribes to mapping information notifications
+    // Subscribes to mapping information topic for notifications
     rpc MappingInfoTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=99 @PUB_SUB=MappingInfoNotification
 
-    // Subscribes to control mode notifications
+    // Subscribes to control mode topic for notifications
     rpc ControlModeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=100 @PUB_SUB=ControlModeNotification
 
-    // Subscribes to operating mode notifications
+    // Subscribes to operating mode topic for notifications
     rpc OperatingModeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=101 @PUB_SUB=OperatingModeNotification
 
-    // Subscribes to sequence information notifications
+    // Subscribes to sequence information topic for notifications
     rpc SequenceInfoTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=102 @PUB_SUB=SequenceInfoNotification
 
-    // Subscribes to protection zone notifications (future)
+    // Subscribes to protection zone topic for notifications
     rpc ProtectionZoneTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=103 @PUB_SUB=ProtectionZoneNotification
-
-    // Subscribes to user notifications
+    
+    // Subscribes to user topic for notifications
     rpc UserTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=104 @PUB_SUB=UserNotification
 
-    // Subscribes to controller notifications
+    // Subscribes to controller topic for notifications
     rpc ControllerTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=105 @PUB_SUB=ControllerNotification
 
-    // Subscribes to action notifications
+    // Subscribes to action topic for notifications
     rpc ActionTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=106 @PUB_SUB=ActionNotification
 
-    // Subscribes to robot event notifications
+    // Subscribes to robot event topic for notifications
     rpc RobotEventTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=107 @PUB_SUB=RobotEventNotification
 
-    // Retrieves the forward kinematics that corresponds to specified transformation matrix (future)
-    rpc GetFwdKinematics (Kinova.Api.Common.Empty) returns (TransformationMatrix);//@RPC_ID=108
-
-    // Moves to the specifed pose
+    // Moves robot to the specifed tool pose (position and orientation) while imposing specified constraints
     rpc PlayCartesianTrajectory (ConstrainedPose) returns (Kinova.Api.Common.Empty);//@RPC_ID=109
 
-    // Moves to the specifed position
+    // Moves robot to the specifed position while imposing specified constraints
     rpc PlayCartesianTrajectoryPosition (ConstrainedPosition) returns (Kinova.Api.Common.Empty);//@RPC_ID=110
 
-    // Moves to the specifed orientation
+    // Moves to the specifed orientation while imposing specified constraints
     rpc PlayCartesianTrajectoryOrientation (ConstrainedOrientation) returns (Kinova.Api.Common.Empty);//@RPC_ID=111
 
-    // Pauses robot movement (future)
-    rpc Pause (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=113
+    // Stops robot movement
+    rpc Stop (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=112
 
-    // Resumes robot movement (future)
-    rpc Resume (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=114
-
-    // Retrieves the currently measured pose, that is the position and orientation that the robot is currently in
+    // Retrieves the current computed tool pose (position and orientation) for the robot
     rpc GetMeasuredCartesianPose (Kinova.Api.Common.Empty) returns (Pose);//@RPC_ID=115
 
-    // Retrieves the commanded Cartesian pose (future)
-    rpc GetCommandedCartesianPose (Kinova.Api.Common.Empty) returns (Pose);//@RPC_ID=116
+    // Sends a wrench command (screw consisting of force and torque) to be applied to the tool. This method is EXPERIMENTAL.
+    rpc SendWrenchCommand (WrenchCommand) returns (Kinova.Api.Common.Empty);//@RPC_ID=118
 
-    // Retrieves the targeted Cartesian pose (future)
-    rpc GetTargetedCartesianPose (Kinova.Api.Common.Empty) returns (Pose);//@RPC_ID=117
+    /*
+	 * Sends a wrench (screw consisting of force and torque) joystick command to be applied to the tool. 
+	 * The wrench values sent to this call are expected to be a ratio of maximum value (between -1.0/+1.0). This method is EXPERIMENTAL.
+	 */
+    rpc SendWrenchJoystickCommand (WrenchCommand) returns (Kinova.Api.Common.Empty);//@RPC_ID=119
 
-    // Sends a twist command
+    /*
+	 * Sends a twist (screw consisting of linear and angular velocity) joystick command to be applied to the tool. 
+	 * The twist values sent to this call are expected to be a ratio of the maximum value (between -1.0/+1.0).
+	 */
+    rpc SendTwistJoystickCommand (TwistCommand) returns (Kinova.Api.Common.Empty);//@RPC_ID=120
+
+    // Sends a twist (screw consisting of linear and angular velocity) command to be applied to the tool
     rpc SendTwistCommand (TwistCommand) returns (Kinova.Api.Common.Empty);//@RPC_ID=121
 
-    // Retrieves the currently measured twist command, that is the current linear and angular robot velocity  (future)
-    rpc GetMeasuredTwist (Kinova.Api.Common.Empty) returns (Twist);//@RPC_ID=122
-
-    // Retrieves the desired twist command (future)
-    rpc GetCommandedTwist (Kinova.Api.Common.Empty) returns (Twist);//@RPC_ID=123
-
-    // Moves to the specifed joint angles
+    // Moves joints to the specified joint angles while imposing specified constraints
     rpc PlayJointTrajectory (ConstrainedJointAngles) returns (Kinova.Api.Common.Empty);//@RPC_ID=124
 
-    // Moves specifed joint to the specifed joint angle
+    // Moves specifed joint to the specifed joint angle while imposing specified constraints
     rpc PlaySelectedJointTrajectory (ConstrainedJointAngle) returns (Kinova.Api.Common.Empty);//@RPC_ID=125
 
-    // Retrieves the currently measured joint angles, that is the current position of each joint
+    // Retrieves the currently measured joint angles for each joint
     rpc GetMeasuredJointAngles (Kinova.Api.Common.Empty) returns (JointAngles);//@RPC_ID=126
 
-    // Retrieves the desired joint angles, that is the desired joint angle for each joint (future)
-    rpc GetCommandedJointAngles (Kinova.Api.Common.Empty) returns (JointAngles);//@RPC_ID=127
-
-    // Sends a joint speeds command, that is the desired speed of one or many joints
-    rpc SendJointSpeedsCommmand (JointSpeeds) returns (Kinova.Api.Common.Empty);//@RPC_ID=132
+    /*
+     * Sends a set of joint speed commands to all joints with one command. Joint speed commmands must be sent to all joints. 
+	 * If you do not want to move some of the joints, simply send a speed value of 0 degrees / second for that joint.
+	 */
+    rpc SendJointSpeedsCommand (JointSpeeds) returns (Kinova.Api.Common.Empty);//@RPC_ID=132
 
     // Sends a speed command for a specific joint
     rpc SendSelectedJointSpeedCommand (JointSpeed) returns (Kinova.Api.Common.Empty);//@RPC_ID=133
 
-    // Retrieves the currently measured joint speeds, that is the current speed of each joint (future)
-    rpc GetMeasuredJointSpeeds (Kinova.Api.Common.Empty) returns (JointSpeeds);//@RPC_ID=134
-
-    // Retrieves the desired joint speeds, that is the desired speed for each joint (future)
-    rpc GetCommandedJointSpeeds (Kinova.Api.Common.Empty) returns (JointSpeeds);//@RPC_ID=135
-
     // Sends a command to move the gripper
     rpc SendGripperCommand (GripperCommand) returns (Kinova.Api.Common.Empty);//@RPC_ID=136
 
-    // Retrieves the current gripper movement, that is the current gripper position, force or speed (future)
+    // Retrieves the current gripper movement, that is the current gripper position, force or speed
     rpc GetMeasuredGripperMovement (GripperRequest) returns (Gripper);//@RPC_ID=137
 
-    // Retrieves the desired gripper movement (future)
-    rpc GetCommandedGripperMovement (GripperRequest) returns (Gripper);//@RPC_ID=138
-
-    // Sets the robot in admittance mode
+    // Sets the robot in the chosen admittance mode 
     rpc SetAdmittance (Admittance) returns (Kinova.Api.Common.Empty);//@RPC_ID=139
-
-    // Defines the reference frame to use with twist and wrench commands
-    rpc SetTwistWrenchReferenceFrame (CartesianReferenceFrameRequest) returns (Kinova.Api.Common.Empty);//@RPC_ID=140
 
     // Sets a new operating mode. Only Maintenance, Update and Run modes are permitted.
     rpc SetOperatingMode (OperatingModeInformation) returns (Kinova.Api.Common.Empty);//@RPC_ID=141
 
-    // Stops robot movement
+    // Stops robot movement and activates emergency stop state. You will not be able to move the robot. Use ClearFaults() to clear the stop.
     rpc ApplyEmergencyStop (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=145
 
     // Clears robot stop. Robot is permitted to move again.
     rpc ClearFaults (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=146
-
-    // Retrieves currently active map associated with specified mapping (future)
-    rpc GetActiveMap (MappingHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=149
 
     // Retrieves current control mode
     rpc GetControlMode (Kinova.Api.Common.Empty) returns (ControlModeInformation);//@RPC_ID=150
@@ -308,40 +294,28 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Retrieves current servoing mode
     rpc GetServoingMode (Kinova.Api.Common.Empty) returns (ServoingModeInformation);//@RPC_ID=153
 
-    // Subscribes to servoing mode notifications
+    // Subscribes to servoing mode topic for notifications
     rpc ServoingModeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=154 @PUB_SUB=ServoingModeNotification
-
-    // Retrieves the last sequence state (future)
-    rpc GetSequenceState (SequenceHandle) returns (SequenceInformation);//@RPC_ID=156
-
-    // Retrieves the last state of the robot versus the specified protection zone (future)
-    rpc GetProtectionZoneState (ProtectionZoneHandle) returns (ProtectionZoneInformation);//@RPC_ID=157
-
-    // Retrieves the action execution state (future)
-    rpc GetActionExecutionState (Kinova.Api.Common.Empty) returns (ActionExecutionState);//@RPC_ID=158
 
     // Deletes all configurations and reverts settings to their factory defaults (except network settings)
     rpc RestoreFactorySettings (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=160
 
-    // Reverts network settings to their factory defaults and predefined user profiles to their default passwords (future)
-    rpc RestoreNetworkFactorySettings (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=161
-
-    // Reboots robot
+    // Reboots the robot
     rpc Reboot (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=162
 
-    // Subscribes to factory notifications
+    // Subscribes to factory topic for notifications
     rpc FactoryTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=164 @PUB_SUB=FactoryNotification
 
     // Retrieves the list of all connected controllers
     rpc GetAllConnectedControllers (Kinova.Api.Common.Empty) returns (ControllerList);//@RPC_ID=166
 
-    // Retrieves the state of a specific controller
+    // Retrieves the state of a specified controller
     rpc GetControllerState (ControllerHandle) returns (ControllerState);//@RPC_ID=167
 
-    // Retrieves the number of actuators
+    // Retrieves the number of actuators in the robot
     rpc GetActuatorCount (Kinova.Api.Common.Empty) returns (ActuatorInformation);//@RPC_ID=171
 
-    // Initiates wifi scanning
+    // Initiates Wi-Fi scanning
     rpc StartWifiScan (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=172
 
     // Retrieves a configured Wi-Fi network
@@ -350,39 +324,128 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Subscribes to network event notifications
     rpc NetworkTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=174 @PUB_SUB=NetworkNotification
 
-    // Retrieves current arm state
+    // Retrieves current robot arm state
     rpc GetArmState (Kinova.Api.Common.Empty) returns (ArmStateInformation);//@RPC_ID=175
 
-    // Subscribes to arm state notifications
+    // Subscribes to robot arm state notifications
     rpc ArmStateTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=176 @PUB_SUB=ArmStateNotification
 
     // Retrieves the IPv4 network information for the specified network adapter
     rpc GetIPv4Information (NetworkHandle) returns (IPv4Information);//@RPC_ID=177
-    
-    // Sets country code
-    rpc SetCountryCode (CountryCode) returns (Kinova.Api.Common.Empty);//@RPC_ID=178
-    
-    // Retrieves country code
-    rpc GetCountryCode (Kinova.Api.Common.Empty) returns (CountryCode);//@RPC_ID=179
+
+    // Sets the Wi-Fi country code
+    rpc SetWifiCountryCode (Kinova.Api.Common.CountryCode) returns (Kinova.Api.Common.Empty);//@RPC_ID=178
+
+    // Retrieves the Wi-Fi country code
+    rpc GetWifiCountryCode (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.CountryCode);//@RPC_ID=179
+
+    // Configures capacitive sensor on the gripper or wrist
+    rpc SetCapSenseConfig (CapSenseConfig)          returns (Kinova.Api.Common.Empty);//@RPC_ID=180
+
+    // Retrieves configuration of capacitive sensor on the gripper or wrist
+    rpc GetCapSenseConfig (Kinova.Api.Common.Empty) returns (CapSenseConfig);//@RPC_ID=181
+
+    // Retrieves speed hard limits for all joints 
+    rpc GetAllJointsSpeedHardLimitation (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=183
+
+    // Retrieves torque hard limits for all joints 
+    rpc GetAllJointsTorqueHardLimitation  (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=184
+
+    // Retrieves twist hard limitations
+    rpc GetTwistHardLimitation (Kinova.Api.Common.Empty) returns (TwistLimitation);//@RPC_ID=185
+
+    // Retrieves wrench hard limitations
+    rpc GetWrenchHardLimitation (Kinova.Api.Common.Empty) returns (WrenchLimitation);//@RPC_ID=186
+
+    /*
+     * Sends the desired joystick speeds to all joints with one command. 
+	 * The speed values sent to this call are expected to be a ratio of the maximum value (between -1.0/+1.0)
+	 * Speeds must be sent to all joints. If you don't want to move some of the joints, send a value of 0.
+	 */
+    rpc SendJointSpeedsJoystickCommand (JointSpeeds) returns (Kinova.Api.Common.Empty);//@RPC_ID=187
+
+    /* 
+	 * Sends a joystick speed for a specific joint. 
+	 * The speed value sent to this call is expected to be a ratio of the maximum value (between -1.0/+1.0)
+	 */
+    rpc SendSelectedJointSpeedJoystickCommand (JointSpeed) returns (Kinova.Api.Common.Empty);//@RPC_ID=188
+
+    // Enables TCP bridge to hardware device
+    rpc EnableBridge (BridgeConfig) returns (BridgeResult); //@RPC_ID=193
+
+    // Disables specified TCP bridge
+    rpc DisableBridge (BridgeIdentifier) returns (BridgeResult); //@RPC_ID=194
+
+    // Retrieves list of created bridges
+    rpc GetBridgeList (Kinova.Api.Common.Empty) returns (BridgeList); //@RPC_ID=195
+
+    // Retrieves configuration for specified bridge
+    rpc GetBridgeConfig (BridgeIdentifier) returns (BridgeConfig); //@RPC_ID=196
+
+    // Plays a pre-computed angular trajectory
+    rpc PlayPreComputedJointTrajectory (PreComputedJointTrajectory) returns (Kinova.Api.Common.Empty);//@RPC_ID=197
+
+    // Retrieves product configuration information
+    rpc GetProductConfiguration (Kinova.Api.Common.Empty) returns (Kinova.Api.ProductConfiguration.CompleteProductConfiguration);//@RPC_ID=198
+
+    // Set new value for Degree of Freedom in product configuration (Identification Number)
+    rpc UpdateDegreeOfFreedomConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationDegreeOfFreedom) returns (Kinova.Api.Common.Empty);//@RPC_ID=199
+
+    // Set new Base type in product configuration (Identification Number)
+    rpc UpdateBaseTypeConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationBaseType) returns (Kinova.Api.Common.Empty);//@RPC_ID=200
+
+    // Set new end-effector type in product configuration (Identification Number)
+    rpc UpdateEndEffectorTypeConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationEndEffectorType) returns (Kinova.Api.Common.Empty);//@RPC_ID=201
+
+    // Set new vision module type in product configuration (Identification Number)
+    rpc UpdateVisionModuleTypeConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationVisionModuleType) returns (Kinova.Api.Common.Empty);//@RPC_ID=202
+
+    // Set new interface module type in product configuration (Identification Number)
+    rpc UpdateInterfaceModuleTypeConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationInterfaceModuleType) returns (Kinova.Api.Common.Empty);//@RPC_ID=203
+
+    // Set new arm laterality in product configuration (Identification Number)
+    rpc UpdateArmLateralityConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationLaterality) returns (Kinova.Api.Common.Empty);//@RPC_ID=204
+
+    // Sets new wrist type in product configuration (Identification Number)
+    rpc UpdateWristTypeConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationWristType) returns (Kinova.Api.Common.Empty);//@RPC_ID=205
+
+    // Restores product configuration to factory product configuration
+    rpc RestoreFactoryProductConfiguration (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=206
+
+    /*
+     * Obtains trajectory error report listing errors for rejected trajectory.
+	 * Provides some feedback on why the trajectory could not be completed.
+	 */
+    rpc GetTrajectoryErrorReport (Kinova.Api.Common.Empty) returns (TrajectoryErrorReport);//@RPC_ID=207
+
+    // Retrieves list of soft speed limits for all joints
+    rpc GetAllJointsSpeedSoftLimitation (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=208
+
+    // Retrieves list of soft torque limits for all joints 
+    rpc GetAllJointsTorqueSoftLimitation  (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=209
+
+    // Retrieves all twist soft limitations
+    rpc GetTwistSoftLimitation (Kinova.Api.Common.Empty) returns (TwistLimitation);//@RPC_ID=210
+
+    // Retrieves all wrench soft limitations
+    rpc GetWrenchSoftLimitation (Kinova.Api.Common.Empty) returns (WrenchLimitation);//@RPC_ID=211
 }
 
-// Enumeration used to identify Base service current version
+// Identifies Base service current version
 enum ServiceVersion {
     RESERVED_0 = 0;         // Reserved
     CURRENT_VERSION = 1;    // Current version
 }
 
-
-// Provides complete infomation about a user. Used when creating a user profile.
+// Information about a user, together with a password. Full set of information needed to create a user profile.
 message FullUserProfile {
     UserProfile user_profile = 1; // Information about the user, including its username.
     string password = 2;          // User's password
 }
 
-
-// Provides information about a user
+// Information about a user
 message UserProfile {
-    Kinova.Api.Common.UserProfileHandle handle = 1; // User handle (no need to set it with CreateUserProfile()
+    Kinova.Api.Common.UserProfileHandle handle = 1; // User handle (no need to set it with CreateUserProfile())
     string username = 2;                            // Username, which is used to connect to robot (or login via Web App)
     string firstname = 3;                           // User's first name
     string lastname = 4;                            // User's last name
@@ -394,49 +457,49 @@ message UserProfileList {
     repeated UserProfile user_profiles = 1;  // User profile
 }
 
-// Array of user handles
+// Array of user profile handles
 message UserList {
     repeated Kinova.Api.Common.UserProfileHandle user_handles = 1; // User handle
 }
 
-// Provides information to change a user's password
+// Information required to change user password
 message PasswordChange {
     Kinova.Api.Common.UserProfileHandle handle = 1; // User handle
     string old_password = 2;                        // Current password
     string new_password = 3;                        // New password
 }
 
-// Identifies a sequence
+// Reference to a specific sequence
 message SequenceHandle {
     uint32 identifier = 1;  // Sequence identifier
     fixed32 permission = 2; // Sequence permission. See 'Kinova.Api.Common.Permission' enum.
 }
 
-// Associates execution options to a sequence
+// Reference to a sequence along with execution options
 message AdvancedSequenceHandle {
     SequenceHandle handle = 1; // Sequence handle
     /*
-     * Loop execution. Set to true to play the sequence in loop, false otherwise. When a sequence is executed in loop, it will automatically 
-     * go back to first task within the sequence after completing execution of last task and continue execution forever 
+     * Loop execution. Set to true to play the sequence in loop, false otherwise. When a sequence is executed in loop, it will automatically
+     * go back to first task within the sequence after completing execution of last task and continue execution forever
      * unless the sequence is explicitely stopped
      */
     bool in_loop = 2;
 }
 
-// Identifies a task inside a sequence
+// Reference to a specific task inside a sequence
 message SequenceTaskHandle {
     SequenceHandle sequence_handle = 1; // Sequence handle
     uint32 task_index = 2;              // Task index inside the sequence
 }
 
-// Provides information about a task inside a sequence
+// Information on a single task within a sequence
 message SequenceTask {
     uint32 group_identifier = 1;    // Specifies the order in which this task must be executed
     Action action = 2;              // Specifies the action to execute
     string application_data = 3;    // Application data (reserved for use by Web App)
 }
 
-// Provides information about a sequence
+// Information about a sequence
 message Sequence {
     SequenceHandle handle = 1;          // Sequence handle
     string name = 2;                    // Sequence name
@@ -444,108 +507,119 @@ message Sequence {
     repeated SequenceTask tasks = 4;    // Array of tasks that this sequence contains
 }
 
-// Array of sequences
+// An array of sequences
 message SequenceList {
     repeated Sequence sequence_list = 1; // Sequence
 }
 
-// Appends an action to an existing sequence (future)
+// Representation of the result of appending (adding at the end) an action to an existing sequence (not implemented yet)
 message AppendActionInformation {
     SequenceHandle sequence_handle = 1; // Sequence to which action must be appended
     Action action = 2;                  // Action to append
 }
 
-// Identifies an action
+// Reference to a specific action
 message ActionHandle {
     uint32 identifier = 1;      // Action identifier
     ActionType action_type = 2; // Action type
     fixed32 permission = 3;     // Permission of specified Action entity. Must use 'Kinova.Api.Common.Permission' enum.
 }
 
-// Message used to request all action instances of a specific action type
+// Message used for requesting all action instances of a specific action type
 message RequestedActionType {
     ActionType action_type = 1; // Action type
 }
 
-// Defines an action
+// Defines an action. An action is some task performed on the robot.
 message Action {
-    ActionHandle handle = 1;                                            // Action handle (useful when updating an existing action)
+    ActionHandle handle = 1;                                            // Reference to the action (useful when updating an existing action)
     string name = 2;                                                    // Action friendly name
     string application_data = 3;                                        // Application data (reserved for use by Web App)
     oneof action_parameters {
-        TwistCommand send_twist_command = 4;                            // Action to control the robot in velocity
+        TwistCommand send_twist_command = 4;                            // Control the tool in velocity
+        WrenchCommand send_wrench_command = 5;                          // Control the tool in force (EXPERIMENTAL)
         JointSpeeds send_joint_speeds = 7;                              // Action to control each joint speed
-        ConstrainedPose reach_pose = 9;                                 // Action to reach a pose
-        ConstrainedJointAngles reach_joint_angles = 10;                 // Action to reach a series of joint angles
-        AdmittanceMode toggle_admittance_mode = 16;                     // Action to enable or disable the admittance mode
-        SwitchControlMapping switch_control_mapping = 19;               // Action to switch the active controller map
-        JointNavigationDirection navigate_joints = 20;                  // Action to select the next actuator to control in a map
-        NavigationDirection navigate_mappings = 21;                     // Action to select a different map
-        ChangeTwist change_twist = 25;                                  // Action to change twist
-        ChangeJointSpeeds change_joint_speeds = 26;                     // Action to change the joint speeds individually
-        EmergencyStop apply_emergency_stop = 31;                        // Action to apply robot emergency stop
-        Faults clear_faults = 32;                                       // Action to clear faults. Robot will be able to move if there is no more fault (see BaseCyclic.BaseFeedback.[fault_bank_a | fault_bank_b])
-
-        Delay delay = 34;                                               // Action to apply a delay
-        ActionHandle execute_action = 35;                               // Action to execute an existing action
-        GripperCommand send_gripper_command = 36;                       // Action to execute a gripper movement
-        Stop stop_action = 38;                                          // Action to stop movement
+        ConstrainedPose reach_pose = 9;                                 // Reach a pose given Cartesian constraints
+        ConstrainedJointAngles reach_joint_angles = 10;                 // Reach a series of joint angles given angular constraints
+        AdmittanceMode toggle_admittance_mode = 16;                     // Enable or disable the admittance mode
+        SwitchControlMapping switch_control_mapping = 19;               // Switch the active controller map
+        JointNavigationDirection navigate_joints = 20;                  // Select the next actuator to control in a map
+        NavigationDirection navigate_mappings = 21;                     // Select a different map
+        ChangeTwist change_twist = 25;                                  // Change tool twist
+        ChangeJointSpeeds change_joint_speeds = 26;                     // Change the joint speeds individually
+        ChangeWrench change_wrench = 28;                                // Change the Cartesian force
+        EmergencyStop apply_emergency_stop = 31;                        // Apply robot emergency stop
+        Faults clear_faults = 32;                                       // Clear faults. Robot will be able to move if there is no more fault (see BaseCyclic.BaseFeedback.[fault_bank_a | fault_bank_b])
+        Delay delay = 34;                                               // Apply a delay
+        ActionHandle execute_action = 35;                               // Execute an existing action
+        GripperCommand send_gripper_command = 36;                       // Send a gripper command
+        Stop stop_action = 38;                                          // Stop movement
+        PreComputedJointTrajectory play_pre_computed_trajectory = 39;   // Play a pre-computed joint trajectory
     }
 }
 
-// List of admissible action types
+// Admissible types of actions
 enum ActionType {
-    UNSPECIFIED_ACTION = 0;         // Unspecified action type
-    SEND_TWIST_COMMAND = 1;         // Action to control the robot in velocity
-    SEND_JOINT_SPEEDS = 4;          // Action to control each joint speed
-    REACH_POSE = 6;                 // Action to reach a pose
-    REACH_JOINT_ANGLES = 7;         // Action to reach a series of joint angles
-    TOGGLE_ADMITTANCE_MODE = 13;    // Action to enable or disable the admittance mode
-    SWITCH_CONTROL_MAPPING = 16;    // Action to switch the active controller map
-    NAVIGATE_JOINTS = 17;           // Action to select the next actuator to control from control mapping
-    NAVIGATE_MAPPINGS = 18;         // Action to select a different map
-    CHANGE_TWIST = 22;              // Action to change the twist
-    CHANGE_JOINT_SPEEDS = 23;       // Action to change the joint speeds individually
-    APPLY_EMERGENCY_STOP = 28;      // Action to apply robot emergency stop
-    CLEAR_FAULTS = 29;              // Action to clear faults. Robot will be able to move if there is no more fault (see BaseCyclic.BaseFeedback.[fault_bank_a | fault_bank_b])
-    TIME_DELAY = 31;                // Action to apply a delay
-    EXECUTE_ACTION = 32;            // Action to execute an existing action
-    SEND_GRIPPER_COMMAND = 33;      // Action to execute a gripper command
-    STOP_ACTION = 35;               // Action to stop movement
+    UNSPECIFIED_ACTION = 0;             // Unspecified action type
+    SEND_TWIST_COMMAND = 1;             // Control the robot in Cartesian velocity
+    SEND_WRENCH_COMMAND = 2;            // Control the robot in force
+    SEND_JOINT_SPEEDS = 4;              // Control each joint speed
+    REACH_POSE = 6;                     // Reach a pose
+    REACH_JOINT_ANGLES = 7;             // Reach a series of joint angles
+    TOGGLE_ADMITTANCE_MODE = 13;        // Enable or disable the admittance mode
+    SWITCH_CONTROL_MAPPING = 16;        // Switch the active controller map
+    NAVIGATE_JOINTS = 17;               // Select the next actuator to control from control mapping
+    NAVIGATE_MAPPINGS = 18;             // Select a different map
+    CHANGE_TWIST = 22;                  // Change the twist
+    CHANGE_JOINT_SPEEDS = 23;           // Change the joint speeds individually
+    CHANGE_WRENCH = 25;                 // Change the Cartesian force
+    APPLY_EMERGENCY_STOP = 28;          // Apply robot emergency stop
+    CLEAR_FAULTS = 29;                  // Clear faults. Robot will be able to move if there is no more fault (see BaseCyclic.BaseFeedback.[fault_bank_a | fault_bank_b])
+    TIME_DELAY = 31;                    // Apply a delay
+    EXECUTE_ACTION = 32;                // Execute an existing action
+    SEND_GRIPPER_COMMAND = 33;          // Send a gripper command
+    STOP_ACTION = 35;                   // Stop robot movement
+    PLAY_PRE_COMPUTED_TRAJECTORY = 39;  // Play a pre-computed trajectory
 }
 
-// Defines an action to switch the active controller map
+// Action parameter to switch the active controller map
 message SwitchControlMapping {
     uint32 controller_identifier = 1;       // Identifier of the controller for which changing the active map is requested
-    MapGroupHandle map_group_handle = 2;    // Identifier of the map group for which the active map needs to change
-    MapHandle map_handle = 3;               // New active map
+    MapGroupHandle map_group_handle = 2;    // Reference to the map group for which the active map needs to change
+    MapHandle map_handle = 3;               // Reference to new active map
 }
 
-// Defines an action to increase (or reduce) the maximum Cartesian velocity by a specific increment
+// Action to change the maximum Cartesian velocity by a specific increment
 message ChangeTwist {
     float linear = 1;   // Linear Cartesian velocity increment (in meters per second)
     float angular = 2;  // Angular Cartesian velocity increment (in degrees per second)
 }
 
-// Defines an action to increase (or reduce) the maximum angular velocity per joint by a specific increment
+// Action to change the maximum angular velocity per joint by a specific increment
 message ChangeJointSpeeds {
    JointSpeeds joint_speeds = 1; // Joint speeds
 }
 
-// Defines an action to force an emergency of the robot
+// Action to change the maximum Cartesian force by a specific increment
+message ChangeWrench {
+    float force = 1;    // Linear force increment (in Newton)
+    float torque = 2;   // Angular torque increment (in Newton*meters)
+}
+
+// Action to force an emergency of the robot
 message EmergencyStop {
 }
 
-// Defines an action to clear faults
+// Action to clear faults
 message Faults {
 }
 
-// Defines an action to apply a delay
+// Action to apply a delay
 message Delay {
     uint32 duration = 1; // Delay (in seconds)
 }
 
-// Defines an action to stop robot movement
+// Action to stop robot movement
 message Stop {
 }
 
@@ -554,35 +628,35 @@ message ActionList {
     repeated Action action_list = 1; // Action
 }
 
-// Defines a specific timeout
+// Timeout for a specified duration
 message Timeout {
-    uint32 value = 1; // Timeout value (future)
+    uint32 value = 1; // Timeout value (not implemented yet)
 }
 
-// Identifies a Wi-Fi SSID
+// Wi-Fi SSID
 message Ssid {
     string identifier = 1; // Wi-Fi Service Set Identifier
 }
 
-// Enables or disables a specific communication interface (e.g. Wi-Fi, Wired Ethernet)
+// Configuration information for enabling or disabling a specific communication interface (e.g. Wi-Fi, Wired Ethernet)
 message CommunicationInterfaceConfiguration {
     NetworkType type = 1;   // Network type (e.g. Wi-Fi, Wired Ethernet)
     bool enable = 2;        // Enable configuration. Set to true to enable network, false otherwise
 }
 
-// List of admissible network types
+// Admissible network types
 enum NetworkType {
     UNSPECIFIED_NETWORK_TYPE = 0;   // Unspecified network type
     WIFI = 1;                       // Wi-Fi network
     WIRED_ETHERNET = 2;             // Wired Ethernet network
 }
 
-// Identifies a network
+// Reference to a network
 message NetworkHandle {
     NetworkType type = 1;  // Network type
 }
 
-// Provides an IPv4 configuration
+// IPv4 configuration information
 message IPv4Configuration {
     uint32 ip_address = 1;      // IPv4 address
     uint32 subnet_mask = 2;     // IPv4 subnet mask
@@ -590,38 +664,38 @@ message IPv4Configuration {
     bool dhcp_enabled = 4;      // Enable automatic (DHCP) IPv4 configuration. Set to true to enable DHCP instead of static configuration.
 }
 
-// Provides information about an IPv4 endpoint
+// Information about an IPv4 endpoint
 message IPv4Information {
     uint32 ip_address = 1;      // IPv4 address
     uint32 subnet_mask = 2;     // IPv4 subnet mask
     uint32 default_gateway = 3; // Gateway IPv4 address
 }
 
-// Provides an IPv4 configuration for a specific network
+// IPv4 configuration for a specific network
 message FullIPv4Configuration {
     NetworkHandle handle = 1;                   // Network handle
     IPv4Configuration ipv4_configuration = 2;   // IPv4 configuration
 }
 
 
-// List of admissible Wi-Fi Security types
+// Admissible Wi-Fi Security types
 enum WifiSecurityType {
-    UNSPECIFIED_AUTHENTICATION = 0; // Unspecified wifi security type
+    UNSPECIFIED_AUTHENTICATION = 0; // Unspecified Wi-Fi security type
     WEP = 1;                        // WEP authentication required
     WPA2_PERSONAL = 2;              // WPA2 Personal authentication required
     WPA_PERSONAL = 4;               // WPA Personal authentication required
     NO_AUTHENTICATION = 8;          // No authentication required
 }
 
-// List of admissible Wi-Fi encryption types
+// Admissible Wi-Fi encryption types
 enum WifiEncryptionType {
-    UNSPECIFIED_ENCRYPTION = 0; // Unspecified wifi encryption type
+    UNSPECIFIED_ENCRYPTION = 0; // Unspecified Wi-Fi encryption type
     AES_ENCRYPTION = 1;         // AES encryption
     TKIP_ENCRYPTION = 2;        // TKIP encryption
     WEP_ENCRYPTION = 4;         // WEP encryption
 }
 
-// List of admissible signal quality values
+// Admissible signal quality values
 enum SignalQuality {
     UNSPECIFIED_SIGNAL_QUALITY = 0; // Unspecified signal quality
     POOR = 1;                       // Poor signal quality
@@ -631,7 +705,7 @@ enum SignalQuality {
     NONE = 5;                       // No signal
 }
 
-// Provides information about a specific Wi-Fi network
+// Information about a specific Wi-Fi network
 message WifiInformation {
     Ssid ssid = 1;                      // SSID
     fixed32 security_type = 2;          // Wi-Fi security type
@@ -642,51 +716,58 @@ message WifiInformation {
     uint32 channel = 7;                 // Wi-Fi operating channel
 }
 
-// Array of Wi-Fi information
+// Array of information about different Wi-Fi networks
 message WifiInformationList {
     repeated WifiInformation wifi_information_list = 1; // Wi-Fi information
 }
 
-// Provides a Wi-Fi Configuration
+// Wi-Fi connection configuration
 message WifiConfiguration {
     Ssid ssid = 1;                  // SSID
     string security_key = 2;        // Security key to used when connecting to Wi-Fi network
     bool connect_automatically = 3; // Connection mode. Set to true so robot automatically connects to this Wi-Fi network at bootup, false otherwise
 }
 
-// Array of Wi-Fi configuration
+// Array of Wi-Fi connection configuration for different networks
 message WifiConfigurationList {
     repeated WifiConfiguration wifi_configuration_list   = 1; // Wi-Fi configurations
 }
 
-// Identifies a protection zone
+// Reference to a specific protection zone
 message ProtectionZoneHandle {
     uint32 identifier = 1;  // Protection zone identifier
     fixed32 permission = 2; // Permission of specified Proctection zone entity. Must use 'Kinova.Api.Common.Permission' enum.
 }
 
-// Provides the rotation matrix configuration of a single row
+/*
+ * Single row of a 3x3 rotation matrix. To be a valid possible row of a rotation matrix, 
+ * the norm of the row must be 1 (the sum of the squares of the row elements has to equal 1).
+ */
 message RotationMatrixRow {
     float column1 = 1;  // Value between -1.0 and 1.0
     float column2 = 2;  // Value between -1.0 and 1.0
     float column3 = 3;  // Value between -1.0 and 1.0
 }
 
-// Provides a 3x3 rotation matrix configuration
+/* 
+ * Representation of a 3x3 rotation matrix. To be a valid rotation matrix, the rows must be orthonormal 
+ * (the rows must each have norm of 1 and the row vectors must be orthogonal to each other). 
+ * The determinant of the matrix must also be +1.
+ */
 message RotationMatrix {
     RotationMatrixRow row1 = 1; // First rotation matrix row
     RotationMatrixRow row2 = 2; // Second rotation matrix row
     RotationMatrixRow row3 = 3; // Third rotation matrix row
 }
 
-// Identifies a Cartesian point
+// Coordinates of a Cartesian point
 message Point {
     float x = 1;  // x (in meters)
     float y = 2;  // y (in meters)
     float z = 3;  // z (in meters)
 }
 
-// List of admissible protection zone shape types
+// Admissible protection zone shape types
 enum ShapeType {
     UNSPECIFIED_SHAPE = 0;  // Unspecified shape type
     CYLINDER = 1;           // Cylinder shape type
@@ -694,7 +775,7 @@ enum ShapeType {
     RECTANGULAR_PRISM = 3;  // Rectangular prism shape type
 }
 
-// Provides a protection zone shape description
+// Protection zone shape description
 message ZoneShape {
     ShapeType shape_type = 1;       // Shape type
     Point origin = 2;               // Origin of the protection zone shape from reference (in meters)
@@ -703,7 +784,7 @@ message ZoneShape {
     float envelope_thickness = 5;   // Thickness of envelop around shape (in meters). The envelop is of same shape type as the shape at its center.
 }
 
-// Provides a protection zone configuration
+// Protection zone configuration
 message ProtectionZone {
     ProtectionZoneHandle handle = 1;                        // Protection zone handle
     string name = 2;                                        // Protection zone friendly name
@@ -719,25 +800,32 @@ message ProtectionZoneList {
     repeated ProtectionZone protection_zones = 1; // Protection zone
 }
 
-// List of admisible limitation types
+// Admissible limitation types
 enum LimitationType {
     UNSPECIFIED_LIMITATION = 0;     // Unspecified limitation
-    FORCE_LIMITATION = 1;           // Force limitation (future)
-    ACCELERATION_LIMITATION = 2;    // Acceleration limitation (future)
+    FORCE_LIMITATION = 1;           // Force limitation (not implemented yet)
+    ACCELERATION_LIMITATION = 2;    // Acceleration limitation (not implemented yet)
     VELOCITY_LIMITATION = 3;        // Velocity limitation
+    TORQUE_LIMITATION = 4;          // Torque limitation
 }
 
-
-// Identifies a limitation
-message LimitationTypeIdentifier {
-    LimitationType type = 1;    // Limitation type
-}
-
-// Provides a Cartesian limitation configuration
+// Translation and orientation limits for a specified limit type for Cartesian configuration
 message CartesianLimitation {
     LimitationType type = 1;    // Limitation type
     float translation = 2;      // Translation limitation
     float orientation = 3;      // Orientation limitation
+}
+
+// Linear and angular speed limitations for twist configuration
+message TwistLimitation {
+    float linear = 1;      // Linear limitation
+    float angular = 2;     // Angular limitation
+}
+
+// Force and torque limitations for wrench configuration
+message WrenchLimitation {
+    float force = 1;      // Force limitation
+    float torque = 2;     // Torque limitation
 }
 
 // Array of Cartesian limitations
@@ -745,37 +833,26 @@ message CartesianLimitationList {
     repeated CartesianLimitation limitations = 1; // Limitation
 }
 
-// Defines joint limitation value
-message JointLimitationValue {
-    LimitationType type = 1;    // Limitation type
-    float value = 2;            // Limitation value
-}
-
-// List of joint limitations
-message JointLimitationValueList {
-    repeated JointLimitationValue joint_limitation_values = 1; // Joint limitation
-}
-
-// Defines a joint limitation
+// Limitation for a specified robot joint
 message JointLimitation {
-    uint32 device_identifier = 1;               // Joint device identifier
-    JointLimitationValue limitation_value = 2;  // Joint limitation value
-}
-
-// Identifies a joint limitation for a specific joint
-message JointLimitationTypeIdentifier {
-    uint32 device_identifier = 1;   // Joint device identifier
+    uint32 joint_identifier = 1;    // Joint device identifier
     LimitationType type = 2;        // Joint limitation type
+    float value = 3;                // Joint limitation value
 }
 
-// Specifies the parameters of an event log query (future)
+// Array of joint limitations
+message JointsLimitationsList {
+    repeated JointLimitation joints_limitations = 1; // Joints Limitations
+}
+
+// Parameters of an event log query (not implemented yet)
 message Query {
     Kinova.Api.Common.Timestamp start_timestamp = 1;    // Start timestamp (set to zero to specify it)
     Kinova.Api.Common.Timestamp end_timestamp = 2;      // End timestamp (set to zero to not specify it)
     string username = 3;                                // Queried username (set to "" to not specify it)
 }
 
-// List of admissible configuration events
+// Admissible configuration events
 enum ConfigurationNotificationEvent {
     UNSPECIFIED_CONFIGURATION_EVENT = 0;    // Unspecified configuration event
     CONFIGURATION_UPDATED = 1;              // Configuration deleted
@@ -784,7 +861,7 @@ enum ConfigurationNotificationEvent {
     CONFIGURATION_CREATED = 4;              // Configuration created
 }
 
-// Message that contains a configuration change event
+// Representation of a configuration change event
 message ConfigurationChangeNotification {
     ConfigurationNotificationEvent event = 1;                           // Configuration event
     Kinova.Api.Common.Timestamp timestamp = 2;                          // Event timestamp
@@ -804,7 +881,7 @@ message ConfigurationChangeNotification {
     Kinova.Api.Common.Connection connection = 15;                       // Connection that caused the configuration event
 }
 
-// Message that contains a mapping information event
+// Notification about a single mapping information event
 message MappingInfoNotification {
     uint32 controller_identifier = 1;                       // Identifier of the controller
     MapHandle active_map_handle = 2;                        // New active map
@@ -813,26 +890,28 @@ message MappingInfoNotification {
     Kinova.Api.Common.Connection connection = 5;            // Connection that caused the mapping information event
 }
 
-// List of admissible robot control modes
+// Admissible robot control modes
 enum ControlMode {
-    UNSPECIFIED_CONTROL_MODE = 0;   // Unspecified control mode
-    ANGULAR_JOYSTICK = 1;           // Angular joystick mode
-    CARTESIAN_JOYSTICK = 2;         // Cartesian joystick mode
-    VISION_JOYSTICK = 3;            // Vision joystick mode
-    ANGULAR_TRAJECTORY = 4;         // Angular trajectory mode
-    CARTESIAN_TRAJECTORY = 5;       // Cartesian trajectory mode
-    CARTESIAN_ADMITTANCE = 6;       // Cartesian admittance mode
-    JOINT_ADMITTANCE = 7;           // Joint admittance mode
-    NULL_SPACE_ADMITTANCE = 8;      // Null space mode
-    IDLE = 13;                      // Idle
+    UNSPECIFIED_CONTROL_MODE = 0;           // Unspecified control mode
+    ANGULAR_JOYSTICK = 1;                   // Angular joystick mode
+    CARTESIAN_JOYSTICK = 2;                 // Cartesian joystick mode
+    VISION_JOYSTICK = 3;                    // Vision joystick mode
+    ANGULAR_TRAJECTORY = 4;                 // Angular trajectory mode
+    CARTESIAN_TRAJECTORY = 5;               // Cartesian trajectory mode
+    CARTESIAN_ADMITTANCE = 6;               // Cartesian admittance mode
+    JOINT_ADMITTANCE = 7;                   // Joint admittance mode
+    NULL_SPACE_ADMITTANCE = 8;              // Null space mode
+    FORCE_CONTROL = 10;                     // Force control mode
+    FORCE_CONTROL_MOTION_RESTRICTED = 11;   // Force control motion restricted mode
+    IDLE = 13;                              // Idle
 };
 
-// Provides control mode information
+// Control mode information
 message ControlModeInformation {
     ControlMode mode = 1; // Control mode
 }
 
-// Message that contains a control mode event
+// Notification about a single control mode event
 message ControlModeNotification {
     ControlMode control_mode = 1;                           // New control mode
     Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
@@ -840,7 +919,7 @@ message ControlModeNotification {
     Kinova.Api.Common.Connection connection = 4;            // Connection that caused the control mode event
 }
 
-// List of admissible robot operating modes (used to report robot firmware upgrade current state)
+// Admissible robot operating modes (used to report robot firmware upgrade current state)
 enum OperatingMode {
     UNSPECIFIED_OPERATING_MODE = 0; // Unspecified operating mode
     MAINTENANCE_MODE = 1;           // Robot in maintenance mode
@@ -852,27 +931,26 @@ enum OperatingMode {
     UPDATING_DEVICE_MODE = 7;       // Robot updating device
 }
 
-// List of admissible servoing modes
+// Admissible servoing modes
 enum ServoingMode {
     UNSPECIFIED_SERVOING_MODE = 0;  // Unspecified servoing mode
-    MULTI_LEVEL_SERVOING = 1;       // Multi-level servoing
     SINGLE_LEVEL_SERVOING = 2;      // Single-level servoing
     LOW_LEVEL_SERVOING = 3;         // Low-level servoing
     BYPASS_SERVOING = 4;            // Bypass mode
 }
 
-// Provides information about the servoing mode
+// Information about the servoing mode
 message ServoingModeInformation {
     ServoingMode servoing_mode = 1; // Servoing mode
 }
 
-// Provides information about the operating mode
+// Information about the operating mode
 message OperatingModeInformation {
     OperatingMode operating_mode = 1;                   // Operating mode
     Kinova.Api.Common.DeviceHandle device_handle = 2;   // Device matching operating mode (if applicable)
 }
 
-// Message that contains an operating mode event
+// Notification about a single operating mode event
 message OperatingModeNotification {
     OperatingMode operating_mode = 1;                       // New operating mode
     Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
@@ -881,7 +959,7 @@ message OperatingModeNotification {
     Kinova.Api.Common.DeviceHandle device_handle = 5;       // Device matching operating mode (if applicable)
 }
 
-// Message that contains a servoing mode event
+// Notification about a single servoing mode event
 message ServoingModeNotification {
     ServoingMode servoing_mode = 1;                         // New servoing mode
     Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
@@ -889,7 +967,7 @@ message ServoingModeNotification {
     Kinova.Api.Common.Connection connection = 4;            // Connection that caused the servoing mode event
 }
 
-// List of admissible sequence event types
+// Admissible sequence event types
 enum EventIdSequenceInfoNotification {
     UNSPECIFIED_SEQUENCE_EVENT = 0; // Unspecified sequence event
     SEQUENCE_COMPLETED = 1;         // Sequence completed successfully
@@ -900,7 +978,7 @@ enum EventIdSequenceInfoNotification {
     SEQUENCE_STARTED = 6;           // Sequence started
 }
 
-// Message that contains a sequence information event
+// Notification about a single sequence information event
 message SequenceInfoNotification {
     EventIdSequenceInfoNotification event_identifier = 1;   // Sequence event type
     SequenceHandle sequence_handle = 2;                     // Handle of the sequence that this event refers to
@@ -912,14 +990,14 @@ message SequenceInfoNotification {
     Kinova.Api.Common.Connection connection = 8;            // Connection that caused the sequence event
 }
 
-// Provides information about a sequence
+// Information about a sequence
 message SequenceInformation {
     EventIdSequenceInfoNotification event_identifier = 1;   // Sequence event type
     uint32 task_index = 2;                                  // Task index
     uint32 task_identifier = 3;                             // Task identifier
 }
 
-// List of admissible protection zone events
+// Admissible protection zone events
 enum ProtectionZoneEvent {
     UNSPECIFIED_PROTECTION_ZONE_EVENT = 0;  // Unspecified protection zone event
     REACHED = 1;                            // Protection zone limit is reached
@@ -927,7 +1005,7 @@ enum ProtectionZoneEvent {
     EXITED = 3;                             // Protection zone limit is exited
 };
 
-// Message that contains a protection zone event
+// Notification about a single protection zone event
 message ProtectionZoneNotification {
     ProtectionZoneEvent event = 1;                          // Event type
     ProtectionZoneHandle handle = 2;                        // Handle of the protection zone that this event refers to
@@ -936,19 +1014,19 @@ message ProtectionZoneNotification {
     Kinova.Api.Common.Connection connection = 5;            // Connection that caused the protection zone event to occur
 }
 
-// Provides information about a protection zone
+// Information about a protection zone event
 message ProtectionZoneInformation {
     ProtectionZoneEvent event = 1; // Event type
 }
 
-// List of admissible user event types
+// Admissible user event types
 enum UserEvent {
     UNSPECIFIED_USER_EVENT = 0; // Unspecified user event
     LOGGED_OUT = 1;             // User logged out
     LOGGED_IN = 2;              // User logged in
 };
 
-// Message that contains a user event
+// Notification about a single user event
 message UserNotification {
     UserEvent user_event = 1;                               // User event type
     Kinova.Api.Common.UserProfileHandle modified_user = 2;  // User profile that was modified
@@ -957,20 +1035,21 @@ message UserNotification {
     Kinova.Api.Common.Connection connection = 5;            // Connection that caused the user profile event (i.e.  user who changed the user profile)
 }
 
-// List of admissible controller types
+// Admissible controller types
 enum ControllerType {
-    UNSPECIFIED_CONTROLLER_TYPE = 0;    // Unspecified controller type
-    XBOX_CONTROLLER = 1;                // Xbox controller
-    WRIST_CONTROLLER = 2;               // Wrist controller on Kinova Arm
+    UNSPECIFIED_CONTROLLER_TYPE = 0;    // Unspecified controller device type
+    XBOX_CONTROLLER = 1;                // Xbox gamepad
+    WRIST_CONTROLLER = 2;               // Wrist buttons
+    GPIO_JOYSTICK = 3;                  // GPIO joystick connected to Kinova robot base
 }
 
-// Identifies a specific controller
+// Reference to a specific controller device
 message ControllerHandle {
-    ControllerType type = 1;            // Controller type
-    uint32 controller_identifier = 2;   // Controller identifier
+    ControllerType type = 1;            // Controller device type
+    uint32 controller_identifier = 2;   // Controller device identifier
 }
 
-// Identifies a specific button (or axis) of a controller
+// Reference ro a specific button (or axis) of a controller device
 message ControllerElementHandle {
     ControllerHandle controller_handle = 1; // Controller handle
     oneof identifier {
@@ -979,23 +1058,23 @@ message ControllerElementHandle {
     }
 }
 
-// Message that contains a controller event
+// Notification about a single controller event
 message ControllerNotification {
     oneof state {
         ControllerState controller_state = 1;               // Used to indicate if a controller connection or disconnection event occured
-        ControllerElementState controller_element = 2;      // Used to indicate if a specifif button (or axis) was pressed (or moved) (future)
+        ControllerElementState controller_element = 2;      // Used to indicate if a specific button (or axis) was pressed (or moved) (not implemented yet)
     }
     Kinova.Api.Common.Timestamp timestamp = 3;              // Event timestamp
     Kinova.Api.Common.UserProfileHandle user_handle = 4;    // User that caused the controller event
     Kinova.Api.Common.Connection connection = 5;            // Connection that caused the controller event
 }
 
-// Array of controllers
+// Array of references to different controllers
 message ControllerList {
     repeated ControllerHandle handles = 1;  // Controller handle
 }
 
-// Indicates if a controller is connected (or disconnected)
+// Indicates if a specific controller is connected (or disconnected)
 message ControllerState {
     ControllerHandle handle = 1;        // Controller identifier
     ControllerEventType event_type = 2; // Type of controller event that occured
@@ -1008,14 +1087,14 @@ message ControllerElementState {
     float axis_value = 3;                       // Axis value (set between -1.0 and 1.0); only set if 'axis' controller element, otherwise set to zero
 }
 
-// List of admissible controller event types
+// Admissible controller event types
 enum ControllerEventType {
     UNSPECIFIED_CONTROLLER_EVENT = 0;   // Unspecified controller event
     CONTROLLER_DISCONNECTED = 1;        // Controller is disconnected
     CONTROLLER_CONNECTED = 2;           // Controller is connected
 }
 
-// List of admissible controller element event types
+// Admissible controller element event types
 enum ControllerElementEventType {
     UNSPECIFIED_CONTROLLER_ELEMENT_EVENT = 0;   // Unspecified controller element event
     AXIS_MOVED = 1;                             // Controller axis moved
@@ -1023,16 +1102,22 @@ enum ControllerElementEventType {
     BUTTON_UP = 3;                              // Controller button released
 }
 
-// List of admissible action event types
+// Admissible action event types
 enum ActionEvent {
     UNSPECIFIED_ACTION_EVENT = 0;   // Unspecified action event
     ACTION_END = 1;                 // Action execution end reached
     ACTION_ABORT = 2;               // Action execution aborted
     ACTION_PAUSE = 3;               // Action execution paused
     ACTION_START = 4;               // Action execution started
+    ACTION_PREPROCESS_START = 5;    // Action pre-process started
+    ACTION_PREPROCESS_ABORT = 6;    // Action pre-process aborted
+    ACTION_PREPROCESS_END = 7;      // Action pre-process ended
+    ACTION_POSTPROCESS_START = 8;   // Action post-process started
+    ACTION_POSTPROCESS_ABORT = 9;   // Action post-process aborted
+    ACTION_POSTPROCESS_END = 10;    // Action post-process ended
 }
 
-// Message that contains an action event
+// Notification about a single action event
 message ActionNotification {
     ActionEvent action_event = 1;                           // Action event type
     ActionHandle handle = 2;                                // Identifies the action for which this event occured
@@ -1042,22 +1127,22 @@ message ActionNotification {
     Kinova.Api.Common.Connection connection = 6;            // Connection that caused the action event
 }
 
-// Indicates the execution state of an action (future)
+// Indicates the execution state of an action (not implemented yet)
 message ActionExecutionState {
     ActionEvent action_event = 1;   // Action event type
     ActionHandle handle = 2;        // Identifies the action for which this event occured
 }
 
-// List of admissible robot events
+// Admissible robot events
 enum RobotEvent {
     UNSPECIFIED_ROBOT_EVENT = 0;    // Unspecified robot event
-    ARM_CONNECTED = 1;              // Arm is connected
-    ARM_DISCONNECTED = 2;           // Arm is disconnected
-    TOOL_CONNECTED = 5;             // Tool is connected to the end effector (future)
-    TOOL_DISCONNECTED = 6;          // Tool is disconnected from end effector (future)
+    ARM_CONNECTED = 1;              // Robot arm is connected
+    ARM_DISCONNECTED = 2;           // Robot arm is disconnected
+    TOOL_CONNECTED = 5;             // Tool is connected to the interface module (not implemented yet)
+    TOOL_DISCONNECTED = 6;          // Tool is disconnected from the interface module (not implemented yet)
 }
 
-// Message that contains a robot event
+// Notification about a single robot event
 message RobotEventNotification {
     RobotEvent event = 1;                                   // Robot event type
     Kinova.Api.Common.DeviceHandle handle = 2;              // Identifier of the hardware device connected or disconnected
@@ -1066,21 +1151,21 @@ message RobotEventNotification {
     Kinova.Api.Common.Connection connection = 6;            // Connection that caused the robot event to occur
 }
 
-// List of admissible backup events (future)
+// Admissible backup events (not implemented yet)
 enum BackupEvent {
     UNSPECIFIED_BACKUP_EVENT = 0;   // Unspecified backup event
     BACKUP_RESTORED = 1;            // Configuration backup restored
     BACKUP_UPLOADED = 2;            // Configuration backup uploaded on robot
 }
 
-// List of admissible factory events
+// Admissible factory events
 enum FactoryEvent {
     UNSPECIFIED_FACTORY_EVENT = 0;          // Unspecified factory event
     FACTORY_DEFAULT_RESTORED = 1;           // Factory defaults restored on robot
-    NETWORK_FACTORY_DEFAULT_RESTORED = 2;   // Network factory defaults restored on robot (future)
+    NETWORK_FACTORY_DEFAULT_RESTORED = 2;   // Network factory defaults restored on robot (not implemented yet)
 }
 
-// Message that contains a factory event
+// Notification about a single factory event
 message FactoryNotification {
     FactoryEvent event = 1;                                 // Event type
     Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
@@ -1088,7 +1173,7 @@ message FactoryNotification {
     Kinova.Api.Common.Connection connection = 4;            // Connection that caused the factory event to occur
 }
 
-// List of admissible network events
+// Admissible network events
 enum NetworkEvent {
     UNSPECIFIED_NETWORK_EVENT = 0;          // Unspecified network event
     WIFI_CONNECTED = 1;                     // Wi-Fi connected
@@ -1103,7 +1188,7 @@ enum NetworkEvent {
     WIFI_AUTH_FAILED = 10;                  // Wi-Fi authentication failure
 }
 
-// Message that contains a network event
+// Notification about a single network event
 message NetworkNotification {
     NetworkEvent event = 1;                                 // Event type
     Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
@@ -1126,7 +1211,7 @@ message ControlModeNotificationList {
     repeated ControlModeNotification notifications = 1;         // Notification
 }
 
-// Array of Operating mode notifications
+// Array of operating mode notifications
 message OperatingModeNotificationList {
     repeated OperatingModeNotification notifications = 1;       // Notification
 }
@@ -1176,20 +1261,20 @@ message NetworkNotificationList {
     repeated NetworkNotification notifications = 1;             // Notification
 }
 
-// Identifies a Mapping
+// Reference to a specific Mapping
 message MappingHandle {
     uint32 identifier = 1;  // Mapping identifier
     fixed32 permission = 2; // Permission of specified mapping entity. Must use 'Kinova.Api.Common.Permission' enum.
 }
 
-// List of admissible controller input types
+// Admissible controller input types
 enum ControllerInputType {
     UNSPECIFIED_CONTROLLER_INPUT_TYPE = 0;  // Unspecified controller input type
     ANALOG = 1;                             // Analog controller input type
     DIGITAL = 2;                            // Digital controller input type
 }
 
-// List of admissible controller input behaviors
+// Admissible controller input behaviors
 enum ControllerBehavior {
     UNSPECIFIED_CONTROLLER_BEHAVIOR = 0;    // Unspecified controller behavior
     CONTROLLER_BUTTON_DOWN = 1;             // Pushing button down
@@ -1199,55 +1284,55 @@ enum ControllerBehavior {
     CONTROLLER_BUTTON_CLICK = 5;            // Button down and up within X msec
 }
 
-// Identifies a Safety event (future)
+// A safety event (not implemented yet)
 message SafetyEvent {
     Kinova.Api.Common.SafetyHandle safety_handle = 1;   // Safety that caused the event to occur
 }
 
-// Identifies a controller event
+// A controller event
 message ControllerEvent {
     ControllerInputType input_type = 1; // Type of controller input that caused the event_identifier
     ControllerBehavior behavior = 2;    // Controller behavior that occured
     uint32 input_identifier = 3;        // Controller input that caused the event
 }
 
-// Identifies a GPIO event (future)
+// A GPIO event (not implemented yet)
 message GpioEvent {
     GpioState gpio_state = 1;       // New GPIO state
     uint32 device_identifier = 2;   // GPIO device identifier for which this event occured
 }
 
-// Defines a map event
+// A map event
 message MapEvent {
     oneof events {
-        SafetyEvent safety_event = 1;           // Mapped safety event (future)
-        GpioEvent gpio_event = 2;               // Mapped GPIO event (future)
+        SafetyEvent safety_event = 1;           // Mapped safety event (not implemented yet)
+        GpioEvent gpio_event = 2;               // Mapped GPIO event (not implemented yet)
         ControllerEvent controller_event = 3;   // Mapped controller event
     }
     string name = 4;                            // Map event friendly name
 }
 
-// Associates a map event to map action
+// Associates an event to an action
 message MapElement {
     MapEvent event = 1; // Map event that occured
     Action action = 2;  // Action to invoke upon event occurence
 }
 
-// Specifies a new active map for the specified mapping and map group
+// Reference to a specific new active map for the specified mapping and map group
 message ActivateMapHandle {
     MappingHandle mapping_handle = 1;       // Mapping that the active map is asked for
-    MapGroupHandle map_group_handle = 2;    // Map group that the active map is asked for (future)
+    MapGroupHandle map_group_handle = 2;    // Map group that the active map is asked for (not implemented yet)
     MapHandle map_handle = 3;               // New active map
 }
 
-// Defines a map as an array of map elements
+// A map as an array of map elements
 message Map {
     MapHandle handle = 1;               // Map handle (do not set on createMap() call)
     string name = 2;                    // Map friendly name
     repeated MapElement elements = 3;   // Array of map elements
 }
 
-// Identifies a map
+// Reference to a specific map
 message MapHandle {
     uint32 identifier = 1;  // Identifier
     fixed32 permission = 2; // Permission of specified map entity. Must use 'Kinova.Api.Common.Permission' enum.
@@ -1258,15 +1343,15 @@ message MapList {
     repeated Map map_list = 1;  // map
 }
 
-// Identifies a map group (future)
+// Reference to a specific map group (not implemented yet)
 message MapGroupHandle {
     uint32 identifier = 1;  // Identifier
     fixed32 permission = 2; // Permission of specified map group entity. Must use 'Kinova.Api.Common.Permission' enum.
 }
 
 /*
- * Message that contains all information about a map group including the list of maps that it contains and its
- * relationship versus other map groups (future)
+ * All information about a map group including the list of maps that it contains and its
+ * relationship versus other map groups (not implemented yet)
  */
 message MapGroup {
     MapGroupHandle group_handle = 1;                        // Map group handle (do not set on createMapGroup() call)
@@ -1278,13 +1363,13 @@ message MapGroup {
     string application_data = 7;                            // Application data (reserved for use by Web App)
 }
 
-// Array of map groups (future)
+// Array of map groups (not implemented yet)
 message MapGroupList {
     repeated MapGroup map_groups = 1;   // Map group
 }
 
 /*
- * Message that contains all information about a mapping including the controller to which it is associated,
+ * All information about a mapping including the controller to which it is associated,
  * the array of map groups it contains, the currently active map group, the array of maps it contains
  * and the currently active map
  */
@@ -1292,8 +1377,8 @@ message Mapping {
     MappingHandle handle = 1;                       // Mapping handle (do not set on createMapping() call)
     string name = 2;                                // Mapping friendly name
     uint32 controller_identifier = 3;               // Associated controller identifier
-    MapGroupHandle active_map_group_handle = 4;     // Currently active map group (future)
-    repeated MapGroupHandle map_group_handles = 5;  // Array of associated map groups (future)
+    MapGroupHandle active_map_group_handle = 4;     // Currently active map group (not implemented yet)
+    repeated MapGroupHandle map_group_handles = 5;  // Array of associated map groups (not implemented yet)
     MapHandle active_map_handle = 6;                // Currently active map
     repeated MapHandle map_handles = 7;             // Array of associated maps
     string application_data = 8;                    // Application data (reserved for use by Web App)
@@ -1305,43 +1390,45 @@ message MappingList {
 }
 
 /*
- * List of admissible Base safeties.
+ * Admissible Base safeties.
  * Used with BaseCyclic.BaseFeedback.[fault_bank_a | fault_bank_b | warning_bank_a | warning_bank_b]
  */
 enum SafetyIdentifier {
     UNSPECIFIED_BASE_SAFETY_IDENTIFIER              = 0;         // 0x0 - Unspecified base safety
     FIRMWARE_UPDATE_FAILURE                         = 1;         // 0x1 - Firmware update failure
-    EXTERNAL_COMMUNICATION_ERROR                    = 2;         // 0x2 - External communication error (future)
+    EXTERNAL_COMMUNICATION_ERROR                    = 2;         // 0x2 - External communication error (not implemented yet)
     MAXIMUM_AMBIENT_TEMPERATURE                     = 4;         // 0x4 - Maximum ambient temperature reached
     MAXIMUM_CORE_TEMPERATURE                        = 8;         // 0x8 - Maximum core temperature reached
     JOINT_FAULT                                     = 16;        // 0x10 - Joint fault
-    CYCLIC_DATA_JITTER                              = 32;        // 0x20 - Cyclic data jitter (future)
-    REACHED_MAXIMUM_EVENT_LOGS                      = 64;        // 0x40 - Reached Maximum number of event log entries (future)
-    NO_KINEMATICS_SUPPORT                           = 128;       // 0x80 - No kinematics support (future)
+    CYCLIC_DATA_JITTER                              = 32;        // 0x20 - Cyclic data jitter (not implemented yet)
+    REACHED_MAXIMUM_EVENT_LOGS                      = 64;        // 0x40 - Reached Maximum number of event log entries (not implemented yet)
+    NO_KINEMATICS_SUPPORT                           = 128;       // 0x80 - No kinematics support (not implemented yet)
     ABOVE_MAXIMUM_DOF                               = 256;       // 0x100 - Above maximum DoF
-    NETWORK_ERROR                                   = 512;       // 0x200 - Network error (future)
+    NETWORK_ERROR                                   = 512;       // 0x200 - Network error (not implemented yet)
     UNABLE_TO_REACH_POSE                            = 1024;      // 0x400 - Unable to reach pose
     JOINT_DETECTION_ERROR                           = 2048;      // 0x800 - Joint detection error
     NETWORK_INITIALIZATION_ERROR                    = 4096;      // 0x1000 - Network initialization error
     MAXIMUM_CURRENT                                 = 8192;      // 0x2000 - Maximum current reached
     MAXIMUM_VOLTAGE                                 = 16384;     // 0x4000 - Maximum voltage reached
     MINIMUM_VOLTAGE                                 = 32768;     // 0x8000 - Minimum voltage reached
-    MAXIMUM_END_EFFECTOR_TRANSLATION_VELOCITY       = 65536;     // 0x10000 - Maximum end effector translation velocity reached (future)
-    MAXIMUM_END_EFFECTOR_ORIENTATION_VELOCITY       = 131072;    // 0x20000 - Maximum end effector orientation velocity reached (future)
-    MAXIMUM_END_EFFECTOR_TRANSLATION_ACCELERATION   = 262144;    // 0x40000 - Maximum end effector translation acceleration reached (future)
-    MAXIMUM_END_EFFECTOR_ORIENTATION_ACCELERATION   = 524288;    // 0x80000 - Maximum end effector orientation acceleration reached (future)
-    MAXIMUM_END_EFFECTOR_TRANSLATION_FORCE          = 1048576;   // 0x100000 - Maximum end effector translation force reached (future)
-    MAXIMUM_END_EFFECTOR_ORIENTATION_FORCE          = 2097152;   // 0x200000 - Maximum end effector orientation force reached (future)
-    MAXIMUM_END_EFFECTOR_PAYLOAD                    = 4194304;   // 0x400000 - Maximum end effector payload reached (future)
+    MAXIMUM_END_EFFECTOR_TRANSLATION_VELOCITY       = 65536;     // 0x10000 - Maximum tool translation velocity reached (not implemented yet)
+    MAXIMUM_END_EFFECTOR_ORIENTATION_VELOCITY       = 131072;    // 0x20000 - Maximum tool orientation velocity reached (not implemented yet)
+    MAXIMUM_END_EFFECTOR_TRANSLATION_ACCELERATION   = 262144;    // 0x40000 - Maximum tool translation acceleration reached (not implemented yet)
+    MAXIMUM_END_EFFECTOR_ORIENTATION_ACCELERATION   = 524288;    // 0x80000 - Maximum tool orientation acceleration reached (not implemented yet)
+    MAXIMUM_END_EFFECTOR_TRANSLATION_FORCE          = 1048576;   // 0x100000 - Maximum tool translation force reached (not implemented yet)
+    MAXIMUM_END_EFFECTOR_ORIENTATION_FORCE          = 2097152;   // 0x200000 - Maximum tool orientation force reached (not implemented yet)
+    MAXIMUM_END_EFFECTOR_PAYLOAD                    = 4194304;   // 0x400000 - Maximum tool payload reached (not implemented yet)
     EMERGENCY_STOP_ACTIVATED                        = 8388608;   // 0x800000 - Emergency stop activated
     EMERGENCY_LINE_ACTIVATED                        = 16777216;  // 0x1000000 - Emergency line activated
     INRUSH_CURRENT_LIMITER_FAULT                    = 33554432;  // 0x2000000 - In rush current limiter fault
-    NVRAM_CORRUPTED                                 = 67108864;  // 0x4000000 - NVRAM corrupted (future)
+    NVRAM_CORRUPTED                                 = 67108864;  // 0x4000000 - NVRAM corrupted (not implemented yet)
     INCOMPATIBLE_FIRMWARE_VERSION                   = 134217728; // 0x8000000 - Incompatible firmware version
     POWERON_SELF_TEST_FAILURE                       = 268435456; // 0x10000000 - Power on seflt test failure
+    DISCRETE_INPUT_STUCK_ACTIVE                     = 536870912; // 0x20000000 - Discrete Input stuck active
+    ARM_INTO_ILLEGAL_POSITION                       = 1073741824;// 0x40000000 - Arm is in an illegal position (sigularity)
 }
 
-// Defines a transformation matrix
+// A 4x4 homogeneous transformation matrix representing the transformation between two reference frames.
 message TransformationMatrix {
     TransformationRow r0 = 1;   // First transformation row
     TransformationRow r1 = 2;   // Second transformation row
@@ -1349,7 +1436,7 @@ message TransformationMatrix {
     TransformationRow r3 = 4;   // Fourth transformation row
 }
 
-// Defines a transformation matrix row
+// A single row of a 4x4 homogeneous transformation matrix 
 message TransformationRow {
     float c0 = 1;   // First column value
     float c1 = 2;   // Second column value
@@ -1357,7 +1444,11 @@ message TransformationRow {
     float c3 = 4;   // Fourth column value
 }
 
-// Defines a Cartesian pose
+/*
+ * A Cartesian tool pose (position and orientation). 
+ * Orientation is defined as a sequence of three Euler angles using z-y-x Tait-Bryan extrinsic convention.
+ * That is, rotation around fixed X-axis, then rotation around fixed Y-axis, then rotation around fixed Z-axis.
+ */
 message Pose {
     float x = 1;        // X position (in meters)
     float y = 2;        // Y position (in meters)
@@ -1366,71 +1457,83 @@ message Pose {
     float theta_y = 5;  // Theta Y orienation (in degrees)
     float theta_z = 6;  // Theta Z orientation (in degrees)
 }
-// Defines a Cartesian position
+// A Cartesian tool position
 message Position {
     float x = 1;    // X position (in meters)
     float y = 2;    // Y position (in meters)
     float z = 3;    // Z position (in meters)
 }
 
-// Defines a Cartesian orientation
+/*
+ * A Cartesian tool orientation. Defines orientation as sequence of three Euler angles using z-y-x Tait-Bryan extrinsic convention.
+ * That is, rotation around fixed X-axis, then rotation around fixed Y-axis, then rotation around fixed Z-axis.
+ */
 message Orientation {
     float theta_x = 1;  // Theta X orientation (in degrees)
     float theta_y = 2;  // Theta Y orientation (in degrees)
     float theta_z = 3;  // Theta Z orientation (in degrees)
 }
 
-// List of admissible constraint types that can be applied when controlling a joint in trajectory mode
+// Admissible constraint types that can be applied when controlling a joint in trajectory mode
 enum JointTrajectoryConstraintType {
     UNSPECIFIED_JOINT_CONSTRAINT = 0;   // Unspecified joint constraint
     JOINT_CONSTRAINT_DURATION = 1;      // Duration constraint (in second)
-    JOINT_CONSTRAINT_SPEED = 2;         // Speed constraint (in meters per second) (future)
+    JOINT_CONSTRAINT_SPEED = 2;         // Speed constraint (in meters per second) (not implemented yet)
 }
 
-// Defines a Cartesian speed
+// A Cartesian tool speed (translation speed and angular speed)
 message CartesianSpeed {
     float translation = 1; // Translation speed (in meters per second)
     float orientation = 2; // Orientation speed (in degrees per second)
 }
 
-// Defines a Cartesian trajectory constraint that can be applied when controlling in Cartesian trajectory mode
+// Cartesian trajectory constraint that can be applied when controlling in Cartesian trajectory mode
 message CartesianTrajectoryConstraint {
     oneof type {
         CartesianSpeed speed = 1;   // Speed constraint (in meters per second)
-        float duration = 2;         // Duration constraint (in meters per second) (future)
+        float duration = 2;         // Duration constraint (in meters per second) (not implemented yet)
     }
 }
 
-// Defines a joint trajectory constraint that can be applied when controlling a joint in trajectory mode
+// Joint trajectory constraint that can be applied when controlling a joint in trajectory mode
 message JointTrajectoryConstraint {
     JointTrajectoryConstraintType type = 1; // Joint trajectory constraint type
     float value = 2;                        // Constraint value (in seconds or in meters per second depending on constraint type)
 }
 
-// List of admissible twist (velocity) modes
-enum TwistMode {
-    UNSPECIFIED_TWIST_MODE = 0;     // Unspecified twist mode
-    TWIST_TOOL_JOYSTICK = 1;        // Twist tool joystick mode
-    TWIST_BASE_FRAME_JOYSTICK = 2;  // Twist base frame joystick mode
-    TWIST_CARTESIAN_JOYSTICK = 3;   // Twist Cartesian joystick mode
+// Admissible wrench (force) modes
+enum WrenchMode {
+    UNSPECIFIED_WRENCH_MODE = 0;    // Unspecified wrench mode
+    WRENCH_RESTRICTED = 1;          // Wrench restricted mode (tool motion is authorized only in the direction of the wrench command)
+    WRENCH_NORMAL = 2;              // Wrench normal mode (tool motion is authorized in any direction)
 }
 
-// Defines a twist (velocity)
+// A wrench (force and torque) 
+message Wrench {
+    float force_x = 1;      // Linear X force (Newtons or ratio between -1.0 and 1.0 if used with Joystick command)
+    float force_y = 2;      // Linear Y force (Newtons or ratio between -1.0 and 1.0 if used with Joystick command)
+    float force_z = 3;      // Linear Z force (Newtons or ratio between -1.0 and 1.0 if used with Joystick command)
+    float torque_x = 4;     // Angular X torque (Newton-meters or ratio between -1.0 and 1.0 if used with Joystick command)
+    float torque_y = 5;     // Angular Y torque (Newton-meters or ratio between -1.0 and 1.0 if used with Joystick command)
+    float torque_z = 6;     // Angular Z torque (Newton-meters or ratio between -1.0 and 1.0 if used with Joystick command)
+}
+
+// A twist (linear and angular velocity).  
 message Twist {
-    float linear_x = 1;     // Linear X velocity
-    float linear_y = 2;     // Linear Y velocity
-    float linear_z = 3;     // Linear Z velocity
-    float angular_x = 4;    // Angular X velocity
-    float angular_y = 5;    // Angular Y velocity
-    float angular_z = 6;    // Angular Z velocity
+    float linear_x = 1;     // Linear X velocity  (m/s or ratio between -1.0 and 1.0 if used with joystick command)
+    float linear_y = 2;     // Linear Y velocity  (m/s or ratio between -1.0 and 1.0 if used with joystick command)
+    float linear_z = 3;     // Linear Z velocity  (m/s or ratio between -1.0 and 1.0 if used with joystick command)
+    float angular_x = 4;    // Angular X velocity (deg/s or ratio between -1.0 and 1.0 if used with joystick command)
+    float angular_y = 5;    // Angular Y velocity (deg/s or ratio between -1.0 and 1.0 if used with joystick command)
+    float angular_z = 6;    // Angular Z velocity (deg/s or ratio between -1.0 and 1.0 if used with joystick command)
 }
 
-// Defines the admittance mode
+// An admittance mode
 message Admittance {
     AdmittanceMode admittance_mode = 1; // mode
 }
 
-// List of admissible admittance modes
+// Admissible admittance modes
 enum AdmittanceMode {
     UNSPECIFIED_ADMITTANCE_MODE = 0;    // Unspecified admittance mode
     CARTESIAN = 1;                      // Cartesian admittance mode
@@ -1439,147 +1542,156 @@ enum AdmittanceMode {
     DISABLED = 4;                       // No admittance
 }
 
-// Defines a Cartesian reference frame
-message CartesianReferenceFrameRequest {
-    CartesianReferenceFrame reference_frame = 1;    // Reference frame
-}
-
-//  List of admissible Cartesian reference frame modes
-enum CartesianReferenceFrame {
-    UNSPECIFIED_CARTESIAN_REFERENCE_FRAME = 0;  // Unspecified Cartesian reference frame
-    MIXED = 1;                                  // Mixed reference frame where translation reference = base and  orientation reference = tool
-    TOOL = 2;                                   // Tool reference frame where translation reference = tool and orientation reference = tool
-}
-
-// Defines a Cartesian pose with constraint
+// Cartesian tool pose with specified constraint
 message ConstrainedPose {
     Pose target_pose = 1;                           // Cartesian pose
     CartesianTrajectoryConstraint constraint = 2;   // Constraint to apply to the target pose
 }
 
-// Defines a Cartesian position with constraint
+// Cartesian tool position with specified constraint
 message ConstrainedPosition {
     Position target_position = 1;                   // Cartesian position
     CartesianTrajectoryConstraint constraint = 2;   // Constraint to apply to the target position
 }
 
-// Defines a Cartesian orientation with constraint
+// Cartesian tool orientation with specified constraint
 message ConstrainedOrientation {
     Orientation target_orientation = 1;             // Cartesian orientation
     CartesianTrajectoryConstraint constraint = 2;   // Constraint to apply to the target orientation
 }
 
-// Defines a twist (velocity) command
-message TwistCommand {
-    TwistMode mode = 1;     // Mode in which the command is executed
-    Twist twist = 2;        // Twist value
-    uint32 duration = 3;    // Duration constrant. If not 0, allows to set a limit (in seconds) to the TwistCommand (future)
+// A wrench command to be applied to the tool
+message WrenchCommand {
+    Kinova.Api.Common.CartesianReferenceFrame reference_frame = 1;  // The reference frame used for the wrench command
+    WrenchMode mode = 2;                                            // Mode in which the command is executed
+    Wrench wrench = 3;                                              // Wrench value
+    uint32 duration = 4;                                            // Duration constraint. If not 0, allows to set a limit (in milliseconds) to the WrenchCommand
 }
 
-// Defines a series of joint angles value with constraint
+// A twist command to be applied to the tool
+message TwistCommand {
+    Kinova.Api.Common.CartesianReferenceFrame reference_frame = 1;      // The reference frame used for the twist command
+    Twist twist = 2;                                                    // Twist value
+    uint32 duration = 3;                                                // Duration constrant. If not 0, allows to set a limit (in milliseconds) to the TwistCommand (not implemented yet)
+}
+
+// An array of joint angles values with specified constraint
 message ConstrainedJointAngles {
-    JointAngles joint_angles = 1;               // Joint angles value
+    JointAngles joint_angles = 1;               // Joint angles values
     JointTrajectoryConstraint constraint = 2;   // Constraint to apply to all the joint angles (optional)
 }
 
-// Defines a single joint angle value with constraint
+// A single joint angle value with specifed constraint
 message ConstrainedJointAngle {
     uint32 joint_identifier = 1;                // Joint identifier (use device_identifier)
     float value = 2;                            // Joint value (in degrees)
     JointTrajectoryConstraint constraint = 3;   // Constraint to apply to the joint angle (optional)
 }
 
-// Position of a series of joints
+// An array of joint angles
 message JointAngles {
-    repeated JointAngle joint_angles = 1; // Array of joint angle
+    repeated JointAngle joint_angles = 1; // Array of joint angles
 }
 
-// Position of a specific joint
+// Angle value of a specific joint
 message JointAngle {
     uint32 joint_identifier = 1;    // Joint identifier
     float value = 2;                // Position (in degrees)
 }
 
-// Defines a series of joint speeds
+// An array of joints speeds
 message JointSpeeds {
-    repeated JointSpeed joint_speeds = 1;   // Array of joint speed
-    uint32 duration = 2;                    // Duration constraint. If not 0, allows to set a limit (in seconds) common to every joint specified in 'joint_speeds' (future)
+    repeated JointSpeed joint_speeds = 1;   // Array of joint speeds
+    uint32 duration = 2;                    // Duration constraint. If not 0, allows to set a limit (in seconds) common to every joint specified in 'joint_speeds' (not implemented yet)
 }
 
-// Defines the speed of a specific joint
+// Speed of a specific joint
 message JointSpeed {
     uint32 joint_identifier = 1;    // Joint identifier
     float value = 2;                // Joint speed (in degrees per second)
-    uint32 duration = 3;            // Duration constraint. If not 0, allows to set a limit (in seconds) to the JointsSpeed (future)
+    uint32 duration = 3;            // Duration constraint. If not 0, allows to set a limit (in seconds) to the JointsSpeed (not implemented yet)
 }
 
-// List of admissible gripper control mode
+// An array of joint torques 
+message JointTorques {
+    repeated JointTorque joint_torques = 1; // Array of joint torque.
+    uint32 duration = 2;                    // Duration constraint. If not 0, allows to set a limit (in seconds) common to every joint specified in 'joint_torques' (not implemented yet)
+}
+
+// joint torque for a specified joint
+message JointTorque {
+    uint32 joint_identifier = 1;    // Joint identifier
+    float value = 2;                // Joint speed (in Newton*meters)
+    uint32 duration = 3;            // Duration constraint. If not 0, allows to set a limit (in seconds) to the JointTorque (not implemented yet)
+}
+
+// Admissible gripper control mode
 enum GripperMode {
     UNSPECIFIED_GRIPPER_MODE = 0;   // Unspecified gripper mode
-    GRIPPER_FORCE = 1;              // Force control (in Newton) (future)
-    GRIPPER_SPEED = 2;              // Speed control (in meters per second) (future)
-    GRIPPER_POSITION = 3; // position control (in meters)
+    GRIPPER_FORCE = 1;              // Force control (in Newton) (not implemented yet)
+    GRIPPER_SPEED = 2;              // Speed control (in meters per second)
+    GRIPPER_POSITION = 3;           // Position control (in meters)
 }
 
-// Defines a command to control the gripper movement
+// A command to control the gripper movement
 message GripperCommand {
     GripperMode mode = 1;   // Mode in which to control the gripper
     /*
-     * In position, admissible values for each finger is between 0 and 1.0, where 0 is closed and 1.0 is fully open.
-     * In speed or torque, admissible values for each finger is between -1.0 and 1.0, where 1.0 corresponds
+     * In position, admissible values for each finger is between 0 and 1.0, where 0 is fully open and 1.0 is fully closed.
+     * In speed, admissible values for each finger is between -1.0 and 1.0, where 1.0 corresponds
      * to maximum opening speed and -1.0 corresponds to maximum closing speed.
      */
     Gripper gripper = 2;    // Gripper movement values
     uint32 duration = 3;    // Duration constraint. If not 0, allows to set a limit (in seconds) to the GripperCommand
 }
 
-// Message used to request the current gripper movement in either position, force or speed
+// Request to apply a specific gripper mode
 message GripperRequest {
     GripperMode mode = 1;   // Mode for which the gripper movement status is requested
 }
 
-// Defines a gripper movement, which is composed of a series of fingers movement
+// Gripper movement composed of a series of fingers movement
 message Gripper {
     repeated Finger finger = 1; // Finger movements
 }
 
-// Defines a finger movement
+// Movement of a specified gripper finger 
 message Finger {
     uint32 finger_identifier = 1;   // Finger identifier
 
     /*
-     * In position, admissible values for each finger is between 0 and 1.0, where 0 is closed and 1.0 is fully open.
+     * In position, admissible values for each finger is between 0 and 1.0, where 0 is fully open and 1.0 is fully closed.
      * In speed or torque, admissible values for each finger is between -1.0 and 1.0, where 1.0 corresponds
-     * to maximum opening speed and -1.0 corresponds to maximum closing speed.
+     * to maximum opening speed or torque and -1.0 corresponds to maximum closing speed or torque.
      */
     float value = 2;
 }
 
 
-// List of admissible map navigation directions
+// Admissible map navigation directions
 enum NavigationDirection {
     UNSPECIFIED_NAVIGATION_DIRECTION = 0;   // Unspecified navigation direction
     NEXT = 1;                               // Go to next map
-    UP = 2;                                 // Go to parent map group (future)
-    DOWN = 3;                               // Go to children map group (future)
+    UP = 2;                                 // Go to parent map group (not implemented yet)
+    DOWN = 3;                               // Go to children map group (not implemented yet)
     PREVIOUS = 4;                           // Go to previous map
 }
 
-// List of admissible joint navigation directions
+// Admissible joint navigation directions
 enum JointNavigationDirection {
     UNSPECIFIED_JOINT_NAVIGATION_DIRECTION = 0; // Unspecified joint navigation direction
     JOINT_NEXT = 1;                             // Go to next joint
     JOINT_PREVIOUS = 2;                         // Go to previous joint
 }
 
-// List of admissible sound types (future)
+// Admissible sound types (not implemented yet)
 enum SoundType {
     UNSPECIFIED_SOUND_TYPE = 0; // Unspecified sound types
     BIP_SERIES = 1;             // Bip series sound type
     SINGLE_BIP = 2;             // Single bin sound type
 }
 
-// List of admissible LED states (future)
+// Admissible LED states (not implemented yet)
 enum LedState {
     UNSPECIFIED_LED_STATE = 0;  // Unspecified LED state
     LED_OFF = 1;                // LED is off
@@ -1587,7 +1699,7 @@ enum LedState {
     LED_ON = 3;                 // LED is one
 }
 
-// List of admissible GPIO states (future)
+// Admissible GPIO states (not implemented yet)
 enum GpioState {
     UNSPECIFIED_GPIO_STATE = 0; // Unspecified GPIO state
     GPIO_OFF = 1;               // GPIO is off
@@ -1595,7 +1707,7 @@ enum GpioState {
     GPIO_ON = 3;                // GPIO is on
 }
 
-// Identifies the system time (future)
+// Identifies the system time (not implemented yet)
 message SystemTime {
     uint32 sec = 1;     // Seconds after the minute(0-59)
     uint32 min = 2;     // Minutes after the hour (0-59)
@@ -1605,7 +1717,7 @@ message SystemTime {
     uint32 year = 6;    // Years since 1900
 }
 
-// List of admissible XBOX360 digital inputs
+// Admissible XBOX360 digital inputs
 enum Xbox360DigitalInputIdentifier {
     UNSPECIFIED_XBOX360_DIGITAL = 0;    // Unspecified  digital input
     XBOX360_PAD_UP = 1;                 // Pad up input
@@ -1624,7 +1736,7 @@ enum Xbox360DigitalInputIdentifier {
     XBOX360_BUTTON_Y = 16;              // Button Y input
 }
 
-// List of admissible XBOX360 analog inputs
+// Admissible XBOX360 analog inputs
 enum Xbox360AnalogInputIdentifier {
     UNSPECIFIED_XBOX360_ANALOG = 0; // Unspecified analog input
     XBOX360_THUMB_LEFT_X = 1;       // Thumb left X input
@@ -1636,142 +1748,169 @@ enum Xbox360AnalogInputIdentifier {
 }
 
 
-// Provides information about actuators
+// A count of the number of actuators in the robot
 message ActuatorInformation {
     uint32 count = 1;   // Number of actuators
 }
 
-// Provides information about the arm state
+// Information about the arm state
 message ArmStateInformation {
     Kinova.Api.Common.ArmState active_state = 1; // Arm active state
     Kinova.Api.Common.Connection connection = 2; // Connection information of the last processed command which triggered an arm state change
 }
 
-// Message that contains a arm state event
+// Notification about a single arm state event
 message ArmStateNotification {
     Kinova.Api.Common.ArmState active_state = 1;    // New arm state
     Kinova.Api.Common.Timestamp timestamp = 2;      // Event timestamp
     Kinova.Api.Common.Connection connection = 3;    // Connection that caused the arm state event
 }
 
-// Country code
-message CountryCode {
-    CountryCodeIdentifier identifier = 1; // ISO3166 country code identifier
+// Admissible capacitive sensor modes
+enum CapSenseMode
+{
+    RESERVED                    = 0; // Reserved, do not use
+    INACTIVE                    = 1; // Cap sensor is inactive
+    ACTIVE_AUTO_THRESHOLD       = 2; // Cap sensor is active in automatic threshold mode
+    ACTIVE_NOISE_ATT            = 4; // Cap sensor is active with noise mitigation enabled
+    ACTIVE_NORMAL               = 5; // Cap sensor is active in normal mode
+    CONFIGURATION               = 6; // Configuration mode
 }
 
-// List of supported ISO3166 country identifiers
-enum CountryCodeIdentifier {
-    UNSPECIFIED_COUNTRY_CODE = 0;
-    UNITED_ARAB_EMIRATES_AE = 1;
-    ANTIGUA_AND_BARBUDA_AG = 2;
-    ANGUILLA_AI = 3;
-    ALBANIA_AL = 4;
-    AMERICAN_SAMOA_AS = 5;
-    AUSTRIA_AT = 6;
-    AUSTRALIA_AU = 7;
-    ARUBA_AW = 8;
-    AZERBAIJAN_AZ =  9;
-    BOSNIA_AND_HERZEGOVINA_BA = 10;
-    BANGLADESH_BD = 11;
-    BELGIUM_BE = 12;
-    BULGARIA_BG = 13;
-    BAHRAIN_BH = 14;
-    BERMUDA_BM = 15;
-    BRUNEI_DARUSSALAM_BN = 16;
-    BRAZIL_BR = 17;
-    BAHAMAS_BS = 18;
-    BELARUS_BY = 19;
-    SWITZERLAND_CH = 20;
-    CANADA_CA = 21;
-    CHINA_CN = 22;
-    COLOMBIA_CO = 23;
-    COSTA_RICA_CR = 24;
-    CYPRUS_CY = 25;
-    CZECH_REPUBLIC_CZ = 26;
-    GERMANY_DE = 27;
-    DENMARK_DK = 28;
-    ECUADOR_EC = 29;
-    ESTONIA_EE = 30;
-    EGYPT_EG = 31;
-    SPAIN_ES = 32;
-    ETHIOPIA_ET = 33;
-    FINLAND_FI = 34;
-    FRANCE_FR = 35;
-    UNITED_KINGDOM_GB = 36;
-    GRENADA_GD = 37;
-    FRENCH_GUIANA_GF = 38;
-    GUADELOUPE_GP = 39;
-    GREECE_GR = 40;
-    GUATEMALA_GT = 41;
-    GUAM_GU = 42;
-    HONG_KONG_HK = 43;
-    CROATIA_HR = 44;
-    HUNGARY_HU = 45;
-    INDIA_IN = 46;
-    INDONESIA_ID = 47;
-    IRELAND_IE = 48;
-    ISRAEL_IL = 49;
-    ICELAND_IS = 50;
-    ITALY_IT = 51;
-    JORDAN_JO = 52;
-    JAPAN_JP = 53;
-    CAMBODIA_KH = 54;
-    REPUBLIC_OF_KOREA_KR = 55;
-    KUWAIT_KW = 56;
-    CAYMAN_ISLANDS_KY = 57;
-    LAO_PDR_LA = 58;
-    LEBANON_LB = 59;
-    LIECHTENSTEIN_LI = 60;
-    SRI_LANKA_LK = 61;
-    LESOTHO_LS = 62;
-    LITHUANIA_LT = 63;
-    LUXEMBOURG_LU = 64;
-    LATVIA_LV = 65;
-    MOROCCO_MA = 66;
-    MONACO_MC = 67;
-    MOLDOVA_MD = 68;
-    MONTENEGRO_ME = 69;
-    REPUBLIC_OF_MACEDONIA_MK = 70;
-    MONGOLIA_MN = 71;
-    MARTINIQUE_MQ = 72;
-    MAURITANIA_MR = 73;
-    MALTA_MT = 74;
-    MAURITIUS_MU = 75;
-    MALDIVES_MV = 76;
-    MALAWI_MW = 77;
-    MEXICO_MX = 78;
-    MALAYSIA_MY = 79;
-    NICARAGUA_NI = 80;
-    NETHERLANDS_NL = 81;
-    NORWAY_NO = 82;
-    NEW_ZEALAND_NZ = 83;
-    OMAN_OM = 84;
-    PANAMA_PA = 85;
-    PERU_PE = 86;
-    PHILIPPINES_PH = 87;
-    POLAND_PL = 88;
-    PUERTO_RICO_PR = 89;
-    PORTUGAL_PT = 90;
-    PARAGUAY_PY = 91;
-    REUNION_RE = 92;
-    ROMANIA_RO = 93;
-    SERBIA_RS = 94;
-    RUSSIAN_FEDERATION_RU = 95;
-    SWEDEN_SE = 96;
-    SINGAPORE_SI = 97;
-    SLOVAKIA_SK = 98;
-    EL_SALVADOR_SV = 99;
-    THAILAND_TH = 100;
-    TUNISIA_TN = 101;
-    TURKEY_TR = 102;
-    TRINIDAD_AND_TOBAGO_TT = 103;
-    TAIWAN_PROVINCE_OF_CHINA_TW = 104;
-    UKRAINE_UA = 105;
-    UNITED_STATES_US = 106;
-    HOLY_SEE_VATICAN_CITY_STATE_VA = 107;
-    BOLIVARIAN_REPUBLIC_OF_VENEZUELA_VE = 108;
-    BRITISH_VIRGIN_ISLANDS_VG = 109;
-    VIETNAM_VN = 110;
-    MAYOTTE_YT = 111;
-    SOUTH_AFRICA_ZA = 112;
+// Capacitive sensor configuration information
+message CapSenseConfig
+{
+    uint32              identifier      = 1; // MessageId
+    CapSenseMode        mode            = 2; // Operational mode of the sensor
+    float               threshold_a     = 3; // Threshold of the sensor A (successive detection count to trigger a change of state)
+    float               threshold_b     = 4; // Threshold of the sensor B (successive detection count to trigger a change of state)
+    float               sensitivity_a   = 5; // Sensitivity of the sensor A (picofarad)
+    float               sensitivity_b   = 6; // Sensitivity of the sensor B (picofarad)
+}
+
+// An array of configuration information for different bridges.
+message BridgeList {
+    repeated BridgeConfig bridgeConfig = 1; // List of bridge configuration.
+}
+
+// The result of an operation on a specific bridge
+message BridgeResult
+{
+    BridgeIdentifier bridge_id = 1; // ID of the bridge on which operation was performed
+    BridgeStatus status = 2;        // Result code of operation.
+}
+
+// Bridge identifier
+message BridgeIdentifier {
+    uint32 bridge_id = 1;   // Unique bridge identifier.
+}
+
+// Bridge configuration information. It is used to either create a bridge or to retrieve information about an existing bridge
+message BridgeConfig {
+    uint32 device_identifier = 1;       // Identifier of the device to which the bridge is connecting.
+    BridgeType bridgetype = 2;          // Bridge type.
+    BridgePortConfig port_config = 3;   // Port configuration. If used to enable port bridging, it is optional. If no port config is given defaults for bridge type is used.
+    BridgeIdentifier bridge_id = 4;     // Bridge identifier. Not used when creating bridge. It is used when retrieving configuration.
+}
+
+// Port configuration information for a TCP port bridge
+message BridgePortConfig
+{
+    uint32 target_port  = 1; // Port on target device.
+    uint32 out_port     = 2; // Port exposed on base's external interface
+}
+
+// Bridge operation status
+enum BridgeStatus {
+    BRIDGE_STATUS_OK                    = 0;    // No error encountered.
+    BRIDGE_STATUS_OUTP_UNAVAILABLE      = 1;    // Requested output port unavailable.
+    BRIDGE_STATUS_UNKNOWN_DEVID         = 2;    // Given device identifier is unknown (no device associated with it).
+    BRIDGE_STATUS_UNKNOWN_BRIDGE_TYPE   = 3;    // Unknown bridge type used.
+    BRIDGE_STATUS_NOT_FOUND             = 4;    // Requested bridge not found.
+    BRIDGE_STATUS_NOT_INITIALIZED       = 5;    // Bridge manager not initialized.
+    BRIDGE_STATUS_UNKNOWN               = 6;    // Unknown error.
+}
+
+// Type of port forward bridge to create
+enum BridgeType {
+    BRIDGE_TYPE_UNSPECIFIED = 0; // Unspecified Type (custom bridge)
+    BRIDGE_TYPE_UART        = 1; // Bridge to uart bridge TCP port.
+    BRIDGE_TYPE_TELNET      = 2; // Bridge to telnet port
+}
+
+// Pre-computed joint trajectory subject to specified continuity constraints. The starting point of the trajectory must have an elapsed time of 0 ms and the angular values must reflect the current state of the robot. The robot control libraries will validate the trajectory fulfills the specified continuity constraints before playing the trajectory.
+message PreComputedJointTrajectory {
+    TrajectoryContinuityMode mode                                   = 1;    // Trajectory continuity mode
+    repeated PreComputedJointTrajectoryElement trajectory_elements  = 2;    // List of pre-computed elements composing the trajectory.
+}
+
+// Set of angle, speed, acceleration, and elapsed time values for each joint for a given 1 ms interval. A PreComputedJointTrajectory is made up of a series of these elements.
+message PreComputedJointTrajectoryElement {
+    repeated float joint_angles          = 1;    // Angles values for all joints (in degrees)
+    repeated float joint_speeds          = 2;    // Speed values for all joints (in degrees per second)
+    repeated float joint_accelerations   = 3;    // Acceleration values for all joints (in degrees per second^2)
+    float time_from_start                = 4;    // Absolute elaspsed time since initial point (in seconds)
+}
+
+// Admissible trajectory continuity mode
+enum TrajectoryContinuityMode
+{
+    TRAJECTORY_CONTINUITY_MODE_UNSPECIFIED  = 0;    // Unspecified continuity
+    TRAJECTORY_CONTINUITY_MODE_POSITION     = 1;    // Position continuity only
+    TRAJECTORY_CONTINUITY_MODE_SPEED        = 2;    // Position and speed continuity
+    TRAJECTORY_CONTINUITY_MODE_ACCELERATION = 3;    // Position, speed and acceleration continuity
+}
+
+// Trajectory validation error types
+enum TrajectoryErrorType
+{
+    TRAJECTORY_ERROR_TYPE_UNSPECIFIED             = 0;   // Unspecified error type
+    TRAJECTORY_ERROR_TYPE_OUTSIDE_WORKSPACE       = 1;   // The trajectory point is outside robot workspace
+    TRAJECTORY_ERROR_TYPE_ACTUATOR_COUNT_MISMATCH = 2;   // There is an actuator count mismatch with the robot
+    TRAJECTORY_ERROR_TYPE_INVALID_DURATION        = 3;   // The trajectory has an invalid duration
+    TRAJECTORY_ERROR_TYPE_ZERO_DISTANCE           = 4;   // The trajectory does not move the robot because the delta is either zero or too small
+    TRAJECTORY_ERROR_TYPE_INVALID_SPEED           = 5;   // The speed for a trajectory point for an actuator is invalid
+    TRAJECTORY_ERROR_TYPE_LARGE_SPEED             = 6;   // The speed for a trajectory point for an actuator exceeds its limit
+    TRAJECTORY_ERROR_TYPE_INVALID_ACCELERATION    = 7;   // The acceleration for a trajectory point for an actuator is invalid
+    TRAJECTORY_ERROR_TYPE_INVALID_TIME_STEP       = 8;   // The time step for a trajectory point is invalid
+    TRAJECTORY_ERROR_TYPE_LARGE_SIZE              = 9;   // The trajectory is too large
+    TRAJECTORY_ERROR_TYPE_WRONG_MODE              = 10;  // The robot is not currently in Trajectory Control mode
+    TRAJECTORY_ERROR_TYPE_JOINT_POSITION_LIMIT    = 11;  // The position limit for a trajectory point for an actuator is exceeded
+    TRAJECTORY_ERROR_TYPE_FILE_ERROR              = 12;  // An internal file error was encountered
+    TRAJECTORY_ERROR_TYPE_NO_FILE_IN_MEMORY       = 13;  // An internal file memory error was encountered
+    TRAJECTORY_ERROR_TYPE_INDEX_OUT_OF_TRAJ       = 14;  // The index for a trajectory point is invalid
+    TRAJECTORY_ERROR_TYPE_ALREADY_RUNNING         = 15;  // A trajectory is already running
+    TRAJECTORY_ERROR_TYPE_WRONG_STARTING_POINT    = 16;  // The difference between the trajectory's starting point and the current position is too large
+    TRAJECTORY_ERROR_TYPE_CARTESIAN_CANNOT_START  = 17;  // The cartesian trajectory is not able to start
+    TRAJECTORY_ERROR_TYPE_WRONG_STARTING_SPEED    = 18;  // The difference between the trajectory's starting speed and the current speed is too large
+    TRAJECTORY_ERROR_TYPE_INVALID_POSITION        = 19;  // The position for a trajectory point for an actuator is invalid
+}
+
+// Trajectory validation error identifiers
+enum TrajectoryErrorIdentifier
+{
+    TRAJECTORY_ERROR_IDENTIFIER_UNSPECIFIED   = 0;   // Unspecified error identifier
+    TRAJECTORY_ERROR_IDENTIFIER_UNAPPLICABLE  = 1;   // No identifier required for this error
+    TRAJECTORY_ERROR_IDENTIFIER_TIME          = 2;   // Time validation failed
+    TRAJECTORY_ERROR_IDENTIFIER_POSITION      = 3;   // Position validation failed
+    TRAJECTORY_ERROR_IDENTIFIER_VELOCITY      = 4;   // Velocity validation failed
+    TRAJECTORY_ERROR_IDENTIFIER_ACCELERATION  = 5;   // Acceleration validation failed
+}
+
+// Details for a single trajectory validation error 
+message TrajectoryErrorElement
+{
+    TrajectoryErrorType       error_type = 1;         // Error type
+    TrajectoryErrorIdentifier error_identifier = 2;   // Error identifier
+    float   error_value = 3; // Erroneous value
+    float   min_value = 4;   // Minimum permitted value
+    float   max_value = 5;   // Maximum permitted value
+    uint32  index = 6;       // Actuator index
+    string  message = 7;     // Clarification message for the error
+}
+
+// Report collecting information on different validation errors for a particular trajectory
+message TrajectoryErrorReport
+{
+    repeated TrajectoryErrorElement trajectory_error_elements = 1;
 }

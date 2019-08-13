@@ -1,9 +1,0 @@
-
-
-uint32 control_mode
-
-Timestamp timestamp
-
-UserProfileHandle user_handle
-
-Connection connection

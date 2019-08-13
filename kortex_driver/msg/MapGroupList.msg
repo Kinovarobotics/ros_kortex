@@ -1,3 +1,0 @@
-
-
-MapGroup[] map_groups

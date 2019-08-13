@@ -1,0 +1,121 @@
+/*
+* KINOVA (R) KORTEX (TM)
+*
+* Copyright (c) 2019 Kinova inc. All rights reserved.
+*
+* This software may be modified and distributed under the
+* terms of the BSD 3-Clause license.
+*
+* Refer to the LICENSE file for details.
+*
+*/
+
+/*
+ * This file has been auto-generated and should not be modified.
+ */
+ 
+{% for include_file_name in include_file_names -%}
+#include "{{include_file_name}}"
+{% endfor -%}
+#include "{{current_header_filename}}"
+
+{{package.short_name}}Services::{{package.short_name}}Services(ros::NodeHandle& n, {{package.cpp_namespace}}::{{package.short_name}}Client* {{package.short_name|lower}}, uint32_t device_id, uint32_t timeout_ms): 
+	m_n(n),
+	m_{{package.short_name|lower}}({{package.short_name|lower}}),
+	m_current_device_id(device_id)
+{
+	m_api_options.timeout_ms = timeout_ms;
+
+	m_pub_Error = m_n.advertise<kortex_driver::KortexError>("kortex_error", 1000);
+{%- for method in package.methods -%}
+{%- if method.is_notification_rpc %}
+	m_pub_{{method.name}} = m_n.advertise<kortex_driver::{{method_prepend_rpc_package_name}}{{method.name|replace("Topic", "")}}Notification>("{{method.name_lowercase_with_underscores}}", 1000);
+{%- endif -%}
+{%- endfor %}
+
+	m_serviceSetDeviceID = n.advertiseService("{{package.short_name_lowercase_with_underscores}}/set_device_id", &{{package.short_name}}Services::SetDeviceID, this);
+	m_serviceSetApiOptions = n.advertiseService("{{package.short_name_lowercase_with_underscores}}/set_api_options", &{{package.short_name}}Services::SetApiOptions, this);
+{% for method in package.methods %}
+	m_service{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}} = m_n.advertiseService("{{package.short_name_lowercase_with_underscores}}/{%- if method.prepend_on_notification -%}activate_publishing_of_{%- endif -%}{{method.name_lowercase_with_underscores}}", &{{package.short_name}}Services::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}, this);
+{%- endfor %}
+}
+
+bool {{package.short_name}}Services::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
+{
+	m_current_device_id = req.device_id;
+
+	return true;
+}
+
+bool {{package.short_name}}Services::SetApiOptions(kortex_driver::SetApiOptions::Request  &req, kortex_driver::SetApiOptions::Response &res)
+{
+	m_api_options.timeout_ms = req.input.timeout_ms;
+
+	return true;
+}
+
+{% for method in package.methods %}
+bool {{package.short_name}}Services::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}(kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Request  &req, kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Response &res)
+{
+	{%- if not method.input_type_short_name == "Empty" %}
+	{{method.input_type_cpp_namespace}}::{{method.input_type_short_name}} input;
+	ToProtoData(req.input, &input);
+	{%- endif %}
+	{%- if not method.output_type_short_name == "Empty" %}
+	{{method.output_type_cpp_namespace}}::{{method.output_type_short_name}} output;
+	{% endif %}
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		{%- if not method.output_type_short_name == "Empty" %}
+		{%- if not method.input_type_short_name == "Empty" %}
+		{%- if method.is_notification_rpc %}
+		std::function< void ({{method.notification_message_cpp_namespace}}::{{method.name|replace("Topic", "")}}Notification) > callback = std::bind(&{{package.short_name}}Services::cb_{{method.name}}, this, std::placeholders::_1);
+		output = m_{{package.short_name|lower}}->{{method.prepend_on_notification}}{{method.name}}(callback, input, m_current_device_id);
+		{%- else %}
+		output = m_{{package.short_name|lower}}->{{method.name}}(input, m_current_device_id, m_api_options);
+		{%- endif %}
+		{%- else %}
+		output = m_{{package.short_name|lower}}->{{method.name}}(m_current_device_id, m_api_options);
+		{%- endif %}
+		{%- else %}
+		{%- if not method.input_type_short_name == "Empty" %}
+		m_{{package.short_name|lower}}->{{method.name}}(input, m_current_device_id, m_api_options);
+		{%- else %}
+		m_{{package.short_name|lower}}->{{method.name}}(m_current_device_id, m_api_options);
+		{%- endif %}
+		{%- endif %}
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	{%- if not method.output_type_short_name == "Empty" %}
+	ToRosData(output, res.output);
+	{%- endif %}
+	return true;
+}
+{%- if method.is_notification_rpc %}
+void {{package.short_name}}Services::cb_{{method.name}}({{method.notification_message_cpp_namespace}}::{{method.name|replace("Topic", "")}}Notification notif)
+{
+	kortex_driver::{{method.name|replace("Topic", "")}}Notification ros_msg;
+	ToRosData(notif, ros_msg);
+	m_pub_{{method.name}}.publish(ros_msg);
+}
+{%- endif %}
+{% endfor -%}

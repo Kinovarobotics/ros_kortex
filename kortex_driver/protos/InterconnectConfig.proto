@@ -1,0 +1,256 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+
+syntax = "proto3";
+
+import public "Common.proto";
+
+package Kinova.Api.InterconnectConfig;
+
+// Service to get and set interface module (interconnect) configuration information, including user expansion
+service InterconnectConfig {//@PROXY_ID=14 @ERROR=Kinova.Api.Error
+
+    // Retrieves user UART configuration
+    rpc GetUARTConfiguration (Kinova.Api.Common.UARTDeviceIdentification) returns (Kinova.Api.Common.UARTConfiguration); //@RPC_ID=1
+    
+    // Configures user UART
+    rpc SetUARTConfiguration (Kinova.Api.Common.UARTConfiguration) returns (Kinova.Api.Common.Empty); //@RPC_ID=2
+
+    // Retrieves user Ethernet configuration
+    rpc GetEthernetConfiguration (EthernetDeviceIdentification) returns (EthernetConfiguration); //@RPC_ID=3
+
+    // Configures user Ethernet port
+    rpc SetEthernetConfiguration (EthernetConfiguration) returns (Kinova.Api.Common.Empty); //@RPC_ID=4
+
+    // Retrieves user GPIO configuration
+    rpc GetGPIOConfiguration (GPIOIdentification) returns (GPIOConfiguration); //@RPC_ID=5
+
+    // Configures user GPIO
+    rpc SetGPIOConfiguration (GPIOConfiguration) returns (Kinova.Api.Common.Empty); //@RPC_ID=6
+
+    // Retrieves user GPIO state
+    rpc GetGPIOState (GPIOIdentification) returns (GPIOState); //@RPC_ID=7
+
+    // Configures user GPIO state
+    rpc SetGPIOState (GPIOState) returns (Kinova.Api.Common.Empty); //@RPC_ID=8
+
+    // Retrieves user I2C configuration
+    rpc GetI2CConfiguration (I2CDeviceIdentification) returns (I2CConfiguration); //@RPC_ID=9
+
+    // Configures user I2C
+    rpc SetI2CConfiguration (I2CConfiguration) returns (Kinova.Api.Common.Empty); //@RPC_ID=10
+
+    // Performs an I2C read request
+    rpc I2CRead (I2CReadParameter) returns (I2CData); //@RPC_ID=11
+
+    // Performs an I2C read register request
+    rpc I2CReadRegister (I2CReadRegisterParameter) returns (I2CData); //@RPC_ID=12
+
+    // Performs an I2C write request
+    rpc I2CWrite (I2CWriteParameter) returns (Kinova.Api.Common.Empty); //@RPC_ID=13
+
+    // Performs an I2C write register request
+    rpc I2CWriteRegister (I2CWriteRegisterParameter) returns (Kinova.Api.Common.Empty); //@RPC_ID=14
+}
+
+// Identifies InterconnectConfig current version
+enum ServiceVersion {
+    RESERVED_0 = 0;         // Reserved
+    CURRENT_VERSION = 1;    // Current version
+}
+
+// Admissible interface module safeties
+enum SafetyIdentifier {
+    UNSPECIFIED_INTERCONNECT_SAFETY_IDENTIFIER = 0;   // 0x0 - Unspecified actuator safety
+    MAXIMUM_MOTOR_CURRENT                      = 1;   // 0x1 - Maximum motor current
+    MAXIMUM_VOLTAGE                            = 2;   // 0x2 - Maximum voltage
+    MINIMUM_VOLTAGE                            = 4;   // 0x4 - Minimum voltage
+    MAXIMUM_MOTOR_TEMPERATURE                  = 8;   // 0x8 - Maximum motor temperature
+    MAXIMUM_CORE_TEMPERATURE                   = 16;  // 0x10 - Maximum core temperature
+    NON_VOLATILE_MEMORY_CORRUPTED              = 32;  // 0x20 - Non-volatile memory corrupted
+    EMERGENCY_LINE_ASSERTED                    = 64;  // 0x40 - Emergency line asserted
+    COMMUNICATION_TICK_LOST                    = 128; // 0x80 - Communication tick lost
+    WATCHDOG_TRIGGERED                         = 256; // 0x100 - Watchdog triggered
+}
+
+// Admissible UART port 
+enum UARTPortId {
+    UART_PORT_UNSPECIFIED = 0; // Unspecified UART port
+    UART_PORT_EXPANSION   = 1; // UART port located on the expansion connector
+}
+
+// Admissible Ethernet device
+enum EthernetDevice {
+    ETHERNET_DEVICE_UNSPECIFIED = 0; // Unspecified ethernet device
+    ETHERNET_DEVICE_EXPANSION   = 1; // Ethernet port located on the expansion connector
+}
+
+// Ethernet device identification
+message EthernetDeviceIdentification {
+    EthernetDevice device = 1; // Ethernet device
+}
+
+// Admissible Ethernet speed
+enum EthernetSpeed {
+    ETHERNET_SPEED_UNSPECIFIED = 0; // Unspecified ethernet speed
+    ETHERNET_SPEED_10M          = 1; // 10 Mbps
+    ETHERNET_SPEED_100M         = 2; // 100 Mbps
+}
+
+// Admissible Ethernet duplex mode
+enum EthernetDuplex {
+    ETHERNET_DUPLEX_UNSPECIFIED = 0; // Unspecified ethernet duplex
+    ETHERNET_DUPLEX_HALF        = 1; // Half duplex
+    ETHERNET_DUPLEX_FULL        = 2; // Full duplex
+}
+
+// Ethernet configuration information
+message EthernetConfiguration {
+    EthernetDevice device    = 1; // Device identification
+    bool enabled             = 2; // True if the ethernet device is enabled, false otherwise
+    EthernetSpeed speed      = 3; // Speed selection
+    EthernetDuplex duplex    = 4; // Duplex mode
+}
+
+// Admissible GPIO identifier
+enum GPIOIdentifier {
+    GPIO_IDENTIFIER_UNSPECIFIED = 0; // Unspecified GPIO identifier
+    GPIO_IDENTIFIER_1           = 1; // GPIO identifier 1
+    GPIO_IDENTIFIER_2           = 2; // GPIO identifier 2
+    GPIO_IDENTIFIER_3           = 3; // GPIO identifier 3
+    GPIO_IDENTIFIER_4           = 4; // GPIO identifier 4
+}
+
+// GPIO identification
+message GPIOIdentification {
+    GPIOIdentifier identifier = 1; // GPIO identifier
+}
+
+// Admissible GPIO mode
+enum GPIOMode {
+    GPIO_MODE_UNSPECIFIED        = 0; // Unspecified GPIO mode
+    GPIO_MODE_INPUT_FLOATING     = 1; // Input floating
+    GPIO_MODE_OUTPUT_PUSH_PULL   = 2; // Output push-pull
+    GPIO_MODE_OUTPUT_OPEN_DRAIN  = 3; // Output open drain
+}
+
+// Admissible GPIO pull mode
+enum GPIOPull {
+    GPIO_PULL_UNSPECIFIED = 0; // Unspecified GPIO pull
+    GPIO_PULL_NONE        = 1; // Pull none
+    GPIO_PULL_UP          = 2; // Pull up
+    GPIO_PULL_DOWN        = 3; // Pull down
+}
+
+// Admissible GPIO value
+enum GPIOValue {
+    GPIO_VALUE_UNSPECIFIED = 0; // Unspecified GPIO value
+    GPIO_VALUE_LOW         = 1; // Low
+    GPIO_VALUE_HIGH        = 2; // High
+}
+
+// GPIO configuration information
+message GPIOConfiguration {
+    GPIOIdentifier identifier = 1; // GPIO identifier
+    GPIOMode mode             = 2; // Mode
+    GPIOPull pull             = 3; // Pull mode
+    GPIOValue default_value   = 4; // Default value at power on
+}
+
+// GPIO state
+message GPIOState {
+    GPIOIdentifier identifier = 1; // GPIO identifier
+    GPIOValue value           = 2; // Value
+}
+
+// Admissible I2C device
+enum I2CDevice {
+    I2C_DEVICE_UNSPECIFIED = 0; // Unspecified I2C device
+    I2C_DEVICE_EXPANSION   = 1; // I2C device located on the expansion connector
+}
+
+// I2C device identification
+message I2CDeviceIdentification {
+    I2CDevice device = 1; // I2C device
+}
+
+// I2C mode
+enum I2CMode {
+    I2C_MODE_UNSPECIFIED = 0; // Unspecified I2C mode
+    I2C_MODE_STANDARD    = 1; // Standard mode
+    I2C_MODE_FAST        = 2; // Fast mode
+    I2C_MODE_FAST_PLUS   = 3; // Fast plus mode
+}
+
+// I2C device addressing mode
+enum I2CDeviceAddressing {
+    I2C_DEVICE_ADDRESSING_UNSPECIFIED = 0; // Unspecified device addressing
+    I2C_DEVICE_ADDRESSING_7_BITS      = 1; // 7 bits device addressing
+    I2C_DEVICE_ADDRESSING_10_BITS     = 2; // 10 bits device addressing
+}
+
+// I2C register address size
+enum I2CRegisterAddressSize {
+    I2C_REGISTER_ADDRESS_SIZE_UNSPECIFIED = 0; // Unspecified I2C register address size
+    I2C_REGISTER_ADDRESS_SIZE_8_BITS      = 1; // 8 bits register address size
+    I2C_REGISTER_ADDRESS_SIZE_16_BITS     = 2; // 16 bits register address size
+}
+
+// I2C configuration information
+message I2CConfiguration {
+    I2CDevice device               = 1; // I2C device identification
+    bool enabled                   = 2; // True if I2C device is enabled, false otherwise
+    I2CMode mode                   = 3; // Mode
+    I2CDeviceAddressing addressing = 4; // Addressing mode
+}
+
+// I2C read request
+message I2CReadParameter {
+    I2CDevice device               = 1; // I2C device identification
+    fixed32 device_address         = 2; // I2C device address
+    fixed32 size                   = 5; // I2C number of bytes to read (max 128 bytes)
+    fixed32 timeout                = 6; // Request timeout in milliseconds
+}
+
+// I2C read register request
+message I2CReadRegisterParameter {
+    I2CDevice device                             = 1; // I2C device identification
+    fixed32 device_address                       = 2; // I2C device address
+    fixed32 register_address                     = 3; // I2C register address (8 or 16 bits)
+    I2CRegisterAddressSize register_address_size = 4; // I2C register address size
+    fixed32 size                                 = 5; // I2C number of bytes to read (max 128 bytes)
+    fixed32 timeout                              = 6; // Request timeout in milliseconds
+}
+
+// I2C write request
+message I2CWriteParameter {
+    I2CDevice device               = 1; // I2C device identification
+    fixed32 device_address         = 2; // I2C device address
+    fixed32 timeout                = 5; // Request timeout in milliseconds
+    I2CData data                   = 6; // Data to write
+}
+
+// I2C write register request
+message I2CWriteRegisterParameter {
+    I2CDevice device                             = 1; // I2C device identification
+    fixed32 device_address                       = 2; // I2C device address
+    fixed32 register_address                     = 3; // I2C register address (8 or 16 bits)
+    I2CRegisterAddressSize register_address_size = 4; // I2C register address size
+    fixed32 timeout                              = 5; // Request timeout in milliseconds
+    I2CData data                                 = 6; // Data to write
+}
+
+// I2C data
+message I2CData {
+    bytes data           = 1; // Data byte(s) array (max 128 bytes)
+    fixed32 size         = 2; // Data byte(s) array size
+}

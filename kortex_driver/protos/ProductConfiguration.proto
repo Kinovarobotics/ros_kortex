@@ -1,0 +1,124 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2019 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+
+syntax = "proto3";
+package Kinova.Api.ProductConfiguration;
+
+import public "Common.proto";
+
+// Admissible model identification
+enum ModelId {
+   MODEL_ID_UNSPECIFIED = 0;           // Unspecified Model identification
+   MODEL_ID_L53 = 1;                   // Gen3 Ultra Lightweight Robot
+   MODEL_ID_L31 = 2;                   // PICO
+   MODEL_ID_HDK = 3;                   // Hardware Development Kit
+}
+
+// Admissible base types
+enum BaseType {
+   BASE_TYPE_UNSPECIFIED = 0;          // Unspecified base type
+   BASE_TYPE_L53_QUICK_CONNECT = 1;    // L53 (Gen3) Quick Connect Base
+   BASE_TYPE_L31_FIXED = 3;            // L31 (PICO) Fixed Base
+   BASE_TYPE_HDK_FIXED = 4;            // HDK Fixed Base
+}
+
+// Admissible end-effector modules
+enum EndEffectorType {
+   END_EFFECTOR_TYPE_UNSPECIFIED = 0;         // Unspecified end-effector type
+   END_EFFECTOR_TYPE_NOT_INSTALLED = 1;       // No gripper installed
+   END_EFFECTOR_TYPE_L31_GRIPPER_2F = 2;      // L31 (PICO) gripper, 2 fingers
+   END_EFFECTOR_TYPE_ROBOTIQ_2F_85 = 3;       // Robotiq 2F-85 gripper, 2 fingers
+}
+
+// Admissible vision modules
+enum VisionModuleType {
+   VISION_MODULE_TYPE_UNSPECIFIED = 0;        // Unspecified vision module type
+   VISION_MODULE_TYPE_NOT_INSTALLED = 1;      // Not Applicable / Not Installed
+   VISION_MODULE_TYPE_L53_2D3D = 2;           // L53 (Gen3) Vision Module
+   VISION_MODULE_TYPE_L53_2D = 3;             // L53 (Gen3) Vision Module without 3D sensor
+   VISION_MODULE_TYPE_EOD = 4;                // EOD Vision Module
+}
+
+// Admissible interface modules
+enum InterfaceModuleType {
+   INTERFACE_MODULE_TYPE_UNSPECIFIED = 0;     // Unspecified interface module type
+   INTERFACE_MODULE_TYPE_NOT_INSTALLED = 1;   // Not Applicable / Not Installed
+   INTERFACE_MODULE_TYPE_L53 = 2;             // L53 (Gen3) Interface Module
+   INTERFACE_MODULE_TYPE_L31 = 3;             // L31 (PICO) Interface Module
+}
+
+// Admissible arm laterality
+enum ArmLaterality {
+   ARM_LATERALITY_UNSPECIFIED = 0;            // Unspecified arm laterality
+   ARM_LATERALITY_NOT_APPLICABLE = 1;         // Not Applicable
+   ARM_LATERALITY_LEFT = 2;                   // Left Laterality
+   ARM_LATERALITY_RIGHT = 3;                  // Right Laterality
+}
+
+// Admissible wrist types
+enum WristType {
+   WRIST_TYPE_UNSPECIFIED = 0;                // Unspecified wrist type
+   WRIST_TYPE_NOT_APPLICABLE = 1;             // Not Applicable
+   WRIST_TYPE_SPHERICAL = 2;                  // Spherical Wrist
+   WRIST_TYPE_CURVED = 3;                     // Curved Wrist
+}
+
+// Complete configuration for a given device
+message CompleteProductConfiguration {
+   string  kin = 1;                                           // Kinova Identification Number of the device
+   ModelId model = 2;                                         // Model of the device
+   Kinova.Api.Common.CountryCode  country_code = 3;           // Country code for the device
+   string  assembly_plant = 4;                                // Assembly plant of the device
+   string  model_year = 5;                                    // Year of the model
+   uint32  degree_of_freedom = 6;                             // Number of DOF for the device
+   BaseType base_type = 7;                                    // Type of base for the device
+   EndEffectorType end_effector_type = 8;                     // End-effector type of the device
+   VisionModuleType vision_module_type = 9;                   // Vision module type of the device
+   InterfaceModuleType interface_module_type = 10;            // Interface module type of the device
+   ArmLaterality arm_laterality = 11;                         // Arm laterality of the device
+   WristType wrist_type = 12;                                 // Wrist type of the device
+}
+
+// New degree of freedom configuration
+message ProductConfigurationDegreeOfFreedom {
+   uint32 degree_of_freedom = 1;            // New degree of freedom
+}
+
+// New base type configuration
+message ProductConfigurationBaseType {
+   BaseType base_type = 1;                  // New base type
+}
+
+// New end-effector installed on arm
+message ProductConfigurationEndEffectorType {
+   EndEffectorType end_effector_type = 1;   // New end-effector type
+}
+
+// New vision module installed on arm
+message ProductConfigurationVisionModuleType {
+   VisionModuleType vision_module_type = 1; // New vision module type
+}
+
+// New interface module installed on arm
+message ProductConfigurationInterfaceModuleType {
+   InterfaceModuleType interface_module_type = 1;   // New interface module type
+}
+
+// New arm laterality for the arm
+message ProductConfigurationLaterality {
+   ArmLaterality arm_laterality = 1;        // New arm laterality
+}
+
+// New wrist type for the arm
+message ProductConfigurationWristType {
+   WristType wrist_type = 1;                // New wrist type
+}

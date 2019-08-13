@@ -12,16 +12,23 @@
 
 # Kortex Driver
 
-## Overview
-This node allows communication between a node and a Gen3 robot. Use this package if you want to:
+# **Note:** There have been many changes made between versions 1.1.7 and 2.0.0 of the ROS driver. You can view the changes and learn the steps to follow to adapt your code in [this section](#compatibility).
 
-* Change basic configuration of the robot.
-* Move the robot in the Cartesian space.
-* Move the robot in the joint space.
-* Activate the admittance mode.
-* Move the robot using the **LOW\_LEVEL**\ (1 kHz\) control mode.
-* Move the robot using the **LOW\_LEVEL\_BYPASS**\ mode.
-* Access the cyclic data sporadically.
+<!-- MarkdownTOC -->
+## Table of contents
+
+1. [Overview](#overview)
+1. [Usage](#usage)
+1. [Topics](#topics)
+1. [Services](#services)
+1. [Compatibility break between v1.1.X and v2.0.X](#compatibility)
+1. [Generation (advanced)](#generation)
+
+<!-- /MarkdownTOC -->
+
+<a id="overview"></a>
+## Overview
+This node allows communication between a ROS node and a Kinova Gen3 Ultra lightweight robot.
 
 ### License
 
@@ -33,252 +40,140 @@ Maintainer: Kinova inc. support@kinovarobotics.com**
 
 This package has been tested under ROS Kinetic and Ubuntu 16.04.
 
-## Installation
-
-### Building from Source
-
-#### Dependencies
-
-- [Robot Operating System (ROS)](http://wiki.ros.org) (middleware for robotics),
-- [Protobuf](https://developers.google.com/protocol-buffers/)
-
-```cpp
-git clone https://github.com/protocolbuffers/protobuf --branch 3.5.1.1   (you must use this specific version)
-```
-Follow these [instructions](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md) to build and install protobuf and its compiler.
-
-#### Building
-
-To build from source, clone the latest version from this repository into your catkin workspace and compile the package using
-
-        cd catkin_workspace/src
-        git clone https://github.com/Kinovarobotics/ros_kortex.git
-        cd ../
-        sudo ./src/ros_kortex/build.sh
-
+<a id="usage"></a>
 ## Usage
 
-### Launch file
-The launch file for this node can be found in the [kortex_bringup](../kortex_bringup/readme.md) package.
+The `kortex_driver` node is the node responsible for the communication between the ROS network and the Kortex-compatible Kinova robots. It publishes topics that users can subscribe to. It also advertises services that users can call from the command line or from their own code to configure or control the robot arm or its sub-devices (actuators, vision module, interface module).  
 
+**Arguments**:
+- **arm** : Name of your robot arm model. See the `kortex_description/arms` folder to see the available robot models. The default value is **gen3**.
+- **gripper** : Name of your robot arm's tool / gripper. See the `kortex_description/grippers` folder to see the available end effector models (or to add your own). The default value is **""** and the only other supported option is **robotiq_2f_85** for now.
+- **robot_name** : This is the namespace in which the driver will run. It defaults to **my_$(arg arm)** (so "my_gen3" for arm="gen3").
+- **ip_address** : The IP address of the robot you're connecting to. The default value is **192.168.1.10**.
+- **cyclic_data_publish_rate** : Publish rate of the *base_feedback* and *joint_state* topics, in Hz. The default value is **100** Hz.
+- **api_rpc_timeout_ms** : The default X-axis position of the robot in Gazebo. The default value is **0.0**.
+- **api_session_inactivity_timeout_ms** : The duration after which the robot will clean the client session if the client hangs up the connection brutally (should not happen with the ROS driver). The default value is **35000** ms and is not normally changed.
+- **api_connection_inactivity_timeout_ms** : The duration after which a connection is destroyed by the robot if no communication is detected between the client and the robot. The default value is **20000** ms and is not normally changed.
+- **start_rviz** : If this argument is true, RViz will be launched. The default value is **true**.
+- **start_moveit** : If this argument is true, a MoveIt! MoveGroup will be launched for the robot. The default value is **true**.
 
-### Starting with rosrun
+- **default_goal_time_tolerance** : The default goal time tolerance for the `FollowJointTrajectory` action server, in seconds. This value is used if no default goal time tolerance is specified in the trajectory. The default value is **0.5** seconds.
+- **default_goal_tolerance** : The default goal tolerance for the `FollowJointTrajectory` action server, in degrees. This value is used if no default goal tolerance is specified in the trajectory for the joint positions reached at the end of the trajectory. The default value is **0.5** degrees.
 
-<code>rosrun kortex\_driver kortex\_driver 192.168.1.10 100</code>
+To launch it with default arguments, run the following command in a terminal : 
 
-In the command above, you would be running the kortex_driver node on an Gen3 robot with IP address 192.168.1.10. The cyclic data would be refreshed at 100 Hz.
+`roslaunch kortex_driver kortex_driver.launch`
 
+To launch it with optional arguments, specify the argument name, then ":=", then the value you want. For example, : 
 
+`roslaunch kortex_driver kortex_driver.launch ip_address:=10.0.100.239 start_rviz:=false robot_name:=terminator`
 
-## Nodes
+You can also have a look at the [roslaunch documentation](http://wiki.ros.org/roslaunch/Commandline%20Tools) for more details.
 
-### Published Topics
+If everything goes well, you will see a "**The Kortex driver has been initialized correctly!**" message. If you also start MoveIt!, the `kortex_driver` output may be flooded in the `move_group` output, so pay attention to the warning and error messages! If the node fails to start for any reason, you will get an error message followed by a "**process has died**" message.
 
-* **`/KortexError`**
-    <p>Every Kortex error will be published here. </p>
+<a id="topics"></a>
+## Topics
+
+### Robot feedback topics
+
+The robot feedback topics are always published by the `kortex_driver`. You don't have to activate them. 
+
+* **`/your_robot_name/kortex_error`**
+
+    Every Kortex error will be published here. You can see the message description [here](msg/non_generated/KortexError.msg).
+
+* **`/your_robot_name/base_feedback`**
+
+    The feedback from the robot is published on this topic at a rate of **cyclic_data_publish_rate**. You can see the message description [here](msg/generated/base_cyclic/BaseCyclic_Feedback.msg).
+
+* **`/your_robot_name/joint_state`**
+
+    The feedback from the robot is converted to a [sensor_msgs/JointState](http://docs.ros.org/kinetic/api/sensor_msgs/html/msg/JointState.html) and published on this topic at a rate of **cyclic_data_publish_rate**.
+
+### Notification topics
     
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | code | Error code, see enum in the ErrorCodes class. |
-    | uint32 | subcode | Sub error code, see enum in the ErrorCodes class. |
-    | string | description | Error details |
+The notification topics are only published by the `kortex_driver` if you activate them by first calling an activation service. Once activated, a notification topic will be activated until the node is shutdown. 
 
-* **`/ConfigurationChangeTopic`**
-    <p>Notification received when a configuration item change.</p>
+Subscribing to all the notifications causes a heavy load on the robot CPU. That is why the notification topics were designed in such a way. The users also typically only use one or two notifications, if at all. 
 
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | event | Event type, see [ConfigurationNotificationEvent.msg](https://github.com/Kinovarobotics/ros_kortex/blob/master/kortex_driver/msg/ConfigurationNotificationEvent.msg). |
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the configuration change event. |
-    | Connection | connection | Connection that caused the configuration change event. |
-    
-* **`/MappingInfoTopic`**
-    <p>Notification received when a controller changes its active map.</p>
+For example, if a user wants to subscribe to the **/my_robot_name/network_topic** (the message type is [NetworkNotification](msg/generated/base/NetworkNotification.msg)), he will have to: 
+1. Call the **/my_robot_name/base/activate_publishing_of_network_notification** service to enable the publishing of the topic
+2. Subscribe to the **/my_robot_name/network_topic** topic
+3. Process the notifications when he receives them in his code
 
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | controller_identifier | Identifier of the controller, see [ConfigurationNotificationEvent.msg](https://github.com/Kinovarobotics/ros_kortex/blob/master/kortex_driver/msg/ControllerType.msg). |
-    | MapHandle | active_map_handle | A handle to the new active map. |
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the mapping event. |
-    | Connection | connection | Connection that caused the mapping event. |
-
-* **`/ControlModeTopic`**
-    <p>Notification received when the control mode has been changed.</p>
-
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | control_mode | New control mode, see [ControlMode.msg](https://github.com/Kinovarobotics/ros_kortex/blob/master/kortex_driver/msg/ControlMode.msg). |
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the control mode event. |
-    | Connection | connection | Connection that caused the control mode event. |
-
-* **`/OperatingModeTopic`**
-    <p>Notification received when the operating mode is changed.</p>
-
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | operating_mode | New operating mode, see [OperatingMode.msg](https://github.com/Kinovarobotics/ros_kortex/blob/master/kortex_driver/msg/OperatingMode.msg). |
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the operating mode event. |
-    | Connection | connection | Connection that caused the operating mode event. |
-    | DeviceHandle | device_handle | Device matching operating mode (if applicable). |
-
-* **`/SequenceInfoTopic`**
-    <p>Notification received when an event occured during a sequence.</p>
-
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | event_identifier | New operating mode, see [EventIdSequenceInfoNotification.msg](https://github.com/Kinovarobotics/ros_kortex/blob/master/kortex_driver/msg/ControllerType.msg). |
-    | SequenceHandle | sequence_handle | Handle of the sequence that this event refers to. |
-    | uint32 | task_index | Task index. |
-    | uint32 | group_identifier | Specifies the order in which this task must be executed. |
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the sequence event. |
-    | uint32 | abort_details | Details if event_identifier is equal to ABORT. |
-    | Connection | connection | Connection that caused the sequence event. |
-
-* **`/ProtectionZoneTopic`**
-    <p>Notification received when a protection zone event occured.</p>
-
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | operating_mode | New operating mode, see [ProtectionZoneEvent.msg](https://github.com/Kinovarobotics/kortex/blob/master/api_cpp/doc/markdown/references/enm_Base_ProtectionZoneEvent.md#). |
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the protection zone event. |
-    | Connection | connection | Connection that caused the protection zone event. |
-
-* **`/ControllerTopic`**
-    <p>Notification received when a controller event occured.</p>
-
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the controller event. |
-    | Connection | connection | Connection that caused the controller event. |
-
-* **`/ActionTopic`**
-    <p>Notification received when an action event occured.</p>
-
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | action_event | New operating mode, see [ActionEvent.msg](https://github.com/Kinovarobotics/kortex/blob/master/api_cpp/doc/markdown/references/enm_Base_ActionEvent.md#). |
-    | ActionHandle | handle | Identifies the action for which this event occured. |
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the action event. |
-    | uint32 | abort_details | Details if event_identifier is equal to ABORT. |
-    | Connection | connection | Connection that caused the action event. |
-
-* **`/RobotEventTopic`**
-    <p>Notification received when an robot event occured.</p>
-
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | event | Robot event type, see [RobotEvent.msg](https://github.com/Kinovarobotics/kortex/blob/master/api_cpp/doc/markdown/references/enm_Base_RobotEvent.md#). |
-    | DeviceHandle | handle | Identifier of the hardware device connected or disconnected. |
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the robot event. |
-    | Connection | connection | Connection that caused the robot event. |
-
-* **`/ServoingModeTopic`**
-    <p>Notification received when an servoing mode event occured.</p>
-
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | servoing_mode | New servoing mode, see [RobotEvent.msg](https://github.com/Kinovarobotics/kortex/blob/master/api_cpp/doc/markdown/references/enm_Base_ServoingMode.md#). |
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the servoing mode event. |
-    | Connection | connection | Connection that caused the servoing mode event. |
-
-* **`/FactoryTopic`**
-    <p>Notification received when an factory event occured.</p>
-
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | event | Factory event type, see [RobotEvent.msg](https://github.com/Kinovarobotics/kortex/blob/master/api_cpp/doc/markdown/references/enm_Base_FactoryEvent.md#). |
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the factory event. |
-    | Connection | connection | Connection that caused the factory event. |
-
-* **`/NetworkTopic`**
-    <p>Notification received when an network event occured.</p>
-
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | event | Network event type, see [RobotEvent.msg](https://github.com/Kinovarobotics/kortex/blob/master/api_cpp/doc/markdown/references/enm_Base_NetworkEvent.md#). |
-    | Timestamp | timestamp | Event timestamp. |
-    | UserProfileHandle | user_handle | User that caused the network event. |
-    | Connection | connection | Connection that caused the network event. |
-
-* **`/ArmStateTopic`**
-
-    <p>Notification received when an armstate event occured.</p>
-
-    | Type | Name | Description |
-    |:---:|:---:|:---:|
-    | uint32 | active_state | New arm state, see [ArmState.msg](https://github.com/Kinovarobotics/kortex/blob/master/api_cpp/doc/markdown/references/enm_Common_ArmState.md#). |
-    | Timestamp | timestamp | Event timestamp. |
-    | Connection | connection | Connection that caused the network event. |
-
-### Services
+<a id="services"></a>
+## Services
 Most of the services supported by this node are generated from the [C++ Kortex API](https://github.com/Kinovarobotics/kortex). You can find the documentation [here](https://github.com/Kinovarobotics/kortex/blob/master/api_cpp/doc/markdown/index.md).
 
-Example:
-If you want to call the ROS service **`GetActuatorCount`** that has been generated by the C++ method [GetActuatorCount](https://github.com/Kinovarobotics/kortex/blob/master/api_cpp/doc/markdown/references/summary_Base.md), you would initialize your service like this:
+### Understanding packages
 
-    ros::ServiceClient client_GetActuatorCount = n.serviceClient<kortex_driver::GetActuatorCount>("GetActuatorCount");
+The *.srv* files are generated in different sub-folders depending on the sub-module they affect. For example, all the RPC calls used to configure the vision module are generated in `srv/generated/vision_config` and all the RPC calls common to all devices are generated in `srv/generated/device_config`. Here is a list of the packages with a short explanation of the services they have to offer: 
 
-#### Non-generated
-* **`SetApiOptions`**
-    <p>Modifies the Kortex API options. Once this service is called, the options set will affect every future call to the node.</p>
+* **actuator_config** : This package contains the functions used to configure a single actuator. 
+**Note:** To choose the actuator you want to configure, you have to call the **/my_robot_name/actuator_config/set_device_id** service and specify the device identifier of the actuator you want to configure. You get the device identifiers of actuators when you launch the node, when you parse the output of the [ReadAllDevices](srv/generated/device_manager/ReadAllDevices.srv) service or in the Kinova Kortex *Web App*.
 
-* **`SetDeviceID`**
-    <p>Modifies the target device (device routing feature) of the node. The default value is 0.</p>
+* **base** : This package contains :
+    * Services to read and update the configuration of the robot
+    * Services to send high level commands to the robot
+    * Services to read and update the Product Configuration
+    * Services to activate the publishing of notifications
+    * Services to read and update the user-related information
+**Note:** The base high level commands are treated every 25 ms inside the robot. High level control cannot be achieved at a rate faster than 40 Hz for now.
 
-### Messages
-Most of the messages supported by this node are generated from the [ C++ Kortex API](https://github.com/Kinovarobotics/kortex). You can find the documentation [here](https://github.com/Kinovarobotics/kortex/blob/master/api_cpp/doc/markdown/index.md).
+* **control_config** : This package contains the functions used to configure the control-related features on the robot. This includes : 
+    * Reading and setting the cartesian reference frame
+    * Reading and setting the gravity vector
+    * Reading and setting the payload information
+    * Reading and setting the tool configuration
 
-#### Non-generated
-* **`ApiOptions`**
-    <p>Represents all the option that you can set on the Kortex API.</p>
+* **device_config** : This package contains the functions used to configure a generic Kortex device. This includes : 
+    * Reading and setting safety configurations
+    * Reading general information on the specified device (software versions, serial numbers, MAC address, IPv4 settings, etc.)
+**Note:** To choose the device you want to configure, you have to call the **/my_robot_name/device_config/set_device_id** service and specify the device identifier of the device you want to configure. You get the device identifiers when you launch the node, when you parse the output of the [ReadAllDevices](srv/generated/device_manager/ReadAllDevices.srv) service or in the WebApp.
 
-* **`KortexError`**
-    <p>Represents a Kortex API error.</p>
+* **device_manager** : This package contains [ReadAllDevices](srv/generated/device_manager/ReadAllDevices.srv) service, which is used to get the list of connected device and various informations on each device. 
 
-### Protos files
-The **protos** directory contains the protobuf files from where the MSG, SRV and source files are generated. The content of this folder should not be modified.
+* **interconnect_config** : This package contains the functions used to configure the interface module on the robot.
+**Note:** You don't have to call the `SetDeviceID` service before calling the **interconnect_config** services, because the `kortex_driver` node goes through the list of connected devices and automatically sets the correct device ID for the **interconnect_config** services.
 
-### Template files
-The **templates** directory contains all the JINJA2 files needed by the protoc generator. For more details on the generation process, see the **Generation** section.
+* **vision_config** : This package contains the functions used to configure the vision module on the robot.
+**Note:** You don't have to call the SetDeviceID service before calling the **vision_config** services, because the kortex_driver node goes through the list of connected devices and automatically sets the correct device ID for the **vision_config** services.
 
-| Filename | Description |
-|:---:|:---:|
-| main.jinja2 | Used to generate src/main.cpp |
-| NodeServices.cpp.jinja2 | Used to generate src/node.cpp |
-| NodeServices.h.jinja2 | Used to generate src/node.h |
-| proto_converterCPP.jinja2 | Used to generate every src/*_proto\_converter.cpp file |
-| proto_converterHeader.jinja2 | Used to generate every src/*_proto\_converter.h file |
-| ros_converterCPP.jinja2 | Used to generate every src/*_ros\_converter.cpp file |
-| ros_converterHeader.jinja2 | Used to generate every src/*_proto\_converter.h file |
-| ros_enum.jinja2 | Used to generate every msg/*.msg files that represent a protobuf enum |
-| ros_message.jinja2 | Used to generate every msg/*.msg files that represent a protobuf message |
-| ros_oneof.jinja2 | Used to generate every msg/*.msg files that represent a protobuf oneof |
-| ros_service.jinja2 | Used to generate every msg/*.msg files that represent a protobuf RPC |
+<a id="compatibility"></a>
+## Compatibility break between v1.1.7 and v2.0.0
 
-## Generation
-<p>
-The generation process is based on a custom protoc plugin. Basically, most of the generation process is in the RosGeneration.py file located in the package root directory. Before launching the generation ensure that you have the Python JINJA2 module installed.
-</p>
+Many things have been changed in the ros_kortex repository between versions 1.1.7 and 2.0.0 and you will have to modify your code if you don't want it to break.
+
+* The `kortex_actuator_driver`, `kortex_vision_config_driver` and `kortex_device_manager` packages were removed and only the `kortex_driver` package remains.
+* Since we only have one driver and the ROS message generation does not deal with namespaces, the messages and services that are duplicated are now named differently. For example, the **Feedback** message exists within the `BaseCyclic`, `ActuatorCyclic`, `InterconnectCyclic` and `GripperCyclic` Protocol Buffers .proto files. In ROS, this is now translated as a "PackageName_" prefix before the message name. So, for the **Feedback** message, the **BaseCyclic_Feedback**, **ActuatorCyclic_Feedback**, **InterconnectCyclic_Feedback** and **GripperCyclic_Feedback** ROS messages have been automatically generated. You may encounter build errors (in C++) or runtime errors (in Python) because of this change. You can just go in the `msg/generated` folder and look for the problematic message to find its new name to change the occurrences in your code. 
+* The services are now all **lowercase_with_underscores** instead of **UpperCase**.
+* The services are now advertised in **/my_robot_name/my_package_name/desired_service** (see the [Services section](#services) to learn about the packages). You can also visualize it if you start the node and type `rosservice list` in a terminal.
+* The topics are now all **lowercase_with_underscores** instead of **UpperCase**.
+* The **/my_robot_name/base_feedback/joint_state** topic is now advertised as **/my_robot_name/joint_state**.
+* The [kortex_driver launch file](launch/kortex_driver.launch) is now located in the `kortex_driver` package instead of the `kortex_bringup` package, which was deleted. Some arguments were added to the file.
+
+<a id="generation"></a>
+## Generation (**advanced**)
+
+Some source code as well as most of the .MSG and .SRV files in this package are automatically generated, but the generated files are given on GitHub so that users don't have to generate them. However, if you have a special version of the Kortex API and want to generate those files yourself, it is possible. You will first need to follow the instructions to install Protocol Buffers.
+
+The generation process is based on a custom `protoc` plugin. Basically, most of the generation process is in the [scripts/ros_kortex_generator.py](scripts/ros_kortex_generator.py). Before launching the generation ensure that you have the Python JINJA2 module installed.
 
 To launch the generation of this package:
 
 1. Open a terminal window.
-1. Browse to the root directory of this package [YOUR\_ROS\_WORKSPACE]/src/ros\_kortex/kortex\_driver/
-1. Ensure that the kortex_driver.sh file can be executed. If not then run: <code>chmod +x kortex_driver.sh</code>
-1. Run the command: <code>protoc --plugin=protoc-gen-custom=kortex_driver.sh -I./protos/ --custom_out=./build ./protos/\*.prot</code>
-1. The result of the generation should be in the following folders:
-    * /src
-    * /msg
-    * /srv
+2. Browse the /scripts directory of this package
+3. Ensure that the generate_protobuf_wrapper_files.sh file can be executed. If not then run: <code>chmod +x generate_protobuf_wrapper_files.sh</code>
+4. Run the command: <code>./generate_protobuf_wrapper_files.sh</code>
+5. The result of the generation should be in the following folders:
+    * `/include/kortex_driver/generated`
+    * `/msg/generated`
+    * `/src/generated`
+    * `/srv/generated`
 
+### Protos files
+The **protos** directory contains the Protobuf files from which the MSG, SRV and source files are generated. The content of this folder should not be modified.
+
+### Template files
+The **templates** directory contains all the JINJA2 files needed by the `protoc` generator.

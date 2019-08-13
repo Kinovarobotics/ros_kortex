@@ -1,0 +1,41 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+
+syntax = "proto3";
+ 
+import public "Common.proto";
+import public "InterconnectCyclicMessage.proto";
+
+package Kinova.Api.InterconnectCyclic;
+
+// Service to exchange cyclic data with interface module
+service InterconnectCyclic {//@PROXY_ID=15 @ERROR=Kinova.Api.Error
+
+    // Sends a command to the interface module and receive feedback about the actual status 
+    rpc Refresh           (Kinova.Api.InterconnectCyclic.Command)    returns (Kinova.Api.InterconnectCyclic.Feedback);   //@RPC_ID=1
+    
+    // Sends a command to the interface module without receiving feedback
+    rpc RefreshCommand    (Kinova.Api.InterconnectCyclic.Command)    returns (Kinova.Api.Common.Empty);      //@RPC_ID=2
+    
+    // Obtains feedback from the interface module on its status
+    rpc RefreshFeedback   (Kinova.Api.InterconnectCyclic.MessageId)  returns (Kinova.Api.InterconnectCyclic.Feedback);   //@RPC_ID=3
+    
+	// Obtains custom data from the interface module
+    rpc RefreshCustomData (Kinova.Api.InterconnectCyclic.MessageId)  returns (Kinova.Api.InterconnectCyclic.CustomData); //@RPC_ID=4
+}
+
+
+// Identifies InterconnectCyclic service current version
+enum ServiceVersion {
+    RESERVED_0 = 0;         // Reserved
+    CURRENT_VERSION = 1;    // Current version
+}

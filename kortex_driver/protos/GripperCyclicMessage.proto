@@ -1,0 +1,86 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+ 
+ syntax = "proto3";
+
+import public "Common.proto";
+
+package Kinova.Api.GripperCyclic;
+
+// Message identifier for command or feedback
+message MessageId {
+    fixed32 identifier      = 1;       // Message ID (first 2 bytes : device ID, last 2 bytes : sequence number)
+}
+
+// Command to a single gripper motor
+message MotorCommand {
+    fixed32   motor_id      = 1;       // Motor ID (1, nb_motor)
+    float     position      = 3;       // Desired position of the gripper fingers in percentage (0-100%)
+    float     velocity      = 4;       // Desired velocity in percentage (0-100%) with which position will be set
+    float     force         = 5;       // Desired force limit of the gripper fingers in percentage (0-100%)
+}
+
+// Command sent to a gripper
+message Command {
+    MessageId command_id               = 1; // MessageId
+    fixed32   flags                    = 2; // Flags
+    repeated MotorCommand motor_cmd    = 3; // Array of finger commands, one for each finger of the gripper.
+}
+
+// Status feedback from a single gripper motor
+message MotorFeedback {
+    fixed32   motor_id               = 1;  // Motor ID (1, nb_motor)
+    float     position               = 4;  // Position of the gripper fingers in percentage (0-100%)
+    float     velocity               = 5;  // Velocity of the gripper fingers in percentage (0-100%)
+    float     current_motor          = 7;  // Current comsumed by the gripper motor (mA)  
+    float     voltage                = 8;  // Motor Voltage (V)
+    float     temperature_motor      = 10; // Motor temperature. (degrees Celsius)
+}
+
+// Status feedback from a gripper
+message Feedback {
+    MessageId feedback_id            = 1; // MessageId
+    fixed32   status_flags           = 2; // Status flags (see GripperConfig.RobotiqGripperStatusFlags)
+    fixed32   fault_bank_a           = 3; // Fault bank A (see GripperConfig.SafetyIdentifier)
+    fixed32   fault_bank_b           = 4; // Fault bank B (see GripperConfig.SafetyIdentifier)
+    fixed32   warning_bank_a         = 5; // Warning bank A (see GripperConfig.SafetyIdentifier)
+    fixed32   warning_bank_b         = 6; // Warning bank B (see GripperConfig.SafetyIdentifier)
+    repeated MotorFeedback motor     = 7;
+}
+
+// Custom data 
+message CustomDataUnit {
+    fixed32   custom_data_0      = 1;  // Custom data word 0
+    fixed32   custom_data_1      = 2;  // Custom data word 1
+    fixed32   custom_data_2      = 3;  // Custom data word 2
+    fixed32   custom_data_3      = 4;  // Custom data word 3
+    fixed32   custom_data_4      = 5;  // Custom data word 4
+    fixed32   custom_data_5      = 6;  // Custom data word 5
+    fixed32   custom_data_6      = 7;  // Custom data word 6
+    fixed32   custom_data_7      = 8;  // Custom data word 7
+    fixed32   custom_data_8      = 9;  // Custom data word 8
+    fixed32   custom_data_9      = 10; // Custom data word 9
+    fixed32   custom_data_10     = 11; // Custom data word 10
+    fixed32   custom_data_11     = 12; // Custom data word 11
+    fixed32   custom_data_12     = 13; // Custom data word 12
+    fixed32   custom_data_13     = 14; // Custom data word 13
+    fixed32   custom_data_14     = 15; // Custom data word 14
+    fixed32   custom_data_15     = 16; // Custom data word 15
+}
+
+// Custom data from gripper and gripper motors
+message CustomData {
+    MessageId custom_data_id                    = 1;  // MessageId
+    CustomDataUnit  gripper_custom_data         = 2;
+    repeated CustomDataUnit motor_custom_data   = 3;
+}
+

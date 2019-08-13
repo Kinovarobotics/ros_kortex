@@ -1,3 +1,0 @@
-
-
-SafetyHandle safety_handle

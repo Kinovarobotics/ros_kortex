@@ -1,0 +1,4 @@
+
+InterconnectCyclic_MessageId command_id
+uint32 flags
+InterconnectCyclic_Command_tool_command oneof_tool_command

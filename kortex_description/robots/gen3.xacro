@@ -5,8 +5,9 @@
     <!-- Arguments -->
     <xacro:arg name="arm" default="gen3" />
     <xacro:arg name="gripper" default="" />
+    <xacro:arg name="sim" default="false" />
 
     <xacro:include filename="$(find kortex_description)/robots/kortex_robot.xacro" />
-    <xacro:load_robot arm="$(arg arm)" gripper="$(arg gripper)"/>
+    <xacro:load_robot arm="$(arg arm)" gripper="$(arg gripper)" sim="$(arg sim)" />
 
 </robot>

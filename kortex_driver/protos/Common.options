@@ -14,3 +14,11 @@ Kinova.Api.Common.DeviceTypes       long_names:false
 Kinova.Api.Common.SafetyStatusValue long_names:false
 Kinova.Api.Common.NotificationType  long_names:false
 Kinova.Api.Common.Unit              long_names:false
+
+
+Kinova.Api.Common.UARTSpeed         long_names:false
+Kinova.Api.Common.UARTWordLength    long_names:false
+Kinova.Api.Common.UARTStopBits      long_names:false
+Kinova.Api.Common.UARTParity        long_names:false
+
+

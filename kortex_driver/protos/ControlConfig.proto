@@ -1,0 +1,130 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+
+syntax = "proto3";
+
+import public "Common.proto";
+
+package Kinova.Api.ControlConfig;
+
+// Service to configure robot control library
+service ControlConfig {//@PROXY_ID=16 @ERROR=Kinova.Api.Error
+
+    // Sets global gravity vector in terms of base reference frame. This needs to be configured to enable control of the robot in wall or ceiling mounting of the robot.
+    rpc SetGravityVector (GravityVector) returns (Kinova.Api.Common.Empty);//@RPC_ID=1
+
+    // Retrieves global gravity vector
+    rpc GetGravityVector (Kinova.Api.Common.Empty) returns (GravityVector);//@RPC_ID=2
+
+    // Sets payload information. This needs to be configured so that the control library can take into account the presence of the payload mass in computing the dynamics of the robot. 
+    rpc SetPayloadInformation (PayloadInformation) returns (Kinova.Api.Common.Empty);//@RPC_ID=3
+
+    // Retrieves payload information
+    rpc GetPayloadInformation (Kinova.Api.Common.Empty) returns (PayloadInformation);//@RPC_ID=4
+
+    // Sets tool configuration. This needs to be configured for two reasons. 1) so that the control library can take into account the presence of the tool mass in computing the dynamics of the robot. 2) so that the robot is aware of the tool frame center relative position and orientation to correctly compute and report the tool position.
+    rpc SetToolConfiguration (ToolConfiguration) returns (Kinova.Api.Common.Empty);//@RPC_ID=5
+
+    // Retrieves tool configuration
+    rpc GetToolConfiguration (Kinova.Api.Common.Empty) returns (ToolConfiguration);//@RPC_ID=6
+
+    // Subscribes to control configuration notifications
+    rpc ControlConfigurationTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=7 @PUB_SUB=ControlConfigurationNotification
+
+    // Unsubscribes client from receiving specified type of notifications
+    rpc Unsubscribe (Kinova.Api.Common.NotificationHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=8 @UNSUB
+
+    // Defines the reference frame to use with twist and wrench commands
+    rpc SetCartesianReferenceFrame (CartesianReferenceFrameInfo) returns (Kinova.Api.Common.Empty);//@RPC_ID=9
+
+    // Retrieves the current reference frame used by the twist and wrench commands
+    rpc GetCartesianReferenceFrame (Kinova.Api.Common.Empty) returns (CartesianReferenceFrameInfo);//@RPC_ID=10
+}
+
+// Identifies ControlConfig current version
+enum ServiceVersion
+{
+    RESERVED_0 = 0;       // Reserved
+    CURRENT_VERSION = 1;  // Current version
+}
+
+// Defines the gravity vector in terms of the robot base frame. If not explicitly configured, it defaults to (0, 0, -9.81), assuming a mounting on a horizontal surface. If the robot is mounted on a wall or ceiling, the gravity vector relative to the base frame will change. The control library needs to be aware of this to accurately compensate for gravity.
+message GravityVector
+{
+    float x = 1;                // x (meters / second^squared)
+    float y = 2;                // y (meters / second^squared)
+    float z = 3;                // z (meters / second^squared)
+}
+
+// A Cartesian position
+message Position {
+    float x = 1;      // x position (in meters)
+    float y = 2;      // y position (in meters)
+    float z = 3;      // z position (in meters)
+}
+
+// Defines payload information
+message PayloadInformation
+{
+    float payload_mass = 1;             // Tool mass in kg
+    Position payload_mass_center = 2;   // Tool mass center position relative to the tool reference frame
+}
+
+// Defines a Cartesian transform
+message CartesianTransform
+{
+    float x = 1;       // x (in meters)
+    float y = 2;       // y (in meters)
+    float z = 3;       // z (in meters)
+    float theta_x = 4; // Theta x (in degrees)
+    float theta_y = 5; // Theta y (in degrees)
+    float theta_z = 6; // Theta z (in degrees)
+}
+
+// Defines a tool configuration
+message ToolConfiguration {
+    CartesianTransform tool_transform = 1;  // Cartesian transform tool
+    float tool_mass = 2;                    // Tool mass (in kg)
+    Position tool_mass_center = 3;          // Tool mass center position relative to the interface module reference frame
+}
+
+// Admissible control configuration events
+enum ControlConfigurationEvent {
+    UNSPECIFIED_CONTROL_CONFIGURATION_EVENT = 0;            // Unspecified control configuration event
+    ANGLE_UNIT_CHANGED = 1;                                 // Angle unit changed event
+    GRAVITY_VECTOR_CHANGED = 2;                             // Gravity vector changed event
+    VISION_JOYSTICK_CONFIGURATION_CHANGED = 3;              // Vision joystick configuration changed event
+    JOINT_ADMITTANCE_CONFIGURATION_CHANGED = 4;             // Joint admittance configuration changed event
+    NULL_ADMITTANCE_CONFIGURATION_CHANGED = 5;              // Null admittance configuration changed event
+    CARTESIAN_ADMITTANCE_CONFIGURATION_CHANGED = 6;         // Cartesian admittance configuration changed event
+    JOINT_TORQUE_HYBRID_CONFIGURATION_CHANGED = 7;          // Joint torque hybrid configuraiton changed event
+    WRENCH_COMMAND_NORMAL_CONFIGURATION_CHANGED = 8;        // Wrench commmand normal configuration changed event
+    WRENCH_COMMAND_RESTRICTED_CONFIGURATION_CHANGED = 9;    // Wrench command restricted configuration changed event
+    CONTROL_CONFIGURATION_FACTORY_RESTORED = 10;            // Control configuration factory restored event
+    TOOL_CONFIGURATION_CHANGED = 11;                        // Tool configuration event
+    PAYLOAD_CONFIGURATION_CHANGED = 12;                     // Payload configuration event
+    CARTESIAN_REFERENCE_CHANGED = 13;                       // Cartesian reference event
+    CHANGE_CONTROL_MODE_FAILED = 14;                        // Control mode change fail event
+}
+
+// Notification about a single control configuration event
+message ControlConfigurationNotification {
+    ControlConfigurationEvent event = 1;
+    Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 3;    // User that caused the factory event to occur
+    Kinova.Api.Common.Connection connection = 4;            // Connection that caused the configuration event
+}
+
+// Cartesian reference frame
+message CartesianReferenceFrameInfo {
+    Kinova.Api.Common.CartesianReferenceFrame reference_frame = 1;    // Reference frame
+}

@@ -1,0 +1,5 @@
+Kinova.Api.GripperCyclic.Command.motor_cmd          max_count:4 fixed_count:false
+Kinova.Api.GripperCyclic.Feedback.motor      max_count:4 fixed_count:false
+Kinova.Api.GripperCyclic.CustomData.motor_custom_data   max_count:4 fixed_count:false
+
+

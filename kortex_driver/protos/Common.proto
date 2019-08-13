@@ -14,25 +14,27 @@ syntax = "proto3";
 
 package Kinova.Api.Common;
 
-// List of admissible device types
+// Admissible device types
 enum DeviceTypes {
     UNSPECIFIED_DEVICE_TYPE = 0;    // Unspecified device type
     BASE = 1;                       // Base module
     VISION = 2;                     // Vision module
     BIG_ACTUATOR = 3;               // Big actuator module
     SMALL_ACTUATOR = 4;             // Small actuator module
-    INTERCONNECT = 5;               // Interconnect module
+    INTERCONNECT = 5;               // Interface module
     GRIPPER = 6;                    // Gripper module
+    MEDIUM_ACTUATOR = 7;            // Medium actuator module
+    XBIG_ACTUATOR = 8;              // XBig actuator module
 }
 
-// Identifies a device
+// Reference to a specific device
 message DeviceHandle {
     DeviceTypes device_type = 1;    // Device type
     uint32 device_identifier = 2;   // Unique device identifier (used with other services)
     uint32 order = 3;               // Unique value indicating the order of that device versus the others to facilitate representation
 }
 
-// List of admissible safety statuses
+// Admissible safety statuses
 enum SafetyStatusValue {
     SAFETY_STATUS_UNSPECIFIED = 0;  // Unspecified safety status
     SAFETY_STATUS_WARNING = 1;      // Warning safety reached
@@ -40,7 +42,7 @@ enum SafetyStatusValue {
     SAFETY_STATUS_NORMAL = 3;       // Safety is off
 }
 
-// List of admissible permissions. Used as bitfields
+// Admissible permissions. Used as bitfields
 enum Permission {
     NO_PERMISSION = 0;      // No permission
     READ_PERMISSION = 1;    // Read permission. Refers to an entity that can be read
@@ -48,15 +50,15 @@ enum Permission {
     DELETE_PERMISSION = 4;  // Delete permission. Refers to an entity that can be deleted
 }
 
-// List of admissible notification types
+// Admissible notification types
 enum NotificationType {
     NOTIFICATION_TYPE_UNSPECIFIED = 0;  // Unspecified notification
-    NOTIFICATION_TYPE_THRESHOLD = 1;    // Threshold notification. Refers to a notification sent beyond a specific threshold (future)
-    NOTIFICATION_TYPE_FIX_RATE = 2;     // Fix rate notification. Refers to a notification sent at a predetermined fix rate (future)
+    NOTIFICATION_TYPE_THRESHOLD = 1;    // Threshold notification. Refers to a notification sent beyond a specific threshold (not implemented yet)
+    NOTIFICATION_TYPE_FIX_RATE = 2;     // Fix rate notification. Refers to a notification sent at a predetermined fix rate (not implemented yet)
     NOTIFICATION_TYPE_EVENT = 3;        // Event type notification. Refers to a notification sent in response to an event
 }
 
-// List of admissible units used throughout API methods
+// Admissible units used throughout API methods
 enum Unit {
     UNSPECIFIED_UNIT = 0;       // Unspecified unit
     CELSIUS = 1;                // Degree Celsius
@@ -85,17 +87,17 @@ message NotificationOptions {
     float threshold_value = 3;  // Threshold value (if applicable)
 }
 
-// Identifies a safety
+// Reference to a specific safety
 message SafetyHandle {
     uint32 identifier = 1; // Safety identifier
 }
 
-// Identifies a notification
+// Reference to a specific notification topic
 message NotificationHandle {
     uint32 identifier = 1; // Notification identifier
 }
 
-// Message that contains a safety event
+// Notification about a single safety event
 message SafetyNotification {
     SafetyHandle safety_handle = 1;     // Safety handle
     SafetyStatusValue value = 2;        // New safety status
@@ -110,20 +112,20 @@ message Timestamp {
     uint32 usec = 2;    // Number of microseconds that have elapsed since the last second (0-999999)
 }
 
-// Identifies a user profile
+// Reference to a user profile
 message UserProfileHandle {
     uint32 identifier = 1;  // User profile identifier
     fixed32 permission = 2; // Must use 'Permission' as bitwise
 }
 
-// Idenfities a connection
+// Connection between a user and the robot
 message Connection {
     UserProfileHandle user_handle = 1;  // User profile handle, or set to zero if no user logged in
     string connection_information = 2;  // Connection info (e.g. IP address with port number)
     uint32 connection_identifier = 3;   // Connection identifier
 }
 
-// List of admissible arm states
+// Admissible robot arm states
 enum ArmState
 {
     ARMSTATE_UNSPECIFIED                    = 0;    // Unspecified arm state
@@ -137,4 +139,194 @@ enum ArmState
     ARMSTATE_SERVOING_PLAYING_SEQUENCE      = 8;    // Arm is currently being controlled via a sequence
     ARMSTATE_SERVOING_MANUALLY_CONTROLLED   = 9;    // Arm is currently being controlled manually
     ARMSTATE_RESERVED                       = 255;  // For debugging, this state must never be reported outside the base. this means that a state is not mapped correctly
+}
+
+// UART configuration details
+message UARTConfiguration {
+    uint32 port_id             = 1; // UART port identification
+    bool enabled               = 2; // True if UART device is enabled, false otherwise
+    UARTSpeed speed            = 3; // Speed selection
+    UARTWordLength word_length = 4; // Word length
+    UARTStopBits stop_bits     = 5; // Stop bits
+    UARTParity parity          = 6; // Parity mode
+}
+
+// UART port id identification
+message UARTDeviceIdentification {
+    uint32 port_id = 1; // UART device port id
+}
+
+// Admissible UART baudrates
+enum UARTSpeed {
+    UART_SPEED_UNSPECIFIED = 0;  // Unspecified UART speed
+    UART_SPEED_4800        = 1;  // 4800 bps
+    UART_SPEED_9600        = 2;  // 9600 bps
+    UART_SPEED_19200       = 3;  // 19200 bps
+    UART_SPEED_38400       = 4;  // 38400 bps
+    UART_SPEED_57600       = 5;  // 57600 bps
+    UART_SPEED_115200      = 6;  // 115200 bps
+    UART_SPEED_230400      = 7;  // 230400 bps
+    UART_SPEED_460800      = 8;  // 460800 bps
+    UART_SPEED_921600      = 9;  // 921600 bps
+    UART_SPEED_1382400     = 10; // 1382400 bps
+    UART_SPEED_1612800     = 11; // 1612800 bps
+    UART_SPEED_1843200     = 12; // 1843200 bps
+    UART_SPEED_2073600     = 13; // 2073600 bps
+    UART_SPEED_2188800     = 14; // 2188800 bps
+    UART_SPEED_2246400     = 15; // 2246400 bps
+}
+
+// Admissible UART word lengths
+enum UARTWordLength {
+    UART_WORD_LENGTH_UNSPECIFIED = 0; // Unspecified UART word length
+    UART_WORD_LENGTH_7           = 1; // 7 bits
+    UART_WORD_LENGTH_8           = 2; // 8 bits
+    UART_WORD_LENGTH_9           = 3; // 9 bits
+}
+
+// Admissible UART stop bits
+enum UARTStopBits {
+    UART_STOP_BITS_UNSPECIFIED = 0; // Unspecified UART stop bits
+    UART_STOP_BITS_0_5         = 1; // 0.5 stop bit
+    UART_STOP_BITS_1           = 2; // 1 stop bit
+    UART_STOP_BITS_1_5         = 3; // 1.5 stop bits
+    UART_STOP_BITS_2           = 4; // 2 stop bits
+}
+
+// Admissible UART parity mode
+enum UARTParity {
+    UART_PARITY_UNSPECIFIED = 0; // Unspecified UART parity
+    UART_PARITY_NONE        = 1; // No parity
+    UART_PARITY_ODD         = 2; // Odd parity
+    UART_PARITY_EVEN        = 3; // Even parity
+}
+
+//  Admissible Cartesian reference frame modes
+enum CartesianReferenceFrame {
+    CARTESIAN_REFERENCE_FRAME_UNSPECIFIED = 0;  // Unspecified Cartesian reference frame
+    CARTESIAN_REFERENCE_FRAME_MIXED = 1;        // Mixed reference frame where translation reference = base and  orientation reference = tool
+    CARTESIAN_REFERENCE_FRAME_TOOL = 2;         // Tool reference frame where translation reference = tool and orientation reference = tool
+    CARTESIAN_REFERENCE_FRAME_BASE = 3;         // Base reference frame where the translation reference = base and orientation reference = base
+}
+
+// Country code
+message CountryCode {
+    CountryCodeIdentifier identifier = 1; // ISO3166 country code identifier
+}
+
+// Supported ISO3166 country identifiers
+enum CountryCodeIdentifier {
+    UNSPECIFIED_COUNTRY_CODE = 0;
+    UNITED_ARAB_EMIRATES_AE = 1;
+    ANTIGUA_AND_BARBUDA_AG = 2;
+    ANGUILLA_AI = 3;
+    ALBANIA_AL = 4;
+    AMERICAN_SAMOA_AS = 5;
+    AUSTRIA_AT = 6;
+    AUSTRALIA_AU = 7;
+    ARUBA_AW = 8;
+    AZERBAIJAN_AZ =  9;
+    BOSNIA_AND_HERZEGOVINA_BA = 10;
+    BANGLADESH_BD = 11;
+    BELGIUM_BE = 12;
+    BULGARIA_BG = 13;
+    BAHRAIN_BH = 14;
+    BERMUDA_BM = 15;
+    BRUNEI_DARUSSALAM_BN = 16;
+    BRAZIL_BR = 17;
+    BAHAMAS_BS = 18;
+    BELARUS_BY = 19;
+    SWITZERLAND_CH = 20;
+    CANADA_CA = 21;
+    CHINA_CN = 22;
+    COLOMBIA_CO = 23;
+    COSTA_RICA_CR = 24;
+    CYPRUS_CY = 25;
+    CZECH_REPUBLIC_CZ = 26;
+    GERMANY_DE = 27;
+    DENMARK_DK = 28;
+    ECUADOR_EC = 29;
+    ESTONIA_EE = 30;
+    EGYPT_EG = 31;
+    SPAIN_ES = 32;
+    ETHIOPIA_ET = 33;
+    FINLAND_FI = 34;
+    FRANCE_FR = 35;
+    UNITED_KINGDOM_GB = 36;
+    GRENADA_GD = 37;
+    FRENCH_GUIANA_GF = 38;
+    GUADELOUPE_GP = 39;
+    GREECE_GR = 40;
+    GUATEMALA_GT = 41;
+    GUAM_GU = 42;
+    HONG_KONG_HK = 43;
+    CROATIA_HR = 44;
+    HUNGARY_HU = 45;
+    INDIA_IN = 46;
+    INDONESIA_ID = 47;
+    IRELAND_IE = 48;
+    ISRAEL_IL = 49;
+    ICELAND_IS = 50;
+    ITALY_IT = 51;
+    JORDAN_JO = 52;
+    JAPAN_JP = 53;
+    CAMBODIA_KH = 54;
+    REPUBLIC_OF_KOREA_KR = 55;
+    KUWAIT_KW = 56;
+    CAYMAN_ISLANDS_KY = 57;
+    LAO_PDR_LA = 58;
+    LEBANON_LB = 59;
+    LIECHTENSTEIN_LI = 60;
+    SRI_LANKA_LK = 61;
+    LESOTHO_LS = 62;
+    LITHUANIA_LT = 63;
+    LUXEMBOURG_LU = 64;
+    LATVIA_LV = 65;
+    MOROCCO_MA = 66;
+    MONACO_MC = 67;
+    MOLDOVA_MD = 68;
+    MONTENEGRO_ME = 69;
+    REPUBLIC_OF_MACEDONIA_MK = 70;
+    MONGOLIA_MN = 71;
+    MARTINIQUE_MQ = 72;
+    MAURITANIA_MR = 73;
+    MALTA_MT = 74;
+    MAURITIUS_MU = 75;
+    MALDIVES_MV = 76;
+    MALAWI_MW = 77;
+    MEXICO_MX = 78;
+    MALAYSIA_MY = 79;
+    NICARAGUA_NI = 80;
+    NETHERLANDS_NL = 81;
+    NORWAY_NO = 82;
+    NEW_ZEALAND_NZ = 83;
+    OMAN_OM = 84;
+    PANAMA_PA = 85;
+    PERU_PE = 86;
+    PHILIPPINES_PH = 87;
+    POLAND_PL = 88;
+    PUERTO_RICO_PR = 89;
+    PORTUGAL_PT = 90;
+    PARAGUAY_PY = 91;
+    REUNION_RE = 92;
+    ROMANIA_RO = 93;
+    SERBIA_RS = 94;
+    RUSSIAN_FEDERATION_RU = 95;
+    SWEDEN_SE = 96;
+    SINGAPORE_SI = 97;
+    SLOVAKIA_SK = 98;
+    EL_SALVADOR_SV = 99;
+    THAILAND_TH = 100;
+    TUNISIA_TN = 101;
+    TURKEY_TR = 102;
+    TRINIDAD_AND_TOBAGO_TT = 103;
+    TAIWAN_PROVINCE_OF_CHINA_TW = 104;
+    UKRAINE_UA = 105;
+    UNITED_STATES_US = 106;
+    HOLY_SEE_VATICAN_CITY_STATE_VA = 107;
+    BOLIVARIAN_REPUBLIC_OF_VENEZUELA_VE = 108;
+    BRITISH_VIRGIN_ISLANDS_VG = 109;
+    VIETNAM_VN = 110;
+    MAYOTTE_YT = 111;
+    SOUTH_AFRICA_ZA = 112;
 }

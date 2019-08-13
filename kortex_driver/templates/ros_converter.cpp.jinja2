@@ -1,7 +1,7 @@
 /*
 * KINOVA (R) KORTEX (TM)
 *
-* Copyright (c) 2018 Kinova inc. All rights reserved.
+* Copyright (c) 2019 Kinova inc. All rights reserved.
 *
 * This software may be modified and distributed under the
 * terms of the BSD 3-Clause license.
@@ -14,24 +14,20 @@
  * This file has been auto-generated and should not be modified.
  */
  
-#include "{{currentPackageName|lower}}_ros_converter.h"
-{% if 'Common' not in currentPackageName %}
-#include "common_ros_converter.h"
-{% endif %}
+#include "{{current_header_filename}}"
 
-{% for detailed_message in item -%}
-int ToRosData({{detailed_message.message.name}} input, kortex_driver::{{detailed_message.message.name}} &output)
+{% for detailed_message in package.messages -%}
+int ToRosData({{detailed_message.cpp_namespace}}::{{detailed_message.name}} input, kortex_driver::{{detailed_message.prepend_message_name}}{{detailed_message.name}} &output)
 {
-	{%- for field in detailed_message.message.field %}
-	{%- if not field.HasField("oneof_index") %}
-	{%- if field.label == 3 %} {# Si c'est un repeated #}
-	{% if field.type == 11 %}
-	{%- set splitTypeName = field.type_name.split('.') -%}
-	output.{{field.name|lower}}.clear();
+	{% for field in detailed_message.message.field -%}
+	{%- if not field.HasField("oneof_index") -%}
+	{%- if field.label == 3 -%} {# REPEATED #}
+	{%- if field.type == 11 %}
+	output.{{field.name}}.clear();
 	for(int i = 0; i < input.{{field.name|lower}}_size(); i++)
 	{
-		kortex_driver::{{splitTypeName[4]}} temp;
-		ToRosData(input.{{field.name}}(i), temp);
+		kortex_driver::{{field.type_name.split(".")[-1]}} temp;
+		ToRosData(input.{{field.name|lower}}(i), temp);
 		output.{{field.name}}.push_back(temp);
 	}
 	{%- else %}
@@ -45,7 +41,6 @@ int ToRosData({{detailed_message.message.name}} input, kortex_driver::{{detailed
 	{%- if field.type == 11 %}
 	ToRosData(input.{{field.name}}(), output.{{field.name}});
 	{%- elif field.type == 14 %}
-	{%- set list1 = field.type_name.split('.') -%} {# Cette ligne sert à enlever les namespace dans le nom du type #}
 	output.{{field.name}} = input.{{field.name}}(); 
 	{%- elif field.type == 12 %}
 	output.{{field.name}} = std::vector<uint8_t>(input.{{field.name}}().begin(), input.{{field.name}}().end());
@@ -55,32 +50,30 @@ int ToRosData({{detailed_message.message.name}} input, kortex_driver::{{detailed
 	{%- endif %}
 	{%- endif %}
 	{%- endfor %}
-	
-	{% if detailed_message.HasOneOf == "true" %}
-	auto oneof_type = input.{{detailed_message.message.ListFields()[-1][1][0].name}}_case();
 
+	{% for detailed_one_of in detailed_message.one_of_list %}
+	auto oneof_type = input.{{detailed_one_of.name}}_case();
 	switch(oneof_type)
 	{
-	{%- for field in detailed_message.message.field -%}
-	{%- if field.HasField("oneof_index") -%}
-	{%- set splitTypeName = field.type_name.split('.') %}
-	{%- set EnumName = field.name.replace("_", " ").title().replace(" ", "") %}
-		case {{detailed_message.message.name}}::k{{EnumName}}:
+	{%- for field in detailed_one_of.fields %}
+	{%- if "_" in field.name -%} {%- set EnumName = field.name.replace("_", " ").title().replace(" ", "") -%} {# In case the field is in the form of "gripper_command" #}
+	{%- else -%} {%- set EnumName = field.name[0]|upper + field.name[1:] -%} {%- endif %} {# In case the field is in the form of "gripperCommand" #}
+	
+		case {{detailed_message.cpp_namespace}}::{{detailed_message.message.name}}::k{{EnumName}}:
 		{
 	{%- if field.type == 11 %}
-			kortex_driver::{{splitTypeName[4]}} temp;
+			decltype(output.oneof_{{detailed_one_of.name}}.{{field.name}})::value_type temp;
 			ToRosData(input.{{field.name}}(), temp);
-			output.oneof_{{detailed_message.message.ListFields()[-1][1][0].name}}.{{field.name}}.push_back(temp);
+			output.oneof_{{detailed_one_of.name}}.{{field.name}}.push_back(temp);
 	{%- elif field.type == 14 %}
-			output.oneof_{{detailed_message.message.ListFields()[-1][1][0].name}}.{{field.name}}.push_back(input.{{field.name}}());
+			output.oneof_{{detailed_one_of.name}}.{{field.name}}.push_back(input.{{field.name}}());
 	{% endif %}
 			break;
 		}
-	{% endif %}
-	{%- endfor %}
+	{%- endfor -%}
 	}
-	{% endif -%}
-
+	{%- endfor %}
+	
 	return 0;
 }
 {% endfor %}

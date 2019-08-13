@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+import public "Common.proto";
+
+package Kinova.Api.GripperConfig;
+
+// Gripper safety identifier
+enum SafetyIdentifier {
+    UNSPECIFIED_ACTUATOR_SAFETY_IDENTIFIER = 0;   //0x0
+    MAXIMUM_MOTOR_CURRENT                  = 1;   //0x1
+    MAXIMUM_VOLTAGE                        = 2;   //0x2
+    MINIMUM_VOLTAGE                        = 4;   //0x4
+    MAXIMUM_MOTOR_TEMPERATURE              = 8;   //0x8
+    MAXIMUM_CORE_TEMPERATURE               = 16;  //0x10
+    NON_VOLATILE_MEMORY_CORRUPTED          = 32;  //0x20
+    EMERGENCY_LINE_ASSERTED                = 64;  //0x40
+    COMMUNICATION_TICK_LOST                = 128; //0x80
+    WATCHDOG_TRIGGERED                     = 256; //0x100
+}
+
+// Status flags for Robotiq Adaptive Gripper
+enum RobotiqGripperStatusFlags {
+    UNSPECIFIED_ROBOTIQ_STATUS              = 0;    //0x0
+    ROBOTIQ_STAT_INITIALIZED                = 1;    //0x01 
+    ROBOTIQ_STAT_OBJECT_DETECTED            = 2;    //0x02
+    ROBOTIQ_STAT_POS_REACHED                = 4;    //0x04
+    ROBOTIQ_STAT_STOPPED                    = 8;    //0x08
+}
+
+

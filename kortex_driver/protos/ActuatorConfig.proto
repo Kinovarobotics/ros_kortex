@@ -1,0 +1,377 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+
+syntax = "proto3"; 
+ 
+import public "Common.proto";
+
+package Kinova.Api.ActuatorConfig;
+
+// Service to configure actuators
+service ActuatorConfig {//@PROXY_ID=10 @ERROR=Kinova.Api.Error
+
+    // Retrieves axis offsets for absolute and relative encoder
+    rpc GetAxisOffsets                          (Kinova.Api.Common.Empty)     returns (AxisOffsets);                 //@RPC_ID=1
+
+    // Sets offsets for absolute and relative encoder
+    rpc SetAxisOffsets                          (AxisPosition)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=2
+    
+    // Reads torque calibration parameters (internal use only)
+    rpc ReadTorqueCalibration                   (Kinova.Api.Common.Empty)     returns (TorqueCalibration);           //@RPC_ID=3
+   
+    // Writes torque calibration parameters (internal use only)
+    rpc WriteTorqueCalibration                  (TorqueCalibration)           returns (Kinova.Api.Common.Empty);     //@RPC_ID=4
+    
+    // Sets zero torque calibration
+    rpc SetTorqueOffset                         (TorqueOffset)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=5
+    
+    // Retrieves actuator control mode
+    rpc GetControlMode                          (Kinova.Api.Common.Empty)     returns (ControlModeInformation);      //@RPC_ID=6
+    
+    // Sets actuator control mode
+    rpc SetControlMode                          (ControlModeInformation)      returns (Kinova.Api.Common.Empty);     //@RPC_ID=7
+    
+    // Retrieves activated control loop(s)
+    rpc GetActivatedControlLoop                 (Kinova.Api.Common.Empty)     returns (ControlLoop);                 //@RPC_ID=8
+    
+    // Sets activated control loop(s)
+    rpc SetActivatedControlLoop                 (ControlLoop)                 returns (Kinova.Api.Common.Empty);     //@RPC_ID=9
+    
+    // Retrieves motor drive FOC parameters (internal use only)
+    rpc GetVectorDriveParameters                (Kinova.Api.Common.Empty)     returns (VectorDriveParameters);       //@RPC_ID=10
+    
+    // Sets motor drive FOC parameters (internal use only)
+    rpc SetVectorDriveParameters                (VectorDriveParameters)       returns (Kinova.Api.Common.Empty);     //@RPC_ID=11
+    
+    // Retrieves encoder derivative parameters (internal use only)
+    rpc GetEncoderDerivativeParameters          (Kinova.Api.Common.Empty)     returns (EncoderDerivativeParameters); //@RPC_ID=12
+
+    // Sets encoder derivative parameters (internal use only)
+    rpc SetEncoderDerivativeParameters          (EncoderDerivativeParameters) returns (Kinova.Api.Common.Empty);     //@RPC_ID=13
+    
+    // Retrieves control loop parameters
+    rpc GetControlLoopParameters                (LoopSelection)               returns (ControlLoopParameters);       //@RPC_ID=14
+
+    // Sets control loop parameters
+    rpc SetControlLoopParameters                (ControlLoopParameters)       returns (Kinova.Api.Common.Empty);     //@RPC_ID=15
+
+    // Starts frequency response test (internal use only)
+    rpc StartFrequencyResponse                  (FrequencyResponse)           returns (Kinova.Api.Common.Empty);     //@RPC_ID=16
+    
+    // Stops frequency response test (internal use only)
+    rpc StopFrequencyResponse                   (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=17
+    
+    // Starts step response test (internal use only)
+    rpc StartStepResponse                       (StepResponse)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=18
+    
+    // Stops step response test (internal use only)
+    rpc StopStepResponse                        (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=19
+    
+    // Starts ramp response test (internal use only)
+    rpc StartRampResponse                       (RampResponse)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=20
+    
+    // Stops ramp response test (internal use only)
+    rpc StopRampResponse                        (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=21
+    
+    // Selects custom data
+    rpc SelectCustomData                        (CustomDataSelection)         returns (Kinova.Api.Common.Empty);     //@RPC_ID=22
+    
+    // Retrieves selected custom data
+    rpc GetSelectedCustomData                   (Kinova.Api.Common.Empty)     returns (CustomDataSelection);         //@RPC_ID=23
+    
+    // Sets command mode (config versus cyclic)
+    rpc SetCommandMode                          (CommandModeInformation)      returns (Kinova.Api.Common.Empty);     //@RPC_ID=24
+    
+    // Clears all error(s) and warning(s) (bank A and B)
+    rpc ClearFaults                             (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=25
+    
+    // Enables or disables servoing
+    rpc SetServoing                             (Servoing)                    returns (Kinova.Api.Common.Empty);     //@RPC_ID=26
+    
+    // Moves the actuator to the desired position
+    rpc MoveToPosition                          (PositionCommand)             returns (Kinova.Api.Common.Empty);     //@RPC_ID=27
+    
+    // Retrieves command mode (config versus cyclic)
+    rpc GetCommandMode                          (Kinova.Api.Common.Empty)     returns (CommandModeInformation);      //@RPC_ID=28
+    
+    // Retrieves servoing state
+    rpc GetServoing                             (Kinova.Api.Common.Empty)     returns (Servoing);                    //@RPC_ID=29
+    
+    // Retrieves torque offset calibration
+    rpc GetTorqueOffset                         (Kinova.Api.Common.Empty)     returns (TorqueOffset);                //@RPC_ID=30
+}
+
+// Identifies ActuatorConfig service current version
+enum ServiceVersion
+{
+    RESERVED_0 = 0;                   // Reserved
+    CURRENT_VERSION = 1;              // Current version
+}
+
+// Admissible limit types 
+enum SafetyLimitType
+{
+   MAXIMAL_LIMIT = 0;                 // Maximal limit
+   MINIMAL_LIMIT = 1;                 // Minimal limit
+}
+
+// Admissible control modes 
+enum ControlMode
+{
+    NONE     = 0;                     // None
+    POSITION = 1;                     // Position mode
+    VELOCITY = 2;                     // Velocity mode
+    TORQUE   = 3;                     // Torque mode
+    CURRENT  = 4;                     // Current mode
+    CUSTOM   = 5;                     // Custom mode
+}
+
+// Admissible command modes 
+enum CommandMode
+{
+    CYCLIC                                = 0; // Cyclic data only
+    ASYNC_CYCLIC_FLAGS                    = 1; // Not supported
+    ASYNC                                 = 2; // Config messages only
+    CYCLIC_JITTERCOMPENSATED_POSITION     = 3; // Smoothing using only position inputs 
+    CYCLIC_JITTERCOMPENSATED_VELOCITY     = 4; // Smoothing using position and velocity inputs
+    CYCLIC_JITTERCOMPENSATED_ACCELERATION = 5; // Smoothing using position, velocity and acceleration inputs (not supported)
+}
+
+// Admissible control loop selections
+enum ControlLoopSelection
+{
+    RESERVED            = 0;    // 0x0 - Reserved (internal use only)
+    JOINT_POSITION      = 1;    // 0x1 - Joint position control (if available)
+    MOTOR_POSITION      = 2;    // 0x2 - Motor position control
+    JOINT_VELOCITY      = 4;    // 0x4 - Joint velocity control (if available)
+    MOTOR_VELOCITY      = 8;    // 0x8 - Motor velocity control
+    JOINT_TORQUE        = 16;   // 0x10 - Joint torque control
+    MOTOR_CURRENT       = 32;   // 0x20 - Motor current control
+}
+
+// Axis position
+message AxisPosition
+{
+    float position = 1;                // Axis position (meters)
+}
+
+// Axis offsets
+message AxisOffsets
+{
+    float absolute_offset = 1;         // Absolute offset value (meters)
+    float relative_offset = 2;         // Relative offset value (meters)
+}
+
+// Torque calibration settings
+message TorqueCalibration
+{
+    float    global_gain   = 1;        // Global gain value
+    float    global_offset = 2;        // Global offset value
+    repeated float gain    = 3;        // Gain (index 0 to 3)
+    repeated float offset  = 4;        // Offset (index 0 to 3)
+}
+
+// Defines torque offset 
+message TorqueOffset
+{
+    float torque_offset = 1;           // Torque offset value
+}
+
+// Control mode information
+message ControlModeInformation
+{
+    ControlMode control_mode = 1;    // Control mode
+}
+
+// Control loop 
+message ControlLoop
+{
+    fixed32 control_loop = 1;         // Use ControlLoopSelection enum values to form bitmask
+}
+
+// Defines the loop selection
+message LoopSelection
+{
+    ControlLoopSelection loop_selection = 1; // ControlLoopSelection enum
+}
+
+// Field-oriented control PI controller gain values
+message VectorDriveParameters
+{
+    float kpq = 1;                   // Quadrature axis current proportional gain
+    float kiq = 2;                   // Quadrature axis current integral gain
+    float kpd = 3;                   // Direct axis current proportional gain
+    float kid = 4;                   // Direct axis current integral gain
+}
+
+// Variable window derivative parameters
+message EncoderDerivativeParameters
+{
+    uint32 max_window_width       = 1;  // Maximum window width
+    uint32 min_encoder_tick_count = 2;  // Minimum encoder tick count
+}
+
+// Control loop parameters (discrete transfer function)
+message ControlLoopParameters
+{
+    ControlLoopSelection  loop_selection    = 1;   // ControlLoopSelection enum
+    float                 error_saturation  = 2;   // Error saturation value
+    float                 output_saturation = 3;   // Output saturation value
+    repeated              float kAz         = 4;   // KAz (index 0 to 4): denominator gains A1 to A5
+    repeated              float kBz         = 5;   // KBz (index 0 to 5): numerator gains B0 to B5
+    float                 error_dead_band   = 6;   // Error dead band value
+}
+
+// Frequency response
+message FrequencyResponse
+{
+    ControlLoopSelection loop_selection = 1;       // ControlLoopSelection enum
+    float                min_frequency  = 2;       // Minimum frequency value
+    float                max_frequency  = 3;       // Maximum frequency value
+    float                amplitude      = 4;       // Amplitude value
+    float                duration       = 5;       // Duration (in seconds)
+}
+
+// Step response
+message StepResponse
+{
+    ControlLoopSelection loop_selection = 1;       // ControlLoopSelection enum
+    float                amplitude      = 2;       // Amplitude value
+    float                step_delay     = 3;       // Step delay value
+    float                duration       = 4;       // Duration (in seconds)
+}
+
+// Ramp response
+message RampResponse
+{
+    ControlLoopSelection loop_selection = 1;       // ControlLoopSelection enum
+    float                slope          = 2;       // Slope value
+    float                ramp_delay     = 3;       // Ramp delay value
+    float                duration       = 4;       // Duration (in seconds)
+}
+
+// Selected custom data channels content
+message CustomDataSelection
+{
+    repeated CustomDataIndex channel = 1;     // 16 channels maximum
+}
+
+// Command mode
+message CommandModeInformation
+{
+    CommandMode command_mode = 1;    // Command mode
+}
+
+// Enables/disables servoing
+message Servoing
+{
+    bool enabled = 1;                // Servoing enabled
+}
+
+// Angular position command for an actuator
+message PositionCommand
+{
+    float position     = 1;          // Position value (degrees)
+    float velocity     = 2;          // Velocity value (degrees per second)
+    float acceleration = 3;          // Acceleration value (degrees per second^squared)
+}
+
+// Admissible bank A actuator safeties
+enum SafetyIdentifierBankA {
+    UNSPECIFIED_ACTUATOR_SAFETY_IDENTIFIER_BANK_A  = 0;             // 0x0 - Unspecified actuator safety
+    FOLLOWING_ERROR                                = 1;             // 0x1 - Following error
+    MAXIMUM_VELOCITY                               = 2;             // 0x2 - Maximum velocity
+    JOINT_LIMIT_HIGH                               = 4;             // 0x4 - Joint position limit high
+    JOINT_LIMIT_LOW                                = 8;             // 0x8 - Joint position limit low
+    STRAIN_GAUGE_MISMATCH                          = 16;            // 0x10 - Strain gauge mismatch
+    MAXIMUM_TORQUE                                 = 32;            // 0x20 - Maximum torque
+    UNRELIABLE_ABSOLUTE_POSITION                   = 64;            // 0x40 - Unreliable absolute position
+    MAGNETIC_POSITION                              = 128;           // 0x80 - Magnetic position
+    HALL_POSITION                                  = 256;           // 0x100 - Hall position
+    HALL_SEQUENCE                                  = 512;           // 0x200 - Hall sequence
+    INPUT_ENCODER_HALL_MISMATCH                    = 1024;          // 0x400 - Input encoder Hall mismatch
+    INPUT_ENCODER_INDEX_MISMATCH                   = 2048;          // 0x800 - Input encoder index mismatch
+    INPUT_ENCODER_MAGNETIC_MISMATCH                = 4096;          // 0x1000 - Input encoder magnetic mismatch
+    MAXIMUM_MOTOR_CURRENT                          = 8192;          // 0x2000 - Maximum motor current
+    MOTOR_CURRENT_MISMATCH                         = 16384;         // 0x4000 - Motor current mismatch
+    MAXIMUM_VOLTAGE                                = 32768;         // 0x8000 - Maximum voltage
+    MINIMUM_VOLTAGE                                = 65536;         // 0x10000 - Minimum voltage
+    MAXIMUM_MOTOR_TEMPERATURE                      = 131072;        // 0x20000 - Maximum motor temperature
+    MAXIMUM_CORE_TEMPERATURE                       = 262144;        // 0x40000 - Maximum core temperature
+    NON_VOLATILE_MEMORY_CORRUPTED                  = 524288;        // 0x80000 - Non-volatile memory corrupted
+    MOTOR_DRIVER_FAULT                             = 1048576;       // 0x100000 - Motor driver fault
+    EMERGENCY_LINE_ASSERTED                        = 2097152;       // 0x200000 - Emergency line asserted
+    COMMUNICATION_TICK_LOST                        = 4194304;       // 0x400000 - Communication tick lost
+    WATCHDOG_TRIGGERED                             = 8388608;       // 0x800000 - Watchdog triggered
+    UNRELIABLE_CAPACITIVE_SENSOR                   = 16777216;      // 0x1000000 - Capacitive sensor is unreliable
+    UNEXPECTED_GEAR_RATIO                          = 33554432;      // 0x2000000 - Incorrect gear ratio for detected configuration
+}
+
+// Custom data options
+enum CustomDataIndex {
+    NO_CUSTOM_DATA_SELECTED = 0; // No custom data selected
+    UINT32_TEST_RAMP = 1; // Incremental value used for test and validation
+    UINT32_MOTOR_ENCODER_RAW = 2; // Rotor optical encoder incremental value (raw)
+    UINT32_JOINT_ENCODER_RAW = 3; // Joint optical encoder incremental value (raw)
+    FLOAT_TEMPERATURE_PHASE_0 = 4; // Motor phase 0 temperature (degrees Celsius)
+    FLOAT_TEMPERATURE_PHASE_1 = 5; // Motor phase 1 temperature (degrees Celsius)
+    FLOAT_TEMPERATURE_PHASE_2 = 6; // Motor phase 2 temperature (degrees Celsius)
+    INT32_TORQUE_SENSOR_RAW_0 = 7; // Individual torque sensor strain gauge 0 ADC value (raw)
+    INT32_TORQUE_SENSOR_RAW_1 = 8; // Individual torque sensor strain gauge 1 ADC value (raw)
+    INT32_TORQUE_SENSOR_RAW_2 = 9; // Individual torque sensor strain gauge 2 ADC value (raw)
+    INT32_TORQUE_SENSOR_RAW_3 = 10; // Individual torque sensor strain gauge 3 ADC value (raw)
+    FLOAT_TORQUE_SENSOR_0 = 11; // Individual torque sensor strain gauge 0 converted value (Newton-meters)
+    FLOAT_TORQUE_SENSOR_1 = 12; // Individual torque sensor strain gauge 1 converted value (Newton-meters)
+    FLOAT_TORQUE_SENSOR_2 = 13; // Individual torque sensor strain gauge 2 converted value (Newton-meters)
+    FLOAT_TORQUE_SENSOR_3 = 14; // Individual torque sensor strain gauge 3 converted value (Newton-meters)
+    UINT32_MOTOR_ENCODER_RAW_LATCH_ON_INDEX_RISING = 15; // Rotor optical encoder incremental value at last index signal rising edge (raw)
+    UINT32_JOINT_ENCODER_RAW_LATCH_ON_INDEX_RISING = 16; // Joint optical encoder incremental value at last index signal rising edge (raw)
+    UINT32_ABSOLUTE_POSITION_SENSOR_RAW = 17; // Absolute position sensor integer value (raw)
+    FLOAT_ABSOLUTE_POSITION_SENSOR = 18; // Absolute position sensor converted value (degrees)
+    FLOAT_CONTROL_POSITION_JOINT_REQUESTED = 19; // Last axis position command received via Ethernet
+    UINT32_JIG_FLAGS = 20; // Jig status flags (internal use)
+    UINT32_TICK_MOTOR_CONTROL = 21; // Rotor optical encoder incremental value corrected for counter overflow (raw)
+    UINT32_TICK_JOINT_CONTROL = 22; // Joint optical encoder incremental value corrected for counter overflow (raw)
+    UINT32_INDEX_TICK_MOTOR_CONTROL = 23; // Rotor optical encoder incremental value corrected for counter overflow at last index signal rising edge (raw)
+    UINT32_INDEX_TICK_JOINT_CONTROL = 24; // Joint optical encoder incremental value corrected for counter overflow at last index signal rising edge (raw)
+    FLOAT_ACCELERATION_X = 25; // x-axis acceleration (meters per second squared)
+    FLOAT_ACCELERATION_Y = 26; // y-axis acceleration (meters per second squared)
+    FLOAT_ACCELERATION_Z = 27; // z-axis acceleration (meters per second squared)
+    FLOAT_ANGULAR_RATE_X = 28; // x-axis angular velocity (degrees per second)
+    FLOAT_ANGULAR_RATE_Y = 29; // y-axis angular velocity (degrees per second)
+    FLOAT_ANGULAR_RATE_Z = 30; // z-axis angular velocity (degrees per second)
+    FLOAT_POSITION_MOTOR_CMD = 31; // Axis position command sent to motor position control loop (degrees)
+    FLOAT_VELOCITY_MOTOR_CMD = 32; // Axis velocity command sent to motor velocity control loop (degrees per second)
+    FLOAT_POSITION_MOTOR = 33; // Actuator position measured by rotor optical encoder (degrees)
+    FLOAT_VELOCITY_MOTOR = 34; // Actuator angular velocity measured by rotor optical encoder (degrees per second)
+    UINT32_COMMUNICATIONS_JITTER = 35; // Jitter from the communication (microseconds)
+    FLOAT_TORQUE_AVERAGE = 36; // Actuator torque (Newton-meters)
+    FLOAT_CURRENT_MOTOR = 37; // Motor current (Amperes)
+    FLOAT_VOLTAGE_DIGITAL = 38; // Main board voltage (Volts)
+    FLOAT_TEMPERATURE_MOTOR_CELSIUS = 39; // Motor temperature (maximum of the three (3) phase temperatures) (degrees Celsius)
+    FLOAT_TEMPERATURE_CORE_CELSIUS = 40; // Microcontroller temperature (degrees Celsius)
+    UINT32_FAULT_A = 41; // Bank A faults (see ActuatorConfig.SafetyIdentifier)
+    UINT32_FAULT_B = 42; // Bank B faults (see ActuatorConfig.SafetyIdentifier)
+    UINT32_WARNING_A = 43; // Bank A warnings (see ActuatorConfig.SafetyIdentifier)
+    UINT32_WARNING_B = 44; // Bank B warnings (see ActuatorConfig.SafetyIdentifier)
+    FLOAT_POSITION_FROM_HALLS = 45; // Actuator position measured by motor hall sensors (degrees)
+    FLOAT_PHASE_CURRENT_0 = 46; // Motor phase 0 current (Amperes)
+    FLOAT_PHASE_CURRENT_1 = 47; // Motor phase 1 current (Amperes)
+    FLOAT_PHASE_CURRENT_2 = 48; // Motor phase 2 current (Amperes)
+    FLOAT_PHASE_PWM_0 = 49; // Pulse width modulation duty cycle applied to motor phase 0 (percentage)
+    FLOAT_PHASE_PWM_1 = 50; // Pulse width modulation duty cycle applied to motor phase 1 (percentage)
+    FLOAT_PHASE_PWM_2 = 51; // Pulse width modulation duty cycle applied to motor phase 2 (percentage)
+    FLOAT_MOTOR_ELECTRICAL_ANGLE = 52; // Motor electrical angle (degrees)
+    FLOAT_CURRENT_MOTOR_CMD = 53; // Motor current command sent to motor drive (Amperes)
+    FLOAT_TORQUE_JOINT_CMD = 54; // Axis torque command sent to joint torque control loop (Newton-meters)
+    FLOAT_POSITION_UNWRAPPED = 55; // Actuator position unwrapped (degrees)
+}

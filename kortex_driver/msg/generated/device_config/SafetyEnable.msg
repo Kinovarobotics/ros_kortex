@@ -1,0 +1,3 @@
+
+SafetyHandle handle
+bool enable

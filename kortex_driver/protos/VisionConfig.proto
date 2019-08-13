@@ -1,0 +1,282 @@
+/*
+ * KINOVA (R) KORTEX (TM)
+ *
+ * Copyright (c) 2018 Kinova inc. All rights reserved.
+ *
+ * This software may be modified and distributed
+ * under the terms of the BSD 3-Clause license.
+ *
+ * Refer to the LICENSE file for details.
+ *
+ */
+
+syntax = "proto3";
+ 
+import public "Common.proto";
+
+package Kinova.Api.VisionConfig;
+
+// Service to configure the Vision Module
+service VisionConfig {//@PROXY_ID=5 @ERROR=Kinova.Api.Error
+
+    // Sets sensor settings (resolution, frame rate, etc)
+    rpc SetSensorSettings (SensorSettings) returns (Kinova.Api.Common.Empty);//@RPC_ID=1
+
+    // Retrieves sensor settings (resolution, frame rate, etc)
+    rpc GetSensorSettings (SensorIdentifier) returns (SensorSettings);//@RPC_ID=2
+
+    // Retrieves option value from the sensor
+    rpc GetOptionValue (OptionIdentifier) returns (OptionValue);//@RPC_ID=3
+
+    // Writes new value to sensor option
+    rpc SetOptionValue (OptionValue) returns (Kinova.Api.Common.Empty);//@RPC_ID=4
+
+    // Retrieves option information from the sensor
+    rpc GetOptionInformation (OptionIdentifier) returns (OptionInformation);//@RPC_ID=5
+    
+    // Subscribes to Vision configuration notifications
+    rpc VisionTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=6 @PUB_SUB=VisionNotification
+    
+    // Do a focus action
+    rpc DoSensorFocusAction (SensorFocusAction) returns (Kinova.Api.Common.Empty);//@RPC_ID=7
+
+    // Retrieves sensor intrinsic parameters
+    rpc GetIntrinsicParameters (SensorIdentifier) returns (IntrinsicParameters);//@RPC_ID=8
+
+    // Retrieves sensor intrinsic parameters for a specific profile
+    rpc GetIntrinsicParametersProfile (IntrinsicProfileIdentifier) returns (IntrinsicParameters);//@RPC_ID=9
+
+    // Sets sensor intrinsic parameters
+    rpc SetIntrinsicParameters (IntrinsicParameters) returns (Kinova.Api.Common.Empty);//@RPC_ID=10
+
+    // Retrieves sensor extrinsic parameters
+    rpc GetExtrinsicParameters (Kinova.Api.Common.Empty) returns (ExtrinsicParameters);//@RPC_ID=11
+
+    // Sets sensor extrinsic parameters
+    rpc SetExtrinsicParameters (ExtrinsicParameters) returns (Kinova.Api.Common.Empty);//@RPC_ID=12
+}
+
+// Identifies VisionConfig service current version
+enum ServiceVersion {
+    RESERVED_0 = 0;         // Reserved
+    CURRENT_VERSION = 1;    // Current version
+}
+
+// Main sensor settings - resolution, frame rate, bit rate - for the chosen sensor (color or depth).
+message SensorSettings {
+    Sensor sensor          = 1; // The sensor (color or depth)
+    Resolution resolution  = 2; // The resolution setting
+    FrameRate frame_rate   = 3; // Frame rate setting
+    BitRate bit_rate       = 4; // Maximum encoded bit rate
+}
+
+// Vision module sensor to configure
+enum Sensor {
+    SENSOR_UNSPECIFIED  = 0; // Unspecified Sensor
+    SENSOR_COLOR        = 1; // Select the Vision module color sensor
+    SENSOR_DEPTH        = 2; // Select the Vision module depth sensor
+}
+
+// Sensor resolution. Note that some settings are only for the color sensor and some are only for the depth sensor.
+enum Resolution {
+    RESOLUTION_UNSPECIFIED  = 0; // Unspecified resolution
+    RESOLUTION_320x240      = 1; // 320 x 240 pixels (supported on color sensor only)
+    RESOLUTION_424x240      = 2; // 424 x 240 pixels (supported on depth sensor only)
+    RESOLUTION_480x270      = 3; // 480 x 270 pixels (supported on depth sensor only)
+    RESOLUTION_640x480      = 4; // 640 x 480 pixels (supported on color sensor only)
+    RESOLUTION_1280x720     = 5; // 1280 x 720 pixels (HD) (supported on color sensor only)
+    RESOLUTION_1920x1080    = 6; // 1920 x 1080 pixels (full HD) (supported on color sensor only)
+}
+
+// Sensor frame rate 
+enum FrameRate {
+    FRAMERATE_UNSPECIFIED  = 0; // Unspecified frame rate
+    FRAMERATE_6_FPS        = 1; // 6 frames per second (supported on depth sensor only)
+    FRAMERATE_15_FPS       = 2; // 15 frames per second
+    FRAMERATE_30_FPS       = 3; // 30 frame per second
+}
+
+// Maximum encoded bit rate, in Mbps 
+enum BitRate {
+    BITRATE_UNSPECIFIED  = 0; // Unspecified bit rate (supported on depth sensor only)
+    BITRATE_10_MBPS      = 1; // 10 Mbps maximum bit rate (supported on color sensor only)
+    BITRATE_15_MBPS      = 2; // 15 Mbps maximum bit rate (supported on color sensor only)
+    BITRATE_20_MBPS      = 3; // 20 Mbps maximum bit rate (supported on color sensor only)
+    BITRATE_25_MBPS      = 4; // 25 Mbps maximum bit rate (supported on color sensor only)
+}
+
+// Sensor to configure
+message SensorIdentifier {
+    Sensor sensor  = 1; // Sensor
+}
+
+// Intrisic parameters profile to retrieve
+message IntrinsicProfileIdentifier {
+    Sensor sensor          = 1; // Sensor
+    Resolution resolution  = 2; // Resolution
+}
+
+// Sensor and the option to configure
+message OptionIdentifier {
+    Sensor sensor  = 1; // The sensor to configure
+    Option option  = 2; // The option to configure on the sensor
+}
+
+// Value of the particular option for the sensor
+message OptionValue {
+    Sensor sensor      = 1; // The sensor to configure (color or depth)
+    Option option      = 2; // The option to configure
+    float  value       = 3; // The desired value for the option
+}
+
+// Information about the optional settings for the chosen sensor
+message OptionInformation {
+    Sensor sensor        = 1; // The sensor (color or depth)
+    Option option        = 2; // The option
+    bool   supported     = 3; // Is the option supported by the chosen sensor?
+    bool   read_only     = 4; // Is the option read-only, or can it be changed?
+    float  minimum       = 5; // Minimum value for the option
+    float  maximum       = 6; // Maximum value for the option
+    float  step          = 7; // Step size for the option value (if it takes on discrete values)
+    float  default_value = 8; // Default value for the option
+}
+
+// Admissible vision module sensor options. Note that some options are only available for the color sensor and some are only available for the depth sensor.
+enum Option {
+    OPTION_UNSPECIFIED                = 0;  // Unspecifed Option 
+    OPTION_BACKLIGHT_COMPENSATION     = 1;  // Enable / disable color backlight compensation (unsupported)
+    OPTION_BRIGHTNESS                 = 2;  // Color image brightness (supported on color sensor only: -4.0 to 4.0, step 1.0)
+    OPTION_CONTRAST                   = 3;  // Color image contrast (supported on color sensor only: -4.0 to 4.0, step 1.0)
+    OPTION_EXPOSURE                   = 4;  // Controls exposure time of color camera. Setting any value will disable auto exposure (supported on depth sensor only: 20.0 to 166000.0, step 20.0)
+    OPTION_GAIN                       = 5;  // Color image gain (supported on depth sensor only: 16.0 to 248.0, step 1.0)
+    OPTION_GAMMA                      = 6;  // Color image gamma setting (unsupported)
+    OPTION_HUE                        = 7;  // Color image hue (unsupported)
+    OPTION_SATURATION                 = 8;  // Color image saturation setting (supported on color sensor only: -4.0 to 4.0, step 1.0)
+    OPTION_SHARPNESS                  = 9;  // Color image sharpness setting (unsupported)
+    OPTION_WHITE_BALANCE              = 10; // Controls white balance of color image. Setting any value will disable auto white balance (unsupported)
+    OPTION_ENABLE_AUTO_EXPOSURE       = 11; // Enable / disable color image auto-exposure (supported on depth sensor only: 0.0 to 1.0, step 1.0)
+    OPTION_ENABLE_AUTO_WHITE_BALANCE  = 12; // Enable / disable color image auto-white-balance (unsupported)
+    OPTION_VISUAL_PRESET              = 13; // Provide access to several recommend sets of option presets for the depth camera (supported on depth sensor only:  0.0 to 5.0, step 1.0)
+    OPTION_LASER_POWER                = 14; // Power of the projector, with 0 meaning projector off (unsupported)
+    OPTION_ACCURACY                   = 15; // Sets the number of patterns projected per frame. The higher the accuracy value the more patterns projected (unsupported)
+    OPTION_MOTION_RANGE               = 16; // Motion vs. Range trade-off, with lower values allowing for better motion sensitivity and higher values allowing for better depth range (unsupported)
+    OPTION_FILTER_OPTION              = 17; // Sets the filter to apply to each depth frame. Each one of the filter is optimized per the application requirements (unsupported)
+    OPTION_CONFIDENCE_THRESHOLD       = 18; // The confidence level threshold used by the Depth algorithm pipe to set whether a pixel will get a valid range or will be marked with invalid range (unsupported)
+    OPTION_EMITTER_ENABLED            = 19; // Laser Emitter enabled (unsupported)
+    OPTION_FRAMES_QUEUE_SIZE          = 20; // Number of frames the user is allowed to keep per stream. Trying to hold-on to more frames will cause frame-drops (supported on depth sensor only: 0.0 to 32.0, step 1.0)
+    OPTION_TOTAL_FRAME_DROPS          = 21; // Total number of detected frame drops from all streams (unsupported)
+    OPTION_AUTO_EXPOSURE_MODE         = 22; // Auto-Exposure modes: Static, Anti-Flicker and Hybrid (unsupported)
+    OPTION_POWER_LINE_FREQUENCY       = 23; // Power Line Frequency control for anti-flickering Off/50Hz/60Hz/Auto (unsupported)
+    OPTION_ASIC_TEMPERATURE           = 24; // Current Asic Temperature (supported on depth sensor only: Read Only -40.0 to 125.0)
+    OPTION_ERROR_POLLING_ENABLED      = 25; // Disable error handling (supported on depth sensor only: 0.0 to 1.0, step 1.0)
+    OPTION_PROJECTOR_TEMPERATURE      = 26; // Current Projector Temperature (unsupported)
+    OPTION_OUTPUT_TRIGGER_ENABLED     = 27; // Enable / disable trigger to be outputed from the camera to any external device on every depth frame (supported on depth sensor only: 0.0 to 1.0, step 1.0)
+    OPTION_MOTION_MODULE_TEMPERATURE  = 28; // Current Motion-Module Temperature (unsupported)
+    OPTION_DEPTH_UNITS                = 29; // Number of meters represented by a single depth unit (supported on depth sensor only: 0.0001 to 0.0100, step 0.000001)
+    OPTION_ENABLE_MOTION_CORRECTION   = 30; // Enable/Disable automatic correction of the motion data (unsupported)
+    OPTION_AUTO_EXPOSURE_PRIORITY     = 31; // Allows sensor to dynamically ajust the frame rate depending on lighting conditions (unsupported)
+    OPTION_COLOR_SCHEME               = 32; // Color scheme for data visualization (unsupported)
+    OPTION_HISTOGRAM_EQUALIZATION_ENABLED  = 33; // Perform histogram equalization post-processing on the depth data (unsupported)
+    OPTION_MIN_DISTANCE               = 34; // Minimal distance to the target (unsupported)
+    OPTION_MAX_DISTANCE               = 35; // Maximum distance to the target (unsupported)
+    OPTION_TEXTURE_SOURCE             = 36; // Texture mapping stream unique ID (unsupported)
+    OPTION_FILTER_MAGNITUDE           = 37; // The 2D-filter effect. The specific interpretation is given within the context of the filter (unsupported)
+    OPTION_FILTER_SMOOTH_ALPHA        = 38; // 2D-filter parameter controls the weight/radius for smoothing (unsupported)
+    OPTION_FILTER_SMOOTH_DELTA        = 39; // 2D-filter range/validity threshold (unsupported)
+    OPTION_HOLES_FILL                 = 40; // Enhance depth data post-processing with holes filling where appropriate (unsupported)
+    OPTION_STEREO_BASELINE            = 41; // The distance in mm between the first and the second imagers in stereo-based depth cameras (supported on depth sensor only: 55.241055 to 55.241055, step 0.0)
+    OPTION_AUTO_EXPOSURE_CONVERGE_STEP     = 42; // Allows dynamically ajust the converge step value of the target exposure in Auto-Exposure algorithm (unsupported)
+}
+
+// Focus action to perform for the specified sensor
+message SensorFocusAction {
+    Sensor sensor             = 1; // The sensor on which to perform the focus action
+    FocusAction focus_action  = 2; // The focus action to perform on the sensor
+    oneof action_parameters {
+        FocusPoint focus_point = 3; // The X-Y point on which to focus
+        ManualFocus manual_focus = 4; // The manual focus abstract value
+    }
+}
+
+// Focus action to perform (start/pause continuous, focus now, disable). Supported only with Color sensor.
+enum FocusAction {
+    FOCUSACTION_UNSPECIFIED             = 0; // Unspecified focus action
+    FOCUSACTION_START_CONTINUOUS_FOCUS  = 1; // Start continuous focus
+    FOCUSACTION_PAUSE_CONTINUOUS_FOCUS  = 2; // Pause continuous focus 
+    FOCUSACTION_FOCUS_NOW               = 3; // Focus now (single-shot)
+    FOCUSACTION_DISABLE_FOCUS           = 4; // Disable focus
+    FOCUSACTION_SET_FOCUS_POINT         = 5; // Set a focus point
+    FOCUSACTION_SET_MANUAL_FOCUS        = 6; // Set the manual focus distance
+}
+
+// Focus point in the X-Y coordinates of the image
+message FocusPoint {
+    uint32 x = 1; // Pixel value on the X axis, between 0 and the current resolution width - 1 
+    uint32 y = 2; // Pixel value on the Y axis, between 0 and the current resolution height - 1
+}
+
+// Abstract value that affects the focus distance
+message ManualFocus {
+    uint32 value = 1; // Abstract value allowing to change the focus distance, between 0 (infinity) and 1023 (close plane)
+}
+
+// Admissible Vision module events.
+enum VisionEvent {
+    UNSPECIFIED_VISION_EVENT = 0;   // Unspecified vision event
+    SENSOR_SETTINGS_CHANGED = 1;    // Sensor setting changed event
+    OPTION_VALUE_CHANGED = 2;       // Option value changed event
+}
+
+// Notification about a single vision module event
+message VisionNotification {
+    VisionEvent event = 1;  // Vision event
+    Sensor sensor  = 2;     // The sensor that caused the notification (if applicable)
+    Option option  = 3;     // The option that caused the notification (if applicable)
+}
+
+// Sensor intrinsic parameters
+message IntrinsicParameters {
+    Sensor sensor = 1; // The sensor for which the parameters apply to
+    Resolution resolution = 2; // The resolution for which the parameters apply to
+    float principal_point_x = 3; // Horizontal coordinate of the principal point of the image, as a pixel offset from the left edge
+    float principal_point_y = 4; // Vertical coordinate of the principal point of the image, as a pixel offset from the top edge
+    float focal_length_x = 5; // Focal length of the image plane, as a multiple of pixel width
+    float focal_length_y = 6; // Focal length of the image plane, as a multiple of pixel height
+    DistortionCoefficients distortion_coeffs = 7; // Distortion coefficients
+}
+
+// Distortion coefficients for sensor intrinsic parameters
+message DistortionCoefficients {
+    float k1 = 1; // First radial distortion coefficient
+    float k2 = 2; // Second radial distortion coefficient
+    float k3 = 3; // Third radial distortion coefficient
+    float p1 = 4; // First tangential distortion coefficient
+    float p2 = 5; // Second tangential distortion coefficient
+}
+
+// Sensor extrinsic parameters
+message ExtrinsicParameters {
+    RotationMatrix rotation = 1; // The rotation matrix from depth sensor reference frame to color sensor reference frame
+    TranslationVector translation = 2; // The translation vector from depth sensor reference frame to color sensor reference frame
+}
+
+// Representation of a 3x3 rotation matrix. To be a valid rotation matrix, the rows must be orthonormal (the rows must each have norm of 1 and the row vectors must be orthogonal to each other). The determinant must also be +1.
+message RotationMatrix {
+    RotationMatrixRow row1 = 1; // First rotation matrix row
+    RotationMatrixRow row2 = 2; // Second rotation matrix row
+    RotationMatrixRow row3 = 3; // Third rotation matrix row
+}
+
+// Single row of a 3x3 rotation matrix. To be a valid possible row of a rotation matrix, the norm of the row must be 1 (the sum of the squares of the row elements has to equal 1). 
+message RotationMatrixRow {
+    float column1 = 1; // Value between -1.0 and 1.0
+    float column2 = 2; // Value between -1.0 and 1.0
+    float column3 = 3; // Value between -1.0 and 1.0
+}
+
+// Provides a 3x1 translation vector configuration
+message TranslationVector {
+    float t_x = 1; // Translation in meters in the x axis
+    float t_y = 2; // Translation in meters in the y axis
+    float t_z = 3; // Translation in meters in the z axis
+}

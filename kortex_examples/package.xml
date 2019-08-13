@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>kortex_examples</name>
-  <version>1.0.0</version>
+  <version>2.0.0</version>
   <description>THe kortex package that act as a robot's driver.</description>
 
-  <maintainer email="ros@kinova.ca">KINOVA</maintainer>
+  <maintainer email="support@kinova.ca" />
 
   <license>BSD</license>
 
@@ -20,11 +20,9 @@
   <exec_depend>std_msgs</exec_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>kortex_driver</build_depend>
-  <build_depend>kortex_actuator_driver</build_depend>
-  <build_depend>kortex_vision_config_driver</build_depend>
-  <build_depend>kortex_device_manager</build_depend>
   <exec_depend>message_runtime</exec_depend>
-
+  <exec_depend>moveit_commander</exec_depend>
+  <exec_depend>moveit_commander</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

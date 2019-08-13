@@ -1,3 +1,0 @@
- 
-float32 absolute_offset 
-float32 relative_offset

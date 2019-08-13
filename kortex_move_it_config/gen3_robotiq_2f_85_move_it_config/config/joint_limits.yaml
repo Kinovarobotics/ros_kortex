@@ -1,0 +1,69 @@
+# joint_limits.yaml allows the dynamics properties specified in the URDF to be overwritten or augmented as needed
+# Specific joint properties can be changed with the keys [max_position, min_position, max_velocity, max_acceleration]
+# Joint limits can be turned off with [has_velocity_limits, has_acceleration_limits]
+joint_limits:
+  joint_1:
+    has_velocity_limits: true
+    max_velocity: 0.86
+    has_acceleration_limits: true
+    max_acceleration: 0.3
+  joint_2:
+    has_velocity_limits: true
+    max_velocity: 0.86
+    has_acceleration_limits: true
+    max_acceleration: 0.3
+  joint_3:
+    has_velocity_limits: true
+    max_velocity: 0.86
+    has_acceleration_limits: true
+    max_acceleration: 0.3
+  joint_4:
+    has_velocity_limits: true
+    max_velocity: 0.86
+    has_acceleration_limits: true
+    max_acceleration: 0.3
+  joint_5:
+    has_velocity_limits: true
+    max_velocity: 0.86
+    has_acceleration_limits: true
+    max_acceleration: 0.3
+  joint_6:
+    has_velocity_limits: true
+    max_velocity: 0.86
+    has_acceleration_limits: true
+    max_acceleration: 0.3
+  joint_7:
+    has_velocity_limits: true
+    max_velocity: 0.86
+    has_acceleration_limits: true
+    max_acceleration: 0.3
+  gripper_finger1_finger_tip_joint:
+    has_velocity_limits: true
+    max_velocity: 2
+    has_acceleration_limits: false
+    max_acceleration: 0
+  gripper_finger1_inner_knuckle_joint:
+    has_velocity_limits: true
+    max_velocity: 2
+    has_acceleration_limits: false
+    max_acceleration: 0
+  gripper_finger1_joint:
+    has_velocity_limits: true
+    max_velocity: 2
+    has_acceleration_limits: false
+    max_acceleration: 0
+  gripper_finger2_finger_tip_joint:
+    has_velocity_limits: true
+    max_velocity: 2
+    has_acceleration_limits: false
+    max_acceleration: 0
+  gripper_finger2_inner_knuckle_joint:
+    has_velocity_limits: true
+    max_velocity: 2
+    has_acceleration_limits: false
+    max_acceleration: 0
+  gripper_finger2_joint:
+    has_velocity_limits: true
+    max_velocity: 2
+    has_acceleration_limits: false
+    max_acceleration: 0

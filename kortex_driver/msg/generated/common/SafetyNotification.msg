@@ -1,0 +1,6 @@
+
+SafetyHandle safety_handle
+uint32 value
+Timestamp timestamp
+UserProfileHandle user_handle
+Connection connection

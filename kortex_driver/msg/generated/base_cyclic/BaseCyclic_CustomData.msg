@@ -1,0 +1,12 @@
+
+uint32 frame_id
+uint32 custom_data_0
+uint32 custom_data_1
+uint32 custom_data_2
+uint32 custom_data_3
+uint32 custom_data_4
+uint32 custom_data_5
+uint32 custom_data_6
+uint32 custom_data_7
+ActuatorCustomData[] actuators_custom_data
+InterconnectCyclic_CustomData interconnect_custom_data

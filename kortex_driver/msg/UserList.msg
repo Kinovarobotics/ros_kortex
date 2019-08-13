@@ -1,3 +1,0 @@
-
-
-UserProfileHandle[] user_handles

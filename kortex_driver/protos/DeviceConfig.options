@@ -1,0 +1,21 @@
+//
+// KINOVA (R) KORTEX (TM)
+//
+// Copyright (c) 2018 Kinova inc. All rights reserved.
+//
+// This software may be modified and distributed
+// under the terms of the BSD 3-Clause license.
+//
+// Refer to the LICENSE file for details.
+//
+//
+
+Kinova.Api.DeviceConfig.ModelNumber.model_number                    max_size:25
+Kinova.Api.DeviceConfig.PartNumber.part_number                      max_size:25
+Kinova.Api.DeviceConfig.SerialNumber.serial_number                  max_size:25
+Kinova.Api.DeviceConfig.PartNumberRevision.part_number_revision     max_size:9
+Kinova.Api.DeviceConfig.MACAddress.mac_address                      max_size:6 fixed_length:true
+Kinova.Api.DeviceConfig.RunModes                                    long_names:false
+Kinova.Api.DeviceConfig.SafetyLimitType                             long_names:false
+
+Kinova.Api.DeviceConfig.Calibration.calibration_parameter           max_count:4 fixed_count:false

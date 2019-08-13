@@ -1,0 +1,28 @@
+<package>
+  <name>kortex_gazebo</name>
+  <version>2.0.0</version>
+  <description>
+    <p>Gazebo simulation package for Kortex robots</p>
+    <p>This package contains launch files to spawn the Kortex robot in Gazebo and visualize it in RViz</p>
+  </description>
+  <author email="avannobel@kinova.ca">Alexandre Vannobel</author>
+  <maintainer email="support@kinova.ca" />
+  <license>BSD</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roslaunch</build_depend>
+  <run_depend>robot_state_publisher</run_depend>
+  <run_depend>rviz</run_depend>
+  <run_depend>joint_state_publisher</run_depend>
+  <run_depend>gazebo</run_depend>
+  <run_depend>xacro</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>gazebo_ros_control</run_depend>
+  <run_depend>moveit_commander</run_depend>
+  <run_depend>moveit_ros_control_interface</run_depend>
+  <run_depend>moveit_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>std_srvs</run_depend>
+  <export>
+    <architecture_independent />
+  </export>
+</package>

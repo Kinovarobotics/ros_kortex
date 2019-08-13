@@ -1,0 +1,22 @@
+//
+// KINOVA (R) KORTEX (TM)
+//
+// Copyright (c) 2018 Kinova inc. All rights reserved.
+//
+// This software may be modified and distributed
+// under the terms of the BSD 3-Clause license.
+//
+// Refer to the LICENSE file for details.
+//
+//
+
+Kinova.Api.ActuatorConfig.TorqueCalibration.gain      max_count:4 fixed_count:true
+Kinova.Api.ActuatorConfig.TorqueCalibration.offset    max_count:4 fixed_count:true
+Kinova.Api.ActuatorConfig.ControlLoopParameters.kAz   max_count:5 fixed_count:true
+Kinova.Api.ActuatorConfig.ControlLoopParameters.kBz   max_count:6 fixed_count:true
+Kinova.Api.ActuatorConfig.CustomDataSelection.channel max_count:16
+Kinova.Api.ActuatorConfig.SafetyLimitType             long_names:false
+Kinova.Api.ActuatorConfig.ControlMode                 long_names:false
+Kinova.Api.ActuatorConfig.CommandMode                 long_names:false
+Kinova.Api.ActuatorConfig.SafetyIdentifierBankA       long_names:false
+Kinova.Api.ActuatorConfig.ControlLoopSelection        long_names:false

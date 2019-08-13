@@ -11,32 +11,13 @@
 * -->
 
 # Kortex API
-This package contains all the C++ files used by the driver nodes and the device manager. This package is mandatory because most of the other packages call it. More detailed documentation is available on the Kortex API [repository](https://github.com/Kinovarobotics/kortex).
+This package contains all the C++ files used by the driver node. This package is mandatory because most of the other packages use it. More detailed documentation is available on the Kortex API [repository](https://github.com/Kinovarobotics/kortex).
 
-<!-- MarkdownTOC -->
+## Downloading the Kortex API
 
-1. [Install C++ Kortex API & the needed dependencies](#install-cpp-kortex-api-the-needed-dependencies)
-1. [Content](#content)
-    1. [include](#include)
-    1. [lib](#lib)
+When you use `catkin_make` to build `ros_kortex`, the [download_kortex_api](./scripts/download_kortex_api.bash) script automatically checks whether or not the API was downloaded. If it is not present, the script downloads and extracts it in the correct folders.
 
-<!-- /MarkdownTOC -->
-
-<a id="install-cpp-kortex-api-the-needed-dependencies"></a>
-## Install C++ Kortex API and dependencies
-
-> *Manual installation using downloaded archive:*  
-> + Download the archive via the [Kinova drive](https://drive.google.com/file/d/1ASbEsulf5cByru8Hy1oBZJyNDBa9H22C/view).
-> + Uncompress the content of the archive and copy the content of <br>/kortex_api/cpp/linux_x86/include/ and /kortex_api/cpp/linux_x86/lib/ <br> to<br> kortex_api/include/ and kortex_api/lib/<br> respectively.
-> + Delete the directory /kortex_api/include/google/
-
-
-<a id="content"></a>
-## Content
-The content of this package should not be deleted or changed.
-<a id="include"></a>
-### include
-Contains Kortex API header files.
-<a id="lib"></a>
-### lib
-Contains Kortex API binary files.
+You can also manually download the API [from here](https://artifactory.kinovaapps.com/artifactory/generic-local-public/kortex/API/2.0.0/kortex_api_2.0.0.zip), extract it and copy the contents of the include and lib folders: 
+ - ```cpp/linux_gcc_x86-64/lib``` to the ```kortex_api/lib``` folder
+ - ```cpp/linux_gcc_x86-64/include``` to the ```kortex_api/include``` folder
+ 

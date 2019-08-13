@@ -1,0 +1,12 @@
+{% for field in detailed_one_of.fields %}
+{% if field.type == field_descriptor_class.TYPE_MESSAGE %}
+{%- set split_message_type = field.type_name.split('.') -%}
+{%- if split_message_type[-1] in detailed_one_of.duplicated_fields -%}
+{{split_message_type[-2]}}_{{split_message_type[-1]}}[] {{field.name}}
+{%- else -%}
+{{split_message_type[-1]}}[] {{field.name}}
+{%- endif -%}
+{%- else -%}
+uint32[] {{field.name}}
+{%- endif -%}
+{% endfor %}

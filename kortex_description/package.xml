@@ -1,12 +1,11 @@
 <package>
   <name>kortex_description</name>
-  <version>1.0.0</version>
+  <version>2.0.0</version>
   <description>
     <p>URDF Description package for Kortex-compatible robots</p>
     <p>This package contains configuration data, 3D models and launch files
 for Kortex-compatible arms and grippers</p>
   </description>
-  <author>me</author>
   <maintainer email="support@kinova.ca" />
   <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>

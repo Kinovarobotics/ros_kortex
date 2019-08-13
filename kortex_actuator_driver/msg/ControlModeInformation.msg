@@ -1,3 +1,0 @@
-
-
-uint32 control_mode

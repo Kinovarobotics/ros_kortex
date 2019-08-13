@@ -1,0 +1,5 @@
+
+uint32 device_identifier
+uint32 bridgetype
+BridgePortConfig port_config
+BridgeIdentifier bridge_id

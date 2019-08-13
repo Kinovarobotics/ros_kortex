@@ -1,3 +1,0 @@
-
-
-SafetyInformation[] information

@@ -1,3 +1,0 @@
-
-
-UserProfile[] user_profiles

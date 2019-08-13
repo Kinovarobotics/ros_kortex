@@ -1,2 +1,0 @@
- 
-uint32 power_on_self_test_result

@@ -1,0 +1,8 @@
+
+uint32 MODEL_ID_UNSPECIFIED = 0
+
+uint32 MODEL_ID_L53 = 1
+
+uint32 MODEL_ID_L31 = 2
+
+uint32 MODEL_ID_HDK = 3

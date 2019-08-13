@@ -1,0 +1,85 @@
+# Publish all joint states -----------------------------------
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50  
+
+gen3_joint_trajectory_controller:
+    type: effort_controllers/JointTrajectoryController
+    joints:
+        - joint_1
+        - joint_2
+        - joint_3
+        - joint_4
+        - joint_5
+        - joint_6
+        - joint_7
+    constraints:
+        goal_time: 1.0
+        stopped_velocity_tolerance: 0.5
+    stop_trajectory_duration: 1.0
+    state_publish_rate:  25
+    action_monitor_rate: 25
+    gains:
+        joint_1: {p: 3000.0, i: 0.0, d: 2.0, i_clamp_min: -100.0, i_clamp_max: 100.0}
+        joint_2: {p: 50000.0, i: 0.0, d: 0.0, i_clamp_min: -5.0, i_clamp_max: 5.0}
+        joint_3: {p: 3000.0, i: 0.0, d: 0.0, i_clamp_min: -1.0, i_clamp_max: 1.0}
+        joint_4: {p: 50000.0, i: 0.0, d: 0.0, i_clamp_min: -1.0, i_clamp_max: 1.0}
+        joint_5: {p: 750.0, i: 0.0, d: 0.2, i_clamp_min: -1.0, i_clamp_max: 1.0}
+        joint_6: {p: 5000.0, i: 0.0, d: 1.0, i_clamp_min: -1.0, i_clamp_max: 1.0}
+        joint_7: {p: 100.0, i: 0.0, d: 0.0, i_clamp_min: -0.1, i_clamp_max: 0.1}
+  
+joint_1_position_controller:
+    joint: joint_1
+    pid:
+        p: 3000.0
+        i: 0.0
+        d: 2.0
+    type: effort_controllers/JointPositionController
+
+joint_2_position_controller:
+    joint: joint_2
+    pid:
+        p: 50000.0
+        i: 0.0
+        d: 0.0
+    type: effort_controllers/JointPositionController
+
+joint_3_position_controller:
+    joint: joint_3
+    pid:
+        p: 3000.0
+        i: 0.0
+        d: 0.0
+    type: effort_controllers/JointPositionController
+
+joint_4_position_controller:
+    joint: joint_4
+    pid:
+        p: 50000.0
+        i: 0.0
+        d: 0.0
+    type: effort_controllers/JointPositionController
+
+joint_5_position_controller:
+    joint: joint_5
+    pid:
+        p: 750.0
+        i: 0.0
+        d: 0.2
+    type: effort_controllers/JointPositionController
+
+joint_6_position_controller:
+    joint: joint_6
+    pid:
+        p: 5000.0
+        i: 0.0
+        d: 1.0
+    type: effort_controllers/JointPositionController
+
+joint_7_position_controller:
+    joint: joint_7
+    pid:
+        p: 100.0
+        i: 0.0
+        d: 0.0
+    type: effort_controllers/JointPositionController

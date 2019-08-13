@@ -14,7 +14,7 @@ syntax = "proto3";
 
 package Kinova.Api;
 
-// List of possible error codes
+// Possible error codes
 enum ErrorCodes {
     ERROR_NONE = 0;             // No error
     ERROR_PROTOCOL_SERVER = 1;  // Protocol server error
@@ -23,7 +23,7 @@ enum ErrorCodes {
     ERROR_INTERNAL = 4;         // Internal error
 }
 
-// List of possible sub errror codes
+// Possible sub-error codes
 enum SubErrorCodes {
     SUB_ERROR_NONE = 0;                     // No sub error
     METHOD_FAILED = 1;                      // Method returned a failure status (generic error)
@@ -119,6 +119,8 @@ enum SubErrorCodes {
 
     WRONG_SERVOING_MODE = 75;               // Robot is in not in the right servoing mode
 
+    CONTROL_WRONG_STARTING_SPEED = 76;      // Robot is not at the right speed when starting a new trajectory.
+
     USERNAME_LENGTH_EXCEEDED = 100;         // User profile username length exceeds maximum allowed length
     FIRSTNAME_LENGTH_EXCEEDED = 101;        // User profile first name length exceeds maximum allowed length
     LASTNAME_LENGTH_EXCEEDED = 102;         // User profile last name length exceeds maximum allowed length
@@ -130,4 +132,14 @@ enum SubErrorCodes {
     ROUTER_UNVAILABLE = 108;                // The client router is currently unavailable. This can happen if an API method is called after the router has been deactivated via the method SetActivationStatus.
 
     ADDRESS_NOT_IN_VALID_RANGE = 120;       // IP Address not valid against netmask
+
+    SESSION_NOT_IN_CONTROL = 130;           // Trying to perform command from a non-controlling session in single-level mode
+
+    METHOD_TIMEOUT = 131;                   // Timeout occured during method execution
+
+    UNSUPPORTED_ROBOT_CONFIGURATION = 132;  // Product Configuration setter method failed because changing this parameter is unsupported on your robot model
+    NVRAM_READ_FAIL = 133;                  // Failed to read in NVRAM.
+    NVRAM_WRITE_FAIL = 134;                 // Failed to write in NVRAM.
+
+    NETWORK_NO_ADDRESS_ASSIGNED = 135;      // The specified interface has no assigned IP 
 }
