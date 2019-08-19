@@ -23,7 +23,9 @@ The source code is released under a [BSD 3-Clause license](../LICENSE).
 Affiliation: [Kinova inc.](https://www.kinovarobotics.com/)<br />
 Maintainer: Kinova inc. support@kinovarobotics.com**
 
-This package has been tested under ROS Kinetic, Gazebo 7 and Ubuntu 16.04.
+This package has been tested under:
+- ROS Kinetic, Gazebo 7 and Ubuntu 16.04
+- ROS Melodic, Gazebo 9 and Ubuntu 18.04
 
 ## Why **"EXPERIMENTAL"**?
  
@@ -101,8 +103,3 @@ By loading one instance of [this plugin](../third_party/roboticsgroup_gazebo_plu
 ### Gazebo grasp plugin
 
 Gazebo doesn't support grasping very well. By loading [this plugin](../third_party/gazebo-pkgs/README.md), we make sure objects grasped by the gripper will not fall. The plugin parameters are specified in with the [transmission elements for the Robotiq gripper](../kortex_description/grippers/robotiq_2f_85/urdf/robotiq_2f_85_transmission_macro.xacro).
-
-### Compiling the plugins
-
-Since Kortex uses Google Protocol Buffers 3.5.1 internally and Gazebo 7 uses Protocol Buffers 2.6.1 internally, if you try compiling all of the `ros_kortex` repo with only one version of Protocol Buffers installed, you will run into build and linking problems. Also, installing multiple versions of Protocol Buffers is tricky. 
-For the Gazebo plugins to build and run fine no matter what the setup is, we copied the Protocol Buffers 2.6.1 headers and dynamic libraries in `kortex_gazebo/include` and `kortex_gazebo/lib` respectively. We also modified the CMakeLists.txt file for every third party Gazebo plugin we use to include and link Protocol Buffers 2.6.1 instead of the system install.
