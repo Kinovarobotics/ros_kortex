@@ -38,7 +38,9 @@ The source code is released under a [BSD 3-Clause license](../LICENSE).
 Affiliation: [Kinova inc.](https://www.kinovarobotics.com/)<br />
 Maintainer: Kinova inc. support@kinovarobotics.com**
 
-This package has been tested under ROS Kinetic and Ubuntu 16.04.
+This package has been tested under :
+- ROS Kinetic and Ubuntu 16.04
+- ROS Melodic and Ubuntu 18.04
 
 <a id="usage"></a>
 ## Usage
