@@ -118,6 +118,7 @@ private:
         ros::NodeHandle m_n;
         ros::Publisher m_pub_Error;
         ros::Publisher m_pub_SafetyTopic;
+        bool m_is_activated_SafetyTopic;
 
         ros::ServiceServer m_serviceSetDeviceID;
         ros::ServiceServer m_serviceSetApiOptions;

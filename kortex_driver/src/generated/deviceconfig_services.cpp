@@ -51,6 +51,7 @@ DeviceConfigServices::DeviceConfigServices(ros::NodeHandle& n, Kinova::Api::Devi
 
 	m_pub_Error = m_n.advertise<kortex_driver::KortexError>("kortex_error", 1000);
 	m_pub_SafetyTopic = m_n.advertise<kortex_driver::SafetyNotification>("safety_topic", 1000);
+	m_is_activated_SafetyTopic = false;
 
 	m_serviceSetDeviceID = n.advertiseService("device_config/set_device_id", &DeviceConfigServices::SetDeviceID, this);
 	m_serviceSetApiOptions = n.advertiseService("device_config/set_api_options", &DeviceConfigServices::SetApiOptions, this);
@@ -106,6 +107,7 @@ bool DeviceConfigServices::SetApiOptions(kortex_driver::SetApiOptions::Request  
 
 bool DeviceConfigServices::GetRunMode(kortex_driver::GetRunMode::Request  &req, kortex_driver::GetRunMode::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::RunMode output;
 	
 	kortex_driver::KortexError result_error;
@@ -138,6 +140,7 @@ bool DeviceConfigServices::GetRunMode(kortex_driver::GetRunMode::Request  &req, 
 
 bool DeviceConfigServices::SetRunMode(kortex_driver::SetRunMode::Request  &req, kortex_driver::SetRunMode::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::RunMode input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -169,6 +172,7 @@ bool DeviceConfigServices::SetRunMode(kortex_driver::SetRunMode::Request  &req, 
 
 bool DeviceConfigServices::GetDeviceType(kortex_driver::GetDeviceType::Request  &req, kortex_driver::GetDeviceType::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::DeviceType output;
 	
 	kortex_driver::KortexError result_error;
@@ -201,6 +205,7 @@ bool DeviceConfigServices::GetDeviceType(kortex_driver::GetDeviceType::Request  
 
 bool DeviceConfigServices::GetFirmwareVersion(kortex_driver::GetFirmwareVersion::Request  &req, kortex_driver::GetFirmwareVersion::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::FirmwareVersion output;
 	
 	kortex_driver::KortexError result_error;
@@ -233,6 +238,7 @@ bool DeviceConfigServices::GetFirmwareVersion(kortex_driver::GetFirmwareVersion:
 
 bool DeviceConfigServices::GetBootloaderVersion(kortex_driver::GetBootloaderVersion::Request  &req, kortex_driver::GetBootloaderVersion::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::BootloaderVersion output;
 	
 	kortex_driver::KortexError result_error;
@@ -265,6 +271,7 @@ bool DeviceConfigServices::GetBootloaderVersion(kortex_driver::GetBootloaderVers
 
 bool DeviceConfigServices::GetModelNumber(kortex_driver::GetModelNumber::Request  &req, kortex_driver::GetModelNumber::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::ModelNumber output;
 	
 	kortex_driver::KortexError result_error;
@@ -297,6 +304,7 @@ bool DeviceConfigServices::GetModelNumber(kortex_driver::GetModelNumber::Request
 
 bool DeviceConfigServices::GetPartNumber(kortex_driver::GetPartNumber::Request  &req, kortex_driver::GetPartNumber::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::PartNumber output;
 	
 	kortex_driver::KortexError result_error;
@@ -329,6 +337,7 @@ bool DeviceConfigServices::GetPartNumber(kortex_driver::GetPartNumber::Request  
 
 bool DeviceConfigServices::GetSerialNumber(kortex_driver::GetSerialNumber::Request  &req, kortex_driver::GetSerialNumber::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::SerialNumber output;
 	
 	kortex_driver::KortexError result_error;
@@ -361,6 +370,7 @@ bool DeviceConfigServices::GetSerialNumber(kortex_driver::GetSerialNumber::Reque
 
 bool DeviceConfigServices::GetMACAddress(kortex_driver::GetMACAddress::Request  &req, kortex_driver::GetMACAddress::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::MACAddress output;
 	
 	kortex_driver::KortexError result_error;
@@ -393,6 +403,7 @@ bool DeviceConfigServices::GetMACAddress(kortex_driver::GetMACAddress::Request  
 
 bool DeviceConfigServices::GetIPv4Settings(kortex_driver::GetIPv4Settings::Request  &req, kortex_driver::GetIPv4Settings::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::IPv4Settings output;
 	
 	kortex_driver::KortexError result_error;
@@ -425,6 +436,7 @@ bool DeviceConfigServices::GetIPv4Settings(kortex_driver::GetIPv4Settings::Reque
 
 bool DeviceConfigServices::SetIPv4Settings(kortex_driver::SetIPv4Settings::Request  &req, kortex_driver::SetIPv4Settings::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::IPv4Settings input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -456,6 +468,7 @@ bool DeviceConfigServices::SetIPv4Settings(kortex_driver::SetIPv4Settings::Reque
 
 bool DeviceConfigServices::GetPartNumberRevision(kortex_driver::GetPartNumberRevision::Request  &req, kortex_driver::GetPartNumberRevision::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::PartNumberRevision output;
 	
 	kortex_driver::KortexError result_error;
@@ -488,6 +501,7 @@ bool DeviceConfigServices::GetPartNumberRevision(kortex_driver::GetPartNumberRev
 
 bool DeviceConfigServices::RebootRequest(kortex_driver::RebootRequest::Request  &req, kortex_driver::RebootRequest::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::RebootRqst input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -519,6 +533,7 @@ bool DeviceConfigServices::RebootRequest(kortex_driver::RebootRequest::Request  
 
 bool DeviceConfigServices::SetSafetyEnable(kortex_driver::SetSafetyEnable::Request  &req, kortex_driver::SetSafetyEnable::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::SafetyEnable input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -550,6 +565,7 @@ bool DeviceConfigServices::SetSafetyEnable(kortex_driver::SetSafetyEnable::Reque
 
 bool DeviceConfigServices::SetSafetyErrorThreshold(kortex_driver::SetSafetyErrorThreshold::Request  &req, kortex_driver::SetSafetyErrorThreshold::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::SafetyThreshold input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -581,6 +597,7 @@ bool DeviceConfigServices::SetSafetyErrorThreshold(kortex_driver::SetSafetyError
 
 bool DeviceConfigServices::SetSafetyWarningThreshold(kortex_driver::SetSafetyWarningThreshold::Request  &req, kortex_driver::SetSafetyWarningThreshold::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::SafetyThreshold input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -612,6 +629,7 @@ bool DeviceConfigServices::SetSafetyWarningThreshold(kortex_driver::SetSafetyWar
 
 bool DeviceConfigServices::SetSafetyConfiguration(kortex_driver::SetSafetyConfiguration::Request  &req, kortex_driver::SetSafetyConfiguration::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::SafetyConfiguration input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -643,6 +661,7 @@ bool DeviceConfigServices::SetSafetyConfiguration(kortex_driver::SetSafetyConfig
 
 bool DeviceConfigServices::GetSafetyConfiguration(kortex_driver::GetSafetyConfiguration::Request  &req, kortex_driver::GetSafetyConfiguration::Response &res)
 {
+	
 	Kinova::Api::Common::SafetyHandle input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::DeviceConfig::SafetyConfiguration output;
@@ -677,6 +696,7 @@ bool DeviceConfigServices::GetSafetyConfiguration(kortex_driver::GetSafetyConfig
 
 bool DeviceConfigServices::GetSafetyInformation(kortex_driver::GetSafetyInformation::Request  &req, kortex_driver::GetSafetyInformation::Response &res)
 {
+	
 	Kinova::Api::Common::SafetyHandle input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::DeviceConfig::SafetyInformation output;
@@ -711,6 +731,7 @@ bool DeviceConfigServices::GetSafetyInformation(kortex_driver::GetSafetyInformat
 
 bool DeviceConfigServices::GetSafetyEnable(kortex_driver::GetSafetyEnable::Request  &req, kortex_driver::GetSafetyEnable::Response &res)
 {
+	
 	Kinova::Api::Common::SafetyHandle input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::DeviceConfig::SafetyEnable output;
@@ -745,6 +766,7 @@ bool DeviceConfigServices::GetSafetyEnable(kortex_driver::GetSafetyEnable::Reque
 
 bool DeviceConfigServices::GetSafetyStatus(kortex_driver::GetSafetyStatus::Request  &req, kortex_driver::GetSafetyStatus::Response &res)
 {
+	
 	Kinova::Api::Common::SafetyHandle input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::DeviceConfig::SafetyStatus output;
@@ -779,6 +801,7 @@ bool DeviceConfigServices::GetSafetyStatus(kortex_driver::GetSafetyStatus::Reque
 
 bool DeviceConfigServices::ClearAllSafetyStatus(kortex_driver::ClearAllSafetyStatus::Request  &req, kortex_driver::ClearAllSafetyStatus::Response &res)
 {
+	
 	kortex_driver::KortexError result_error;
 	
 	try
@@ -808,6 +831,7 @@ bool DeviceConfigServices::ClearAllSafetyStatus(kortex_driver::ClearAllSafetySta
 
 bool DeviceConfigServices::ClearSafetyStatus(kortex_driver::ClearSafetyStatus::Request  &req, kortex_driver::ClearSafetyStatus::Response &res)
 {
+	
 	Kinova::Api::Common::SafetyHandle input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -839,6 +863,7 @@ bool DeviceConfigServices::ClearSafetyStatus(kortex_driver::ClearSafetyStatus::R
 
 bool DeviceConfigServices::GetAllSafetyConfiguration(kortex_driver::GetAllSafetyConfiguration::Request  &req, kortex_driver::GetAllSafetyConfiguration::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::SafetyConfigurationList output;
 	
 	kortex_driver::KortexError result_error;
@@ -871,6 +896,7 @@ bool DeviceConfigServices::GetAllSafetyConfiguration(kortex_driver::GetAllSafety
 
 bool DeviceConfigServices::GetAllSafetyInformation(kortex_driver::GetAllSafetyInformation::Request  &req, kortex_driver::GetAllSafetyInformation::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::SafetyInformationList output;
 	
 	kortex_driver::KortexError result_error;
@@ -903,6 +929,7 @@ bool DeviceConfigServices::GetAllSafetyInformation(kortex_driver::GetAllSafetyIn
 
 bool DeviceConfigServices::ResetSafetyDefaults(kortex_driver::ResetSafetyDefaults::Request  &req, kortex_driver::ResetSafetyDefaults::Response &res)
 {
+	
 	kortex_driver::KortexError result_error;
 	
 	try
@@ -932,6 +959,10 @@ bool DeviceConfigServices::ResetSafetyDefaults(kortex_driver::ResetSafetyDefault
 
 bool DeviceConfigServices::OnNotificationSafetyTopic(kortex_driver::OnNotificationSafetyTopic::Request  &req, kortex_driver::OnNotificationSafetyTopic::Response &res)
 {
+	
+	// If the notification is already activated, don't activate multiple times
+	if (m_is_activated_SafetyTopic)
+		return true;
 	Kinova::Api::Common::NotificationOptions input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::Common::NotificationHandle output;
@@ -942,6 +973,7 @@ bool DeviceConfigServices::OnNotificationSafetyTopic(kortex_driver::OnNotificati
 	{
 		std::function< void (Kinova::Api::Common::SafetyNotification) > callback = std::bind(&DeviceConfigServices::cb_SafetyTopic, this, std::placeholders::_1);
 		output = m_deviceconfig->OnNotificationSafetyTopic(callback, input, m_current_device_id);
+		m_is_activated_SafetyTopic = true;
 	}
 
 	catch (Kinova::Api::KDetailedException& ex)
@@ -973,6 +1005,7 @@ void DeviceConfigServices::cb_SafetyTopic(Kinova::Api::Common::SafetyNotificatio
 
 bool DeviceConfigServices::ExecuteCalibration(kortex_driver::ExecuteCalibration::Request  &req, kortex_driver::ExecuteCalibration::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::Calibration input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -1004,6 +1037,7 @@ bool DeviceConfigServices::ExecuteCalibration(kortex_driver::ExecuteCalibration:
 
 bool DeviceConfigServices::GetCalibrationResult(kortex_driver::GetCalibrationResult::Request  &req, kortex_driver::GetCalibrationResult::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::CalibrationElement input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::DeviceConfig::CalibrationResult output;
@@ -1038,6 +1072,7 @@ bool DeviceConfigServices::GetCalibrationResult(kortex_driver::GetCalibrationRes
 
 bool DeviceConfigServices::StopCalibration(kortex_driver::StopCalibration::Request  &req, kortex_driver::StopCalibration::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::Calibration input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::DeviceConfig::CalibrationResult output;
@@ -1072,6 +1107,7 @@ bool DeviceConfigServices::StopCalibration(kortex_driver::StopCalibration::Reque
 
 bool DeviceConfigServices::DeviceConfig_SetCapSenseConfig(kortex_driver::DeviceConfig_SetCapSenseConfig::Request  &req, kortex_driver::DeviceConfig_SetCapSenseConfig::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::CapSenseConfig input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -1103,6 +1139,7 @@ bool DeviceConfigServices::DeviceConfig_SetCapSenseConfig(kortex_driver::DeviceC
 
 bool DeviceConfigServices::DeviceConfig_GetCapSenseConfig(kortex_driver::DeviceConfig_GetCapSenseConfig::Request  &req, kortex_driver::DeviceConfig_GetCapSenseConfig::Response &res)
 {
+	
 	Kinova::Api::DeviceConfig::CapSenseConfig output;
 	
 	kortex_driver::KortexError result_error;

@@ -68,6 +68,7 @@ private:
 {%- for method in package.methods %}
 {%- if method.is_notification_rpc %}
         ros::Publisher m_pub_{{method.name}};
+        bool m_is_activated_{{method.name}};
 {%- endif %}
 {%- endfor %}
 

@@ -51,6 +51,7 @@ VisionConfigServices::VisionConfigServices(ros::NodeHandle& n, Kinova::Api::Visi
 
 	m_pub_Error = m_n.advertise<kortex_driver::KortexError>("kortex_error", 1000);
 	m_pub_VisionTopic = m_n.advertise<kortex_driver::VisionNotification>("vision_topic", 1000);
+	m_is_activated_VisionTopic = false;
 
 	m_serviceSetDeviceID = n.advertiseService("vision_config/set_device_id", &VisionConfigServices::SetDeviceID, this);
 	m_serviceSetApiOptions = n.advertiseService("vision_config/set_api_options", &VisionConfigServices::SetApiOptions, this);
@@ -86,6 +87,7 @@ bool VisionConfigServices::SetApiOptions(kortex_driver::SetApiOptions::Request  
 
 bool VisionConfigServices::SetSensorSettings(kortex_driver::SetSensorSettings::Request  &req, kortex_driver::SetSensorSettings::Response &res)
 {
+	
 	Kinova::Api::VisionConfig::SensorSettings input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -117,6 +119,7 @@ bool VisionConfigServices::SetSensorSettings(kortex_driver::SetSensorSettings::R
 
 bool VisionConfigServices::GetSensorSettings(kortex_driver::GetSensorSettings::Request  &req, kortex_driver::GetSensorSettings::Response &res)
 {
+	
 	Kinova::Api::VisionConfig::SensorIdentifier input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::VisionConfig::SensorSettings output;
@@ -151,6 +154,7 @@ bool VisionConfigServices::GetSensorSettings(kortex_driver::GetSensorSettings::R
 
 bool VisionConfigServices::GetOptionValue(kortex_driver::GetOptionValue::Request  &req, kortex_driver::GetOptionValue::Response &res)
 {
+	
 	Kinova::Api::VisionConfig::OptionIdentifier input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::VisionConfig::OptionValue output;
@@ -185,6 +189,7 @@ bool VisionConfigServices::GetOptionValue(kortex_driver::GetOptionValue::Request
 
 bool VisionConfigServices::SetOptionValue(kortex_driver::SetOptionValue::Request  &req, kortex_driver::SetOptionValue::Response &res)
 {
+	
 	Kinova::Api::VisionConfig::OptionValue input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -216,6 +221,7 @@ bool VisionConfigServices::SetOptionValue(kortex_driver::SetOptionValue::Request
 
 bool VisionConfigServices::GetOptionInformation(kortex_driver::GetOptionInformation::Request  &req, kortex_driver::GetOptionInformation::Response &res)
 {
+	
 	Kinova::Api::VisionConfig::OptionIdentifier input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::VisionConfig::OptionInformation output;
@@ -250,6 +256,10 @@ bool VisionConfigServices::GetOptionInformation(kortex_driver::GetOptionInformat
 
 bool VisionConfigServices::OnNotificationVisionTopic(kortex_driver::OnNotificationVisionTopic::Request  &req, kortex_driver::OnNotificationVisionTopic::Response &res)
 {
+	
+	// If the notification is already activated, don't activate multiple times
+	if (m_is_activated_VisionTopic)
+		return true;
 	Kinova::Api::Common::NotificationOptions input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::Common::NotificationHandle output;
@@ -260,6 +270,7 @@ bool VisionConfigServices::OnNotificationVisionTopic(kortex_driver::OnNotificati
 	{
 		std::function< void (Kinova::Api::VisionConfig::VisionNotification) > callback = std::bind(&VisionConfigServices::cb_VisionTopic, this, std::placeholders::_1);
 		output = m_visionconfig->OnNotificationVisionTopic(callback, input, m_current_device_id);
+		m_is_activated_VisionTopic = true;
 	}
 
 	catch (Kinova::Api::KDetailedException& ex)
@@ -291,6 +302,7 @@ void VisionConfigServices::cb_VisionTopic(Kinova::Api::VisionConfig::VisionNotif
 
 bool VisionConfigServices::DoSensorFocusAction(kortex_driver::DoSensorFocusAction::Request  &req, kortex_driver::DoSensorFocusAction::Response &res)
 {
+	
 	Kinova::Api::VisionConfig::SensorFocusAction input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -322,6 +334,7 @@ bool VisionConfigServices::DoSensorFocusAction(kortex_driver::DoSensorFocusActio
 
 bool VisionConfigServices::GetIntrinsicParameters(kortex_driver::GetIntrinsicParameters::Request  &req, kortex_driver::GetIntrinsicParameters::Response &res)
 {
+	
 	Kinova::Api::VisionConfig::SensorIdentifier input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::VisionConfig::IntrinsicParameters output;
@@ -356,6 +369,7 @@ bool VisionConfigServices::GetIntrinsicParameters(kortex_driver::GetIntrinsicPar
 
 bool VisionConfigServices::GetIntrinsicParametersProfile(kortex_driver::GetIntrinsicParametersProfile::Request  &req, kortex_driver::GetIntrinsicParametersProfile::Response &res)
 {
+	
 	Kinova::Api::VisionConfig::IntrinsicProfileIdentifier input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::VisionConfig::IntrinsicParameters output;
@@ -390,6 +404,7 @@ bool VisionConfigServices::GetIntrinsicParametersProfile(kortex_driver::GetIntri
 
 bool VisionConfigServices::SetIntrinsicParameters(kortex_driver::SetIntrinsicParameters::Request  &req, kortex_driver::SetIntrinsicParameters::Response &res)
 {
+	
 	Kinova::Api::VisionConfig::IntrinsicParameters input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -421,6 +436,7 @@ bool VisionConfigServices::SetIntrinsicParameters(kortex_driver::SetIntrinsicPar
 
 bool VisionConfigServices::GetExtrinsicParameters(kortex_driver::GetExtrinsicParameters::Request  &req, kortex_driver::GetExtrinsicParameters::Response &res)
 {
+	
 	Kinova::Api::VisionConfig::ExtrinsicParameters output;
 	
 	kortex_driver::KortexError result_error;
@@ -453,6 +469,7 @@ bool VisionConfigServices::GetExtrinsicParameters(kortex_driver::GetExtrinsicPar
 
 bool VisionConfigServices::SetExtrinsicParameters(kortex_driver::SetExtrinsicParameters::Request  &req, kortex_driver::SetExtrinsicParameters::Response &res)
 {
+	
 	Kinova::Api::VisionConfig::ExtrinsicParameters input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
