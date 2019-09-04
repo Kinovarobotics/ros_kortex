@@ -87,6 +87,7 @@ bool InterconnectConfigServices::SetApiOptions(kortex_driver::SetApiOptions::Req
 
 bool InterconnectConfigServices::GetUARTConfiguration(kortex_driver::GetUARTConfiguration::Request  &req, kortex_driver::GetUARTConfiguration::Response &res)
 {
+	
 	Kinova::Api::Common::UARTDeviceIdentification input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::Common::UARTConfiguration output;
@@ -121,6 +122,7 @@ bool InterconnectConfigServices::GetUARTConfiguration(kortex_driver::GetUARTConf
 
 bool InterconnectConfigServices::SetUARTConfiguration(kortex_driver::SetUARTConfiguration::Request  &req, kortex_driver::SetUARTConfiguration::Response &res)
 {
+	
 	Kinova::Api::Common::UARTConfiguration input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -152,6 +154,7 @@ bool InterconnectConfigServices::SetUARTConfiguration(kortex_driver::SetUARTConf
 
 bool InterconnectConfigServices::GetEthernetConfiguration(kortex_driver::GetEthernetConfiguration::Request  &req, kortex_driver::GetEthernetConfiguration::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::EthernetDeviceIdentification input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::InterconnectConfig::EthernetConfiguration output;
@@ -186,6 +189,7 @@ bool InterconnectConfigServices::GetEthernetConfiguration(kortex_driver::GetEthe
 
 bool InterconnectConfigServices::SetEthernetConfiguration(kortex_driver::SetEthernetConfiguration::Request  &req, kortex_driver::SetEthernetConfiguration::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::EthernetConfiguration input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -217,6 +221,7 @@ bool InterconnectConfigServices::SetEthernetConfiguration(kortex_driver::SetEthe
 
 bool InterconnectConfigServices::GetGPIOConfiguration(kortex_driver::GetGPIOConfiguration::Request  &req, kortex_driver::GetGPIOConfiguration::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::GPIOIdentification input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::InterconnectConfig::GPIOConfiguration output;
@@ -251,6 +256,7 @@ bool InterconnectConfigServices::GetGPIOConfiguration(kortex_driver::GetGPIOConf
 
 bool InterconnectConfigServices::SetGPIOConfiguration(kortex_driver::SetGPIOConfiguration::Request  &req, kortex_driver::SetGPIOConfiguration::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::GPIOConfiguration input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -282,6 +288,7 @@ bool InterconnectConfigServices::SetGPIOConfiguration(kortex_driver::SetGPIOConf
 
 bool InterconnectConfigServices::GetGPIOState(kortex_driver::GetGPIOState::Request  &req, kortex_driver::GetGPIOState::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::GPIOIdentification input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::InterconnectConfig::GPIOState output;
@@ -316,6 +323,7 @@ bool InterconnectConfigServices::GetGPIOState(kortex_driver::GetGPIOState::Reque
 
 bool InterconnectConfigServices::SetGPIOState(kortex_driver::SetGPIOState::Request  &req, kortex_driver::SetGPIOState::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::GPIOState input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -347,6 +355,7 @@ bool InterconnectConfigServices::SetGPIOState(kortex_driver::SetGPIOState::Reque
 
 bool InterconnectConfigServices::GetI2CConfiguration(kortex_driver::GetI2CConfiguration::Request  &req, kortex_driver::GetI2CConfiguration::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::I2CDeviceIdentification input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::InterconnectConfig::I2CConfiguration output;
@@ -381,6 +390,7 @@ bool InterconnectConfigServices::GetI2CConfiguration(kortex_driver::GetI2CConfig
 
 bool InterconnectConfigServices::SetI2CConfiguration(kortex_driver::SetI2CConfiguration::Request  &req, kortex_driver::SetI2CConfiguration::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::I2CConfiguration input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -412,6 +422,7 @@ bool InterconnectConfigServices::SetI2CConfiguration(kortex_driver::SetI2CConfig
 
 bool InterconnectConfigServices::I2CRead(kortex_driver::I2CRead::Request  &req, kortex_driver::I2CRead::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::I2CReadParameter input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::InterconnectConfig::I2CData output;
@@ -446,6 +457,7 @@ bool InterconnectConfigServices::I2CRead(kortex_driver::I2CRead::Request  &req, 
 
 bool InterconnectConfigServices::I2CReadRegister(kortex_driver::I2CReadRegister::Request  &req, kortex_driver::I2CReadRegister::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::I2CReadRegisterParameter input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::InterconnectConfig::I2CData output;
@@ -480,6 +492,7 @@ bool InterconnectConfigServices::I2CReadRegister(kortex_driver::I2CReadRegister:
 
 bool InterconnectConfigServices::I2CWrite(kortex_driver::I2CWrite::Request  &req, kortex_driver::I2CWrite::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::I2CWriteParameter input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -511,6 +524,7 @@ bool InterconnectConfigServices::I2CWrite(kortex_driver::I2CWrite::Request  &req
 
 bool InterconnectConfigServices::I2CWriteRegister(kortex_driver::I2CWriteRegister::Request  &req, kortex_driver::I2CWriteRegister::Response &res)
 {
+	
 	Kinova::Api::InterconnectConfig::I2CWriteRegisterParameter input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;

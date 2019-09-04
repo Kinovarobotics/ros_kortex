@@ -51,6 +51,7 @@ ControlConfigServices::ControlConfigServices(ros::NodeHandle& n, Kinova::Api::Co
 
 	m_pub_Error = m_n.advertise<kortex_driver::KortexError>("kortex_error", 1000);
 	m_pub_ControlConfigurationTopic = m_n.advertise<kortex_driver::ControlConfigurationNotification>("control_configuration_topic", 1000);
+	m_is_activated_ControlConfigurationTopic = false;
 
 	m_serviceSetDeviceID = n.advertiseService("control_config/set_device_id", &ControlConfigServices::SetDeviceID, this);
 	m_serviceSetApiOptions = n.advertiseService("control_config/set_api_options", &ControlConfigServices::SetApiOptions, this);
@@ -84,6 +85,7 @@ bool ControlConfigServices::SetApiOptions(kortex_driver::SetApiOptions::Request 
 
 bool ControlConfigServices::SetGravityVector(kortex_driver::SetGravityVector::Request  &req, kortex_driver::SetGravityVector::Response &res)
 {
+	
 	Kinova::Api::ControlConfig::GravityVector input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -115,6 +117,7 @@ bool ControlConfigServices::SetGravityVector(kortex_driver::SetGravityVector::Re
 
 bool ControlConfigServices::GetGravityVector(kortex_driver::GetGravityVector::Request  &req, kortex_driver::GetGravityVector::Response &res)
 {
+	
 	Kinova::Api::ControlConfig::GravityVector output;
 	
 	kortex_driver::KortexError result_error;
@@ -147,6 +150,7 @@ bool ControlConfigServices::GetGravityVector(kortex_driver::GetGravityVector::Re
 
 bool ControlConfigServices::SetPayloadInformation(kortex_driver::SetPayloadInformation::Request  &req, kortex_driver::SetPayloadInformation::Response &res)
 {
+	
 	Kinova::Api::ControlConfig::PayloadInformation input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -178,6 +182,7 @@ bool ControlConfigServices::SetPayloadInformation(kortex_driver::SetPayloadInfor
 
 bool ControlConfigServices::GetPayloadInformation(kortex_driver::GetPayloadInformation::Request  &req, kortex_driver::GetPayloadInformation::Response &res)
 {
+	
 	Kinova::Api::ControlConfig::PayloadInformation output;
 	
 	kortex_driver::KortexError result_error;
@@ -210,6 +215,7 @@ bool ControlConfigServices::GetPayloadInformation(kortex_driver::GetPayloadInfor
 
 bool ControlConfigServices::SetToolConfiguration(kortex_driver::SetToolConfiguration::Request  &req, kortex_driver::SetToolConfiguration::Response &res)
 {
+	
 	Kinova::Api::ControlConfig::ToolConfiguration input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -241,6 +247,7 @@ bool ControlConfigServices::SetToolConfiguration(kortex_driver::SetToolConfigura
 
 bool ControlConfigServices::GetToolConfiguration(kortex_driver::GetToolConfiguration::Request  &req, kortex_driver::GetToolConfiguration::Response &res)
 {
+	
 	Kinova::Api::ControlConfig::ToolConfiguration output;
 	
 	kortex_driver::KortexError result_error;
@@ -273,6 +280,10 @@ bool ControlConfigServices::GetToolConfiguration(kortex_driver::GetToolConfigura
 
 bool ControlConfigServices::OnNotificationControlConfigurationTopic(kortex_driver::OnNotificationControlConfigurationTopic::Request  &req, kortex_driver::OnNotificationControlConfigurationTopic::Response &res)
 {
+	
+	// If the notification is already activated, don't activate multiple times
+	if (m_is_activated_ControlConfigurationTopic)
+		return true;
 	Kinova::Api::Common::NotificationOptions input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::Common::NotificationHandle output;
@@ -283,6 +294,7 @@ bool ControlConfigServices::OnNotificationControlConfigurationTopic(kortex_drive
 	{
 		std::function< void (Kinova::Api::ControlConfig::ControlConfigurationNotification) > callback = std::bind(&ControlConfigServices::cb_ControlConfigurationTopic, this, std::placeholders::_1);
 		output = m_controlconfig->OnNotificationControlConfigurationTopic(callback, input, m_current_device_id);
+		m_is_activated_ControlConfigurationTopic = true;
 	}
 
 	catch (Kinova::Api::KDetailedException& ex)
@@ -314,6 +326,7 @@ void ControlConfigServices::cb_ControlConfigurationTopic(Kinova::Api::ControlCon
 
 bool ControlConfigServices::ControlConfig_Unsubscribe(kortex_driver::ControlConfig_Unsubscribe::Request  &req, kortex_driver::ControlConfig_Unsubscribe::Response &res)
 {
+	
 	Kinova::Api::Common::NotificationHandle input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -345,6 +358,7 @@ bool ControlConfigServices::ControlConfig_Unsubscribe(kortex_driver::ControlConf
 
 bool ControlConfigServices::SetCartesianReferenceFrame(kortex_driver::SetCartesianReferenceFrame::Request  &req, kortex_driver::SetCartesianReferenceFrame::Response &res)
 {
+	
 	Kinova::Api::ControlConfig::CartesianReferenceFrameInfo input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -376,6 +390,7 @@ bool ControlConfigServices::SetCartesianReferenceFrame(kortex_driver::SetCartesi
 
 bool ControlConfigServices::GetCartesianReferenceFrame(kortex_driver::GetCartesianReferenceFrame::Request  &req, kortex_driver::GetCartesianReferenceFrame::Response &res)
 {
+	
 	Kinova::Api::ControlConfig::CartesianReferenceFrameInfo output;
 	
 	kortex_driver::KortexError result_error;

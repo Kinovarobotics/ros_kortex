@@ -74,6 +74,7 @@ bool DeviceManagerServices::SetApiOptions(kortex_driver::SetApiOptions::Request 
 
 bool DeviceManagerServices::ReadAllDevices(kortex_driver::ReadAllDevices::Request  &req, kortex_driver::ReadAllDevices::Response &res)
 {
+	
 	Kinova::Api::DeviceManager::DeviceHandles output;
 	
 	kortex_driver::KortexError result_error;

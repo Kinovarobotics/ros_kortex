@@ -91,6 +91,7 @@ bool ActuatorConfigServices::SetApiOptions(kortex_driver::SetApiOptions::Request
 
 bool ActuatorConfigServices::GetAxisOffsets(kortex_driver::GetAxisOffsets::Request  &req, kortex_driver::GetAxisOffsets::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::AxisOffsets output;
 	
 	kortex_driver::KortexError result_error;
@@ -123,6 +124,7 @@ bool ActuatorConfigServices::GetAxisOffsets(kortex_driver::GetAxisOffsets::Reque
 
 bool ActuatorConfigServices::SetAxisOffsets(kortex_driver::SetAxisOffsets::Request  &req, kortex_driver::SetAxisOffsets::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::AxisPosition input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -154,6 +156,7 @@ bool ActuatorConfigServices::SetAxisOffsets(kortex_driver::SetAxisOffsets::Reque
 
 bool ActuatorConfigServices::SetTorqueOffset(kortex_driver::SetTorqueOffset::Request  &req, kortex_driver::SetTorqueOffset::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::TorqueOffset input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -185,6 +188,7 @@ bool ActuatorConfigServices::SetTorqueOffset(kortex_driver::SetTorqueOffset::Req
 
 bool ActuatorConfigServices::ActuatorConfig_GetControlMode(kortex_driver::ActuatorConfig_GetControlMode::Request  &req, kortex_driver::ActuatorConfig_GetControlMode::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::ControlModeInformation output;
 	
 	kortex_driver::KortexError result_error;
@@ -217,6 +221,7 @@ bool ActuatorConfigServices::ActuatorConfig_GetControlMode(kortex_driver::Actuat
 
 bool ActuatorConfigServices::SetControlMode(kortex_driver::SetControlMode::Request  &req, kortex_driver::SetControlMode::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::ControlModeInformation input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -248,6 +253,7 @@ bool ActuatorConfigServices::SetControlMode(kortex_driver::SetControlMode::Reque
 
 bool ActuatorConfigServices::GetActivatedControlLoop(kortex_driver::GetActivatedControlLoop::Request  &req, kortex_driver::GetActivatedControlLoop::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::ControlLoop output;
 	
 	kortex_driver::KortexError result_error;
@@ -280,6 +286,7 @@ bool ActuatorConfigServices::GetActivatedControlLoop(kortex_driver::GetActivated
 
 bool ActuatorConfigServices::SetActivatedControlLoop(kortex_driver::SetActivatedControlLoop::Request  &req, kortex_driver::SetActivatedControlLoop::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::ControlLoop input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -311,6 +318,7 @@ bool ActuatorConfigServices::SetActivatedControlLoop(kortex_driver::SetActivated
 
 bool ActuatorConfigServices::GetControlLoopParameters(kortex_driver::GetControlLoopParameters::Request  &req, kortex_driver::GetControlLoopParameters::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::LoopSelection input;
 	ToProtoData(req.input, &input);
 	Kinova::Api::ActuatorConfig::ControlLoopParameters output;
@@ -345,6 +353,7 @@ bool ActuatorConfigServices::GetControlLoopParameters(kortex_driver::GetControlL
 
 bool ActuatorConfigServices::SetControlLoopParameters(kortex_driver::SetControlLoopParameters::Request  &req, kortex_driver::SetControlLoopParameters::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::ControlLoopParameters input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -376,6 +385,7 @@ bool ActuatorConfigServices::SetControlLoopParameters(kortex_driver::SetControlL
 
 bool ActuatorConfigServices::SelectCustomData(kortex_driver::SelectCustomData::Request  &req, kortex_driver::SelectCustomData::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::CustomDataSelection input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -407,6 +417,7 @@ bool ActuatorConfigServices::SelectCustomData(kortex_driver::SelectCustomData::R
 
 bool ActuatorConfigServices::GetSelectedCustomData(kortex_driver::GetSelectedCustomData::Request  &req, kortex_driver::GetSelectedCustomData::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::CustomDataSelection output;
 	
 	kortex_driver::KortexError result_error;
@@ -439,6 +450,7 @@ bool ActuatorConfigServices::GetSelectedCustomData(kortex_driver::GetSelectedCus
 
 bool ActuatorConfigServices::SetCommandMode(kortex_driver::SetCommandMode::Request  &req, kortex_driver::SetCommandMode::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::CommandModeInformation input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -470,6 +482,7 @@ bool ActuatorConfigServices::SetCommandMode(kortex_driver::SetCommandMode::Reque
 
 bool ActuatorConfigServices::ActuatorConfig_ClearFaults(kortex_driver::ActuatorConfig_ClearFaults::Request  &req, kortex_driver::ActuatorConfig_ClearFaults::Response &res)
 {
+	
 	kortex_driver::KortexError result_error;
 	
 	try
@@ -499,6 +512,7 @@ bool ActuatorConfigServices::ActuatorConfig_ClearFaults(kortex_driver::ActuatorC
 
 bool ActuatorConfigServices::SetServoing(kortex_driver::SetServoing::Request  &req, kortex_driver::SetServoing::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::Servoing input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -530,6 +544,7 @@ bool ActuatorConfigServices::SetServoing(kortex_driver::SetServoing::Request  &r
 
 bool ActuatorConfigServices::MoveToPosition(kortex_driver::MoveToPosition::Request  &req, kortex_driver::MoveToPosition::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::PositionCommand input;
 	ToProtoData(req.input, &input);
 	kortex_driver::KortexError result_error;
@@ -561,6 +576,7 @@ bool ActuatorConfigServices::MoveToPosition(kortex_driver::MoveToPosition::Reque
 
 bool ActuatorConfigServices::GetCommandMode(kortex_driver::GetCommandMode::Request  &req, kortex_driver::GetCommandMode::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::CommandModeInformation output;
 	
 	kortex_driver::KortexError result_error;
@@ -593,6 +609,7 @@ bool ActuatorConfigServices::GetCommandMode(kortex_driver::GetCommandMode::Reque
 
 bool ActuatorConfigServices::GetServoing(kortex_driver::GetServoing::Request  &req, kortex_driver::GetServoing::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::Servoing output;
 	
 	kortex_driver::KortexError result_error;
@@ -625,6 +642,7 @@ bool ActuatorConfigServices::GetServoing(kortex_driver::GetServoing::Request  &r
 
 bool ActuatorConfigServices::GetTorqueOffset(kortex_driver::GetTorqueOffset::Request  &req, kortex_driver::GetTorqueOffset::Response &res)
 {
+	
 	Kinova::Api::ActuatorConfig::TorqueOffset output;
 	
 	kortex_driver::KortexError result_error;

@@ -78,6 +78,7 @@ private:
         ros::NodeHandle m_n;
         ros::Publisher m_pub_Error;
         ros::Publisher m_pub_VisionTopic;
+        bool m_is_activated_VisionTopic;
 
         ros::ServiceServer m_serviceSetDeviceID;
         ros::ServiceServer m_serviceSetApiOptions;

@@ -74,6 +74,7 @@ private:
         ros::NodeHandle m_n;
         ros::Publisher m_pub_Error;
         ros::Publisher m_pub_ControlConfigurationTopic;
+        bool m_is_activated_ControlConfigurationTopic;
 
         ros::ServiceServer m_serviceSetDeviceID;
         ros::ServiceServer m_serviceSetApiOptions;
