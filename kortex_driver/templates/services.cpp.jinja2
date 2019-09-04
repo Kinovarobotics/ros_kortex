@@ -30,6 +30,7 @@
 {%- for method in package.methods -%}
 {%- if method.is_notification_rpc %}
 	m_pub_{{method.name}} = m_n.advertise<kortex_driver::{{method_prepend_rpc_package_name}}{{method.name|replace("Topic", "")}}Notification>("{{method.name_lowercase_with_underscores}}", 1000);
+	m_is_activated_{{method.name}} = false;
 {%- endif -%}
 {%- endfor %}
 
@@ -57,6 +58,12 @@ bool {{package.short_name}}Services::SetApiOptions(kortex_driver::SetApiOptions:
 {% for method in package.methods %}
 bool {{package.short_name}}Services::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}(kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Request  &req, kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Response &res)
 {
+	{% if method.is_notification_rpc %}
+	// If the notification is already activated, don't activate multiple times
+	if (m_is_activated_{{method.name}})
+		return true;
+	{%- endif %}
+
 	{%- if not method.input_type_short_name == "Empty" %}
 	{{method.input_type_cpp_namespace}}::{{method.input_type_short_name}} input;
 	ToProtoData(req.input, &input);
@@ -73,6 +80,7 @@ bool {{package.short_name}}Services::{{method.prepend_rpc_package_name}}{{method
 		{%- if method.is_notification_rpc %}
 		std::function< void ({{method.notification_message_cpp_namespace}}::{{method.name|replace("Topic", "")}}Notification) > callback = std::bind(&{{package.short_name}}Services::cb_{{method.name}}, this, std::placeholders::_1);
 		output = m_{{package.short_name|lower}}->{{method.prepend_on_notification}}{{method.name}}(callback, input, m_current_device_id);
+		m_is_activated_{{method.name}} = true;
 		{%- else %}
 		output = m_{{package.short_name|lower}}->{{method.name}}(input, m_current_device_id, m_api_options);
 		{%- endif %}
