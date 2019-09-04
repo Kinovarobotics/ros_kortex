@@ -30,3 +30,7 @@ target_link_libraries(example_vision_configuration_cpp ${catkin_LIBRARIES} )
 add_executable(example_full_arm_movement_cpp cpp/full_arm/example_full_arm_movement.cpp)
 add_dependencies(example_full_arm_movement_cpp ${catkin_EXPORTED_TARGETS})
 target_link_libraries(example_full_arm_movement_cpp ${catkin_LIBRARIES} )
+
+add_executable(example_cartesian_poses_with_notifications cpp/full_arm/example_cartesian_poses_with_notifications.cpp)
+add_dependencies(example_cartesian_poses_with_notifications ${catkin_EXPORTED_TARGETS})
+target_link_libraries(example_cartesian_poses_with_notifications ${catkin_LIBRARIES} )
