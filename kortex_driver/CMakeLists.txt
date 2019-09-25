@@ -5,10 +5,19 @@ project(kortex_driver)
 add_compile_options(-std=c++11)
 add_definitions(-D_OS_UNIX)
 
-# custom bash script to download the API if it has not been downloaded yet
-execute_process(COMMAND ./download_kortex_api.bash
-                WORKING_DIRECTORY ../src/ros_kortex/kortex_api/scripts
-                RESULT_VARIABLE DOWNLOAD_API_RESULT)
+
+find_path (KORTEX_API_DOWNLOADER_PATH  # Set this variable
+			download_kortex_api.bash  # To the Working dir of this file 
+			${PROJECT_SOURCE_DIRl}/../kortex_api/scripts # Search this file here
+			../src/ros_kortex/kortex_api/scripts) # and here
+
+if(KORTEX_API_DOWNLOADER_PATH)
+	execute_process(COMMAND ./download_kortex_api.bash
+			WORKING_DIRECTORY ${KORTEX_API_DOWNLOADER_PATH}
+                        RESULT_VARIABLE DOWNLOAD_API_RESULT)
+else()
+	message(FATAL_ERROR "Could not find download_kortex_api.bash in current workspace")
+endif()
 
 if(NOT DOWNLOAD_API_RESULT EQUAL 0)
   message(FATAL_ERROR "Download of the Kortex API failed")
