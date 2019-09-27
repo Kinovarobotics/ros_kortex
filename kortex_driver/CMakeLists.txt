@@ -8,8 +8,7 @@ add_definitions(-D_OS_UNIX)
 
 find_path (KORTEX_API_DOWNLOADER_PATH  # Set this variable
 			download_kortex_api.bash  # To the Working dir of this file 
-			${PROJECT_SOURCE_DIRl}/../kortex_api/scripts # Search this file here
-			../src/ros_kortex/kortex_api/scripts) # and here
+			${PROJECT_SOURCE_DIRl}/../kortex_api/scripts) # Search this file here
 
 if(KORTEX_API_DOWNLOADER_PATH)
 	execute_process(COMMAND ./download_kortex_api.bash
