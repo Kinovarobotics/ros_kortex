@@ -10,7 +10,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation
 
 ## Declare a catkin package
 catkin_package()
-catkin_python_setup()
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(include ${PROJECT_SOURCE_DIR}/src)
@@ -34,3 +33,33 @@ target_link_libraries(example_full_arm_movement_cpp ${catkin_LIBRARIES} )
 add_executable(example_cartesian_poses_with_notifications_cpp cpp/full_arm/example_cartesian_poses_with_notifications.cpp)
 add_dependencies(example_cartesian_poses_with_notifications_cpp ${catkin_EXPORTED_TARGETS})
 target_link_libraries(example_cartesian_poses_with_notifications_cpp ${catkin_LIBRARIES} )
+
+# Install
+
+## Mark executable scripts (Python etc.) for installation
+## in contrast to setup.py, you can choose the destination
+# install(PROGRAMS
+#   python/actuator_config/example_actuator_configuration.py
+#   python/full_arm/example_cartesian_poses_with_notifications.py
+#   python/full_arm/example_full_arm_movement.py
+#   python/move_it/example_move_it_trajectories.py
+#   python/vision_config/example_vision_configuration.py
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
+catkin_install_python(PROGRAMS python/actuator_config/example_actuator_configuration.py
+                               python/full_arm/example_cartesian_poses_with_notifications.py
+                               python/full_arm/example_full_arm_movement.py
+                               python/move_it/example_move_it_trajectories.py
+                               python/vision_config/example_vision_configuration.py 
+                      DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+## Mark executables and/or libraries for installation
+install(TARGETS 
+    example_actuator_configuration_cpp
+    example_vision_configuration_cpp
+    example_full_arm_movement_cpp
+    example_cartesian_poses_with_notifications_cpp
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
