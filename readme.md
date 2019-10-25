@@ -3,7 +3,7 @@ ROS Kortex is the official ROS package to interact with Kortex and its related p
 
 ## Download links
 
-You can download the latest Gen3 firmware [from here](https://artifactory.kinovaapps.com/artifactory/generic-local-public/kortex/gen3/2.0.0/Gen3-2.0.0.swu) and you can download the release notes [from here](https://artifactory.kinovaapps.com/artifactory/generic-local-public/kortex/gen3/2.0.0/RN-001_KINOVA_Gen3_Ultra_lightweight_robot-Release_Notes_EN_R04.pdf).
+You can refer to the [Kortex repository "Download links" section](https://github.com/Kinovarobotics/kortex#download-links) to download the firmware package and the release notes.
 
 ### Accessing the color and depth streams 
 
