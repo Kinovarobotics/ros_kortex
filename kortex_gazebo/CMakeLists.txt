@@ -13,11 +13,6 @@ catkin_package()
 
 find_package(roslaunch)
 
-foreach(dir config launch meshes urdf)
-	install(DIRECTORY ${dir}/
-		DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
-endforeach(dir)
-
 # Gazebo is compiled with Protobuf 2.6.1 and Kortex with Protobuf 3.5.1
 # The 2.6.1 includes are prepended to the include_directories so the Gazebo plugins we compile here build
 include_directories(BEFORE ./include/)
@@ -28,3 +23,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 # To add your Gazebo plugin to this package, put your source file under src and uncomment/modify those lines
 # add_library(my_gazebo_plugin SHARED src/my_gazebo_plugin.cpp)
 # target_link_libraries(my_gazebo_plugin ${GAZEBO_LIBRARIES})
+
+
+# Install
+install(PROGRAMS
+  scripts/home_robot.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  FILES_MATCHING PATTERN "*.launch"
+)
