@@ -175,6 +175,8 @@
 #include "kortex_driver/SetApiOptions.h"
 #include "kortex_driver/ApiOptions.h"
 
+#include <geometry_msgs/TwistStamped.h>
+
 using namespace std;
 
 class BaseServices
@@ -326,6 +328,8 @@ class BaseServices
         bool GetAllJointsTorqueSoftLimitation(kortex_driver::GetAllJointsTorqueSoftLimitation::Request  &req, kortex_driver::GetAllJointsTorqueSoftLimitation::Response &res);
         bool GetTwistSoftLimitation(kortex_driver::GetTwistSoftLimitation::Request  &req, kortex_driver::GetTwistSoftLimitation::Response &res);
         bool GetWrenchSoftLimitation(kortex_driver::GetWrenchSoftLimitation::Request  &req, kortex_driver::GetWrenchSoftLimitation::Response &res);
+        
+        void cmd_vel_cb(const geometry_msgs::TwistStamped::ConstPtr& msg);
 
 private:
         uint32_t m_current_device_id;
@@ -363,6 +367,8 @@ private:
         bool m_is_activated_NetworkTopic;
         ros::Publisher m_pub_ArmStateTopic;
         bool m_is_activated_ArmStateTopic;
+
+        ros::Subscriber cmd_vel;
 
         ros::ServiceServer m_serviceSetDeviceID;
         ros::ServiceServer m_serviceSetApiOptions;

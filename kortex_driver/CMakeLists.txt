@@ -7,7 +7,7 @@ add_definitions(-D_OS_UNIX)
 
 # custom bash script to download the API if it has not been downloaded yet
 execute_process(COMMAND ./download_kortex_api.bash
-                WORKING_DIRECTORY ../src/ros_kortex/kortex_api/scripts
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/../kortex_api/scripts
                 RESULT_VARIABLE DOWNLOAD_API_RESULT)
 
 if(NOT DOWNLOAD_API_RESULT EQUAL 0)
@@ -42,6 +42,7 @@ endforeach()
 ## declare ROS messages and services
 add_message_files(DIRECTORY msg/non_generated)
 add_message_files(DIRECTORY msg/generated)
+
 foreach(sub_dir ${msg_generated_dir_list})
     add_message_files(DIRECTORY msg/generated/${sub_dir})
 endforeach()

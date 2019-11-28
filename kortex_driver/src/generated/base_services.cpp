@@ -13,6 +13,7 @@
 /*
  * This file has been auto-generated and should not be modified.
  */
+#include <kortex_driver/SetCartesianReferenceFrame.h>
  
 #include "kortex_driver/generated/common_proto_converter.h"
 #include "kortex_driver/generated/common_ros_converter.h"
@@ -78,6 +79,9 @@ BaseServices::BaseServices(ros::NodeHandle& n, Kinova::Api::Base::BaseClient* ba
 	m_is_activated_NetworkTopic = false;
 	m_pub_ArmStateTopic = m_n.advertise<kortex_driver::ArmStateNotification>("arm_state_topic", 1000);
 	m_is_activated_ArmStateTopic = false;
+
+	cmd_vel = m_n.subscribe("/kinova_cmd_vel", 100, &BaseServices::cmd_vel_cb, this);
+
 
 	m_serviceSetDeviceID = n.advertiseService("base/set_device_id", &BaseServices::SetDeviceID, this);
 	m_serviceSetApiOptions = n.advertiseService("base/set_api_options", &BaseServices::SetApiOptions, this);
@@ -2678,6 +2682,42 @@ bool BaseServices::SendTwistJoystickCommand(kortex_driver::SendTwistJoystickComm
 		return false;
 	}
 	return true;
+}
+
+void BaseServices::cmd_vel_cb(const geometry_msgs::TwistStamped::ConstPtr& msg)
+{
+	Kinova::Api::Base::TwistCommand input;
+	kortex_driver::TwistCommand t_input;
+	kortex_driver::KortexError result_error;
+	t_input.reference_frame = Kinova::Api::Common::CartesianReferenceFrame::CARTESIAN_REFERENCE_FRAME_BASE; 
+	t_input.duration = 0.02;
+	t_input.twist.linear_x = msg->twist.linear.x;
+	t_input.twist.linear_y = msg->twist.linear.y;
+	t_input.twist.linear_z = msg->twist.linear.z;
+	t_input.twist.angular_x = msg->twist.angular.x;
+	t_input.twist.angular_y = msg->twist.angular.y;
+	t_input.twist.angular_z = msg->twist.angular.z;
+	ToProtoData(t_input, &input);
+	try
+	{
+		m_base->SendTwistCommand(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+	}
 }
 
 bool BaseServices::SendTwistCommand(kortex_driver::SendTwistCommand::Request  &req, kortex_driver::SendTwistCommand::Response &res)
