@@ -80,8 +80,8 @@ If you started the `kortex_driver` node in a non-default namespace (not **my_gen
 
 The example looks for advertised services and topics in the **my_gen3** namespace by default.
 
-To run the example: `rosrun kortex_examples example_move_it_trajectories.py`
+To run the example: `roslaunch kortex_examples moveit_example.launch`
 
 If you started the `kortex_driver` node in a non-default namespace (not **my_gen3**), you will have to supply the node your own namespace in the command line : 
 
-`rosrun kortex_examples example_full_arm_movement_cpp __ns:=<your_own_namespace>`
+`roslaunch kortex_examples moveit_example.launch robot_name:=<your_own_namespace>`

@@ -5,10 +5,18 @@ project(kortex_driver)
 add_compile_options(-std=c++11)
 add_definitions(-D_OS_UNIX)
 
-# custom bash script to download the API if it has not been downloaded yet
-execute_process(COMMAND ./download_kortex_api.bash
-                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/../kortex_api/scripts
-                RESULT_VARIABLE DOWNLOAD_API_RESULT)
+
+find_path (KORTEX_API_DOWNLOADER_PATH  # Set this variable
+			download_kortex_api.bash  # To the Working dir of this file 
+			${PROJECT_SOURCE_DIR}/../kortex_api/scripts) # Search this file here
+
+if(KORTEX_API_DOWNLOADER_PATH)
+	execute_process(COMMAND ./download_kortex_api.bash
+			WORKING_DIRECTORY ${KORTEX_API_DOWNLOADER_PATH}
+                        RESULT_VARIABLE DOWNLOAD_API_RESULT)
+else()
+	message(FATAL_ERROR "Could not find download_kortex_api.bash in current workspace")
+endif()
 
 if(NOT DOWNLOAD_API_RESULT EQUAL 0)
   message(FATAL_ERROR "Download of the Kortex API failed")
@@ -77,3 +85,24 @@ add_dependencies(kortex_driver_generated_files ${PROJECT_NAME}_gencpp)
 add_executable(kortex_arm_driver ${non_generated_files})
 target_link_libraries(kortex_arm_driver ${catkin_LIBRARIES} KortexApi gcov kortex_driver_generated_files)
 add_dependencies(kortex_arm_driver kortex_driver_generated_files)
+
+# Install
+
+install(TARGETS kortex_driver_generated_files kortex_arm_driver
+   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/../kortex_api/include/
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+
+install(DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  FILES_MATCHING PATTERN "*.launch"
+)

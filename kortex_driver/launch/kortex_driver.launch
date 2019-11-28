@@ -62,6 +62,7 @@
 
         <!-- Start joint and robot state publisher -->
         <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+            <param name="rate" value="$(arg cyclic_data_publish_rate)" />
             <rosparam param="source_list">[base_feedback/joint_state]</rosparam>
         </node>
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
