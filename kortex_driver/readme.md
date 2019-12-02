@@ -60,7 +60,7 @@ The `kortex_driver` node is the node responsible for the communication between t
 - **start_moveit** : If this argument is true, a MoveIt! MoveGroup will be launched for the robot. The default value is **true**.
 
 - **default_goal_time_tolerance** : The default goal time tolerance for the `FollowJointTrajectory` action server, in seconds. This value is used if no default goal time tolerance is specified in the trajectory. The default value is **0.5** seconds.
-- **default_goal_tolerance** : The default goal tolerance for the `FollowJointTrajectory` action server, in degrees. This value is used if no default goal tolerance is specified in the trajectory for the joint positions reached at the end of the trajectory. The default value is **0.5** degrees.
+- **default_goal_tolerance** : The default goal tolerance for the `FollowJointTrajectory` action server, in radians. This value is used if no default goal tolerance is specified in the trajectory for the joint positions reached at the end of the trajectory. The default value is **0.005** radians.
 
 To launch it with default arguments, run the following command in a terminal : 
 
