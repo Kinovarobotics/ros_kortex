@@ -1,5 +1,8 @@
 gripper_joint_names:
   - gripper_finger1_joint
 
-gripper_joint_limits:
+gripper_joint_limits_min:
+  - 0.000
+
+gripper_joint_limits_max:
   - 0.804

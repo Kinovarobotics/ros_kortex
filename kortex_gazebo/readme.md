@@ -13,7 +13,7 @@
 # Kortex Gazebo (**EXPERIMENTAL**)
 
 ## Overview
-This package contains files to simulate the Kinova Gen3 Ultra lightweight robot in Gazebo.
+This package contains files to simulate the Kinova Gen3 and Gen3 lite robots in Gazebo.
 
 ### License
 
@@ -23,9 +23,7 @@ The source code is released under a [BSD 3-Clause license](../LICENSE).
 Affiliation: [Kinova inc.](https://www.kinovarobotics.com/)<br />
 Maintainer: Kinova inc. support@kinovarobotics.com**
 
-This package has been tested under:
-- ROS Kinetic, Gazebo 7 and Ubuntu 16.04
-- ROS Melodic, Gazebo 9 and Ubuntu 18.04
+This package has been tested under ROS Kinetic, Gazebo 7 and Ubuntu 16.04 and under ROS Melodic, Gazebo 9 and Ubuntu 18.04.
 
 ## Why **"EXPERIMENTAL"**?
  
@@ -49,7 +47,7 @@ The launch can be parametrized with arguments :
 - **y0** : The default Y-axis position of the robot in Gazebo. The default value is **0.0**.
 - **z0** : The default Z-axis position of the robot in Gazebo. The default value is **0.0**.
 - **arm** : Name of your robot arm model. See the `kortex_description/arms` folder to see the available robot models. The default value is **gen3**.
-- **gripper** : Name of your robot tool / gripper. See the `kortex_description/grippers` folder to see the available tool models (or to add your own). The default value is **""** and the only other supported option is **robotiq_2f_85**.
+- **gripper** : Name of your robot arm's tool / gripper. See the `kortex_description/grippers` folder to see the available end effector models (or to add your own). The default value is **""**. For Gen3, you can also put **robotiq_2f_85**. For Gen3 lite, you need to put **gen3_lite_2f**.
 - **robot_name** : This is the namespace of the arm that is going to be spawned. It defaults to **my_$(arg arm)** (so my_gen3 for arm="gen3").
 - **use_trajectory_controller** : If this argument is false, one `JointPositionController` per joint will be launched and the arm will offer a basic ROS Control interface to control every joint individually with topics. If this argument is true, a MoveIt! node will be started for the arm and the arm will offer a `FollowJointTrajectory` interface to control the arm (via a `JointTrajectoryController`). The default value is **true**.
 - **use_sim_time** : If this value is true, Gazebo will use simulated time instead of system clock. The default value is **true**.
@@ -93,13 +91,13 @@ When everything is well loaded, the script unpauses Gazebo's physics and uses Mo
 
 ## Plugins
 
-To properly simulate the Robotiq 2F-85 Gripper in Gazebo, we use two Gazebo Plugins.
+To properly simulate the grippers in Gazebo, we use two Gazebo Plugins.
 
 ### Mimic joint plugin
 
 Gazebo doesn't offer support for the URDF **mimic** tag. 
-By loading one instance of [this plugin](../third_party/roboticsgroup_gazebo_plugins/README.md) per mimic joint, we are able to simulate those joints properly. The plugin parameters are specified with the [transmission elements for the Robotiq gripper](../kortex_description/grippers/robotiq_2f_85/urdf/robotiq_2f_85_transmission_macro.xacro).
+By loading one instance of [this plugin](../third_party/roboticsgroup_gazebo_plugins/README.md) per mimic joint, we are able to simulate those joints properly. The plugin parameters are specified with the [transmission elements for the Robotiq gripper](../kortex_description/grippers/robotiq_2f_85/urdf/robotiq_2f_85_transmission_macro.xacro) and the [transmission elements for the Gen3 lite gripper](../kortex_description/grippers/gen3_lite_2f/urdf/gen3_lite_2f_transmission_macro.xacro).
 
 ### Gazebo grasp plugin
 
-Gazebo doesn't support grasping very well. By loading [this plugin](../third_party/gazebo-pkgs/README.md), we make sure objects grasped by the gripper will not fall. The plugin parameters are specified in with the [transmission elements for the Robotiq gripper](../kortex_description/grippers/robotiq_2f_85/urdf/robotiq_2f_85_transmission_macro.xacro).
+Gazebo doesn't support grasping very well. By loading [this plugin](../third_party/gazebo-pkgs/README.md), we make sure objects grasped by the gripper will not fall. The plugin parameters are specified in with the [transmission elements for the Robotiq gripper](../kortex_description/grippers/robotiq_2f_85/urdf/robotiq_2f_85_transmission_macro.xacro) and the [transmission elements for the Gen3 lite gripper](../kortex_description/grippers/gen3_lite_2f/urdf/gen3_lite_2f_transmission_macro.xacro).

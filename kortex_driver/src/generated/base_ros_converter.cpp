@@ -192,8 +192,8 @@ int ToRosData(Kinova::Api::Base::Action input, kortex_driver::Action &output)
 	output.application_data = input.application_data();
 
 	
-	auto oneof_type = input.action_parameters_case();
-	switch(oneof_type)
+	auto oneof_type_action_parameters = input.action_parameters_case();
+	switch(oneof_type_action_parameters)
 	{ 
 	
 		case Kinova::Api::Base::Action::kSendTwistCommand:
@@ -755,8 +755,8 @@ int ToRosData(Kinova::Api::Base::ConfigurationChangeNotification input, kortex_d
 	ToRosData(input.connection(), output.connection);
 
 	
-	auto oneof_type = input.configuration_change_case();
-	switch(oneof_type)
+	auto oneof_type_configuration_change = input.configuration_change_case();
+	switch(oneof_type_configuration_change)
 	{ 
 	
 		case Kinova::Api::Base::ConfigurationChangeNotification::kSequenceHandle:
@@ -997,8 +997,8 @@ int ToRosData(Kinova::Api::Base::ControllerElementHandle input, kortex_driver::C
 	ToRosData(input.controller_handle(), output.controller_handle);
 
 	
-	auto oneof_type = input.identifier_case();
-	switch(oneof_type)
+	auto oneof_type_identifier = input.identifier_case();
+	switch(oneof_type_identifier)
 	{ 
 	
 		case Kinova::Api::Base::ControllerElementHandle::kButton:
@@ -1021,8 +1021,8 @@ int ToRosData(Kinova::Api::Base::ControllerNotification input, kortex_driver::Co
 	ToRosData(input.connection(), output.connection);
 
 	
-	auto oneof_type = input.state_case();
-	switch(oneof_type)
+	auto oneof_type_state = input.state_case();
+	switch(oneof_type_state)
 	{ 
 	
 		case Kinova::Api::Base::ControllerNotification::kControllerState:
@@ -1381,8 +1381,8 @@ int ToRosData(Kinova::Api::Base::MapEvent input, kortex_driver::MapEvent &output
 	output.name = input.name();
 
 	
-	auto oneof_type = input.events_case();
-	switch(oneof_type)
+	auto oneof_type_events = input.events_case();
+	switch(oneof_type_events)
 	{ 
 	
 		case Kinova::Api::Base::MapEvent::kSafetyEvent:
@@ -1644,8 +1644,8 @@ int ToRosData(Kinova::Api::Base::CartesianTrajectoryConstraint input, kortex_dri
 	
 
 	
-	auto oneof_type = input.type_case();
-	switch(oneof_type)
+	auto oneof_type_type = input.type_case();
+	switch(oneof_type_type)
 	{ 
 	
 		case Kinova::Api::Base::CartesianTrajectoryConstraint::kSpeed:

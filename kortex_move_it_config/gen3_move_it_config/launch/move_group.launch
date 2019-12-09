@@ -1,6 +1,11 @@
 <launch>
 
-  <include file="$(find gen3_move_it_config)/launch/planning_context.launch" />
+  <!-- The number of degrees of freedom of the Gen3 arm -->
+  <arg name="dof" default="7"/>
+
+  <include file="$(find gen3_move_it_config)/launch/planning_context.launch">
+    <arg name="dof" value="$(arg dof)"/>
+  </include>
 
   <!-- GDB Debug Option -->
   <arg name="debug" default="false" />
@@ -45,6 +50,7 @@
 
   <!-- Trajectory Execution Functionality -->
   <include ns="move_group" file="$(find gen3_move_it_config)/launch/trajectory_execution.launch.xml" if="$(arg allow_trajectory_execution)">
+    <arg name="dof" value="$(arg dof)"/>
     <arg name="moveit_manage_controllers" value="true" />
     <arg name="moveit_controller_manager" value="gen3" unless="$(arg fake_execution)"/>
     <arg name="moveit_controller_manager" value="fake" if="$(arg fake_execution)"/>

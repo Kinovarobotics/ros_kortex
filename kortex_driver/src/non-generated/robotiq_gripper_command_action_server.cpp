@@ -12,10 +12,11 @@
 
 #include "kortex_driver/non-generated/robotiq_gripper_command_action_server.h"
 
-RobotiqGripperCommandActionServer::RobotiqGripperCommandActionServer(const std::string& server_name, const std::string& gripper_joint_name, double gripper_joint_limit, ros::NodeHandle& nh, Kinova::Api::Base::BaseClient* base, Kinova::Api::BaseCyclic::BaseCyclicClient* base_cyclic):
+RobotiqGripperCommandActionServer::RobotiqGripperCommandActionServer(const std::string& server_name, const std::string& gripper_joint_name, double gripper_joint_limit_min, double gripper_joint_limit_max, ros::NodeHandle& nh, Kinova::Api::Base::BaseClient* base, Kinova::Api::BaseCyclic::BaseCyclicClient* base_cyclic):
     m_server_name(server_name),
     m_gripper_joint_name(gripper_joint_name),
-    m_gripper_joint_limit(gripper_joint_limit),
+    m_gripper_joint_limit_min(gripper_joint_limit_min),
+    m_gripper_joint_limit_max(gripper_joint_limit_max),
     m_node_handle(nh),
     m_server(nh, server_name, boost::bind(&RobotiqGripperCommandActionServer::goal_received_callback, this, _1), boost::bind(&RobotiqGripperCommandActionServer::preempt_received_callback, this, _1), false),
     m_base(base),
@@ -66,7 +67,7 @@ void RobotiqGripperCommandActionServer::goal_received_callback(actionlib::Action
     proto_gripper_command.set_mode(Kinova::Api::Base::GripperMode::GRIPPER_POSITION);
     auto gripper = proto_gripper_command.mutable_gripper();
     // Position for a finger must be between relative (between 0 and 1), but position is absolute in the Goal coming from ROS
-    double relative_position = relative_position_from_absolute(ros_gripper_command.position);
+    double relative_position = m_math_util.relative_position_from_absolute(ros_gripper_command.position, m_gripper_joint_limit_min, m_gripper_joint_limit_max);
     auto finger = gripper->add_finger();
     finger->set_finger_identifier(0);
     finger->set_value(relative_position);
@@ -115,7 +116,7 @@ void RobotiqGripperCommandActionServer::gripper_position_polling_thread()
         // Get gripper position and find if we're stuck
         feedback = m_base_cyclic->RefreshFeedback();
         actual_gripper_position = feedback.interconnect().gripper_feedback().motor(0).position() / 100.0;
-        if (fabs(actual_gripper_position - previous_gripper_position) > ROBOTIQ_GRIPPER_RELATIVE_ERROR)
+        if (fabs(actual_gripper_position - previous_gripper_position) > 0.01)
         {
             n_stuck = 0;
         }
@@ -126,7 +127,7 @@ void RobotiqGripperCommandActionServer::gripper_position_polling_thread()
         previous_gripper_position = actual_gripper_position;
 
         // If we're stuck, the trajectory is over
-        if (n_stuck >= 2) // 100ms in the same position
+        if (n_stuck >= 4) // 200ms in the same position
         {
             m_is_trajectory_running_lock.lock();
             m_is_trajectory_running = false;
@@ -144,14 +145,15 @@ void RobotiqGripperCommandActionServer::gripper_position_polling_thread()
         }
         else
         {
+            ROS_ERROR("we're finished");
             m_goal.setAborted();
         }
     }
 
     // Timeout was reached
-    // This shouldn't happen, really
     else
     {
+        ROS_ERROR("BANG timeout");
         m_goal.setAborted();
     }
 
@@ -170,7 +172,7 @@ bool RobotiqGripperCommandActionServer::is_goal_acceptable(actionlib::ActionServ
     control_msgs::GripperCommandGoalConstPtr goal = goal_handle.getGoal();
 
     // If the position is not in the joint limits range, reject the goal
-    double relative_position = relative_position_from_absolute(goal_handle.getGoal()->command.position);
+    double relative_position = m_math_util.relative_position_from_absolute(goal_handle.getGoal()->command.position, m_gripper_joint_limit_min, m_gripper_joint_limit_max);
     if (relative_position > 1 || relative_position < 0)
     {
         return false;
@@ -183,9 +185,11 @@ bool RobotiqGripperCommandActionServer::is_goal_tolerance_respected()
 {
     Kinova::Api::BaseCyclic::Feedback feedback = m_base_cyclic->RefreshFeedback();
     double actual_gripper_position = feedback.interconnect().gripper_feedback().motor(0).position() / 100.0;
+    double goal_as_relative_position = m_math_util.relative_position_from_absolute(m_goal.getGoal()->command.position, m_gripper_joint_limit_min, m_gripper_joint_limit_max);
 
-    return  m_goal.getGoal()->command.position < absolute_position_from_relative(actual_gripper_position + ROBOTIQ_GRIPPER_RELATIVE_ERROR) &&
-            m_goal.getGoal()->command.position > absolute_position_from_relative(actual_gripper_position - ROBOTIQ_GRIPPER_RELATIVE_ERROR);
+    ROS_INFO("%f and %f", actual_gripper_position, goal_as_relative_position);
+
+    return fabs(actual_gripper_position - goal_as_relative_position) < MAX_GRIPPER_RELATIVE_ERROR;
 }
 
 void RobotiqGripperCommandActionServer::join_polling_thread()
@@ -210,14 +214,4 @@ void RobotiqGripperCommandActionServer::stop_all_movement()
     {
         ROS_ERROR("Sending a gripper speed of 0 failed : %s", e.what());
     }
-}
-
-double RobotiqGripperCommandActionServer::relative_position_from_absolute(double absolute_position)
-{
-    return absolute_position / m_gripper_joint_limit;
-}
-
-double RobotiqGripperCommandActionServer::absolute_position_from_relative(double relative_position)
-{
-    return relative_position * m_gripper_joint_limit;
 }

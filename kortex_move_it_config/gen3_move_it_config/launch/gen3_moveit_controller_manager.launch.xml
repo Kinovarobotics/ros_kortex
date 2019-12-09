@@ -1,9 +1,11 @@
 <launch>
 
+  <arg name="dof" default="7"/>
+
   <!-- Set the param that trajectory_execution_manager needs to find the controller plugin -->
   <param name="moveit_controller_manager" value="moveit_simple_controller_manager/MoveItSimpleControllerManager"/>
 
   <!-- The rest of the params are specific to this plugin -->
-  <rosparam file="$(find gen3_move_it_config)/config/ros_controllers.yaml"/>
+  <rosparam file="$(find gen3_move_it_config)/config/$(arg dof)dof/ros_controllers.yaml"/>
 
 </launch>

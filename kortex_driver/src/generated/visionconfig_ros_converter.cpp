@@ -91,8 +91,8 @@ int ToRosData(Kinova::Api::VisionConfig::SensorFocusAction input, kortex_driver:
 	output.focus_action = input.focus_action();
 
 	
-	auto oneof_type = input.action_parameters_case();
-	switch(oneof_type)
+	auto oneof_type_action_parameters = input.action_parameters_case();
+	switch(oneof_type_action_parameters)
 	{ 
 	
 		case Kinova::Api::VisionConfig::SensorFocusAction::kFocusPoint:

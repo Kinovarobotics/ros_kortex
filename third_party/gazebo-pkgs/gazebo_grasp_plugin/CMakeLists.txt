@@ -67,6 +67,10 @@ link_directories(
   ${GAZEBO_LIBRARY_DIRS}
 )
 
+# Protobuf 2.6.1 includes were copied in kortex_gazebo/include and are necessary to build Gazebo plugins
+include_directories(BEFORE ../../../kortex_gazebo/include/)
+link_directories(BEFORE ../../../kortex_gazebo/lib/)
+
 ## Declare a cpp library
 add_library(gazebo_grasp_fix SHARED src/GazeboGraspFix.cpp src/GazeboGraspGripper.cpp)
 

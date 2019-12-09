@@ -1,6 +1,7 @@
 <launch>
 
   <!-- This file makes it easy to include the settings for trajectory execution  -->
+  <arg name="dof" default="7"/>
 
   <!-- Flag indicating whether MoveIt! is allowed to load/unload  or switch controllers -->
   <arg name="moveit_manage_controllers" default="true"/>
@@ -15,6 +16,8 @@
 
   <!-- Load the robot specific controller manager; this sets the moveit_controller_manager ROS parameter -->
   <arg name="moveit_controller_manager" default="gen3_robotiq_2f_85" />
-  <include file="$(find gen3_robotiq_2f_85_move_it_config)/launch/$(arg moveit_controller_manager)_moveit_controller_manager.launch.xml" />
+  <include file="$(find gen3_robotiq_2f_85_move_it_config)/launch/$(arg moveit_controller_manager)_moveit_controller_manager.launch.xml">
+    <arg name="dof" value="$(arg dof)"/>
+  </include>
 
 </launch>

@@ -28,6 +28,10 @@ catkin_package(
 link_directories(${GAZEBO_LIBRARY_DIRS})
 include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} include)
 
+# Protobuf 2.6.1 includes were copied in kortex_gazebo/include and are necessary to build Gazebo plugins
+include_directories(BEFORE ../../kortex_gazebo/include/)
+link_directories(BEFORE ../../kortex_gazebo/lib/)
+
 add_library(roboticsgroup_gazebo_mimic_joint_plugin src/mimic_joint_plugin.cpp)
 target_link_libraries(roboticsgroup_gazebo_mimic_joint_plugin libprotobuf.so ${catkin_LIBRARIES})
 

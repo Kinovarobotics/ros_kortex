@@ -62,6 +62,7 @@ void example_find_actuators_and_set_device_id(ros::NodeHandle& n, const std::str
     {
 
       if((output.device_handle[i].device_type == device_type.BIG_ACTUATOR) ||
+          (output.device_handle[i].device_type == device_type.MEDIUM_ACTUATOR) ||
           (output.device_handle[i].device_type == device_type.SMALL_ACTUATOR))
       {
         // Add the device_id to the vector if we found an actuator

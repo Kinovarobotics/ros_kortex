@@ -314,6 +314,7 @@ enum SafetyIdentifierBankA {
     WATCHDOG_TRIGGERED                             = 8388608;       // 0x800000 - Watchdog triggered
     UNRELIABLE_CAPACITIVE_SENSOR                   = 16777216;      // 0x1000000 - Capacitive sensor is unreliable
     UNEXPECTED_GEAR_RATIO                          = 33554432;      // 0x2000000 - Incorrect gear ratio for detected configuration
+    HALL_MAGNETIC_MISMATCH                         = 67108864;      // 0x4000000 - Position mismatch between hall and magnetic sensors
 }
 
 // Custom data options

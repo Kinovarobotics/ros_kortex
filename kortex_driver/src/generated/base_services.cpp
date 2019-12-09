@@ -108,8 +108,13 @@ BaseServices::BaseServices(ros::NodeHandle& n, Kinova::Api::Base::BaseClient* ba
 	m_serviceReadAllProtectionZones = m_n.advertiseService("base/read_all_protection_zones", &BaseServices::ReadAllProtectionZones, this);
 	m_serviceCreateMapping = m_n.advertiseService("base/create_mapping", &BaseServices::CreateMapping, this);
 	m_serviceReadMapping = m_n.advertiseService("base/read_mapping", &BaseServices::ReadMapping, this);
+	m_serviceUpdateMapping = m_n.advertiseService("base/update_mapping", &BaseServices::UpdateMapping, this);
+	m_serviceDeleteMapping = m_n.advertiseService("base/delete_mapping", &BaseServices::DeleteMapping, this);
 	m_serviceReadAllMappings = m_n.advertiseService("base/read_all_mappings", &BaseServices::ReadAllMappings, this);
 	m_serviceCreateMap = m_n.advertiseService("base/create_map", &BaseServices::CreateMap, this);
+	m_serviceReadMap = m_n.advertiseService("base/read_map", &BaseServices::ReadMap, this);
+	m_serviceUpdateMap = m_n.advertiseService("base/update_map", &BaseServices::UpdateMap, this);
+	m_serviceDeleteMap = m_n.advertiseService("base/delete_map", &BaseServices::DeleteMap, this);
 	m_serviceReadAllMaps = m_n.advertiseService("base/read_all_maps", &BaseServices::ReadAllMaps, this);
 	m_serviceActivateMap = m_n.advertiseService("base/activate_map", &BaseServices::ActivateMap, this);
 	m_serviceCreateAction = m_n.advertiseService("base/create_action", &BaseServices::CreateAction, this);
@@ -1081,6 +1086,70 @@ bool BaseServices::ReadMapping(kortex_driver::ReadMapping::Request  &req, kortex
 	return true;
 }
 
+bool BaseServices::UpdateMapping(kortex_driver::UpdateMapping::Request  &req, kortex_driver::UpdateMapping::Response &res)
+{
+	
+	Kinova::Api::Base::Mapping input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->UpdateMapping(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::DeleteMapping(kortex_driver::DeleteMapping::Request  &req, kortex_driver::DeleteMapping::Response &res)
+{
+	
+	Kinova::Api::Base::MappingHandle input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->DeleteMapping(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
 bool BaseServices::ReadAllMappings(kortex_driver::ReadAllMappings::Request  &req, kortex_driver::ReadAllMappings::Response &res)
 {
 	
@@ -1146,6 +1215,105 @@ bool BaseServices::CreateMap(kortex_driver::CreateMap::Request  &req, kortex_dri
 		return false;
 	}
 	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::ReadMap(kortex_driver::ReadMap::Request  &req, kortex_driver::ReadMap::Response &res)
+{
+	
+	Kinova::Api::Base::MapHandle input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::Base::Map output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->ReadMap(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::UpdateMap(kortex_driver::UpdateMap::Request  &req, kortex_driver::UpdateMap::Response &res)
+{
+	
+	Kinova::Api::Base::Map input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->UpdateMap(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::DeleteMap(kortex_driver::DeleteMap::Request  &req, kortex_driver::DeleteMap::Response &res)
+{
+	
+	Kinova::Api::Base::MapHandle input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->DeleteMap(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
 	return true;
 }
 

@@ -69,7 +69,7 @@ class ExampleActuatorConfiguration:
         try:
             all_devices = self.read_all_devices()
             for device in all_devices.output.device_handle:
-                if device.device_type == DeviceTypes.BIG_ACTUATOR or device.device_type == DeviceTypes.SMALL_ACTUATOR:
+                if device.device_type == DeviceTypes.BIG_ACTUATOR or device.device_type == DeviceTypes.SMALL_ACTUATOR or device.device_type == DeviceTypes.MEDIUM_ACTUATOR:
                     # Add the device_id to the list if we found an actuator
                     actuator_device_ids.append(device.device_identifier)
                     rospy.loginfo("Found an actuator with device id " + str(device.device_identifier))

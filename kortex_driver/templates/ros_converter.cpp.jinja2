@@ -52,8 +52,8 @@ int ToRosData({{detailed_message.cpp_namespace}}::{{detailed_message.name}} inpu
 	{%- endfor %}
 
 	{% for detailed_one_of in detailed_message.one_of_list %}
-	auto oneof_type = input.{{detailed_one_of.name}}_case();
-	switch(oneof_type)
+	auto oneof_type_{{detailed_one_of.name}} = input.{{detailed_one_of.name}}_case();
+	switch(oneof_type_{{detailed_one_of.name}})
 	{
 	{%- for field in detailed_one_of.fields %}
 	{%- if "_" in field.name -%} {%- set EnumName = field.name.replace("_", " ").title().replace(" ", "") -%} {# In case the field is in the form of "gripper_command" #}

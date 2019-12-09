@@ -12,11 +12,14 @@
     <arg name="z0" default="0"/>
 
     <!-- Arm and gripper type -->
-    <arg name="arm" default="gen3"/>
-    <arg name="gripper" default="" />
+    <arg name="arm" default="gen3_lite"/>
+    <arg name="dof" default="7" if="$(eval arg('arm') == 'gen3')"/> <!-- Number of degrees of freedom of the arm -->
+    <arg name="dof" default="6" if="$(eval arg('arm') == 'gen3_lite')"/> <!-- Number of degrees of freedom of the arm -->
+    <arg name="vision" default="true"/> <!-- True if the arm has a Vision module -->
+    <arg name="gripper" default="gen3_lite_2f" />
     <arg name="robot_name" default="my_$(arg arm)"/>
 
-    <!-- Use trajectory controllers and MoveIt! -->
+    <!-- Use trajectory controllers and MoveIt -->
     <arg name="use_trajectory_controller" default="true"/>
 
     <!-- Gazebo parameters -->
@@ -36,41 +39,42 @@
 
         <!-- Load the description for the robot -->
         <!-- Without gripper -->
-        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro sim:=true"
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true"
             if="$(eval not arg('gripper'))"/>
         <!-- With gripper -->
-        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro sim:=true"
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true"
             unless="$(eval not arg('gripper'))"/>
 
         <!-- Spawn the robot in Gazebo -->
-        <!-- TODO Find cleaner way to set the starting position and that will work for other arms -->
+        <!-- <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/gazebo_initial_joint_positions.yaml"/> -->
+        <!-- <param name="initial_positions" value=""/> TODO -->
         <!-- Without gripper -->
         <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
             args="-urdf -param robot_description -model $(arg robot_name) -x $(arg x0) -y $(arg y0) -z $(arg z0)
-                  -robot_namespace $(arg robot_name)
+                -robot_namespace $(arg robot_name)
                 -J joint_1 1.57
-                -J joint_2 -0.35
+                -J joint_2 0.35
                 -J joint_3 3.14
                 -J joint_4 -2.00
                 -J joint_5 0
                 -J joint_6 -1.00
-                -J joint_7 1.57 "
-            if="$(eval not arg('gripper'))"/>
+                -J joint_7 1.57"  
+            if="$(eval not arg('gripper'))"/> <!--TODO-->
         <!-- With gripper -->
         <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-            args="-urdf -param robot_description -model $(arg robot_name) -x $(arg x0) -y $(arg y0) -z $(arg z0)
-                  -robot_namespace $(arg robot_name)
-                -J joint_1 1.57
-                -J joint_2 -0.35
+        args="-urdf -param robot_description -model $(arg robot_name) -x $(arg x0) -y $(arg y0) -z $(arg z0)
+            -robot_namespace $(arg robot_name)
+            -J joint_1 1.57
+                -J joint_2 0.35
                 -J joint_3 3.14
                 -J joint_4 -2.00
                 -J joint_5 0
                 -J joint_6 -1.00
-                -J joint_7 1.57 "
-            unless="$(eval not arg('gripper'))"/>
+                -J joint_7 1.57"
+        unless="$(eval not arg('gripper'))"/> <!--TODO-->
 
         <!-- Load controller configuration file from kortex_control package -->
-        <rosparam file="$(find kortex_control)/arms/$(arg arm)/config/joint_position_controllers.yaml" command="load"/>
+        <rosparam file="$(find kortex_control)/arms/$(arg arm)/$(arg dof)dof/config/joint_position_controllers.yaml" command="load"/>
         <rosparam file="$(find kortex_control)/grippers/$(arg gripper)/config/gripper_action_controller_parameters.yaml" command="load"
             unless="$(eval not arg('gripper'))"/>
 
@@ -121,11 +125,13 @@
             <!-- Start MoveIt! main executable -->
             <!-- TODO Find cleaner way to do that and that will work with other arms -->
             <!-- Without gripper -->
-            <include file="$(find gen3_move_it_config)/launch/move_group.launch"
-                if="$(eval not arg('gripper'))"/> 
+            <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_move_it_config/launch/move_group.launch" if="$(eval not arg('gripper'))"> 
+                <arg name="dof" value="$(arg dof)"/>
+            </include>
             <!-- With gripper -->
-            <include file="$(find gen3_robotiq_2f_85_move_it_config)/launch/move_group.launch"
-                unless="$(eval not arg('gripper'))"/> 
+            <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_$(arg gripper)_move_it_config/launch/move_group.launch" unless="$(eval not arg('gripper'))">
+                <arg name="dof" value="$(arg dof)"/>
+            </include>
 
             <!-- Unpause the physics in Gazebo and home the robot -->
             <node name="home_the_arm" pkg="kortex_gazebo" type="home_robot.py" output="log" respawn="false" />

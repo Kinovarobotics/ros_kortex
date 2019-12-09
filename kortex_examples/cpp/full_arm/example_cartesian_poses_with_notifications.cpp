@@ -37,9 +37,10 @@ void notification_callback(const kortex_driver::ActionNotification::ConstPtr& no
 {
   switch(notif->action_event)
   {
-    //This event is published when an action has ended
+    //This event is published when an action has ended or was aborted
     case kortex_driver::ActionEvent::ACTION_END:
     {
+      ROS_INFO("Action has ended!");
       if(notif->handle.identifier == 1001)
       {
         Pose1Done = true;
@@ -54,7 +55,29 @@ void notification_callback(const kortex_driver::ActionNotification::ConstPtr& no
       {
         Pose3Done = true;
       }
+      break;
     }
+    case kortex_driver::ActionEvent::ACTION_ABORT:
+    {
+      ROS_ERROR("Action was aborted!");
+      if(notif->handle.identifier == 1001)
+      {
+        Pose1Done = true;
+      }
+
+      if(notif->handle.identifier == 1002)
+      {
+        Pose2Done = true;
+      }
+
+      if(notif->handle.identifier == 1003)
+      {
+        Pose3Done = true;
+      }
+      break;
+    }
+    default:
+      break;
   }
   
 }
@@ -86,12 +109,12 @@ void example_cartesian_action(ros::NodeHandle n, std::string robot_name)
 
   my_constrained_pose.constraint.oneof_type.speed.push_back(my_cartesian_speed);
 
-  my_constrained_pose.target_pose.x = 0.365f;
-  my_constrained_pose.target_pose.y = 0.169f;
-  my_constrained_pose.target_pose.z = 0.252f;
-  my_constrained_pose.target_pose.theta_x = -31.3f;
-  my_constrained_pose.target_pose.theta_y = -176.6f;
-  my_constrained_pose.target_pose.theta_z = 60.7f;
+  my_constrained_pose.target_pose.x = 0.374f;
+  my_constrained_pose.target_pose.y = 0.081f;
+  my_constrained_pose.target_pose.z = 0.450f;
+  my_constrained_pose.target_pose.theta_x = -57.6f;
+  my_constrained_pose.target_pose.theta_y = 91.1f;
+  my_constrained_pose.target_pose.theta_z = 2.3f;
 
   ros::ServiceClient service_client_execute_action = n.serviceClient<kortex_driver::ExecuteAction>("/" + robot_name + "/base/execute_action");
   kortex_driver::ExecuteAction service_execute_action;
@@ -121,7 +144,7 @@ void example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   service_execute_action.request.input.handle.identifier = 1002;
   service_execute_action.request.input.name = "pose2";
 
-  my_constrained_pose.target_pose.z = 0.352f;
+  my_constrained_pose.target_pose.z = 0.3f;
 
   service_execute_action.request.input.oneof_action_parameters.reach_pose.clear();
   service_execute_action.request.input.oneof_action_parameters.reach_pose.push_back(my_constrained_pose);
@@ -147,7 +170,7 @@ void example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   service_execute_action.request.input.handle.identifier = 1003;
   service_execute_action.request.input.name = "pose3";
   
-  my_constrained_pose.target_pose.z = 0.452f;
+  my_constrained_pose.target_pose.z = 0.20f;
 
   service_execute_action.request.input.oneof_action_parameters.reach_pose.clear();
   service_execute_action.request.input.oneof_action_parameters.reach_pose.push_back(my_constrained_pose);
@@ -202,11 +225,22 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
   std::string robot_name = "my_gen3";
 
+  // Parameter robot_name
+  if (!ros::param::get("~robot_name", robot_name))
+  {
+    std::string error_string = "Parameter robot_name was not specified, defaulting to " + robot_name + " as namespace";
+    ROS_WARN("%s", error_string.c_str());
+  }
+  else 
+  {
+    std::string error_string = "Using robot_name " + robot_name + " as namespace";
+    ROS_INFO("%s", error_string.c_str());
+  }
+
   ros::Subscriber sub = n.subscribe("/" + robot_name  + "/action_topic", 1000, notification_callback);
   example_set_cartesian_reference_frame(n, robot_name);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   example_cartesian_action(n, robot_name);
 
-  //ros::spin();
   return 0;
 }

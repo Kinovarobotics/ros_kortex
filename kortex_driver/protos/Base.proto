@@ -102,11 +102,26 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Retrieves an existing mapping
     rpc ReadMapping (MappingHandle) returns (Mapping);//@RPC_ID=27
 
+    // Updates an existing mapping
+    rpc UpdateMapping (Mapping) returns (Kinova.Api.Common.Empty);//@RPC_ID=28
+    
+    // Deletes an existing mapping
+    rpc DeleteMapping (MappingHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=29
+
     // Retrieves a list of all mappings
     rpc ReadAllMappings (Kinova.Api.Common.Empty) returns (MappingList);//@RPC_ID=30
 
     // Creates a new map
     rpc CreateMap (Map) returns (MapHandle);//@RPC_ID=36
+
+    // Retrieves an existing map
+    rpc ReadMap (MapHandle) returns (Map);//@RPC_ID=37
+    
+    // Updates an existing map
+    rpc UpdateMap (Map) returns (Kinova.Api.Common.Empty);//@RPC_ID=38
+    
+    // Deletes an existing map
+    rpc DeleteMap (MapHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=39
 
     // Retrieves a list of all maps associated to the specified mapping
     rpc ReadAllMaps (MappingHandle) returns (MapList);//@RPC_ID=40
@@ -649,6 +664,8 @@ enum NetworkType {
     UNSPECIFIED_NETWORK_TYPE = 0;   // Unspecified network type
     WIFI = 1;                       // Wi-Fi network
     WIRED_ETHERNET = 2;             // Wired Ethernet network
+    WIRED_MICROUSB = 3;             // Wired Ethernet over USB network (RNDIS)
+    WIRED_USB = 4;                  // Wired Ethernet over USB network
 }
 
 // Reference to a network

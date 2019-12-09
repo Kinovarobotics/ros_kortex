@@ -24,18 +24,18 @@
 #include "BaseCyclicClientRpc.h"
 #include "Errors.pb.h"
 
+#include "kortex_math_util.h"
+
 // Duration timeout for a gripper trajectory (in seconds) 
 #define GRIPPER_TRAJECTORY_TIME_LIMIT 2.0
 
-// Robotiq Gripper relative position precision 
-// Augmented to 2/255 instead of 1/255 because sometimes there are false negatives with 1/255
-#define ROBOTIQ_GRIPPER_RELATIVE_ERROR 2.0/255.0
+#define MAX_GRIPPER_RELATIVE_ERROR 0.05
 
 class RobotiqGripperCommandActionServer
 {
     public:
         RobotiqGripperCommandActionServer() = delete;
-        RobotiqGripperCommandActionServer(const std::string& server_name, const std::string& gripper_joint_name, double gripper_joint_limit, ros::NodeHandle& nh, Kinova::Api::Base::BaseClient* base, Kinova::Api::BaseCyclic::BaseCyclicClient* base_cyclic);
+        RobotiqGripperCommandActionServer(const std::string& server_name, const std::string& gripper_joint_name, double gripper_joint_limit_min, double gripper_joint_limit_max, ros::NodeHandle& nh, Kinova::Api::Base::BaseClient* base, Kinova::Api::BaseCyclic::BaseCyclicClient* base_cyclic);
         ~RobotiqGripperCommandActionServer();
    
     private:
@@ -60,9 +60,12 @@ class RobotiqGripperCommandActionServer
         std::mutex m_is_trajectory_running_lock;
         std::thread m_gripper_position_polling_thread;
 
+        KortexMathUtil m_math_util;
+
         // ROS Params
         std::string m_gripper_joint_name;
-        double      m_gripper_joint_limit;
+        double      m_gripper_joint_limit_min;
+        double      m_gripper_joint_limit_max;
 
         // Action Server Callbacks
         void goal_received_callback(actionlib::ActionServer<control_msgs::GripperCommandAction>::GoalHandle new_goal_handle);
@@ -76,8 +79,6 @@ class RobotiqGripperCommandActionServer
         bool is_goal_tolerance_respected();
         void stop_all_movement();
         void join_polling_thread();
-        double relative_position_from_absolute(double absolute_position);
-        double absolute_position_from_relative(double relative_position);
 };
 
 #endif

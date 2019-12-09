@@ -56,6 +56,10 @@ endif()
 link_directories(${GAZEBO_LIBRARY_DIRS})
 include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS} include)
 
+# Protobuf 2.6.1 includes were copied in kortex_gazebo/include and are necessary to build Gazebo plugins
+include_directories(BEFORE ../../../kortex_gazebo/include/)
+link_directories(BEFORE ../../../kortex_gazebo/lib/)
+
 ## Declare a C++ library
 add_library(${PROJECT_NAME} SHARED
   src/GazeboVersionHelpers.cpp

@@ -1,0 +1,9 @@
+    <launch>
+
+        <!-- Robot namespace -->
+        <arg name="robot_name" default="my_gen3"/>
+    
+        <!-- Launch the example in that namespace -->
+        <node name="moveit_example" pkg="kortex_examples" type="example_move_it_trajectories.py" ns="$(arg robot_name)" output="screen"/>
+
+    </launch>
