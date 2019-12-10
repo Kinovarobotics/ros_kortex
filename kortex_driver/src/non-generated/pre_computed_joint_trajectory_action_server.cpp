@@ -30,8 +30,8 @@ PreComputedJointTrajectoryActionServer::PreComputedJointTrajectoryActionServer(c
     }
     if (!ros::param::get("~default_goal_tolerance", m_default_goal_tolerance))
     {
-        ROS_WARN("Parameter default_goal_tolerance was not specified; assuming 0.5 as default value.");
-        m_default_goal_time_tolerance = 0.5;
+        ROS_WARN("Parameter default_goal_tolerance was not specified; assuming 0.005 radians as default value.");
+        m_default_goal_time_tolerance = 0.005;
     }
     if (!ros::param::get("~joint_names", m_joint_names))
     {
@@ -444,7 +444,7 @@ bool PreComputedJointTrajectoryActionServer::is_goal_tolerance_respected(bool en
     std::vector<double> goal_tolerances;
     if (goal->goal_tolerance.empty())
     {
-        ROS_DEBUG("Goal did not specify tolerances, using default tolerance of %f degrees for every joint.", m_default_goal_tolerance);
+        ROS_DEBUG("Goal did not specify tolerances, using default tolerance of %f radians for every joint.", m_default_goal_tolerance);
         for (int i = 0; i < m_joint_names.size(); i++)
         {
             goal_tolerances.push_back(m_default_goal_tolerance);

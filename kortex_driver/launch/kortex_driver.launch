@@ -19,7 +19,7 @@
 
     <!-- Action server params -->
     <arg name="default_goal_time_tolerance" default="0.5"/> <!--seconds-->
-    <arg name="default_goal_tolerance" default="0.5"/> <!--degrees-->
+    <arg name="default_goal_tolerance" default="0.005"/> <!--radians-->
 
     <group ns="$(arg robot_name)">
 
