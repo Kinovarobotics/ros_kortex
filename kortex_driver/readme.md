@@ -52,6 +52,8 @@ The `kortex_driver` node is the node responsible for the communication between t
 - **gripper** : Name of your robot arm's tool / gripper. See the `kortex_description/grippers` folder to see the available end effector models (or to add your own). The default value is **""** and the only other supported option is **robotiq_2f_85** for now.
 - **robot_name** : This is the namespace in which the driver will run. It defaults to **my_$(arg arm)** (so "my_gen3" for arm="gen3").
 - **ip_address** : The IP address of the robot you're connecting to. The default value is **192.168.1.10**.
+- **username** : The username for the robot connection. The default value is **admin**.
+- **password** : The password for the robot connection. The default value is **admin**.
 - **cyclic_data_publish_rate** : Publish rate of the *base_feedback* and *joint_state* topics, in Hz. The default value is **100** Hz.
 - **api_rpc_timeout_ms** : The default X-axis position of the robot in Gazebo. The default value is **0.0**.
 - **api_session_inactivity_timeout_ms** : The duration after which the robot will clean the client session if the client hangs up the connection brutally (should not happen with the ROS driver). The default value is **35000** ms and is not normally changed.

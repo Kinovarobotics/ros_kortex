@@ -8,6 +8,8 @@
 
     <!-- Kortex API options -->
     <arg name="ip_address" default="192.168.1.10"/>
+    <arg name="username" default="admin"/>
+    <arg name="password" default="admin"/>
     <arg name="cyclic_data_publish_rate" default="100"/> <!--Hz-->
     <arg name="api_rpc_timeout_ms" default="2000"/> <!--milliseconds-->
     <arg name="api_session_inactivity_timeout_ms" default="35000"/> <!--milliseconds-->
@@ -34,6 +36,8 @@
         <!-- Start the kortex_driver node -->
         <node name="$(arg robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver" output="screen"> <!--launch-prefix="gdb -ex run args"-->
             <param name="ip_address" value="$(arg ip_address)"/>
+            <param name="username" value="$(arg username)"/>
+            <param name="password" value="$(arg password)"/>
             <param name="cyclic_data_publish_rate" value="$(arg cyclic_data_publish_rate)"/>
             <param name="api_rpc_timeout_ms" value="$(arg api_rpc_timeout_ms)"/>
             <param name="api_session_inactivity_timeout_ms" value="$(arg api_session_inactivity_timeout_ms)"/>
