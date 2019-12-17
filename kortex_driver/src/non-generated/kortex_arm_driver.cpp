@@ -97,6 +97,20 @@ void KortexArmDriver::parseRosArguments()
         throw new std::runtime_error(error_string);
     }
 
+    if (!ros::param::get("~username", m_username))
+    {
+        std::string error_string = "Username for the robot session was not specified in the launch file, shutting down the node...";
+        ROS_ERROR("%s", error_string.c_str());
+        throw new std::runtime_error(error_string);
+    }
+
+    if (!ros::param::get("~password", m_password))
+    {
+        std::string error_string = "Password for the robot session was not specified in the launch file, shutting down the node...";
+        ROS_ERROR("%s", error_string.c_str());
+        throw new std::runtime_error(error_string);
+    }
+
     if (!ros::param::get("~cyclic_data_publish_rate", m_cyclic_data_publish_rate))
     {
         std::string error_string = "Publish rate of the cyclic data was not specified in the launch file, shutting down the node...";
@@ -194,8 +208,8 @@ void KortexArmDriver::initApi()
     	
     // Create the sessions so we can start using the robot
     auto createSessionInfo = Kinova::Api::Session::CreateSessionInfo();
-	createSessionInfo.set_username("admin");
-	createSessionInfo.set_password("admin");
+	createSessionInfo.set_username(m_username);
+	createSessionInfo.set_password(m_password);
 	createSessionInfo.set_session_inactivity_timeout(m_api_session_inactivity_timeout_ms);
     createSessionInfo.set_connection_inactivity_timeout(m_api_connection_inactivity_timeout_ms);
 
