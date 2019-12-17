@@ -31,7 +31,7 @@ PreComputedJointTrajectoryActionServer::PreComputedJointTrajectoryActionServer(c
     if (!ros::param::get("~default_goal_tolerance", m_default_goal_tolerance))
     {
         ROS_WARN("Parameter default_goal_tolerance was not specified; assuming 0.005 radians as default value.");
-        m_default_goal_time_tolerance = 0.005;
+        m_default_goal_tolerance = 0.005;
     }
     if (!ros::param::get("~joint_names", m_joint_names))
     {
@@ -154,10 +154,11 @@ void PreComputedJointTrajectoryActionServer::preempt_received_callback(actionlib
 // Called in a separate thread when a notification comes in
 void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::Base::ActionNotification notif)
 {
-    ROS_DEBUG("Action notification received.");
     Kinova::Api::Base::ActionEvent event = notif.action_event();
     Kinova::Api::Base::ActionHandle handle = notif.handle();
     Kinova::Api::Base::ActionType type = handle.action_type();
+    ROS_DEBUG("Action notification received of type %s", Kinova::Api::Base::ActionEvent_Name(event).c_str());
+    std::lock_guard<std::mutex> guard(m_action_notification_thread_lock);
 
     control_msgs::FollowJointTrajectoryResult result;
     std::ostringstream oss;
@@ -189,6 +190,14 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
             {
                 ROS_INFO("Preprocessing has finished in the arm and goal has been accepted.");
                 set_server_state(ActionServerState::TRAJECTORY_EXECUTION_PENDING);
+            }
+            // FIXME KOR-3563 Sometimes the notifications arrive in the wrong order so it is possible to receive 
+            // a ACTION_PREPROCESS_END notification after the ACTION_START
+            // When this bug will be fixed this else if can be removed
+            else if (m_server_state == ActionServerState::TRAJECTORY_EXECUTION_IN_PROGRESS)
+            {
+                ROS_DEBUG("Notification order mismatch : We received the ACTION_PREPROCESS_END after the ACTION_START");
+                break;
             }
             // We should not have received that
             else
@@ -244,7 +253,8 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
         // The arm is starting to move
         case Kinova::Api::Base::ActionEvent::ACTION_START:
             // The preprocessing was done and the goal is still active (not preempted)
-            if ((m_server_state == ActionServerState::TRAJECTORY_EXECUTION_PENDING) &&
+            if ((m_server_state == ActionServerState::TRAJECTORY_EXECUTION_PENDING ||
+                 m_server_state == ActionServerState::PRE_PROCESSING_IN_PROGRESS) && // FIXME KOR-3563 this happens if we received a ACTION_START before a ACTION_PREPROCESS_END
                  m_goal.getGoalStatus().status == actionlib_msgs::GoalStatus::ACTIVE)
             {
                 ROS_INFO("Trajectory has started.");
@@ -326,7 +336,7 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
                 else
                 {
                     result.error_code = result.PATH_TOLERANCE_VIOLATED;
-                    oss << "After validation, trajectory execution failed in the arm with sub error code " << notif.abort_details();
+                    oss << "After validation, trajectory execution failed in the arm with sub error code " << Kinova::Api::SubErrorCodes_Name(notif.abort_details());
                     result.error_string = oss.str();
 
                     ROS_ERROR("%s", oss.str().c_str());
