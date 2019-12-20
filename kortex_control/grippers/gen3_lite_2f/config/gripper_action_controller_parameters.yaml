@@ -1,0 +1,11 @@
+gen3_lite_2f_gripper_controller:
+    type: position_controllers/GripperActionController
+    joint: right_finger_bottom_joint
+    action_monitor_rate: 100
+
+gazebo_ros_control:
+  pid_gains:
+        right_finger_bottom_joint: {p: 0.1, i: 0.0, d: 0.0} 
+        right_finger_tip_joint: {p: 1.0, i: 0.0, d: 0.0} 
+        left_finger_bottom_joint: {p: 10.0, i: 0.0, d: 0.0} 
+        left_finger_tip_joint: {p: 1.0, i: 0.0, d: 0.0}

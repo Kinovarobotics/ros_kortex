@@ -88,9 +88,15 @@ class KortexArmDriver
 
     std::string m_gripper_name;
     std::vector<std::string> m_gripper_joint_names;
-    std::vector<float> m_gripper_joint_limits;
+    std::vector<float> m_gripper_joint_limits_min;
+    std::vector<float> m_gripper_joint_limits_max;
 
+    int m_degrees_of_freedom;
+
+    bool m_is_interconnect_module_present;
     int m_interconnect_device_id;
+
+    bool m_is_vision_module_present;
     int m_vision_device_id;
 
     // Kortex Api objects

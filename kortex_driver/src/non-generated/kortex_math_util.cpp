@@ -63,3 +63,15 @@ double KortexMathUtil::wrapDegreesFromZeroTo360(double deg_not_wrapped)
     } while(!properly_wrapped);
     return deg_not_wrapped;
 }
+
+double KortexMathUtil::relative_position_from_absolute(double absolute_position, double min_value, double max_value)
+{
+    double range = max_value - min_value;
+    return (absolute_position - min_value) / range;
+}
+
+double KortexMathUtil::absolute_position_from_relative(double relative_position, double min_value, double max_value)
+{
+    double range = max_value - min_value;
+    return relative_position * range + min_value;
+}

@@ -29,7 +29,7 @@ fi
 
 # Download the API from Google Drive
 echo "Downloading the Kortex API from the Web..."
-wget -q -O kortex_api.zip https://artifactory.kinovaapps.com/artifactory/generic-local-public/kortex/API/2.0.0/kortex_api_2.0.0.zip
+jfrog rt dl --flat  generic-local-stable/API/2.1.0/kortex_api_2.1.0-3.zip ./
 RESULT=$?
 if [ "${RESULT}" -ne 0 ]; then
     echo "ERROR while fetching the kortex api. code = ${RESULT}"
@@ -37,6 +37,7 @@ if [ "${RESULT}" -ne 0 ]; then
 fi
 
 # Unzip it
+mv kortex_api_2.1.0-3.zip kortex_api.zip
 unzip -d kortex_api kortex_api.zip > /dev/null
 RESULT=$?
 if [ "${RESULT}" -ne 0 ]; then

@@ -50,9 +50,15 @@ KortexArmDriver::~KortexArmDriver()
     delete m_control_config_ros_services;
     delete m_device_config_ros_services;
     delete m_device_manager_ros_services;
-    delete m_interconnect_config_ros_services;
-    delete m_vision_config_ros_services;
-
+    if (m_interconnect_config_ros_services)
+    {
+        delete m_interconnect_config_ros_services;
+    }
+    if (m_vision_config_ros_services)
+    {
+        delete m_vision_config_ros_services;
+    }
+    
     m_tcp_session_manager->CloseSession();
     m_udp_session_manager->CloseSession();
     m_tcp_router->SetActivationStatus(false);
@@ -146,6 +152,13 @@ void KortexArmDriver::parseRosArguments()
         throw new std::runtime_error(error_string);
     }
 
+    if (!ros::param::get("~dof", m_degrees_of_freedom))
+    {
+        std::string error_string = "Number of degrees of freedom was not specified in the launch file, shutting down the node...";
+        ROS_ERROR("%s", error_string.c_str());
+        throw new std::runtime_error(error_string);
+    }
+
     if (!ros::param::get("~joint_names", m_arm_joint_names))
     {
         std::string error_string = "Arm joint_names were not specified, shutting down the node...";
@@ -171,9 +184,17 @@ void KortexArmDriver::parseRosArguments()
         }
 
         // Get the gripper_joint_limits size
-        if (!ros::param::get("~gripper_joint_limits", m_gripper_joint_limits))
+        if (!ros::param::get("~gripper_joint_limits_min", m_gripper_joint_limits_min))
         {
-            std::string error_string = "Gripper joint limits were not specified in the launch file, shutting down the node...";
+            std::string error_string = "Gripper joint min limits were not specified in the launch file, shutting down the node...";
+            ROS_ERROR("%s", error_string.c_str());
+            throw new std::runtime_error(error_string);
+        }
+
+        // Get the gripper_joint_limits size
+        if (!ros::param::get("~gripper_joint_limits_max", m_gripper_joint_limits_max))
+        {
+            std::string error_string = "Gripper joint max limits were not specified in the launch file, shutting down the node...";
             ROS_ERROR("%s", error_string.c_str());
             throw new std::runtime_error(error_string);
         }
@@ -247,7 +268,7 @@ void KortexArmDriver::verifyProductConfiguration()
             throw new std::runtime_error(error_string);
         }
     }
-    else if (m_arm_name == "pico")
+    else if (m_arm_name == "gen3_lite")
     {
         if (product_config.model() != Kinova::Api::ProductConfiguration::ModelId::MODEL_ID_L31)
         {
@@ -259,6 +280,13 @@ void KortexArmDriver::verifyProductConfiguration()
     else
     {
         std::string error_string = "The arm model specified in the launch file is not supported, shutting down the node...";
+        ROS_ERROR("%s", error_string.c_str());
+        throw new std::runtime_error(error_string);
+    }
+    // Compare number of degrees of freedom specified in the launch file with the number of detected actuators
+    if (product_config.degree_of_freedom() != m_degrees_of_freedom)
+    {
+        std::string error_string = "The degrees of freedom specified in the launch file doesn't match the detected number of actuators, shutting down the node...";
         ROS_ERROR("%s", error_string.c_str());
         throw new std::runtime_error(error_string);
     }
@@ -282,6 +310,15 @@ void KortexArmDriver::verifyProductConfiguration()
             throw new std::runtime_error(error_string);
         }
     }
+    else if (m_gripper_name == "gen3_lite_2f")
+    {
+        if (product_config.end_effector_type() != Kinova::Api::ProductConfiguration::EndEffectorType::END_EFFECTOR_TYPE_L31_GRIPPER_2F)
+        {
+            std::string error_string = "The gripper model specified in the launch file doesn't match the detected arm's gripper model, shutting down the node...";
+            ROS_ERROR("%s", error_string.c_str());
+            throw new std::runtime_error(error_string);
+        }
+    }
     else 
     {
         std::string error_string = "The gripper model specified in the launch file is not supported, shutting down the node...";
@@ -292,10 +329,17 @@ void KortexArmDriver::verifyProductConfiguration()
     // Set the ROS Param for the degrees of freedom
     m_node_handle.setParam("degrees_of_freedom", int(product_config.degree_of_freedom()));
     m_node_handle.setParam("is_gripper_present", isGripperPresent());
+    m_node_handle.setParam("gripper_joint_names", m_gripper_joint_names);
 
     // Find all the devices and print the device ID's
     ROS_INFO("-------------------------------------------------");
     ROS_INFO("Scanning all devices in robot... ");
+
+    // We suppose we don't have an interconnect or a vision module until we find it
+    m_is_interconnect_module_present = false;
+    m_is_vision_module_present = false;
+
+    // Loop through the devices to find the device ID's
     auto devices = m_device_manager->ReadAllDevices();
     for (auto device : devices.device_handle())
     {
@@ -313,11 +357,13 @@ void KortexArmDriver::verifyProductConfiguration()
         else if (device.device_type() == Kinova::Api::Common::DeviceTypes::INTERCONNECT)
         {
             m_interconnect_device_id = device.device_identifier();
+            m_is_interconnect_module_present = true;
             ROS_INFO("Interconnect device was found on device identifier %u", m_interconnect_device_id);
         }
         else if (device.device_type() == Kinova::Api::Common::DeviceTypes::VISION)
         {
             m_vision_device_id = device.device_identifier();
+            m_is_vision_module_present = true;
             ROS_INFO("Vision device was found on device identifier %u", m_vision_device_id);
         }
     }
@@ -333,8 +379,22 @@ void KortexArmDriver::initRosServices()
     m_control_config_ros_services = new ControlConfigServices(m_node_handle, m_control_config, 0, m_api_rpc_timeout_ms);
     m_device_config_ros_services = new DeviceConfigServices(m_node_handle, m_device_config, 0, m_api_rpc_timeout_ms);
     m_device_manager_ros_services = new DeviceManagerServices(m_node_handle, m_device_manager, 0, m_api_rpc_timeout_ms);
-    m_interconnect_config_ros_services = new InterconnectConfigServices(m_node_handle, m_interconnect_config, m_interconnect_device_id, m_api_rpc_timeout_ms);
-    m_vision_config_ros_services = new VisionConfigServices(m_node_handle, m_vision_config, m_vision_device_id, m_api_rpc_timeout_ms);
+    if (m_is_interconnect_module_present)
+    {
+        m_interconnect_config_ros_services = new InterconnectConfigServices(m_node_handle, m_interconnect_config, m_interconnect_device_id, m_api_rpc_timeout_ms);
+    }
+    else 
+    {
+        m_interconnect_config_ros_services = nullptr;
+    }
+    if (m_is_vision_module_present)
+    {
+        m_vision_config_ros_services = new VisionConfigServices(m_node_handle, m_vision_config, m_vision_device_id, m_api_rpc_timeout_ms);
+    }
+    else
+    {
+        m_vision_config_ros_services = nullptr;
+    }
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     ROS_INFO("Kortex Driver's services initialized correctly.");
     ROS_INFO("-------------------------------------------------");
@@ -346,9 +406,9 @@ void KortexArmDriver::startActionServers()
     m_action_server_follow_joint_trajectory = new PreComputedJointTrajectoryActionServer(m_arm_name + "_joint_trajectory_controller/follow_joint_trajectory", m_node_handle, m_base, m_base_cyclic);
     // Start Gripper Action Server if the arm has a gripper
     m_action_server_gripper_command = nullptr;
-    if (m_gripper_name == "robotiq_2f_85")
+    if (isGripperPresent())
     {
-        m_action_server_gripper_command = new RobotiqGripperCommandActionServer(m_gripper_name + "_gripper_controller/gripper_cmd", m_gripper_joint_names[0], m_gripper_joint_limits[0], m_node_handle, m_base, m_base_cyclic);
+        m_action_server_gripper_command = new RobotiqGripperCommandActionServer(m_gripper_name + "_gripper_controller/gripper_cmd", m_gripper_joint_names[0], m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0], m_node_handle, m_base, m_base_cyclic);
     }
 }
 
@@ -414,14 +474,14 @@ void KortexArmDriver::publishFeedback()
             joint_state.effort[i] = base_feedback.actuators[i].torque;
         }
 
-        if (m_gripper_name == "robotiq_2f_85")
+        if (isGripperPresent())
         {
             for (int i = 0; i < base_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor.size(); i++)
             {
                 int joint_state_index = base_feedback.actuators.size() + i;
                 joint_state.name[joint_state_index] = m_gripper_joint_names[i];
-                // Arm feedback is between 0 and 100, and upper limit in URDF is specified in gripper_joint_limits[i] parameter
-                joint_state.position[joint_state_index] = base_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor[i].position / 100.0 * m_gripper_joint_limits[i];
+                // Arm feedback is between 0 and 100, and limits in URDF are specified in gripper_joint_limits_min[i] and gripper_joint_limits_max[i] parameters
+                joint_state.position[joint_state_index] = m_math_util.absolute_position_from_relative(base_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor[i].position / 100.0, m_gripper_joint_limits_min[i], m_gripper_joint_limits_max[i]);
                 joint_state.velocity[joint_state_index] = base_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor[i].velocity;
                 // Not supported for now
                 joint_state.effort[joint_state_index] = 0.0;

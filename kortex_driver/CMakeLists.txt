@@ -1,10 +1,8 @@
-
 cmake_minimum_required(VERSION 2.8.3)
 project(kortex_driver)
 
 add_compile_options(-std=c++11)
 add_definitions(-D_OS_UNIX)
-
 
 find_path (KORTEX_API_DOWNLOADER_PATH  # Set this variable
 			download_kortex_api.bash  # To the Working dir of this file 

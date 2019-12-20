@@ -42,9 +42,9 @@ To run the C++ example: `rosrun kortex_examples example_actuator_configuration_c
 
 To run the Python example: `rosrun kortex_examples example_actuator_configuration.py`
 
-If you started the `kortex_driver` node in a non-default namespace (not **my_gen3**) or if you want to test the example on another actuator than the first one, you will have to supply node parameters in the command line (the syntax doesn't change if you run the C++ or Python example) : 
+If you started the `kortex_driver` node in another namespace (not **my_gen3**) or if you want to test the example on another actuator than the first one, you will have to supply node parameters in the command line (the syntax doesn't change if you run the C++ or Python example): 
 
-`rosrun kortex_examples example_actuator_configuration_cpp _robot_name:=<your_own_namespace> _device_id:=<your_device_id>`
+`rosrun kortex_examples example_actuator_configuration_cpp _robot_name:=<your_robot_name> _device_id:=<your_device_id>`
 
 <a id="full_arm"></a>
 ## Full arm examples
@@ -52,13 +52,23 @@ If you started the `kortex_driver` node in a non-default namespace (not **my_gen
 
 The examples look for advertised services in the **my_gen3** namespace by default.
 
-To run the C++ example: `rosrun kortex_examples example_full_arm_movement_cpp`
+- **Simple movement example**:
 
-To run the Python example: `rosrun kortex_examples example_full_arm_movement.py`
+    - To run the C++ example: `rosrun kortex_examples example_full_arm_movement_cpp`
+    - To run the Python example: `rosrun kortex_examples example_full_arm_movement.py`
+    
+    If you started the `kortex_driver` node in another namespace (not **my_gen3**), you will have to supply the node a parameter in the command line (the syntax doesn't change if you run the C++ or Python example) : 
+    
+    `rosrun kortex_examples example_full_arm_movement_cpp _robot_name:=<your_robot_name>`
 
-If you started the `kortex_driver` node in a non-default namespace (not **my_gen3**), you will have to supply the node a parameter in the command line (the syntax doesn't change if you run the C++ or Python example) : 
+- **Cartesian poses with notifications**:
 
-`rosrun kortex_examples example_full_arm_movement_cpp _robot_name:=<your_own_namespace>`
+    - To run the C++ example: `rosrun kortex_examples example_cartesian_poses_with_notifications_cpp`
+    - To run the Python example: `rosrun kortex_examples example_cartesian_poses_with_notifications.py`
+    
+    If you started the `kortex_driver` node in another namespace (not **my_gen3**), you will have to supply the node a parameter in the command line (the syntax doesn't change if you run the C++ or Python example) : 
+    
+    `rosrun kortex_examples example_cartesian_poses_with_notifications_cpp _robot_name:=<your_robot_name>`
 
 <a id="vision_config"></a>
 ## Vision module configuration examples
@@ -70,9 +80,9 @@ To run the C++ example: `rosrun kortex_examples example_vision_configuration_cpp
 
 To run the Python example: `rosrun kortex_examples example_vision_configuration.py`
 
-If you started the `kortex_driver` node in a non-default namespace (not **my_gen3**), you will have to supply the node a parameter in the command line (the syntax doesn't change if you run the C++ or Python example) : 
+If you started the `kortex_driver` node in another namespace (not **my_gen3**), you will have to supply the node a parameter in the command line (the syntax doesn't change if you run the C++ or Python example) : 
 
-`rosrun kortex_examples example_full_arm_movement_cpp _robot_name:=<your_own_namespace>`
+`rosrun kortex_examples example_vision_configuration_cpp _robot_name:=<your_robot_name>`
 
 <a id="move_it"></a>
 ## MoveIt! example

@@ -1,9 +1,16 @@
 <?xml version="1.0"?>
 <launch>
     
-    <!-- Arm and tool configuration -->
-    <arg name="arm" default="gen3"/> <!-- gen3 is the only supported arm for now -->
-    <arg name="gripper" default=""/> <!-- "robotiq_2f_85" is the only supported gripper for now, as well as no gripper ("") -->
+    <!-- Arm configuration -->
+    <arg name="arm" default="gen3"/>
+    <arg name="dof" default="7" if="$(eval arg('arm') == 'gen3')"/> <!-- Number of degrees of freedom of the arm -->
+    <arg name="dof" default="6" if="$(eval arg('arm') == 'gen3_lite')"/> <!-- Number of degrees of freedom of the arm -->
+    <arg name="vision" default="true"/> <!-- True if the arm has a Vision module -->
+
+    <!-- Gripper configuration -->
+    <arg name="gripper" default=""/>
+
+    <!-- Namespace -->
     <arg name="robot_name" default="my_$(arg arm)"/>
 
     <!-- Kortex API options -->
@@ -27,10 +34,10 @@
 
         <!-- Load the description for the robot -->
         <!-- Without gripper -->
-        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro sim:=false"
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false"
             if="$(eval not arg('gripper'))"/>
         <!-- With gripper -->
-        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro sim:=false"
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false"
             unless="$(eval not arg('gripper'))"/>
 
         <!-- Start the kortex_driver node -->
@@ -46,7 +53,8 @@
             <param name="default_goal_tolerance" value="$(arg default_goal_tolerance)"/>
             <param name="arm" value="$(arg arm)"/>
             <param name="gripper" value="$(arg gripper)"/>
-            <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/config/joint_limits.yaml"/>
+            <param name="dof" value="$(arg dof)"/>
+            <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/joint_limits.yaml"/>
             <!-- If there is a gripper, load the active joint names for it -->
             <rosparam command="load" file="$(find kortex_description)/grippers/$(arg gripper)/config/joint_limits.yaml" unless="$(eval not arg('gripper'))"/>
         </node>
@@ -56,11 +64,13 @@
 
             <!-- TODO Find cleaner way to do that and that will work with other arms -->
             <!-- Without gripper -->
-            <include file="$(find gen3_move_it_config)/launch/move_group.launch"
-                if="$(eval not arg('gripper'))"/> 
+            <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_move_it_config/launch/move_group.launch" if="$(eval not arg('gripper'))"> 
+                <arg name="dof" value="$(arg dof)"/>
+            </include>
             <!-- With gripper -->
-            <include file="$(find gen3_robotiq_2f_85_move_it_config)/launch/move_group.launch"
-                unless="$(eval not arg('gripper'))"/> 
+            <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_$(arg gripper)_move_it_config/launch/move_group.launch" unless="$(eval not arg('gripper'))"> 
+                <arg name="dof" value="$(arg dof)"/>
+            </include>
 
         </group>
 
@@ -68,6 +78,7 @@
         <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
             <param name="rate" value="$(arg cyclic_data_publish_rate)" />
             <rosparam param="source_list">[base_feedback/joint_state]</rosparam>
+            <param name="use_gui" value="false"/>
         </node>
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 

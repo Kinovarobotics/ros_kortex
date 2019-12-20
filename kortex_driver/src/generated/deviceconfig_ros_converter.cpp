@@ -222,8 +222,8 @@ int ToRosData(Kinova::Api::DeviceConfig::CalibrationParameter input, kortex_driv
 	output.calibration_parameter_identifier = input.calibration_parameter_identifier();
 
 	
-	auto oneof_type = input.value_case();
-	switch(oneof_type)
+	auto oneof_type_value = input.value_case();
+	switch(oneof_type_value)
 	{ 
 	
 		case Kinova::Api::DeviceConfig::CalibrationParameter::kSignedIntValue:

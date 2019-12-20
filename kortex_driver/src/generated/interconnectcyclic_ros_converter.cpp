@@ -32,8 +32,8 @@ int ToRosData(Kinova::Api::InterconnectCyclic::Command input, kortex_driver::Int
 	output.flags = input.flags();
 
 	
-	auto oneof_type = input.tool_command_case();
-	switch(oneof_type)
+	auto oneof_type_tool_command = input.tool_command_case();
+	switch(oneof_type_tool_command)
 	{ 
 	
 		case Kinova::Api::InterconnectCyclic::Command::kGripperCommand:
@@ -66,8 +66,8 @@ int ToRosData(Kinova::Api::InterconnectCyclic::Feedback input, kortex_driver::In
 	output.warning_bank_b = input.warning_bank_b();
 
 	
-	auto oneof_type = input.tool_feedback_case();
-	switch(oneof_type)
+	auto oneof_type_tool_feedback = input.tool_feedback_case();
+	switch(oneof_type_tool_feedback)
 	{ 
 	
 		case Kinova::Api::InterconnectCyclic::Feedback::kGripperFeedback:
@@ -102,8 +102,8 @@ int ToRosData(Kinova::Api::InterconnectCyclic::CustomData input, kortex_driver::
 	output.custom_data_15 = input.custom_data_15();
 
 	
-	auto oneof_type = input.tool_customData_case();
-	switch(oneof_type)
+	auto oneof_type_tool_customData = input.tool_customData_case();
+	switch(oneof_type_tool_customData)
 	{ 
 	
 		case Kinova::Api::InterconnectCyclic::CustomData::kGripperCustomData:

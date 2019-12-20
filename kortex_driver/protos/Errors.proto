@@ -132,7 +132,8 @@ enum SubErrorCodes {
     ROUTER_UNVAILABLE = 108;                // The client router is currently unavailable. This can happen if an API method is called after the router has been deactivated via the method SetActivationStatus.
 
     ADDRESS_NOT_IN_VALID_RANGE = 120;       // IP Address not valid against netmask
-
+    ADDRESS_NOT_CONFIGURABLE = 121;         // IP Address not configurable on specified interface
+    
     SESSION_NOT_IN_CONTROL = 130;           // Trying to perform command from a non-controlling session in single-level mode
 
     METHOD_TIMEOUT = 131;                   // Timeout occured during method execution

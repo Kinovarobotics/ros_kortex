@@ -53,8 +53,13 @@
 #include "kortex_driver/ReadAllProtectionZones.h"
 #include "kortex_driver/CreateMapping.h"
 #include "kortex_driver/ReadMapping.h"
+#include "kortex_driver/UpdateMapping.h"
+#include "kortex_driver/DeleteMapping.h"
 #include "kortex_driver/ReadAllMappings.h"
 #include "kortex_driver/CreateMap.h"
+#include "kortex_driver/ReadMap.h"
+#include "kortex_driver/UpdateMap.h"
+#include "kortex_driver/DeleteMap.h"
 #include "kortex_driver/ReadAllMaps.h"
 #include "kortex_driver/ActivateMap.h"
 #include "kortex_driver/CreateAction.h"
@@ -210,8 +215,13 @@ class BaseServices
         bool ReadAllProtectionZones(kortex_driver::ReadAllProtectionZones::Request  &req, kortex_driver::ReadAllProtectionZones::Response &res);
         bool CreateMapping(kortex_driver::CreateMapping::Request  &req, kortex_driver::CreateMapping::Response &res);
         bool ReadMapping(kortex_driver::ReadMapping::Request  &req, kortex_driver::ReadMapping::Response &res);
+        bool UpdateMapping(kortex_driver::UpdateMapping::Request  &req, kortex_driver::UpdateMapping::Response &res);
+        bool DeleteMapping(kortex_driver::DeleteMapping::Request  &req, kortex_driver::DeleteMapping::Response &res);
         bool ReadAllMappings(kortex_driver::ReadAllMappings::Request  &req, kortex_driver::ReadAllMappings::Response &res);
         bool CreateMap(kortex_driver::CreateMap::Request  &req, kortex_driver::CreateMap::Response &res);
+        bool ReadMap(kortex_driver::ReadMap::Request  &req, kortex_driver::ReadMap::Response &res);
+        bool UpdateMap(kortex_driver::UpdateMap::Request  &req, kortex_driver::UpdateMap::Response &res);
+        bool DeleteMap(kortex_driver::DeleteMap::Request  &req, kortex_driver::DeleteMap::Response &res);
         bool ReadAllMaps(kortex_driver::ReadAllMaps::Request  &req, kortex_driver::ReadAllMaps::Response &res);
         bool ActivateMap(kortex_driver::ActivateMap::Request  &req, kortex_driver::ActivateMap::Response &res);
         bool CreateAction(kortex_driver::CreateAction::Request  &req, kortex_driver::CreateAction::Response &res);
@@ -393,8 +403,13 @@ private:
 	ros::ServiceServer m_serviceReadAllProtectionZones;
 	ros::ServiceServer m_serviceCreateMapping;
 	ros::ServiceServer m_serviceReadMapping;
+	ros::ServiceServer m_serviceUpdateMapping;
+	ros::ServiceServer m_serviceDeleteMapping;
 	ros::ServiceServer m_serviceReadAllMappings;
 	ros::ServiceServer m_serviceCreateMap;
+	ros::ServiceServer m_serviceReadMap;
+	ros::ServiceServer m_serviceUpdateMap;
+	ros::ServiceServer m_serviceDeleteMap;
 	ros::ServiceServer m_serviceReadAllMaps;
 	ros::ServiceServer m_serviceActivateMap;
 	ros::ServiceServer m_serviceCreateAction;

@@ -59,6 +59,9 @@ class ExampleMoveItTrajectories(object):
     rospy.init_node('example_move_it_trajectories')
 
     self.is_gripper_present = rospy.get_param(rospy.get_namespace() + "is_gripper_present", False)
+    gripper_joint_names = rospy.get_param(rospy.get_namespace() + "gripper_joint_names", [])
+    self.gripper_joint_name = gripper_joint_names[0]
+    self.degrees_of_freedom = rospy.get_param(rospy.get_namespace() + "degrees_of_freedom", 7)
 
     # Create the MoveItInterface necessary objects
     arm_group_name = "arm"
@@ -99,13 +102,21 @@ class ExampleMoveItTrajectories(object):
     self.arm_group.set_goal_joint_tolerance(tolerance)
 
     # Set the joint target configuration
-    joint_positions[0] = pi/2
-    joint_positions[1] = 0
-    joint_positions[2] = pi/4
-    joint_positions[3] = -pi/4
-    joint_positions[4] = 0
-    joint_positions[5] = pi/2
-    joint_positions[6] = 0.2
+    if self.degrees_of_freedom == 7:
+      joint_positions[0] = pi/2
+      joint_positions[1] = 0
+      joint_positions[2] = pi/4
+      joint_positions[3] = -pi/4
+      joint_positions[4] = 0
+      joint_positions[5] = pi/2
+      joint_positions[6] = 0.2
+    elif self.degrees_of_freedom == 6:
+      joint_positions[0] = 0
+      joint_positions[1] = 0
+      joint_positions[2] = pi/2
+      joint_positions[3] = pi/4
+      joint_positions[4] = 0
+      joint_positions[5] = pi/2
     arm_group.set_joint_value_target(joint_positions)
     
     # Plan and execute in one command
@@ -134,7 +145,6 @@ class ExampleMoveItTrajectories(object):
 
     # Set the trajectory constraint if one is specified
     if constraints is not None:
-      #import pdb; pdb.set_trace()
       arm_group.set_path_constraints(constraints)
 
     # Get the current Cartesian Position
@@ -148,9 +158,10 @@ class ExampleMoveItTrajectories(object):
     gripper_group = self.gripper_group
     
     # We only have to move this joint because all others are mimic!
-    gripper_joint = self.robot.get_joint("gripper_finger1_joint")
+    gripper_joint = self.robot.get_joint(self.gripper_joint_name)
     gripper_max_absolute_pos = gripper_joint.max_bound()
-    gripper_joint.move(relative_position * gripper_max_absolute_pos, True)
+    gripper_min_absolute_pos = gripper_joint.min_bound()
+    gripper_joint.move(relative_position * (gripper_max_absolute_pos - gripper_min_absolute_pos) + gripper_min_absolute_pos, True)
 
 def main():
   example = ExampleMoveItTrajectories()
@@ -170,13 +181,10 @@ def main():
   rospy.loginfo("Press any key to start Reach Cartesian Pose sub example")
   raw_input()
   actual_pose = example.get_cartesian_pose()
-  actual_pose.position.x -= 0.1
-  actual_pose.position.y += 0.3
-  actual_pose.position.z += 0.3
+  actual_pose.position.z -= 0.2
   example.reach_cartesian_pose(pose=actual_pose, tolerance=0.01, constraints=None)
   
-  if example.is_gripper_present:
-
+  if example.degrees_of_freedom == 7:
     rospy.loginfo("Press any key to start Reach Cartesian Pose With Constraints sub example")
     raw_input()
     
@@ -192,7 +200,8 @@ def main():
 
     # Send the goal
     example.reach_cartesian_pose(pose=actual_pose, tolerance=0.01, constraints=constraints)
-    
+
+  if example.is_gripper_present:
     rospy.loginfo("Press any key to open the gripper sub example")
     raw_input()
     example.reach_gripper_position(0)

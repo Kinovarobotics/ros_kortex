@@ -21,4 +21,4 @@ The `joint_position_controllers.yaml` file for the chosen arm is loaded to the P
 
 ## ROS Control support for the real arm
 
-ROS Control support for the Kinova Gen3 Ultra lightweight robot is not currently available and will be part of a future release.  
+ROS Control support for the Kinova Gen3 and Gen3 lite robots is not currently available and will be part of a future release.  

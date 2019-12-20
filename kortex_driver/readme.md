@@ -28,7 +28,7 @@
 
 <a id="overview"></a>
 ## Overview
-This node allows communication between a ROS node and a Kinova Gen3 Ultra lightweight robot.
+This node allows communication between a ROS node and a Kinova Gen3 or Gen3 lite robot.
 
 ### License
 
@@ -38,9 +38,7 @@ The source code is released under a [BSD 3-Clause license](../LICENSE).
 Affiliation: [Kinova inc.](https://www.kinovarobotics.com/)<br />
 Maintainer: Kinova inc. support@kinovarobotics.com**
 
-This package has been tested under :
-- ROS Kinetic and Ubuntu 16.04
-- ROS Melodic and Ubuntu 18.04
+This package has been tested under ROS Kinetic (Ubuntu 16.04) and ROS Melodic (Ubuntu 18.04).
 
 <a id="usage"></a>
 ## Usage
@@ -49,7 +47,7 @@ The `kortex_driver` node is the node responsible for the communication between t
 
 **Arguments**:
 - **arm** : Name of your robot arm model. See the `kortex_description/arms` folder to see the available robot models. The default value is **gen3**.
-- **gripper** : Name of your robot arm's tool / gripper. See the `kortex_description/grippers` folder to see the available end effector models (or to add your own). The default value is **""** and the only other supported option is **robotiq_2f_85** for now.
+- **gripper** : Name of your robot arm's tool / gripper. See the `kortex_description/grippers` folder to see the available end effector models (or to add your own). The default value is **""**. For Gen3, you can also put **robotiq_2f_85**. For Gen3 lite, you need to put **gen3_lite_2f**.
 - **robot_name** : This is the namespace in which the driver will run. It defaults to **my_$(arg arm)** (so "my_gen3" for arm="gen3").
 - **ip_address** : The IP address of the robot you're connecting to. The default value is **192.168.1.10**.
 - **username** : The username for the robot connection. The default value is **admin**.
@@ -149,7 +147,7 @@ The *.srv* files are generated in different sub-folders depending on the sub-mod
 
 Many things have been changed in the ros_kortex repository between versions 1.1.7 and 2.0.0 and you will have to modify your code if you don't want it to break.
 
-* The `kortex_actuator_driver`, `kortex_vision_config_driver` and `kortex_device_manager` packages were removed and only the `kortex_driver` package remains.
+* The `kortex_actuator_driver`, `kortex_vision_config_driver` and `kortex_device_manager` packages were removed and only the `kortex_driver` package remains (one driver to rule them all).
 * Since we only have one driver and the ROS message generation does not deal with namespaces, the messages and services that are duplicated are now named differently. For example, the **Feedback** message exists within the `BaseCyclic`, `ActuatorCyclic`, `InterconnectCyclic` and `GripperCyclic` Protocol Buffers .proto files. In ROS, this is now translated as a "PackageName_" prefix before the message name. So, for the **Feedback** message, the **BaseCyclic_Feedback**, **ActuatorCyclic_Feedback**, **InterconnectCyclic_Feedback** and **GripperCyclic_Feedback** ROS messages have been automatically generated. You may encounter build errors (in C++) or runtime errors (in Python) because of this change. You can just go in the `msg/generated` folder and look for the problematic message to find its new name to change the occurrences in your code. 
 * The services are now all **lowercase_with_underscores** instead of **UpperCase**.
 * The services are now advertised in **/my_robot_name/my_package_name/desired_service** (see the [Services section](#services) to learn about the packages). You can also visualize it if you start the node and type `rosservice list` in a terminal.

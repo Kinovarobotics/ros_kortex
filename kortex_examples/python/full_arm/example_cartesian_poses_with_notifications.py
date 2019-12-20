@@ -99,6 +99,15 @@ class ExampleCartesianActionsWithNotifications:
 
     def notification_callback(self, notif):
         if notif.action_event == ActionEvent.ACTION_END:
+            rospy.loginfo("Action has ended.")
+            if notif.handle.identifier == 1001:
+                self.pose_1_done.set()
+            if notif.handle.identifier == 1002:
+                self.pose_2_done.set()
+            if notif.handle.identifier == 1003:
+                self.pose_3_done.set()
+        if notif.action_event == ActionEvent.ACTION_ABORT:
+            rospy.logerr("Action was aborted!")
             if notif.handle.identifier == 1001:
                 self.pose_1_done.set()
             if notif.handle.identifier == 1002:
@@ -145,12 +154,12 @@ class ExampleCartesianActionsWithNotifications:
         my_constrained_pose = ConstrainedPose()
         my_constrained_pose.constraint.oneof_type.speed.append(my_cartesian_speed)
 
-        my_constrained_pose.target_pose.x = 0.365
-        my_constrained_pose.target_pose.y = 0.169
-        my_constrained_pose.target_pose.z = 0.252
-        my_constrained_pose.target_pose.theta_x = -31.3
-        my_constrained_pose.target_pose.theta_y = -176.6
-        my_constrained_pose.target_pose.theta_z = 60.7
+        my_constrained_pose.target_pose.x = 0.374
+        my_constrained_pose.target_pose.y = 0.081
+        my_constrained_pose.target_pose.z = 0.450
+        my_constrained_pose.target_pose.theta_x = -57.6
+        my_constrained_pose.target_pose.theta_y = 91.1
+        my_constrained_pose.target_pose.theta_z = 2.3
 
         req = ExecuteActionRequest()
         req.input.oneof_action_parameters.reach_pose.append(my_constrained_pose)
@@ -171,7 +180,7 @@ class ExampleCartesianActionsWithNotifications:
         req.input.handle.identifier = 1002
         req.input.name = "pose2"
 
-        my_constrained_pose.target_pose.z = 0.352
+        my_constrained_pose.target_pose.z = 0.3
 
         req.input.oneof_action_parameters.reach_pose[0] = my_constrained_pose
 
@@ -189,7 +198,7 @@ class ExampleCartesianActionsWithNotifications:
         req.input.handle.identifier = 1003
         req.input.name = "pose3"
 
-        my_constrained_pose.target_pose.z = 0.432
+        my_constrained_pose.target_pose.z = 0.20
 
         req.input.oneof_action_parameters.reach_pose[0] = my_constrained_pose
 
