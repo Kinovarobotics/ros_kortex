@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 {
     ros::init(argc, argv, "kortex_arm_driver");
 
-    // if(ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info) ) {
+    // if(ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) {
     //     ros::console::notifyLoggerLevelsChanged();
     // }
     

@@ -75,6 +75,8 @@ class KortexArmDriver
 
     // Api options
     std::string m_ip_address;
+    std::string m_username;
+    std::string m_password;
     int m_cyclic_data_publish_rate;
     int m_api_rpc_timeout_ms;
     int m_api_session_inactivity_timeout_ms;

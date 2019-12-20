@@ -72,6 +72,7 @@ class PreComputedJointTrajectoryActionServer
         std::chrono::system_clock::time_point m_trajectory_end_time;
         
         std::mutex m_server_state_lock;
+        std::mutex m_action_notification_thread_lock;
         ActionServerState m_server_state;
 
         KortexMathUtil m_math_util;

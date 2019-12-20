@@ -94,4 +94,4 @@ To run the example: `roslaunch kortex_examples moveit_example.launch`
 
 If you started the `kortex_driver` node in a non-default namespace (not **my_gen3**), you will have to supply the node your own namespace in the command line : 
 
-`roslaunch kortex_examples moveit_example.launch robot_name:=<your_robot_name>`
+`roslaunch kortex_examples moveit_example.launch robot_name:=<your_own_namespace>`

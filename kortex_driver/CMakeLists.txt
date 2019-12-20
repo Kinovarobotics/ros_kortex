@@ -82,3 +82,24 @@ add_dependencies(kortex_driver_generated_files ${PROJECT_NAME}_gencpp)
 add_executable(kortex_arm_driver ${non_generated_files})
 target_link_libraries(kortex_arm_driver ${catkin_LIBRARIES} KortexApi gcov kortex_driver_generated_files)
 add_dependencies(kortex_arm_driver kortex_driver_generated_files)
+
+# Install
+
+install(TARGETS kortex_driver_generated_files kortex_arm_driver
+   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY include/${PROJECT_NAME}/
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/../kortex_api/include/
+   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+
+install(DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  FILES_MATCHING PATTERN "*.launch"
+)
