@@ -113,7 +113,7 @@ You can publish on those topics for joint or Cartesian velocity control of the r
 
     From the command line, with your robot name being "my_gen3", you can publish to this topic like so:
     ```
-    rostopic pub /my_gen3_lite/in/clear_faults std_msgs/Empty "{}"
+    rostopic pub /my_gen3/in/clear_faults std_msgs/Empty "{}"
     ```
 
 * **`/your_robot_name/in/stop`**
@@ -122,7 +122,7 @@ You can publish on those topics for joint or Cartesian velocity control of the r
 
     From the command line, with your robot name being "my_gen3", you can publish to this topic like so:
     ```
-    rostopic pub /my_gen3_lite/in/stop std_msgs/Empty "{}"
+    rostopic pub /my_gen3/in/stop std_msgs/Empty "{}"
     ```
 
 * **`/your_robot_name/in/emergency_stop`**
@@ -131,7 +131,7 @@ You can publish on those topics for joint or Cartesian velocity control of the r
 
     From the command line, with your robot name being "my_gen3", you can publish to this topic like so:
     ```
-    rostopic pub /my_gen3_lite/in/emergency_stop std_msgs/Empty "{}"
+    rostopic pub /my_gen3/in/emergency_stop std_msgs/Empty "{}"
     ```
 
 ### Robot feedback topics (out)
