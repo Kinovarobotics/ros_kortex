@@ -67,7 +67,6 @@ void KortexSubscribers::new_twist_cb(const kortex_driver::TwistCommand& twist)
     twist_command.mutable_twist()->set_angular_x(KortexMathUtil::toDeg(twist_command.twist().angular_x()));
     twist_command.mutable_twist()->set_angular_y(KortexMathUtil::toDeg(twist_command.twist().angular_y()));
     twist_command.mutable_twist()->set_angular_z(KortexMathUtil::toDeg(twist_command.twist().angular_z()));
-    ROS_INFO("angular X converted to %3.3f", twist_command.twist().angular_x());
 
     try
     {
