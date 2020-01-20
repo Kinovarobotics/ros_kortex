@@ -77,7 +77,33 @@ If everything goes well, you will see a "**The Kortex driver has been initialize
 <a id="topics"></a>
 ## Topics
 
-### Robot feedback topics
+### Robot control topics (in)
+
+You can publish on those topics for joint or Cartesian velocity control of the robot. You can also quickly stop its motion, apply the emergency stop (which will trigger a robot Fault state) and clear the Fault state with the corresponding topics.
+
+**Note: the robot's high level commands function at a rate of 40Hz. This will be improved in a future release.**
+
+* **`/your_robot_name/in/joint_velocity`**
+
+    Publishing joint velocities (radians/second) on this topic will move the arm until it reaches a limit, or until you send a zero-velocity command or a Stop. You can see the message description [here](msg/generated/base/JointSpeeds.msg).
+
+* **`/your_robot_name/in/cartesian_velocity`**
+
+    Publishing a Cartesian velocity (meters/second for linear, rad/second for angular) on this topic will move the arm until it reaches a limit, or until you send a zero-velocity command or a Stop. You can see the message description [here](msg/generated/base/SendTwistCommand.msg).
+
+* **`/your_robot_name/in/clear_faults`**
+
+    This clears the robot's fault state (if the faults are clearable).
+
+* **`/your_robot_name/in/stop`**
+
+    This stops the robot's motion smoothly.
+
+* **`/your_robot_name/in/emergency_stop`**
+
+    This triggers a robot fault.
+
+### Robot feedback topics (out)
 
 The robot feedback topics are always published by the `kortex_driver`. You don't have to activate them. 
 
@@ -93,7 +119,7 @@ The robot feedback topics are always published by the `kortex_driver`. You don't
 
     The feedback from the robot is converted to a [sensor_msgs/JointState](http://docs.ros.org/kinetic/api/sensor_msgs/html/msg/JointState.html) and published on this topic at a rate of **cyclic_data_publish_rate**.
 
-### Notification topics
+### Notification topics (out)
     
 The notification topics are only published by the `kortex_driver` if you activate them by first calling an activation service. Once activated, a notification topic will be activated until the node is shutdown. 
 
