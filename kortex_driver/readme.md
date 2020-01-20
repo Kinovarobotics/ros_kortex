@@ -87,21 +87,52 @@ You can publish on those topics for joint or Cartesian velocity control of the r
 
     Publishing joint velocities (radians/second) on this topic will move the arm until it reaches a limit, or until you send a zero-velocity command or a Stop. You can see the message description [here](msg/generated/base/JointSpeeds.msg).
 
+    From the command line, with your robot name being "my_gen3", you can publish a joint velocity to joint 0 to this topic like so:
+    ```
+    rostopic pub /my_gen3/in/joint_velocity kortex_driver/JointSpeeds "joint_speeds:
+    - joint_identifier: 0
+    value: 0.57
+    duration: 0" 
+    ```
+
 * **`/your_robot_name/in/cartesian_velocity`**
 
-    Publishing a Cartesian velocity (meters/second for linear, rad/second for angular) on this topic will move the arm until it reaches a limit, or until you send a zero-velocity command or a Stop. You can see the message description [here](msg/generated/base/SendTwistCommand.msg).
+    Publishing a Cartesian velocity (meters/second for linear, rad/second for angular) on this topic will move the arm until it reaches a limit, or until you send a zero-velocity command or a Stop. You can see the message description [here](msg/generated/base/TwistCommand.msg).
+
+    From the command line, with your robot name being "my_gen3", you can publish a twist to this topic like so:
+    ```
+    rostopic pub /my_gen3/in/cartesian_velocity kortex_driver/TwistCommand "reference_frame: 0
+    twist: {linear_x: 0.0, linear_y: 0.0, linear_z: 0.05, angular_x: 0.0, angular_y: 0.0,
+    angular_z: 0.0}
+    duration: 0"
+    ```
 
 * **`/your_robot_name/in/clear_faults`**
 
     This clears the robot's fault state (if the faults are clearable).
 
+    From the command line, with your robot name being "my_gen3", you can publish to this topic like so:
+    ```
+    rostopic pub /my_gen3_lite/in/clear_faults std_msgs/Empty "{}"
+    ```
+
 * **`/your_robot_name/in/stop`**
 
     This stops the robot's motion smoothly.
 
+    From the command line, with your robot name being "my_gen3", you can publish to this topic like so:
+    ```
+    rostopic pub /my_gen3_lite/in/stop std_msgs/Empty "{}"
+    ```
+
 * **`/your_robot_name/in/emergency_stop`**
 
     This triggers a robot fault.
+
+    From the command line, with your robot name being "my_gen3", you can publish to this topic like so:
+    ```
+    rostopic pub /my_gen3_lite/in/emergency_stop std_msgs/Empty "{}"
+    ```
 
 ### Robot feedback topics (out)
 
