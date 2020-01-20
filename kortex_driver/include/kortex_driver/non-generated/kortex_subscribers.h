@@ -22,6 +22,7 @@
 #include "kortex_driver/JointSpeeds.h"
 
 #include "kortex_driver/generated/base_proto_converter.h"
+#include "kortex_driver/non-generated/kortex_math_util.h"
 
 class KortexSubscribers
 {

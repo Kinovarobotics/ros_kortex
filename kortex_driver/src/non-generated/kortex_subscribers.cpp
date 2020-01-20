@@ -31,7 +31,15 @@ KortexSubscribers::~KortexSubscribers()
 void KortexSubscribers::new_joint_speeds_cb(const kortex_driver::JointSpeeds& joint_speeds)
 {
     Kinova::Api::Base::JointSpeeds speeds;
-    ToProtoData(joint_speeds, &speeds);
+    kortex_driver::JointSpeeds joint_speeds_in_rad(joint_speeds); // Since joint_speeds is const we need this copy
+
+    // Convert radians in degrees
+    for (unsigned int i = 0; i < joint_speeds.joint_speeds.size(); i++)
+    {
+        joint_speeds_in_rad.joint_speeds[i].value = KortexMathUtil::toDeg(joint_speeds.joint_speeds[i].value);
+    }
+    ToProtoData(joint_speeds_in_rad, &speeds);
+
     try
     {
         m_base->SendJointSpeedsCommand(speeds);
@@ -54,6 +62,13 @@ void KortexSubscribers::new_twist_cb(const kortex_driver::TwistCommand& twist)
 {
     Kinova::Api::Base::TwistCommand twist_command;
     ToProtoData(twist, &twist_command);
+
+    // Convert radians to degrees
+    twist_command.mutable_twist()->set_angular_x(KortexMathUtil::toDeg(twist_command.twist().angular_x()));
+    twist_command.mutable_twist()->set_angular_y(KortexMathUtil::toDeg(twist_command.twist().angular_y()));
+    twist_command.mutable_twist()->set_angular_z(KortexMathUtil::toDeg(twist_command.twist().angular_z()));
+    ROS_INFO("angular X converted to %3.3f", twist_command.twist().angular_x());
+
     try
     {
         m_base->SendTwistCommand(twist_command);
