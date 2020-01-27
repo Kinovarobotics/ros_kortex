@@ -172,7 +172,7 @@ void KortexArmDriver::parseRosArguments()
         ROS_ERROR("%s", error_string.c_str());
         throw new std::runtime_error(error_string);
     }
-        if (!ros::param::get("~prefix", m_prefix))
+    if (!ros::param::get("~prefix", m_prefix))
     {
         std::string error_string = "Prefix name was not specified in the launch file, shutting down the node...";
         ROS_ERROR("%s", error_string.c_str());
