@@ -18,6 +18,7 @@ KortexArmDriver::KortexArmDriver(ros::NodeHandle nh): m_node_handle(nh), m_node_
     parseRosArguments();
     initApi();
     verifyProductConfiguration();
+    initSubscribers();
     initRosServices();
     startActionServers();
 
@@ -44,6 +45,8 @@ KortexArmDriver::~KortexArmDriver()
     {
         delete m_action_server_gripper_command;
     }
+
+    delete m_topic_subscribers;
 
     delete m_actuator_config_ros_services;
     delete m_base_ros_services;
@@ -374,6 +377,11 @@ void KortexArmDriver::verifyProductConfiguration()
         }
     }
     ROS_INFO("-------------------------------------------------");
+}
+
+void KortexArmDriver::initSubscribers()
+{
+    m_topic_subscribers = new KortexSubscribers(m_node_handle, m_base);
 }
 
 void KortexArmDriver::initRosServices()
