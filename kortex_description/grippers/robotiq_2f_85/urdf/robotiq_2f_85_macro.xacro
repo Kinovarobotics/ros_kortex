@@ -4,16 +4,16 @@
 <robot name="robotiq_85_gripper" xmlns:xacro="http://ros.org/wiki/xacro">
     <xacro:property name="M_PI" value="3.14159"/>
     
-    <xacro:macro name="load_gripper" params="parent">       
+    <xacro:macro name="load_gripper" params="parent prefix">       
         
-        <joint name="gripper_base_joint" type="fixed">
+        <joint name="${prefix}gripper_base_joint" type="fixed">
             <parent link="${parent}"/>
-            <child link="gripper_base_link"/>
+            <child link="${prefix}gripper_base_link"/>
             <origin rpy="1.57 -1.57 0.0" xyz="0.0 0.0 0.0"/>
         </joint>
         
         
-        <link name="gripper_base_link">
+        <link name="${prefix}gripper_base_link">
             <visual>
                 <geometry>
                     <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_base_link.dae"/>
@@ -33,7 +33,7 @@
             </inertial>
         </link>
 
-        <gazebo reference="gripper_base_link">
+        <gazebo reference="${prefix}gripper_base_link">
             <implicitSpringDamper>1</implicitSpringDamper>
             <mu1>100000</mu1>
             <mu2>100000</mu2>
@@ -41,24 +41,24 @@
             <kd>1.0</kd>
         </gazebo>   
 
-        <joint name="gripper_finger1_joint" type="revolute">
-            <parent link="gripper_base_link"/>
-            <child link="gripper_finger1_knuckle_link"/>
+        <joint name="${prefix}gripper_finger1_joint" type="revolute">
+            <parent link="${prefix}gripper_base_link"/>
+            <child link="${prefix}gripper_finger1_knuckle_link"/>
             <axis xyz="0 0 1"/>
             <origin rpy="${M_PI} 0.0 0.0" xyz="0.05490451627 0.03060114443 0.0"/>
             <limit lower="0.0" upper="0.804" velocity="2.0" effort="1000"/>
         </joint>
 
-        <joint name="gripper_finger2_joint" type="revolute">
-            <parent link="gripper_base_link"/>
-            <child link="gripper_finger2_knuckle_link"/>
+        <joint name="${prefix}gripper_finger2_joint" type="revolute">
+            <parent link="${prefix}gripper_base_link"/>
+            <child link="${prefix}gripper_finger2_knuckle_link"/>
             <axis xyz="0 0 1"/>
             <origin rpy="0.0 0.0 0.0" xyz="0.05490451627 -0.03060114443 0.0"/>
             <limit lower="0.0" upper="0.804" velocity="2.0" effort="1000"/>
-            <mimic joint="gripper_finger1_joint"/>
+            <mimic joint="${prefix}gripper_finger1_joint"/>
         </joint>
 
-        <link name="gripper_finger1_knuckle_link">
+        <link name="${prefix}gripper_finger1_knuckle_link">
             <visual>
                 <geometry>
                     <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_knuckle_link.dae"/>
@@ -78,7 +78,7 @@
             </inertial>
         </link>
         
-        <gazebo reference="gripper_finger1_knuckle_link">
+        <gazebo reference="${prefix}gripper_finger1_knuckle_link">
             <implicitSpringDamper>1</implicitSpringDamper>
             <mu1>100000</mu1>
             <mu2>100000</mu2>
@@ -86,7 +86,7 @@
             <kd>1.0</kd>
         </gazebo>   
 
-        <link name="gripper_finger2_knuckle_link">
+        <link name="${prefix}gripper_finger2_knuckle_link">
             <visual>
                 <geometry>
                     <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_knuckle_link.dae"/>
@@ -106,7 +106,7 @@
             </inertial>
         </link>
 
-        <gazebo reference="gripper_finger2_knuckle_link">
+        <gazebo reference="${prefix}gripper_finger2_knuckle_link">
             <implicitSpringDamper>1</implicitSpringDamper>
             <mu1>100000</mu1>
             <mu2>100000</mu2>
@@ -114,19 +114,19 @@
             <kd>1.0</kd>
         </gazebo> 
 
-        <joint name="gripper_finger1_finger_joint" type="fixed">
-            <parent link="gripper_finger1_knuckle_link"/>
-            <child link="gripper_finger1_finger_link"/>
+        <joint name="${prefix}gripper_finger1_finger_joint" type="fixed">
+            <parent link="${prefix}gripper_finger1_knuckle_link"/>
+            <child link="${prefix}gripper_finger1_finger_link"/>
             <origin xyz="-0.00408552455 -0.03148604435 0.0" rpy="0 0 0" />
         </joint>
 
-        <joint name="gripper_finger2_finger_joint" type="fixed">
-            <parent link="gripper_finger2_knuckle_link"/>
-            <child link="gripper_finger2_finger_link"/>
+        <joint name="${prefix}gripper_finger2_finger_joint" type="fixed">
+            <parent link="${prefix}gripper_finger2_knuckle_link"/>
+            <child link="${prefix}gripper_finger2_finger_link"/>
             <origin xyz="-0.00408552455 -0.03148604435 0.0" rpy="0 0 0" />
         </joint>
 
-        <link name="gripper_finger1_finger_link">
+        <link name="${prefix}gripper_finger1_finger_link">
             <visual>
                 <geometry>
                     <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_finger_link.dae"/>
@@ -146,7 +146,7 @@
             </inertial>
         </link>
 
-        <gazebo reference="gripper_finger1_finger_link">
+        <gazebo reference="${prefix}gripper_finger1_finger_link">
             <implicitSpringDamper>1</implicitSpringDamper>
             <mu1>100000</mu1>
             <mu2>100000</mu2>
@@ -154,7 +154,7 @@
             <kd>1.0</kd>
         </gazebo>  
 
-        <link name="gripper_finger2_finger_link">
+        <link name="${prefix}gripper_finger2_finger_link">
             <visual>
                 <geometry>
                     <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_finger_link.dae"/>
@@ -174,7 +174,7 @@
             </inertial>
         </link>
 
-        <gazebo reference="gripper_finger2_finger_link">
+        <gazebo reference="${prefix}gripper_finger2_finger_link">
             <implicitSpringDamper>1</implicitSpringDamper>
             <mu1>100000</mu1>
             <mu2>100000</mu2>
@@ -182,25 +182,25 @@
             <kd>1.0</kd>
         </gazebo>  
 
-        <joint name="gripper_finger1_inner_knuckle_joint" type="continuous">
-            <parent link="gripper_base_link"/>
-            <child link="gripper_finger1_inner_knuckle_link"/>
+        <joint name="${prefix}gripper_finger1_inner_knuckle_joint" type="continuous">
+            <parent link="${prefix}gripper_base_link"/>
+            <child link="${prefix}gripper_finger1_inner_knuckle_link"/>
             <axis xyz="0 0 1"/>
             <origin xyz="0.06142 0.0127 0" rpy="${M_PI} 0.0 0.0" />
             <limit lower="0.0" upper="0.804" velocity="2.0" effort="0.1"/>
-            <mimic joint="gripper_finger1_joint" offset="0"/>
+            <mimic joint="${prefix}gripper_finger1_joint" offset="0"/>
         </joint>
 
-        <joint name="gripper_finger2_inner_knuckle_joint" type="continuous">
-            <parent link="gripper_base_link"/>
-            <child link="gripper_finger2_inner_knuckle_link"/>
+        <joint name="${prefix}gripper_finger2_inner_knuckle_joint" type="continuous">
+            <parent link="${prefix}gripper_base_link"/>
+            <child link="${prefix}gripper_finger2_inner_knuckle_link"/>
             <axis xyz="0 0 1"/>
             <origin xyz="0.06142 -0.0127 0" rpy="0 0 0"/>
             <limit lower="0.0" upper="0.804" velocity="2.0" effort="0.1"/>
-            <mimic joint="gripper_finger1_joint" offset="0"/>
+            <mimic joint="${prefix}gripper_finger1_joint" offset="0"/>
         </joint>
 
-        <link name="gripper_finger1_inner_knuckle_link">
+        <link name="${prefix}gripper_finger1_inner_knuckle_link">
             <visual>
                 <geometry>
                     <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_inner_knuckle_link.dae"/>
@@ -220,7 +220,7 @@
             </inertial>
         </link>
 
-        <gazebo reference="gripper_finger1_inner_knuckle_link">
+        <gazebo reference="${prefix}gripper_finger1_inner_knuckle_link">
             <implicitSpringDamper>1</implicitSpringDamper>
             <mu1>100000</mu1>
             <mu2>100000</mu2>
@@ -228,7 +228,7 @@
             <kd>1.0</kd>
         </gazebo> 
         
-        <link name="gripper_finger2_inner_knuckle_link">
+        <link name="${prefix}gripper_finger2_inner_knuckle_link">
             <visual>
                 <geometry>
                     <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_inner_knuckle_link.dae"/>
@@ -248,7 +248,7 @@
             </inertial>
         </link>
 
-        <gazebo reference="gripper_finger2_inner_knuckle_link">
+        <gazebo reference="${prefix}gripper_finger2_inner_knuckle_link">
             <implicitSpringDamper>1</implicitSpringDamper>
             <mu1>100000</mu1>
             <mu2>100000</mu2>
@@ -256,26 +256,26 @@
             <kd>1.0</kd>
         </gazebo> 
 
-        <joint name="gripper_finger1_finger_tip_joint" type="continuous">
-            <parent link="gripper_finger1_inner_knuckle_link"/>
-            <child link="gripper_finger1_finger_tip_link"/>
+        <joint name="${prefix}gripper_finger1_finger_tip_joint" type="continuous">
+            <parent link="${prefix}gripper_finger1_inner_knuckle_link"/>
+            <child link="${prefix}gripper_finger1_finger_tip_link"/>
             <axis xyz="0 0 1"/>
             <origin xyz="0.04303959807 -0.03759940821 0.0" rpy="0.0 0.0 0.0"/>
             <limit lower="0.0" upper="0.804" velocity="2.0" effort="0.1"/>
-            <mimic joint="gripper_finger1_joint" multiplier="-1"/>
+            <mimic joint="${prefix}gripper_finger1_joint" multiplier="-1"/>
         </joint>
 
-        <joint name="gripper_finger2_finger_tip_joint" type="continuous">
-            <parent link="gripper_finger2_inner_knuckle_link"/>
-            <child link="gripper_finger2_finger_tip_link"/>
+        <joint name="${prefix}gripper_finger2_finger_tip_joint" type="continuous">
+            <parent link="${prefix}gripper_finger2_inner_knuckle_link"/>
+            <child link="${prefix}gripper_finger2_finger_tip_link"/>
             <axis xyz="0 0 1"/>
             <origin rpy="0.0 0.0 0.0" xyz="0.04303959807 -0.03759940821  0.0"/>
             <limit lower="0.0" upper="0.804" velocity="2.0" effort="0.1"/>
-            <mimic joint="gripper_finger1_joint" multiplier="-1"/>
+            <mimic joint="${prefix}gripper_finger1_joint" multiplier="-1"/>
         </joint>
 
 
-        <link name="gripper_finger1_finger_tip_link">
+        <link name="${prefix}gripper_finger1_finger_tip_link">
             <visual>
                 <geometry>
                     <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_finger_tip_link.dae"/>
@@ -295,7 +295,7 @@
             </inertial>
         </link> 
         
-        <gazebo reference="gripper_finger1_finger_tip_link">
+        <gazebo reference="${prefix}gripper_finger1_finger_tip_link">
             <implicitSpringDamper>1</implicitSpringDamper>
             <mu1>100000</mu1>
             <mu2>100000</mu2>
@@ -303,7 +303,7 @@
             <kd>1.0</kd>
         </gazebo> 
 
-        <link name="gripper_finger2_finger_tip_link">
+        <link name="${prefix}gripper_finger2_finger_tip_link">
             <visual>
                 <geometry>
                     <mesh filename="package://kortex_description/grippers/robotiq_2f_85/meshes/visual/robotiq_85_finger_tip_link.dae"/>
@@ -323,7 +323,7 @@
             </inertial>
         </link>
         
-        <gazebo reference="gripper_finger2_finger_tip_link">
+        <gazebo reference="${prefix}gripper_finger2_finger_tip_link">
             <implicitSpringDamper>1</implicitSpringDamper>
             <mu1>100000</mu1>
             <mu2>100000</mu2>

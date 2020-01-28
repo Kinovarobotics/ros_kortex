@@ -87,6 +87,7 @@ class KortexArmDriver
     std::vector<std::string> m_arm_joint_names;
 
     std::string m_gripper_name;
+    std::string m_prefix;
     std::vector<std::string> m_gripper_joint_names;
     std::vector<float> m_gripper_joint_limits_min;
     std::vector<float> m_gripper_joint_limits_max;

@@ -49,6 +49,7 @@ The `kortex_driver` node is the node responsible for the communication between t
 - **arm** : Name of your robot arm model. See the `kortex_description/arms` folder to see the available robot models. The default value is **gen3**.
 - **gripper** : Name of your robot arm's tool / gripper. See the `kortex_description/grippers` folder to see the available end effector models (or to add your own). The default value is **""**. For Gen3, you can also put **robotiq_2f_85**. For Gen3 lite, you need to put **gen3_lite_2f**.
 - **robot_name** : This is the namespace in which the driver will run. It defaults to **my_$(arg arm)** (so "my_gen3" for arm="gen3").
+- **prefix** : This is an optional prefix for all joint and link names in the kortex_description. It is used to allow differentiating between different arms in the same URDF. It defaults to **an empty string**. **Note** : Changing the prefix invalidates the MoveIt! configuration, and requires modifying said configuration, plus the .yaml files with harcoded joint names.
 - **ip_address** : The IP address of the robot you're connecting to. The default value is **192.168.1.10**.
 - **username** : The username for the robot connection. The default value is **admin**.
 - **password** : The password for the robot connection. The default value is **admin**.
