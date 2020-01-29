@@ -44,7 +44,7 @@
         <!-- Load the Gazebo transmissions and gazebo_ros_control plugin -->
         <xacro:if value="${sim}">
 
-            <xacro:load_gazebo_arm_transmissions prefix= "${prefix}"/>
+            <xacro:load_gazebo_arm_transmissions prefix="${prefix}"/>
 
             <xacro:unless value="${not gripper}">
                 <xacro:load_gazebo_gripper_transmissions prefix="${prefix}"/>
