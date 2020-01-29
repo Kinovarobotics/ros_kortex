@@ -47,6 +47,7 @@
 
 #include "kortex_driver/non-generated/pre_computed_joint_trajectory_action_server.h"
 #include "kortex_driver/non-generated/robotiq_gripper_command_action_server.h"
+#include "kortex_driver/non-generated/kortex_subscribers.h"
 
 #define TCP_PORT 10000
 #define UDP_PORT 10001
@@ -66,6 +67,7 @@ class KortexArmDriver
     void parseRosArguments();
     void initApi();
     void verifyProductConfiguration();
+    void initSubscribers();
     void initRosServices();
     void startActionServers();
 
@@ -130,6 +132,9 @@ class KortexArmDriver
     // Action servers
     PreComputedJointTrajectoryActionServer* m_action_server_follow_joint_trajectory;
     RobotiqGripperCommandActionServer* m_action_server_gripper_command;
+
+    // Topic subscribers
+    KortexSubscribers* m_topic_subscribers;
 
     // ROS and thread objects to publish the feedback from the robot
     bool m_node_is_running;
