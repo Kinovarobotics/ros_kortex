@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+
+<robot name="dual_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:arg name="left_arm"  default=""/>
+    <xacro:arg name="left_gripper" default=""/>
+    <xacro:arg name="left_dof"  default=""/>
+    <xacro:arg name="left_vision" default=""/>
+    <xacro:arg name="left_sim" default=""/>
+    <xacro:arg name="left_prefix" default=""/>
+
+    <xacro:arg name="right_arm"  default=""/>
+    <xacro:arg name="right_gripper" default=""/>
+    <xacro:arg name="right_dof"  default=""/>
+    <xacro:arg name="right_vision" default=""/>
+    <xacro:arg name="right_sim" default=""/>
+    <xacro:arg name="right_prefix" default=""/>
+
+    <xacro:include filename="$(find kortex_description)/robots/kortex_robot.xacro" />
+
+    <link name="world" />
+    <joint name="world_to_$(arg left_prefix)root" type="fixed">
+        <child link="$(arg left_prefix)base_link" />
+        <parent link="world" />
+        <!-- Here you can change the origin of the left arm-->
+        <origin xyz="-1 0 0" rpy="0 0 0" />    
+    </joint> 
+    <joint name="world_to_$(arg right_prefix)root" type="fixed">
+        <child link="$(arg right_prefix)base_link" />
+        <parent link="world" />
+        <!-- Here you can change the origin of the right arm -->
+        <origin xyz="1 0 0" rpy="0 0 0" />    
+    </joint> 
+
+    <xacro:load_robot 
+        arm="$(arg left_arm)"
+        gripper="$(arg left_gripper)" 
+        dof="$(arg left_dof)"
+        vision="$(arg left_vision)" 
+        sim="$(arg left_sim)"
+        prefix="$(arg left_prefix)"
+    />
+    <xacro:load_robot 
+        arm="$(arg right_arm)"
+        gripper="$(arg right_gripper)" 
+        dof="$(arg right_dof)"
+        vision="$(arg right_vision)" 
+        sim="$(arg right_sim)"
+        prefix="$(arg right_prefix)"
+    />
+</robot>

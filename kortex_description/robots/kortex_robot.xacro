@@ -7,7 +7,7 @@
         <!-- Files to include -->
         <xacro:include filename="$(find kortex_description)/arms/${arm}/${dof}dof/urdf/${arm}_macro.xacro" />
         <xacro:unless value="${not gripper}">
-            <xacro:include filename="$(find kortex_description)/grippers/$(arg gripper)/urdf/$(arg gripper)_macro.xacro" />
+            <xacro:include filename="$(find kortex_description)/grippers/${gripper}/urdf/${gripper}_macro.xacro" />
         </xacro:unless>
         
         <xacro:if value="${sim}">
@@ -15,7 +15,7 @@
             <xacro:include filename="$(find kortex_description)/arms/${arm}/${dof}dof/urdf/${arm}_transmission_macro.xacro" />
             <!-- Gripper transmission elements if there is a gripper-->
             <xacro:unless value="${not gripper}">
-                <xacro:include filename="$(find kortex_description)/grippers/$(arg gripper)/urdf/$(arg gripper)_transmission_macro.xacro" />
+                <xacro:include filename="$(find kortex_description)/grippers/${gripper}/urdf/${gripper}_transmission_macro.xacro" />
             </xacro:unless>
         </xacro:if>
 
@@ -38,16 +38,17 @@
 
         <!-- Load the gripper -->
         <xacro:unless value="${not gripper}">
-            <xacro:load_gripper parent="${prefix}${last_arm_link}"  prefix="${prefix}"/> <!-- last_arm_link is defined in "$(find kortex_description)/arms/${arm}/urdf/${arm}_macro.xacro" -->
+            <!-- last_arm_link is defined in "$(find kortex_description)/arms/${arm}/urdf/${arm}_macro.xacro" -->
+            <xacro:load_gripper parent="${prefix}${last_arm_link}"  prefix="${prefix}"/> 
         </xacro:unless>
 
         <!-- Load the Gazebo transmissions and gazebo_ros_control plugin -->
         <xacro:if value="${sim}">
 
-            <xacro:load_gazebo_arm_transmissions/>
+            <xacro:load_gazebo_arm_transmissions prefix="${prefix}"/>
 
             <xacro:unless value="${not gripper}">
-                <xacro:load_gazebo_gripper_transmissions/>
+                <xacro:load_gazebo_gripper_transmissions prefix="${prefix}"/>
             </xacro:unless>
 
             <gazebo>

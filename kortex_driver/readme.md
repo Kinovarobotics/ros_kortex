@@ -22,6 +22,7 @@
 1. [Topics](#topics)
 1. [Services](#services)
 1. [Compatibility break between v1.1.X and v2.0.X](#compatibility)
+1. [Support for multiple arms](#multiple)
 1. [Generation (advanced)](#generation)
 
 <!-- /MarkdownTOC -->
@@ -212,6 +213,50 @@ Many things have been changed in the ros_kortex repository between versions 1.1.
 * The topics are now all **lowercase_with_underscores** instead of **UpperCase**.
 * The **/my_robot_name/base_feedback/joint_state** topic is now advertised as **/my_robot_name/joint_state**.
 * The [kortex_driver launch file](launch/kortex_driver.launch) is now located in the `kortex_driver` package instead of the `kortex_bringup` package, which was deleted. Some arguments were added to the file.
+
+
+<a id="multiple"></a>
+## Support for multiple arms
+
+The [kortex_driver launch file](launch/kortex_driver.launch) is primarily used to define one-armed robots. 
+Having more than one arm requires prefixing the joints and links to protect against ambiguity when refering those. 
+To this end, a [kortex_dual_driver launch file](launch/kortex_dual_driver.launch) has been made to demonstrate running a two-armed robot. 
+The same pattern could be repeated to describe a robot with any number of arms.
+
+**Note**: This launch file is intended as a starting point showing how to launch a robot with two arms. When using this launch file for a specific robot, it should be modified to fit the robot's description. 
+
+The launch file uses the same parameters as the one-armed version, except that most parameters are to be defined individually for each arm (with the **left_** and **right_** prefixes).
+
+The prefixes used in the joints and links names can be changed using the following parameters:
+- `left_prefix`
+- `right_prefix`
+
+The following parameters are to be specified for each robot (using `left_` and `right_` prefixes):
+- `arm`
+- `dof`
+- `vision`
+- `gripper`
+- `ip_address`
+- `username`
+- `password`
+- `cyclic_data_publish_rate`
+- `api_rpc_timeout_ms`
+- `api_session_inactivity_timeout_ms`
+- `api_connection_inactivity_timeout_ms`
+- `default_goal_time_tolerance`
+- `default_goal_tolerance`
+
+
+The folowing parameters are **NOT** to be prefixed:
+- `robot_name`
+- `start_rviz`
+- `start_moveit`
+- `cyclic_data_publish_rate`
+
+These parameters are common to both arms.
+
+Example use : `roslaunch kortex_driver kortex_dual_driver.launch robot_name:=terminator left_ip_address:=192.168.1.11 left_arm:=gen3 left_gripper:=robotiq_2f_85 right_ip_address:=192.168.1.12 right_arm:=gen3 right_gripper:=robotiq_2f_85 start_moveit:=false`
+
 
 <a id="generation"></a>
 ## Generation (**advanced**)
