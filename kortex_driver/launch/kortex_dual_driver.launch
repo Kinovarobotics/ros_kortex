@@ -75,7 +75,7 @@
             right_prefix:=$(arg right_prefix)"
     />
 
-    <!-- Start the kortex_driver node -->
+    <!-- Start the left arm kortex_driver node -->
     <node name="$(arg left_robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver" output="screen" ns="$(arg left_robot_name)"> launch-prefix="gdb -ex run args"
         <param name="ip_address" value="$(arg left_ip_address)"/>
         <param name="username" value="$(arg left_username)"/>
@@ -94,6 +94,7 @@
         <!-- If there is a gripper, load the active joint names for it -->
         <rosparam command="load" file="$(find kortex_description)/grippers/$(arg left_gripper)/config/joint_limits.yaml" unless="$(eval not arg('left_gripper'))"/>
     </node>
+    <!-- Start the right arm kortex_driver node -->
     <node name="$(arg right_robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver" output="screen" ns="$(arg right_robot_name)"> launch-prefix="gdb -ex run args"
         <param name="ip_address" value="$(arg right_ip_address)"/>
         <param name="username" value="$(arg right_username)"/>
