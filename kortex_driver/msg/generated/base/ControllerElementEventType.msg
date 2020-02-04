@@ -6,3 +6,5 @@ uint32 AXIS_MOVED = 1
 uint32 BUTTON_DOWN = 2
 
 uint32 BUTTON_UP = 3
+
+uint32 BUTTON_CLICK = 4

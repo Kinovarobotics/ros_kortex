@@ -60,11 +60,9 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Retrieves the list of all existing sequences
     rpc ReadAllSequences (Kinova.Api.Common.Empty) returns (SequenceList);//@RPC_ID=12
 
-    // Deletes a specific task from the specified sequence
-    rpc DeleteSequenceTask (SequenceTaskHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=13
+    // DeleteSequenceTask is still RPC_ID=13, but is at position 221 in this file
 
-    // Deletes all tasks from the specified sequence
-    rpc DeleteAllSequenceTasks (SequenceHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=14
+    // DeleteAllSequenceTasks is still RPC_ID=14, but is at position 222 in this file
 
     // Plays an existing sequence
     rpc PlaySequence (SequenceHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=15
@@ -228,13 +226,13 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Subscribes to robot event topic for notifications
     rpc RobotEventTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=107 @PUB_SUB=RobotEventNotification
 
-    // Moves robot to the specifed tool pose (position and orientation) while imposing specified constraints
+    // Moves robot to the specified tool pose (position and orientation) while imposing specified constraints.
     rpc PlayCartesianTrajectory (ConstrainedPose) returns (Kinova.Api.Common.Empty);//@RPC_ID=109
 
-    // Moves robot to the specifed position while imposing specified constraints
+    // Moves robot to the specified position while imposing specified constraints.
     rpc PlayCartesianTrajectoryPosition (ConstrainedPosition) returns (Kinova.Api.Common.Empty);//@RPC_ID=110
 
-    // Moves to the specifed orientation while imposing specified constraints
+    // Moves to the specified orientation while imposing specified constraints.
     rpc PlayCartesianTrajectoryOrientation (ConstrainedOrientation) returns (Kinova.Api.Common.Empty);//@RPC_ID=111
 
     // Stops robot movement
@@ -261,10 +259,10 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Sends a twist (screw consisting of linear and angular velocity) command to be applied to the tool
     rpc SendTwistCommand (TwistCommand) returns (Kinova.Api.Common.Empty);//@RPC_ID=121
 
-    // Moves joints to the specified joint angles while imposing specified constraints
+    // Moves joints to the specified joint angles while imposing specified constraints.
     rpc PlayJointTrajectory (ConstrainedJointAngles) returns (Kinova.Api.Common.Empty);//@RPC_ID=124
 
-    // Moves specifed joint to the specifed joint angle while imposing specified constraints
+    // Moves specifed joint to the specifed joint angle while imposing specified constraints.
     rpc PlaySelectedJointTrajectory (ConstrainedJointAngle) returns (Kinova.Api.Common.Empty);//@RPC_ID=125
 
     // Retrieves the currently measured joint angles for each joint
@@ -361,16 +359,16 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     rpc GetCapSenseConfig (Kinova.Api.Common.Empty) returns (CapSenseConfig);//@RPC_ID=181
 
     // Retrieves speed hard limits for all joints 
-    rpc GetAllJointsSpeedHardLimitation (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=183
+    rpc GetAllJointsSpeedHardLimitation (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=183 @DEPRECATED="This function will be removed in a future release. Use GetKinematicHardLimits from the ControlConfig service instead."
 
     // Retrieves torque hard limits for all joints 
-    rpc GetAllJointsTorqueHardLimitation  (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=184
+    rpc GetAllJointsTorqueHardLimitation  (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=184 @DEPRECATED
 
     // Retrieves twist hard limitations
-    rpc GetTwistHardLimitation (Kinova.Api.Common.Empty) returns (TwistLimitation);//@RPC_ID=185
+    rpc GetTwistHardLimitation (Kinova.Api.Common.Empty) returns (TwistLimitation);//@RPC_ID=185 @DEPRECATED="This function will be removed in a future release. Use GetKinematicHardLimits from the ControlConfig service instead."
 
     // Retrieves wrench hard limitations
-    rpc GetWrenchHardLimitation (Kinova.Api.Common.Empty) returns (WrenchLimitation);//@RPC_ID=186
+    rpc GetWrenchHardLimitation (Kinova.Api.Common.Empty) returns (WrenchLimitation);//@RPC_ID=186 @DEPRECATED
 
     /*
      * Sends the desired joystick speeds to all joints with one command. 
@@ -403,27 +401,9 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Retrieves product configuration information
     rpc GetProductConfiguration (Kinova.Api.Common.Empty) returns (Kinova.Api.ProductConfiguration.CompleteProductConfiguration);//@RPC_ID=198
 
-    // Set new value for Degree of Freedom in product configuration (Identification Number)
-    rpc UpdateDegreeOfFreedomConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationDegreeOfFreedom) returns (Kinova.Api.Common.Empty);//@RPC_ID=199
-
-    // Set new Base type in product configuration (Identification Number)
-    rpc UpdateBaseTypeConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationBaseType) returns (Kinova.Api.Common.Empty);//@RPC_ID=200
-
     // Set new end-effector type in product configuration (Identification Number)
     rpc UpdateEndEffectorTypeConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationEndEffectorType) returns (Kinova.Api.Common.Empty);//@RPC_ID=201
-
-    // Set new vision module type in product configuration (Identification Number)
-    rpc UpdateVisionModuleTypeConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationVisionModuleType) returns (Kinova.Api.Common.Empty);//@RPC_ID=202
-
-    // Set new interface module type in product configuration (Identification Number)
-    rpc UpdateInterfaceModuleTypeConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationInterfaceModuleType) returns (Kinova.Api.Common.Empty);//@RPC_ID=203
-
-    // Set new arm laterality in product configuration (Identification Number)
-    rpc UpdateArmLateralityConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationLaterality) returns (Kinova.Api.Common.Empty);//@RPC_ID=204
-
-    // Sets new wrist type in product configuration (Identification Number)
-    rpc UpdateWristTypeConfiguration (Kinova.Api.ProductConfiguration.ProductConfigurationWristType) returns (Kinova.Api.Common.Empty);//@RPC_ID=205
-
+    
     // Restores product configuration to factory product configuration
     rpc RestoreFactoryProductConfiguration (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=206
 
@@ -434,16 +414,73 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     rpc GetTrajectoryErrorReport (Kinova.Api.Common.Empty) returns (TrajectoryErrorReport);//@RPC_ID=207
 
     // Retrieves list of soft speed limits for all joints
-    rpc GetAllJointsSpeedSoftLimitation (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=208
+    rpc GetAllJointsSpeedSoftLimitation (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=208 @DEPRECATED="This function will be removed in a future release. Use GetKinematicSoftLimits from the ControlConfig service instead."
 
     // Retrieves list of soft torque limits for all joints 
-    rpc GetAllJointsTorqueSoftLimitation  (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=209
+    rpc GetAllJointsTorqueSoftLimitation  (Kinova.Api.Common.Empty) returns (JointsLimitationsList);//@RPC_ID=209 @DEPRECATED
 
     // Retrieves all twist soft limitations
-    rpc GetTwistSoftLimitation (Kinova.Api.Common.Empty) returns (TwistLimitation);//@RPC_ID=210
+    rpc GetTwistSoftLimitation (Kinova.Api.Common.Empty) returns (TwistLimitation);//@RPC_ID=210 @DEPRECATED="This function will be removed in a future release. Use GetKinematicSoftLimits from the ControlConfig service instead."
 
     // Retrieves all wrench soft limitations
-    rpc GetWrenchSoftLimitation (Kinova.Api.Common.Empty) returns (WrenchLimitation);//@RPC_ID=211
+    rpc GetWrenchSoftLimitation (Kinova.Api.Common.Empty) returns (WrenchLimitation);//@RPC_ID=211 @DEPRECATED
+
+    // Sets controller configuration mode
+    rpc SetControllerConfigurationMode (ControllerConfigurationMode) returns (Kinova.Api.Common.Empty);//@RPC_ID=212
+
+    // Retrieves current controller configuration mode
+    rpc GetControllerConfigurationMode (Kinova.Api.Common.Empty) returns (ControllerConfigurationMode);//@RPC_ID=213
+
+    // Enables the teaching mode on a sequence
+    rpc StartTeaching (SequenceTaskHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=214
+
+    // Disables the teaching mode on a sequence
+    rpc StopTeaching (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=215
+
+    // Adds tasks to the specified sequence
+    rpc AddSequenceTasks (SequenceTasksConfiguration) returns (SequenceTasksRange);//@RPC_ID=216
+
+    // Updates a task within the specified sequence
+    rpc UpdateSequenceTask (SequenceTaskConfiguration) returns (Kinova.Api.Common.Empty);//@RPC_ID=217
+
+    // Swaps two task indexes in a sequence
+    rpc SwapSequenceTasks (SequenceTasksPair) returns (Kinova.Api.Common.Empty);//@RPC_ID=218
+
+    // Reads a specific task from the specified sequence
+    rpc ReadSequenceTask (SequenceTaskHandle) returns (SequenceTask);//@RPC_ID=219
+
+    // Reads all tasks from the specified sequence
+    rpc ReadAllSequenceTasks (SequenceHandle) returns (SequenceTasks);//@RPC_ID=220
+
+    // Deletes a specific task from the specified sequence
+    rpc DeleteSequenceTask (SequenceTaskHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=13
+
+    // Deletes all tasks from the specified sequence
+    rpc DeleteAllSequenceTasks (SequenceHandle) returns (Kinova.Api.Common.Empty);//@RPC_ID=14
+
+    // Take a snapshot of current robot Cartesian, joint or gripper position 
+    rpc TakeSnapshot (Snapshot) returns (Kinova.Api.Common.Empty);//@RPC_ID=223
+
+    // Retrieves current firmware bundle versions
+    rpc GetFirmwareBundleVersions (Kinova.Api.Common.Empty) returns (FirmwareBundleVersions);//@RPC_ID=224
+
+    // Move task to new index in a sequence
+    rpc MoveSequenceTask (SequenceTasksPair) returns (Kinova.Api.Common.Empty);//@RPC_ID=227
+
+    // Duplicates an existing mapping
+    rpc DuplicateMapping (MappingHandle) returns (MappingHandle);//@RPC_ID=228
+
+    // Duplicates an existing map
+    rpc DuplicateMap (MapHandle) returns (MapHandle);//@RPC_ID=229
+
+    // Sets controller configuration
+    rpc SetControllerConfiguration (ControllerConfiguration) returns (Kinova.Api.Common.Empty);//@RPC_ID=230
+
+    // Retrieves current controller configuration
+    rpc GetControllerConfiguration (ControllerHandle) returns (ControllerConfiguration);//@RPC_ID=231
+
+    // Retrieves all controller configurations
+    rpc GetAllControllerConfigurations (Kinova.Api.Common.Empty) returns (ControllerConfigurationList);//@RPC_ID=232
 }
 
 // Identifies Base service current version
@@ -509,9 +546,39 @@ message SequenceTaskHandle {
 
 // Information on a single task within a sequence
 message SequenceTask {
-    uint32 group_identifier = 1;    // Specifies the order in which this task must be executed
+    uint32 group_identifier = 1;    // This field is deprecated and unused. Use task_index in the SequenceTaskHandle instead.
     Action action = 2;              // Specifies the action to execute
     string application_data = 3;    // Application data (reserved for use by Web App)
+}
+
+// Information on multiple tasks within a sequence
+message SequenceTasks {
+    repeated SequenceTask sequence_tasks    = 1;    // List of tasks
+}
+
+// Reference to a specific task within a sequence, and information on list of sequence tasks to be inserted
+message SequenceTasksConfiguration {
+    SequenceTaskHandle sequence_task_handle = 1;    // Sequence Handle and task index as the insertion point
+    repeated SequenceTask sequence_tasks    = 2;    // Tasks to be inserted 
+}
+
+// Reference to a specific task within a sequence, and configuration information on task to be updated
+message SequenceTaskConfiguration {
+    SequenceTaskHandle sequence_task_handle = 1;    // Sequence Handle and index of task to update
+    SequenceTask sequence_task = 2;                 // Configuration information on task to be updated
+}
+
+// Information on a range of task indexes
+message SequenceTasksRange {
+    uint32 first_task_index = 1;    // Index of first task 
+    uint32 second_task_index = 2;   // Index of second task
+}
+
+// Information on a sequence and a pair of tasks to be operated on
+message SequenceTasksPair {
+    SequenceHandle sequence_handle = 1; // Sequence handle
+    uint32 first_task_index = 2;        // Index of first task 
+    uint32 second_task_index = 3;       // Index of second task
 }
 
 // Information about a sequence
@@ -554,9 +621,10 @@ message Action {
         TwistCommand send_twist_command = 4;                            // Control the tool in velocity
         WrenchCommand send_wrench_command = 5;                          // Control the tool in force (EXPERIMENTAL)
         JointSpeeds send_joint_speeds = 7;                              // Action to control each joint speed
-        ConstrainedPose reach_pose = 9;                                 // Reach a pose given Cartesian constraints
-        ConstrainedJointAngles reach_joint_angles = 10;                 // Reach a series of joint angles given angular constraints
+        ConstrainedPose reach_pose = 9;                                 // Reach a pose given Cartesian constraints.
+        ConstrainedJointAngles reach_joint_angles = 10;                 // Reach a series of joint angles given angular constraints.
         AdmittanceMode toggle_admittance_mode = 16;                     // Enable or disable the admittance mode
+        Snapshot snapshot = 17;                                         // Take a snapshot of current robot position
         SwitchControlMapping switch_control_mapping = 19;               // Switch the active controller map
         JointNavigationDirection navigate_joints = 20;                  // Select the next actuator to control in a map
         NavigationDirection navigate_mappings = 21;                     // Select a different map
@@ -582,6 +650,7 @@ enum ActionType {
     REACH_POSE = 6;                     // Reach a pose
     REACH_JOINT_ANGLES = 7;             // Reach a series of joint angles
     TOGGLE_ADMITTANCE_MODE = 13;        // Enable or disable the admittance mode
+    SNAPSHOT = 14;                      // Take a snapshot of current robot position
     SWITCH_CONTROL_MAPPING = 16;        // Switch the active controller map
     NAVIGATE_JOINTS = 17;               // Select the next actuator to control from control mapping
     NAVIGATE_MAPPINGS = 18;             // Select a different map
@@ -595,6 +664,20 @@ enum ActionType {
     SEND_GRIPPER_COMMAND = 33;          // Send a gripper command
     STOP_ACTION = 35;                   // Stop robot movement
     PLAY_PRE_COMPUTED_TRAJECTORY = 39;  // Play a pre-computed trajectory
+}
+
+// Admissible types of snapshots
+enum SnapshotType {
+    UNSPECIFIED_SNAPSHOT = 0;           // Unspecified snapshot type
+    CARTESIAN_POSITION_SNAPSHOT = 1;    // Snapshot of the current Cartesian robot position
+    JOINT_POSITION_SNAPSHOT = 2;        // Snapshot of the current joint robot position
+    GRIPPER_SNAPSHOT = 3;               // Snapshot of the current gripper position
+    COMBINED_SNAPSHOT = 4;              // Snapshot of the current robot and gripper positions
+}
+
+// Action parameter to take a snapshot of current robot position
+message Snapshot {
+    SnapshotType snapshot_type = 1;     // Snapshot type
 }
 
 // Action parameter to switch the active controller map
@@ -894,6 +977,7 @@ message ConfigurationChangeNotification {
         Kinova.Api.Common.SafetyHandle safety_handle = 11;              // Safety for which the configuration changed
         NetworkHandle network_handle = 12;                              // Network element for which the configuration changed
         Ssid ssid = 14;                                                 // Wi-Fi instance for which the configuration changed
+        ControllerHandle controller_handle = 16;                        // Controller instance for which the configuration changed
     }
     Kinova.Api.Common.Connection connection = 15;                       // Connection that caused the configuration event
 }
@@ -905,14 +989,15 @@ message MappingInfoNotification {
     Kinova.Api.Common.Timestamp timestamp = 3;              // Event timestamp
     Kinova.Api.Common.UserProfileHandle user_handle = 4;    // User that caused the mapping information event
     Kinova.Api.Common.Connection connection = 5;            // Connection that caused the mapping information event
+    MappingHandle mapping_handle = 6;                       // Mapping for which the map was activated
 }
 
-// Admissible robot control modes
+// Admissible robot control modes.
+// This enum may be removed in a future release. It has been moved to ControlConfig service.
 enum ControlMode {
     UNSPECIFIED_CONTROL_MODE = 0;           // Unspecified control mode
     ANGULAR_JOYSTICK = 1;                   // Angular joystick mode
     CARTESIAN_JOYSTICK = 2;                 // Cartesian joystick mode
-    VISION_JOYSTICK = 3;                    // Vision joystick mode
     ANGULAR_TRAJECTORY = 4;                 // Angular trajectory mode
     CARTESIAN_TRAJECTORY = 5;               // Cartesian trajectory mode
     CARTESIAN_ADMITTANCE = 6;               // Cartesian admittance mode
@@ -924,6 +1009,7 @@ enum ControlMode {
 };
 
 // Control mode information
+// This message may be removed in a future release. It has been moved to ControlConfig service.
 message ControlModeInformation {
     ControlMode mode = 1; // Control mode
 }
@@ -1000,7 +1086,7 @@ message SequenceInfoNotification {
     EventIdSequenceInfoNotification event_identifier = 1;   // Sequence event type
     SequenceHandle sequence_handle = 2;                     // Handle of the sequence that this event refers to
     uint32 task_index = 3;                                  // Task index
-    uint32 group_identifier = 4;                            // Specifies the order in which this task must be executed
+    uint32 group_identifier = 4;                            // This field is deprecated and unused. Use task_index instead.
     Kinova.Api.Common.Timestamp timestamp = 5;              // Event timestamp
     Kinova.Api.Common.UserProfileHandle user_handle = 6;    // User that caused the sequence event
     SubErrorCodes abort_details = 7;                        // Details if event_identifier is equal to ABORT
@@ -1057,7 +1143,8 @@ enum ControllerType {
     UNSPECIFIED_CONTROLLER_TYPE = 0;    // Unspecified controller device type
     XBOX_CONTROLLER = 1;                // Xbox gamepad
     WRIST_CONTROLLER = 2;               // Wrist buttons
-    GPIO_JOYSTICK = 3;                  // GPIO joystick connected to Kinova robot base
+    BASIC_JOYSTICK_CONTROLLER = 3;      // Simplified joystick connected to Kinova robot base
+    BASE_GPIO_CONTROLLER = 4;           // GPIO Controller (not implemented yet)
 }
 
 // Reference to a specific controller device
@@ -1079,7 +1166,7 @@ message ControllerElementHandle {
 message ControllerNotification {
     oneof state {
         ControllerState controller_state = 1;               // Used to indicate if a controller connection or disconnection event occured
-        ControllerElementState controller_element = 2;      // Used to indicate if a specific button (or axis) was pressed (or moved) (not implemented yet)
+        ControllerElementState controller_element = 2;      // Used to indicate if a specific button (or axis) was pressed (or moved)
     }
     Kinova.Api.Common.Timestamp timestamp = 3;              // Event timestamp
     Kinova.Api.Common.UserProfileHandle user_handle = 4;    // User that caused the controller event
@@ -1117,6 +1204,7 @@ enum ControllerElementEventType {
     AXIS_MOVED = 1;                             // Controller axis moved
     BUTTON_DOWN = 2;                            // Controller button pressed
     BUTTON_UP = 3;                              // Controller button released
+    BUTTON_CLICK = 4;                           // Controller button clicked
 }
 
 // Admissible action event types
@@ -1315,8 +1403,9 @@ message ControllerEvent {
 
 // A GPIO event (not implemented yet)
 message GpioEvent {
-    GpioState gpio_state = 1;       // New GPIO state
-    uint32 device_identifier = 2;   // GPIO device identifier for which this event occured
+    ControllerInputType input_type = 1;  // Type of controller input that caused the event_identifier
+    GpioBehavior behavior = 2;           // GPIO behavior that occured
+    uint32 input_identifier = 3;         // GPIO PIN ID that caused the event               
 }
 
 // A map event
@@ -1333,6 +1422,7 @@ message MapEvent {
 message MapElement {
     MapEvent event = 1; // Map event that occured
     Action action = 2;  // Action to invoke upon event occurence
+    string name = 3;    // Map element friendly name
 }
 
 // Reference to a specific new active map for the specified mapping and map group
@@ -1495,7 +1585,7 @@ message Orientation {
 enum JointTrajectoryConstraintType {
     UNSPECIFIED_JOINT_CONSTRAINT = 0;   // Unspecified joint constraint
     JOINT_CONSTRAINT_DURATION = 1;      // Duration constraint (in second)
-    JOINT_CONSTRAINT_SPEED = 2;         // Speed constraint (in meters per second) (not implemented yet)
+    JOINT_CONSTRAINT_SPEED = 2;         // Speed constraint (in meters per second)
 }
 
 // A Cartesian tool speed (translation speed and angular speed)
@@ -1507,8 +1597,8 @@ message CartesianSpeed {
 // Cartesian trajectory constraint that can be applied when controlling in Cartesian trajectory mode
 message CartesianTrajectoryConstraint {
     oneof type {
-        CartesianSpeed speed = 1;   // Speed constraint (in meters per second)
-        float duration = 2;         // Duration constraint (in meters per second) (not implemented yet)
+        CartesianSpeed speed = 1;   // Speed constraint
+        float duration = 2;         // Duration constraint (in seconds) (not implemented yet)
     }
 }
 
@@ -1716,12 +1806,30 @@ enum LedState {
     LED_ON = 3;                 // LED is one
 }
 
-// Admissible GPIO states (not implemented yet)
-enum GpioState {
-    UNSPECIFIED_GPIO_STATE = 0; // Unspecified GPIO state
-    GPIO_OFF = 1;               // GPIO is off
-    GPIO_PULSE = 2;             // GPIO is in pulse state
-    GPIO_ON = 3;                // GPIO is on
+// Admissible GPIO behavior (not implemented yet)
+enum GpioBehavior {
+    UNSPECIFIED_GPIO_BEHAVIOR = 0; // Unspecified GPIO behavior
+    GPIO_FALLING = 1;              // Falling edge
+    GPIO_RISING = 2;               // Rising edge
+    GPIO_PULSE_LOW = 3;            // Sequence of HIGH - LOW - HIGH
+    GPIO_PULSE_HIGH = 4;           // Sequence of LOW - HIGH - LOW
+}
+
+// Available GPIO PIN (not implemented yet)
+enum Gen3GpioPinId {
+    UNSPECIFIED_PIN = 0;  // Unspecified PIN ID
+    GPIO_PIN_B = 1;       // GPIO PIN B
+    GPIO_PIN_C = 2;       // GPIO PIN C
+    GPIO_PIN_D = 3;       // GPIO PIN D
+    GPIO_PIN_E = 4;       // GPIO PIN E
+    GPIO_PIN_G = 5;       // GPIO PIN G
+    GPIO_PIN_H = 6;       // GPIO PIN H
+    GPIO_PIN_I = 7;       // GPIO PIN I
+    GPIO_PIN_K = 8;       // GPIO PIN K
+    GPIO_PIN_N = 9;       // GPIO PIN N
+    GPIO_PIN_O = 10;      // GPIO PIN O
+    GPIO_PIN_S = 11;      // GPIO PIN S
+    GPIO_PIN_T = 12;      // GPIO PIN T
 }
 
 // Identifies the system time (not implemented yet)
@@ -1764,6 +1872,32 @@ enum Xbox360AnalogInputIdentifier {
     XBOX360_TRIGGER_RIGHT = 6;      // Trigger right input
 }
 
+// Admissible Wrist digital inputs
+enum WristDigitalInputIdentifier {
+    UNSPECIFIED_WRIST_DIGITAL = 0;      // Unspecified digital input
+    WRIST_BUTTON_1 = 1;                 // Button 1 input
+    WRIST_BUTTON_2 = 2;                 // Button 2 input
+    WRIST_BUTTON_BOTH = 3;              // Button 1 + Button 2 combo
+}
+
+// Controller configuration mode information
+message ControllerConfigurationMode {
+    bool enable = 1;    // Enable controller configuration mode. Set to true to configure controllers, false for normal operation
+}
+
+// Controller configuration information
+message ControllerConfiguration {
+    ControllerHandle handle = 1;                // Controller identifier 
+    string name = 2;                            // Controller friendly name
+    MappingHandle active_mapping_handle = 3;    // Mapping that is active on this controller
+    string analog_input_identifier_enum = 4;    // Name that identifies the enum used to interpret the ‘analog_input_identifier’ field (for example in ControllerEvent). Thus 'analog_input_identifier_enum' shall take the name of an existing enum (ex. Xbox360AnalogInputIdentifier)
+    string digital_input_identifier_enum = 5;   // Name that identifies the enum used to interpret the ‘digital_input_identifier’ field (for example in ControllerEvent). Thus 'digital_input_identifier_enum' shall take the name of an existing enum (ex. Xbox360DigitalInputIdentifier, WristDigitalInputIdentifier)
+}
+
+// Controller configuration information for multiple controllers
+message ControllerConfigurationList {
+    repeated ControllerConfiguration controller_configurations = 1;       // List of controller configurations
+}
 
 // A count of the number of actuators in the robot
 message ActuatorInformation {
@@ -1930,4 +2064,19 @@ message TrajectoryErrorElement
 message TrajectoryErrorReport
 {
     repeated TrajectoryErrorElement trajectory_error_elements = 1;
+}
+
+// Firmware bundle versions including main firmware bundle version and components versions
+message FirmwareBundleVersions
+{
+    string main_bundle_version = 1; // Version of the main bundle
+    repeated FirmwareComponentVersion components_versions = 2; // List containing all components of the bundle
+} 
+
+// Individual component with its version
+message FirmwareComponentVersion
+{
+    string name = 1; // Name of the component
+    string version = 2; // Version of the component
+    uint32 device_id = 3; // Device id of the component
 }

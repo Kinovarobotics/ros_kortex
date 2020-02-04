@@ -39,8 +39,6 @@
 #include "kortex_driver/ReadSequence.h"
 #include "kortex_driver/DeleteSequence.h"
 #include "kortex_driver/ReadAllSequences.h"
-#include "kortex_driver/DeleteSequenceTask.h"
-#include "kortex_driver/DeleteAllSequenceTasks.h"
 #include "kortex_driver/PlaySequence.h"
 #include "kortex_driver/PlayAdvancedSequence.h"
 #include "kortex_driver/StopSequence.h"
@@ -161,19 +159,32 @@
 #include "kortex_driver/GetBridgeConfig.h"
 #include "kortex_driver/PlayPreComputedJointTrajectory.h"
 #include "kortex_driver/GetProductConfiguration.h"
-#include "kortex_driver/UpdateDegreeOfFreedomConfiguration.h"
-#include "kortex_driver/UpdateBaseTypeConfiguration.h"
 #include "kortex_driver/UpdateEndEffectorTypeConfiguration.h"
-#include "kortex_driver/UpdateVisionModuleTypeConfiguration.h"
-#include "kortex_driver/UpdateInterfaceModuleTypeConfiguration.h"
-#include "kortex_driver/UpdateArmLateralityConfiguration.h"
-#include "kortex_driver/UpdateWristTypeConfiguration.h"
 #include "kortex_driver/RestoreFactoryProductConfiguration.h"
 #include "kortex_driver/GetTrajectoryErrorReport.h"
 #include "kortex_driver/GetAllJointsSpeedSoftLimitation.h"
 #include "kortex_driver/GetAllJointsTorqueSoftLimitation.h"
 #include "kortex_driver/GetTwistSoftLimitation.h"
 #include "kortex_driver/GetWrenchSoftLimitation.h"
+#include "kortex_driver/SetControllerConfigurationMode.h"
+#include "kortex_driver/GetControllerConfigurationMode.h"
+#include "kortex_driver/StartTeaching.h"
+#include "kortex_driver/StopTeaching.h"
+#include "kortex_driver/AddSequenceTasks.h"
+#include "kortex_driver/UpdateSequenceTask.h"
+#include "kortex_driver/SwapSequenceTasks.h"
+#include "kortex_driver/ReadSequenceTask.h"
+#include "kortex_driver/ReadAllSequenceTasks.h"
+#include "kortex_driver/DeleteSequenceTask.h"
+#include "kortex_driver/DeleteAllSequenceTasks.h"
+#include "kortex_driver/TakeSnapshot.h"
+#include "kortex_driver/GetFirmwareBundleVersions.h"
+#include "kortex_driver/MoveSequenceTask.h"
+#include "kortex_driver/DuplicateMapping.h"
+#include "kortex_driver/DuplicateMap.h"
+#include "kortex_driver/SetControllerConfiguration.h"
+#include "kortex_driver/GetControllerConfiguration.h"
+#include "kortex_driver/GetAllControllerConfigurations.h"
 
 #include "kortex_driver/KortexError.h"
 #include "kortex_driver/SetDeviceID.h"
@@ -201,8 +212,6 @@ class BaseServices
         bool ReadSequence(kortex_driver::ReadSequence::Request  &req, kortex_driver::ReadSequence::Response &res);
         bool DeleteSequence(kortex_driver::DeleteSequence::Request  &req, kortex_driver::DeleteSequence::Response &res);
         bool ReadAllSequences(kortex_driver::ReadAllSequences::Request  &req, kortex_driver::ReadAllSequences::Response &res);
-        bool DeleteSequenceTask(kortex_driver::DeleteSequenceTask::Request  &req, kortex_driver::DeleteSequenceTask::Response &res);
-        bool DeleteAllSequenceTasks(kortex_driver::DeleteAllSequenceTasks::Request  &req, kortex_driver::DeleteAllSequenceTasks::Response &res);
         bool PlaySequence(kortex_driver::PlaySequence::Request  &req, kortex_driver::PlaySequence::Response &res);
         bool PlayAdvancedSequence(kortex_driver::PlayAdvancedSequence::Request  &req, kortex_driver::PlayAdvancedSequence::Response &res);
         bool StopSequence(kortex_driver::StopSequence::Request  &req, kortex_driver::StopSequence::Response &res);
@@ -323,19 +332,32 @@ class BaseServices
         bool GetBridgeConfig(kortex_driver::GetBridgeConfig::Request  &req, kortex_driver::GetBridgeConfig::Response &res);
         bool PlayPreComputedJointTrajectory(kortex_driver::PlayPreComputedJointTrajectory::Request  &req, kortex_driver::PlayPreComputedJointTrajectory::Response &res);
         bool GetProductConfiguration(kortex_driver::GetProductConfiguration::Request  &req, kortex_driver::GetProductConfiguration::Response &res);
-        bool UpdateDegreeOfFreedomConfiguration(kortex_driver::UpdateDegreeOfFreedomConfiguration::Request  &req, kortex_driver::UpdateDegreeOfFreedomConfiguration::Response &res);
-        bool UpdateBaseTypeConfiguration(kortex_driver::UpdateBaseTypeConfiguration::Request  &req, kortex_driver::UpdateBaseTypeConfiguration::Response &res);
         bool UpdateEndEffectorTypeConfiguration(kortex_driver::UpdateEndEffectorTypeConfiguration::Request  &req, kortex_driver::UpdateEndEffectorTypeConfiguration::Response &res);
-        bool UpdateVisionModuleTypeConfiguration(kortex_driver::UpdateVisionModuleTypeConfiguration::Request  &req, kortex_driver::UpdateVisionModuleTypeConfiguration::Response &res);
-        bool UpdateInterfaceModuleTypeConfiguration(kortex_driver::UpdateInterfaceModuleTypeConfiguration::Request  &req, kortex_driver::UpdateInterfaceModuleTypeConfiguration::Response &res);
-        bool UpdateArmLateralityConfiguration(kortex_driver::UpdateArmLateralityConfiguration::Request  &req, kortex_driver::UpdateArmLateralityConfiguration::Response &res);
-        bool UpdateWristTypeConfiguration(kortex_driver::UpdateWristTypeConfiguration::Request  &req, kortex_driver::UpdateWristTypeConfiguration::Response &res);
         bool RestoreFactoryProductConfiguration(kortex_driver::RestoreFactoryProductConfiguration::Request  &req, kortex_driver::RestoreFactoryProductConfiguration::Response &res);
         bool GetTrajectoryErrorReport(kortex_driver::GetTrajectoryErrorReport::Request  &req, kortex_driver::GetTrajectoryErrorReport::Response &res);
         bool GetAllJointsSpeedSoftLimitation(kortex_driver::GetAllJointsSpeedSoftLimitation::Request  &req, kortex_driver::GetAllJointsSpeedSoftLimitation::Response &res);
         bool GetAllJointsTorqueSoftLimitation(kortex_driver::GetAllJointsTorqueSoftLimitation::Request  &req, kortex_driver::GetAllJointsTorqueSoftLimitation::Response &res);
         bool GetTwistSoftLimitation(kortex_driver::GetTwistSoftLimitation::Request  &req, kortex_driver::GetTwistSoftLimitation::Response &res);
         bool GetWrenchSoftLimitation(kortex_driver::GetWrenchSoftLimitation::Request  &req, kortex_driver::GetWrenchSoftLimitation::Response &res);
+        bool SetControllerConfigurationMode(kortex_driver::SetControllerConfigurationMode::Request  &req, kortex_driver::SetControllerConfigurationMode::Response &res);
+        bool GetControllerConfigurationMode(kortex_driver::GetControllerConfigurationMode::Request  &req, kortex_driver::GetControllerConfigurationMode::Response &res);
+        bool StartTeaching(kortex_driver::StartTeaching::Request  &req, kortex_driver::StartTeaching::Response &res);
+        bool StopTeaching(kortex_driver::StopTeaching::Request  &req, kortex_driver::StopTeaching::Response &res);
+        bool AddSequenceTasks(kortex_driver::AddSequenceTasks::Request  &req, kortex_driver::AddSequenceTasks::Response &res);
+        bool UpdateSequenceTask(kortex_driver::UpdateSequenceTask::Request  &req, kortex_driver::UpdateSequenceTask::Response &res);
+        bool SwapSequenceTasks(kortex_driver::SwapSequenceTasks::Request  &req, kortex_driver::SwapSequenceTasks::Response &res);
+        bool ReadSequenceTask(kortex_driver::ReadSequenceTask::Request  &req, kortex_driver::ReadSequenceTask::Response &res);
+        bool ReadAllSequenceTasks(kortex_driver::ReadAllSequenceTasks::Request  &req, kortex_driver::ReadAllSequenceTasks::Response &res);
+        bool DeleteSequenceTask(kortex_driver::DeleteSequenceTask::Request  &req, kortex_driver::DeleteSequenceTask::Response &res);
+        bool DeleteAllSequenceTasks(kortex_driver::DeleteAllSequenceTasks::Request  &req, kortex_driver::DeleteAllSequenceTasks::Response &res);
+        bool TakeSnapshot(kortex_driver::TakeSnapshot::Request  &req, kortex_driver::TakeSnapshot::Response &res);
+        bool GetFirmwareBundleVersions(kortex_driver::GetFirmwareBundleVersions::Request  &req, kortex_driver::GetFirmwareBundleVersions::Response &res);
+        bool MoveSequenceTask(kortex_driver::MoveSequenceTask::Request  &req, kortex_driver::MoveSequenceTask::Response &res);
+        bool DuplicateMapping(kortex_driver::DuplicateMapping::Request  &req, kortex_driver::DuplicateMapping::Response &res);
+        bool DuplicateMap(kortex_driver::DuplicateMap::Request  &req, kortex_driver::DuplicateMap::Response &res);
+        bool SetControllerConfiguration(kortex_driver::SetControllerConfiguration::Request  &req, kortex_driver::SetControllerConfiguration::Response &res);
+        bool GetControllerConfiguration(kortex_driver::GetControllerConfiguration::Request  &req, kortex_driver::GetControllerConfiguration::Response &res);
+        bool GetAllControllerConfigurations(kortex_driver::GetAllControllerConfigurations::Request  &req, kortex_driver::GetAllControllerConfigurations::Response &res);
 
 private:
         uint32_t m_current_device_id;
@@ -389,8 +411,6 @@ private:
 	ros::ServiceServer m_serviceReadSequence;
 	ros::ServiceServer m_serviceDeleteSequence;
 	ros::ServiceServer m_serviceReadAllSequences;
-	ros::ServiceServer m_serviceDeleteSequenceTask;
-	ros::ServiceServer m_serviceDeleteAllSequenceTasks;
 	ros::ServiceServer m_servicePlaySequence;
 	ros::ServiceServer m_servicePlayAdvancedSequence;
 	ros::ServiceServer m_serviceStopSequence;
@@ -497,18 +517,31 @@ private:
 	ros::ServiceServer m_serviceGetBridgeConfig;
 	ros::ServiceServer m_servicePlayPreComputedJointTrajectory;
 	ros::ServiceServer m_serviceGetProductConfiguration;
-	ros::ServiceServer m_serviceUpdateDegreeOfFreedomConfiguration;
-	ros::ServiceServer m_serviceUpdateBaseTypeConfiguration;
 	ros::ServiceServer m_serviceUpdateEndEffectorTypeConfiguration;
-	ros::ServiceServer m_serviceUpdateVisionModuleTypeConfiguration;
-	ros::ServiceServer m_serviceUpdateInterfaceModuleTypeConfiguration;
-	ros::ServiceServer m_serviceUpdateArmLateralityConfiguration;
-	ros::ServiceServer m_serviceUpdateWristTypeConfiguration;
 	ros::ServiceServer m_serviceRestoreFactoryProductConfiguration;
 	ros::ServiceServer m_serviceGetTrajectoryErrorReport;
 	ros::ServiceServer m_serviceGetAllJointsSpeedSoftLimitation;
 	ros::ServiceServer m_serviceGetAllJointsTorqueSoftLimitation;
 	ros::ServiceServer m_serviceGetTwistSoftLimitation;
 	ros::ServiceServer m_serviceGetWrenchSoftLimitation;
+	ros::ServiceServer m_serviceSetControllerConfigurationMode;
+	ros::ServiceServer m_serviceGetControllerConfigurationMode;
+	ros::ServiceServer m_serviceStartTeaching;
+	ros::ServiceServer m_serviceStopTeaching;
+	ros::ServiceServer m_serviceAddSequenceTasks;
+	ros::ServiceServer m_serviceUpdateSequenceTask;
+	ros::ServiceServer m_serviceSwapSequenceTasks;
+	ros::ServiceServer m_serviceReadSequenceTask;
+	ros::ServiceServer m_serviceReadAllSequenceTasks;
+	ros::ServiceServer m_serviceDeleteSequenceTask;
+	ros::ServiceServer m_serviceDeleteAllSequenceTasks;
+	ros::ServiceServer m_serviceTakeSnapshot;
+	ros::ServiceServer m_serviceGetFirmwareBundleVersions;
+	ros::ServiceServer m_serviceMoveSequenceTask;
+	ros::ServiceServer m_serviceDuplicateMapping;
+	ros::ServiceServer m_serviceDuplicateMap;
+	ros::ServiceServer m_serviceSetControllerConfiguration;
+	ros::ServiceServer m_serviceGetControllerConfiguration;
+	ros::ServiceServer m_serviceGetAllControllerConfigurations;
 };
 #endif

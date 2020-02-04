@@ -107,7 +107,7 @@ int ToRosData(Kinova::Api::ActuatorConfig::EncoderDerivativeParameters input, ko
 {
 	
 	output.max_window_width = input.max_window_width();
-	output.min_encoder_tick_count = input.min_encoder_tick_count();
+	output.min_angle = input.min_angle();
 
 	
 	
@@ -209,6 +209,15 @@ int ToRosData(Kinova::Api::ActuatorConfig::PositionCommand input, kortex_driver:
 	output.position = input.position();
 	output.velocity = input.velocity();
 	output.acceleration = input.acceleration();
+
+	
+	
+	return 0;
+}
+int ToRosData(Kinova::Api::ActuatorConfig::CoggingFeedforwardModeInformation input, kortex_driver::CoggingFeedforwardModeInformation &output)
+{
+	
+	output.cogging_feedforward_mode = input.cogging_feedforward_mode();
 
 	
 	

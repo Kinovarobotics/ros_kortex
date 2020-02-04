@@ -27,6 +27,7 @@ enum ModelId {
 enum BaseType {
    BASE_TYPE_UNSPECIFIED = 0;          // Unspecified base type
    BASE_TYPE_L53_QUICK_CONNECT = 1;    // L53 (Gen3) Quick Connect Base
+   BASE_TYPE_L53_FIXED = 2;            // L53 (Gen3) Fixed Base
    BASE_TYPE_L31_FIXED = 3;            // L31 (PICO) Fixed Base
    BASE_TYPE_HDK_FIXED = 4;            // HDK Fixed Base
 }
@@ -37,6 +38,7 @@ enum EndEffectorType {
    END_EFFECTOR_TYPE_NOT_INSTALLED = 1;       // No gripper installed
    END_EFFECTOR_TYPE_L31_GRIPPER_2F = 2;      // L31 (PICO) gripper, 2 fingers
    END_EFFECTOR_TYPE_ROBOTIQ_2F_85 = 3;       // Robotiq 2F-85 gripper, 2 fingers
+   END_EFFECTOR_TYPE_ROBOTIQ_2F_140 = 4;      // Robotiq 2F-140 gripper, 2 fingers
 }
 
 // Admissible vision modules
@@ -88,37 +90,8 @@ message CompleteProductConfiguration {
    WristType wrist_type = 12;                                 // Wrist type of the device
 }
 
-// New degree of freedom configuration
-message ProductConfigurationDegreeOfFreedom {
-   uint32 degree_of_freedom = 1;            // New degree of freedom
-}
-
-// New base type configuration
-message ProductConfigurationBaseType {
-   BaseType base_type = 1;                  // New base type
-}
-
 // New end-effector installed on arm
 message ProductConfigurationEndEffectorType {
    EndEffectorType end_effector_type = 1;   // New end-effector type
 }
 
-// New vision module installed on arm
-message ProductConfigurationVisionModuleType {
-   VisionModuleType vision_module_type = 1; // New vision module type
-}
-
-// New interface module installed on arm
-message ProductConfigurationInterfaceModuleType {
-   InterfaceModuleType interface_module_type = 1;   // New interface module type
-}
-
-// New arm laterality for the arm
-message ProductConfigurationLaterality {
-   ArmLaterality arm_laterality = 1;        // New arm laterality
-}
-
-// New wrist type for the arm
-message ProductConfigurationWristType {
-   WristType wrist_type = 1;                // New wrist type
-}

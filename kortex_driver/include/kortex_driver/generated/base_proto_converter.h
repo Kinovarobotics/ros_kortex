@@ -50,12 +50,18 @@
 #include "kortex_driver/AdvancedSequenceHandle.h"
 #include "kortex_driver/SequenceTaskHandle.h"
 #include "kortex_driver/SequenceTask.h"
+#include "kortex_driver/SequenceTasks.h"
+#include "kortex_driver/SequenceTasksConfiguration.h"
+#include "kortex_driver/SequenceTaskConfiguration.h"
+#include "kortex_driver/SequenceTasksRange.h"
+#include "kortex_driver/SequenceTasksPair.h"
 #include "kortex_driver/Sequence.h"
 #include "kortex_driver/SequenceList.h"
 #include "kortex_driver/AppendActionInformation.h"
 #include "kortex_driver/ActionHandle.h"
 #include "kortex_driver/RequestedActionType.h"
 #include "kortex_driver/Action.h"
+#include "kortex_driver/Snapshot.h"
 #include "kortex_driver/SwitchControlMapping.h"
 #include "kortex_driver/ChangeTwist.h"
 #include "kortex_driver/ChangeJointSpeeds.h"
@@ -162,7 +168,7 @@
 #include "kortex_driver/ConstrainedJointAngle.h"
 #include "kortex_driver/JointAngles.h"
 #include "kortex_driver/JointAngle.h"
-#include "kortex_driver/JointSpeeds.h"
+#include "kortex_driver/Base_JointSpeeds.h"
 #include "kortex_driver/JointSpeed.h"
 #include "kortex_driver/JointTorques.h"
 #include "kortex_driver/JointTorque.h"
@@ -171,6 +177,9 @@
 #include "kortex_driver/Gripper.h"
 #include "kortex_driver/Finger.h"
 #include "kortex_driver/SystemTime.h"
+#include "kortex_driver/ControllerConfigurationMode.h"
+#include "kortex_driver/ControllerConfiguration.h"
+#include "kortex_driver/ControllerConfigurationList.h"
 #include "kortex_driver/ActuatorInformation.h"
 #include "kortex_driver/ArmStateInformation.h"
 #include "kortex_driver/ArmStateNotification.h"
@@ -184,6 +193,8 @@
 #include "kortex_driver/PreComputedJointTrajectoryElement.h"
 #include "kortex_driver/TrajectoryErrorElement.h"
 #include "kortex_driver/TrajectoryErrorReport.h"
+#include "kortex_driver/FirmwareBundleVersions.h"
+#include "kortex_driver/FirmwareComponentVersion.h"
 
 
 int ToProtoData(kortex_driver::FullUserProfile input, Kinova::Api::Base::FullUserProfile *output);
@@ -195,12 +206,18 @@ int ToProtoData(kortex_driver::SequenceHandle input, Kinova::Api::Base::Sequence
 int ToProtoData(kortex_driver::AdvancedSequenceHandle input, Kinova::Api::Base::AdvancedSequenceHandle *output);
 int ToProtoData(kortex_driver::SequenceTaskHandle input, Kinova::Api::Base::SequenceTaskHandle *output);
 int ToProtoData(kortex_driver::SequenceTask input, Kinova::Api::Base::SequenceTask *output);
+int ToProtoData(kortex_driver::SequenceTasks input, Kinova::Api::Base::SequenceTasks *output);
+int ToProtoData(kortex_driver::SequenceTasksConfiguration input, Kinova::Api::Base::SequenceTasksConfiguration *output);
+int ToProtoData(kortex_driver::SequenceTaskConfiguration input, Kinova::Api::Base::SequenceTaskConfiguration *output);
+int ToProtoData(kortex_driver::SequenceTasksRange input, Kinova::Api::Base::SequenceTasksRange *output);
+int ToProtoData(kortex_driver::SequenceTasksPair input, Kinova::Api::Base::SequenceTasksPair *output);
 int ToProtoData(kortex_driver::Sequence input, Kinova::Api::Base::Sequence *output);
 int ToProtoData(kortex_driver::SequenceList input, Kinova::Api::Base::SequenceList *output);
 int ToProtoData(kortex_driver::AppendActionInformation input, Kinova::Api::Base::AppendActionInformation *output);
 int ToProtoData(kortex_driver::ActionHandle input, Kinova::Api::Base::ActionHandle *output);
 int ToProtoData(kortex_driver::RequestedActionType input, Kinova::Api::Base::RequestedActionType *output);
 int ToProtoData(kortex_driver::Action input, Kinova::Api::Base::Action *output);
+int ToProtoData(kortex_driver::Snapshot input, Kinova::Api::Base::Snapshot *output);
 int ToProtoData(kortex_driver::SwitchControlMapping input, Kinova::Api::Base::SwitchControlMapping *output);
 int ToProtoData(kortex_driver::ChangeTwist input, Kinova::Api::Base::ChangeTwist *output);
 int ToProtoData(kortex_driver::ChangeJointSpeeds input, Kinova::Api::Base::ChangeJointSpeeds *output);
@@ -307,7 +324,7 @@ int ToProtoData(kortex_driver::ConstrainedJointAngles input, Kinova::Api::Base::
 int ToProtoData(kortex_driver::ConstrainedJointAngle input, Kinova::Api::Base::ConstrainedJointAngle *output);
 int ToProtoData(kortex_driver::JointAngles input, Kinova::Api::Base::JointAngles *output);
 int ToProtoData(kortex_driver::JointAngle input, Kinova::Api::Base::JointAngle *output);
-int ToProtoData(kortex_driver::JointSpeeds input, Kinova::Api::Base::JointSpeeds *output);
+int ToProtoData(kortex_driver::Base_JointSpeeds input, Kinova::Api::Base::JointSpeeds *output);
 int ToProtoData(kortex_driver::JointSpeed input, Kinova::Api::Base::JointSpeed *output);
 int ToProtoData(kortex_driver::JointTorques input, Kinova::Api::Base::JointTorques *output);
 int ToProtoData(kortex_driver::JointTorque input, Kinova::Api::Base::JointTorque *output);
@@ -316,6 +333,9 @@ int ToProtoData(kortex_driver::GripperRequest input, Kinova::Api::Base::GripperR
 int ToProtoData(kortex_driver::Gripper input, Kinova::Api::Base::Gripper *output);
 int ToProtoData(kortex_driver::Finger input, Kinova::Api::Base::Finger *output);
 int ToProtoData(kortex_driver::SystemTime input, Kinova::Api::Base::SystemTime *output);
+int ToProtoData(kortex_driver::ControllerConfigurationMode input, Kinova::Api::Base::ControllerConfigurationMode *output);
+int ToProtoData(kortex_driver::ControllerConfiguration input, Kinova::Api::Base::ControllerConfiguration *output);
+int ToProtoData(kortex_driver::ControllerConfigurationList input, Kinova::Api::Base::ControllerConfigurationList *output);
 int ToProtoData(kortex_driver::ActuatorInformation input, Kinova::Api::Base::ActuatorInformation *output);
 int ToProtoData(kortex_driver::ArmStateInformation input, Kinova::Api::Base::ArmStateInformation *output);
 int ToProtoData(kortex_driver::ArmStateNotification input, Kinova::Api::Base::ArmStateNotification *output);
@@ -329,5 +349,7 @@ int ToProtoData(kortex_driver::PreComputedJointTrajectory input, Kinova::Api::Ba
 int ToProtoData(kortex_driver::PreComputedJointTrajectoryElement input, Kinova::Api::Base::PreComputedJointTrajectoryElement *output);
 int ToProtoData(kortex_driver::TrajectoryErrorElement input, Kinova::Api::Base::TrajectoryErrorElement *output);
 int ToProtoData(kortex_driver::TrajectoryErrorReport input, Kinova::Api::Base::TrajectoryErrorReport *output);
+int ToProtoData(kortex_driver::FirmwareBundleVersions input, Kinova::Api::Base::FirmwareBundleVersions *output);
+int ToProtoData(kortex_driver::FirmwareComponentVersion input, Kinova::Api::Base::FirmwareComponentVersion *output);
 
 #endif

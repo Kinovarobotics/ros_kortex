@@ -20,94 +20,101 @@ package Kinova.Api.ActuatorConfig;
 service ActuatorConfig {//@PROXY_ID=10 @ERROR=Kinova.Api.Error
 
     // Retrieves axis offsets for absolute and relative encoder
-    rpc GetAxisOffsets                          (Kinova.Api.Common.Empty)     returns (AxisOffsets);                 //@RPC_ID=1
+    rpc GetAxisOffsets                          (Kinova.Api.Common.Empty)           returns (AxisOffsets);                          //@RPC_ID=1
 
     // Sets offsets for absolute and relative encoder
-    rpc SetAxisOffsets                          (AxisPosition)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=2
+    // Invoking this method shall invalidate arm calibration if one exists. This method is for kinova usage only.
+    rpc SetAxisOffsets                          (AxisPosition)                      returns (Kinova.Api.Common.Empty);              //@RPC_ID=2
     
     // Reads torque calibration parameters (internal use only)
-    rpc ReadTorqueCalibration                   (Kinova.Api.Common.Empty)     returns (TorqueCalibration);           //@RPC_ID=3
+    rpc ReadTorqueCalibration                   (Kinova.Api.Common.Empty)           returns (TorqueCalibration);                    //@RPC_ID=3
    
     // Writes torque calibration parameters (internal use only)
-    rpc WriteTorqueCalibration                  (TorqueCalibration)           returns (Kinova.Api.Common.Empty);     //@RPC_ID=4
+    rpc WriteTorqueCalibration                  (TorqueCalibration)                 returns (Kinova.Api.Common.Empty);              //@RPC_ID=4
     
     // Sets zero torque calibration
-    rpc SetTorqueOffset                         (TorqueOffset)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=5
+    rpc SetTorqueOffset                         (TorqueOffset)                      returns (Kinova.Api.Common.Empty);              //@RPC_ID=5
     
     // Retrieves actuator control mode
-    rpc GetControlMode                          (Kinova.Api.Common.Empty)     returns (ControlModeInformation);      //@RPC_ID=6
+    rpc GetControlMode                          (Kinova.Api.Common.Empty)           returns (ControlModeInformation);               //@RPC_ID=6
     
     // Sets actuator control mode
-    rpc SetControlMode                          (ControlModeInformation)      returns (Kinova.Api.Common.Empty);     //@RPC_ID=7
+    rpc SetControlMode                          (ControlModeInformation)            returns (Kinova.Api.Common.Empty);              //@RPC_ID=7
     
     // Retrieves activated control loop(s)
-    rpc GetActivatedControlLoop                 (Kinova.Api.Common.Empty)     returns (ControlLoop);                 //@RPC_ID=8
+    rpc GetActivatedControlLoop                 (Kinova.Api.Common.Empty)           returns (ControlLoop);                          //@RPC_ID=8
     
     // Sets activated control loop(s)
-    rpc SetActivatedControlLoop                 (ControlLoop)                 returns (Kinova.Api.Common.Empty);     //@RPC_ID=9
+    rpc SetActivatedControlLoop                 (ControlLoop)                       returns (Kinova.Api.Common.Empty);              //@RPC_ID=9
     
     // Retrieves motor drive FOC parameters (internal use only)
-    rpc GetVectorDriveParameters                (Kinova.Api.Common.Empty)     returns (VectorDriveParameters);       //@RPC_ID=10
+    rpc GetVectorDriveParameters                (Kinova.Api.Common.Empty)           returns (VectorDriveParameters);                //@RPC_ID=10
     
     // Sets motor drive FOC parameters (internal use only)
-    rpc SetVectorDriveParameters                (VectorDriveParameters)       returns (Kinova.Api.Common.Empty);     //@RPC_ID=11
+    rpc SetVectorDriveParameters                (VectorDriveParameters)             returns (Kinova.Api.Common.Empty);              //@RPC_ID=11
     
     // Retrieves encoder derivative parameters (internal use only)
-    rpc GetEncoderDerivativeParameters          (Kinova.Api.Common.Empty)     returns (EncoderDerivativeParameters); //@RPC_ID=12
+    rpc GetEncoderDerivativeParameters          (Kinova.Api.Common.Empty)           returns (EncoderDerivativeParameters);          //@RPC_ID=12
 
     // Sets encoder derivative parameters (internal use only)
-    rpc SetEncoderDerivativeParameters          (EncoderDerivativeParameters) returns (Kinova.Api.Common.Empty);     //@RPC_ID=13
+    rpc SetEncoderDerivativeParameters          (EncoderDerivativeParameters)       returns (Kinova.Api.Common.Empty);              //@RPC_ID=13
     
     // Retrieves control loop parameters
-    rpc GetControlLoopParameters                (LoopSelection)               returns (ControlLoopParameters);       //@RPC_ID=14
+    rpc GetControlLoopParameters                (LoopSelection)                     returns (ControlLoopParameters);                //@RPC_ID=14
 
     // Sets control loop parameters
-    rpc SetControlLoopParameters                (ControlLoopParameters)       returns (Kinova.Api.Common.Empty);     //@RPC_ID=15
+    rpc SetControlLoopParameters                (ControlLoopParameters)             returns (Kinova.Api.Common.Empty);              //@RPC_ID=15
 
     // Starts frequency response test (internal use only)
-    rpc StartFrequencyResponse                  (FrequencyResponse)           returns (Kinova.Api.Common.Empty);     //@RPC_ID=16
+    rpc StartFrequencyResponse                  (FrequencyResponse)                 returns (Kinova.Api.Common.Empty);              //@RPC_ID=16
     
     // Stops frequency response test (internal use only)
-    rpc StopFrequencyResponse                   (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=17
+    rpc StopFrequencyResponse                   (Kinova.Api.Common.Empty)           returns (Kinova.Api.Common.Empty);              //@RPC_ID=17
     
     // Starts step response test (internal use only)
-    rpc StartStepResponse                       (StepResponse)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=18
+    rpc StartStepResponse                       (StepResponse)                      returns (Kinova.Api.Common.Empty);              //@RPC_ID=18
     
     // Stops step response test (internal use only)
-    rpc StopStepResponse                        (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=19
+    rpc StopStepResponse                        (Kinova.Api.Common.Empty)           returns (Kinova.Api.Common.Empty);              //@RPC_ID=19
     
     // Starts ramp response test (internal use only)
-    rpc StartRampResponse                       (RampResponse)                returns (Kinova.Api.Common.Empty);     //@RPC_ID=20
+    rpc StartRampResponse                       (RampResponse)                      returns (Kinova.Api.Common.Empty);              //@RPC_ID=20
     
     // Stops ramp response test (internal use only)
-    rpc StopRampResponse                        (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=21
+    rpc StopRampResponse                        (Kinova.Api.Common.Empty)           returns (Kinova.Api.Common.Empty);              //@RPC_ID=21
     
     // Selects custom data
-    rpc SelectCustomData                        (CustomDataSelection)         returns (Kinova.Api.Common.Empty);     //@RPC_ID=22
+    rpc SelectCustomData                        (CustomDataSelection)               returns (Kinova.Api.Common.Empty);              //@RPC_ID=22
     
     // Retrieves selected custom data
-    rpc GetSelectedCustomData                   (Kinova.Api.Common.Empty)     returns (CustomDataSelection);         //@RPC_ID=23
+    rpc GetSelectedCustomData                   (Kinova.Api.Common.Empty)           returns (CustomDataSelection);                  //@RPC_ID=23
     
     // Sets command mode (config versus cyclic)
-    rpc SetCommandMode                          (CommandModeInformation)      returns (Kinova.Api.Common.Empty);     //@RPC_ID=24
+    rpc SetCommandMode                          (CommandModeInformation)            returns (Kinova.Api.Common.Empty);              //@RPC_ID=24
     
     // Clears all error(s) and warning(s) (bank A and B)
-    rpc ClearFaults                             (Kinova.Api.Common.Empty)     returns (Kinova.Api.Common.Empty);     //@RPC_ID=25
+    rpc ClearFaults                             (Kinova.Api.Common.Empty)           returns (Kinova.Api.Common.Empty);              //@RPC_ID=25
     
     // Enables or disables servoing
-    rpc SetServoing                             (Servoing)                    returns (Kinova.Api.Common.Empty);     //@RPC_ID=26
+    rpc SetServoing                             (Servoing)                          returns (Kinova.Api.Common.Empty);              //@RPC_ID=26
     
     // Moves the actuator to the desired position
-    rpc MoveToPosition                          (PositionCommand)             returns (Kinova.Api.Common.Empty);     //@RPC_ID=27
+    rpc MoveToPosition                          (PositionCommand)                   returns (Kinova.Api.Common.Empty);              //@RPC_ID=27
     
     // Retrieves command mode (config versus cyclic)
-    rpc GetCommandMode                          (Kinova.Api.Common.Empty)     returns (CommandModeInformation);      //@RPC_ID=28
+    rpc GetCommandMode                          (Kinova.Api.Common.Empty)           returns (CommandModeInformation);               //@RPC_ID=28
     
     // Retrieves servoing state
-    rpc GetServoing                             (Kinova.Api.Common.Empty)     returns (Servoing);                    //@RPC_ID=29
+    rpc GetServoing                             (Kinova.Api.Common.Empty)           returns (Servoing);                             //@RPC_ID=29
     
     // Retrieves torque offset calibration
-    rpc GetTorqueOffset                         (Kinova.Api.Common.Empty)     returns (TorqueOffset);                //@RPC_ID=30
+    rpc GetTorqueOffset                         (Kinova.Api.Common.Empty)           returns (TorqueOffset);                         //@RPC_ID=30
+
+    // Sets cogging feedforward mode
+    rpc SetCoggingFeedforwardMode               (CoggingFeedforwardModeInformation) returns (Kinova.Api.Common.Empty);              //@RPC_ID=31
+
+    // Retrieves cogging feedforward mode
+    rpc GetCoggingFeedforwardMode               (Kinova.Api.Common.Empty)           returns (CoggingFeedforwardModeInformation);    //@RPC_ID=32
 }
 
 // Identifies ActuatorConfig service current version
@@ -156,6 +163,14 @@ enum ControlLoopSelection
     MOTOR_VELOCITY      = 8;    // 0x8 - Motor velocity control
     JOINT_TORQUE        = 16;   // 0x10 - Joint torque control
     MOTOR_CURRENT       = 32;   // 0x20 - Motor current control
+}
+
+// Admissable cogging feedforward modes
+enum CoggingFeedforwardMode
+{
+    FEEDFORWARD_OFF         = 0;    // No cogging compensation
+    FEEDFORWARD_ADAPTIVE    = 1;    // Cogging compensation with adaptive parameters
+    FEEDFORWARD_CALIBRATED  = 2;    // Cogging compensation with calibrated parameters
 }
 
 // Axis position
@@ -216,8 +231,8 @@ message VectorDriveParameters
 // Variable window derivative parameters
 message EncoderDerivativeParameters
 {
-    uint32 max_window_width       = 1;  // Maximum window width
-    uint32 min_encoder_tick_count = 2;  // Minimum encoder tick count
+    uint32 max_window_width = 1;  // Maximum window width
+    float  min_angle        = 2;  // Minimum angle for derivative (degrees)
 }
 
 // Control loop parameters (discrete transfer function)
@@ -283,6 +298,12 @@ message PositionCommand
     float position     = 1;          // Position value (degrees)
     float velocity     = 2;          // Velocity value (degrees per second)
     float acceleration = 3;          // Acceleration value (degrees per second^squared)
+}
+
+// Cogging feedforward mode
+message CoggingFeedforwardModeInformation
+{
+    CoggingFeedforwardMode cogging_feedforward_mode = 1;    // Cogging feedforward mode
 }
 
 // Admissible bank A actuator safeties
@@ -375,4 +396,43 @@ enum CustomDataIndex {
     FLOAT_CURRENT_MOTOR_CMD = 53; // Motor current command sent to motor drive (Amperes)
     FLOAT_TORQUE_JOINT_CMD = 54; // Axis torque command sent to joint torque control loop (Newton-meters)
     FLOAT_POSITION_UNWRAPPED = 55; // Actuator position unwrapped (degrees)
+    UINT32_HALL_SENSOR_0 = 56; // Hall sensor 0 value (raw)
+    UINT32_HALL_SENSOR_1 = 57; // Hall sensor 1 value (raw)
+    UINT32_HALL_SENSOR_2 = 58; // Hall sensor 2 value (raw)
+    INT32_HALL_SENSOR_SCALED_0 = 59; // Hall sensor 0 scaled value (raw)
+    INT32_HALL_SENSOR_SCALED_1 = 60; // Hall sensor 1 scaled value (raw)
+    INT32_HALL_SENSOR_SCALED_2 = 61; // Hall sensor 2 scaled value (raw)
+    FLOAT_COGGING_COEFFICIENT_A_0 = 62; // Cogging torque cancellation coefficient A0 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_1 = 63; // Cogging torque cancellation coefficient A1 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_2 = 64; // Cogging torque cancellation coefficient A2 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_3 = 65; // Cogging torque cancellation coefficient A3 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_4 = 66; // Cogging torque cancellation coefficient A4 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_5 = 67; // Cogging torque cancellation coefficient A5 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_6 = 68; // Cogging torque cancellation coefficient A6 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_7 = 69; // Cogging torque cancellation coefficient A7 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_8 = 70; // Cogging torque cancellation coefficient A8 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_9 = 71; // Cogging torque cancellation coefficient A9 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_10 = 72; // Cogging torque cancellation coefficient A10 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_11 = 73; // Cogging torque cancellation coefficient A11 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_12 = 74; // Cogging torque cancellation coefficient A12 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_13 = 75; // Cogging torque cancellation coefficient A13 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_14 = 76; // Cogging torque cancellation coefficient A14 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_A_15 = 77; // Cogging torque cancellation coefficient A15 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_0 = 78; // Cogging torque cancellation coefficient B0 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_1 = 79; // Cogging torque cancellation coefficient B1 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_2 = 80; // Cogging torque cancellation coefficient B2 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_3 = 81; // Cogging torque cancellation coefficient B3 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_4 = 82; // Cogging torque cancellation coefficient B4 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_5 = 83; // Cogging torque cancellation coefficient B5 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_6 = 84; // Cogging torque cancellation coefficient B6 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_7 = 85; // Cogging torque cancellation coefficient B7 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_8 = 86; // Cogging torque cancellation coefficient B8 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_9 = 87; // Cogging torque cancellation coefficient B9 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_10 = 88; // Cogging torque cancellation coefficient B10 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_11 = 89; // Cogging torque cancellation coefficient B11 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_12 = 90; // Cogging torque cancellation coefficient B12 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_13 = 91; // Cogging torque cancellation coefficient B13 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_14 = 92; // Cogging torque cancellation coefficient B14 (Amperes)
+    FLOAT_COGGING_COEFFICIENT_B_15 = 93; // Cogging torque cancellation coefficient B15 (Amperes)
+    FLOAT_CURRENT_COGGING_FEEDFORWARD = 94; // Commanded cogging cancellation feedforward current sent to motor drive (Amperes)
 }

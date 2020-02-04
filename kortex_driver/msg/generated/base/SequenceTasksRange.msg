@@ -1,0 +1,3 @@
+
+uint32 first_task_index
+uint32 second_task_index

@@ -66,6 +66,25 @@ ControlConfigServices::ControlConfigServices(ros::NodeHandle& n, Kinova::Api::Co
 	m_serviceControlConfig_Unsubscribe = m_n.advertiseService("control_config/unsubscribe", &ControlConfigServices::ControlConfig_Unsubscribe, this);
 	m_serviceSetCartesianReferenceFrame = m_n.advertiseService("control_config/set_cartesian_reference_frame", &ControlConfigServices::SetCartesianReferenceFrame, this);
 	m_serviceGetCartesianReferenceFrame = m_n.advertiseService("control_config/get_cartesian_reference_frame", &ControlConfigServices::GetCartesianReferenceFrame, this);
+	m_serviceControlConfig_GetControlMode = m_n.advertiseService("control_config/get_control_mode", &ControlConfigServices::ControlConfig_GetControlMode, this);
+	m_serviceSetJointSpeedSoftLimits = m_n.advertiseService("control_config/set_joint_speed_soft_limits", &ControlConfigServices::SetJointSpeedSoftLimits, this);
+	m_serviceSetTwistLinearSoftLimit = m_n.advertiseService("control_config/set_twist_linear_soft_limit", &ControlConfigServices::SetTwistLinearSoftLimit, this);
+	m_serviceSetTwistAngularSoftLimit = m_n.advertiseService("control_config/set_twist_angular_soft_limit", &ControlConfigServices::SetTwistAngularSoftLimit, this);
+	m_serviceSetJointAccelerationSoftLimits = m_n.advertiseService("control_config/set_joint_acceleration_soft_limits", &ControlConfigServices::SetJointAccelerationSoftLimits, this);
+	m_serviceGetKinematicHardLimits = m_n.advertiseService("control_config/get_kinematic_hard_limits", &ControlConfigServices::GetKinematicHardLimits, this);
+	m_serviceGetKinematicSoftLimits = m_n.advertiseService("control_config/get_kinematic_soft_limits", &ControlConfigServices::GetKinematicSoftLimits, this);
+	m_serviceGetAllKinematicSoftLimits = m_n.advertiseService("control_config/get_all_kinematic_soft_limits", &ControlConfigServices::GetAllKinematicSoftLimits, this);
+	m_serviceSetDesiredLinearTwist = m_n.advertiseService("control_config/set_desired_linear_twist", &ControlConfigServices::SetDesiredLinearTwist, this);
+	m_serviceSetDesiredAngularTwist = m_n.advertiseService("control_config/set_desired_angular_twist", &ControlConfigServices::SetDesiredAngularTwist, this);
+	m_serviceSetDesiredJointSpeeds = m_n.advertiseService("control_config/set_desired_joint_speeds", &ControlConfigServices::SetDesiredJointSpeeds, this);
+	m_serviceGetDesiredSpeeds = m_n.advertiseService("control_config/get_desired_speeds", &ControlConfigServices::GetDesiredSpeeds, this);
+	m_serviceResetGravityVector = m_n.advertiseService("control_config/reset_gravity_vector", &ControlConfigServices::ResetGravityVector, this);
+	m_serviceResetPayloadInformation = m_n.advertiseService("control_config/reset_payload_information", &ControlConfigServices::ResetPayloadInformation, this);
+	m_serviceResetToolConfiguration = m_n.advertiseService("control_config/reset_tool_configuration", &ControlConfigServices::ResetToolConfiguration, this);
+	m_serviceResetJointSpeedSoftLimits = m_n.advertiseService("control_config/reset_joint_speed_soft_limits", &ControlConfigServices::ResetJointSpeedSoftLimits, this);
+	m_serviceResetTwistLinearSoftLimit = m_n.advertiseService("control_config/reset_twist_linear_soft_limit", &ControlConfigServices::ResetTwistLinearSoftLimit, this);
+	m_serviceResetTwistAngularSoftLimit = m_n.advertiseService("control_config/reset_twist_angular_soft_limit", &ControlConfigServices::ResetTwistAngularSoftLimit, this);
+	m_serviceResetJointAccelerationSoftLimits = m_n.advertiseService("control_config/reset_joint_acceleration_soft_limits", &ControlConfigServices::ResetJointAccelerationSoftLimits, this);
 }
 
 bool ControlConfigServices::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
@@ -398,6 +417,636 @@ bool ControlConfigServices::GetCartesianReferenceFrame(kortex_driver::GetCartesi
 	try
 	{
 		output = m_controlconfig->GetCartesianReferenceFrame(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::ControlConfig_GetControlMode(kortex_driver::ControlConfig_GetControlMode::Request  &req, kortex_driver::ControlConfig_GetControlMode::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::ControlModeInformation output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->GetControlMode(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::SetJointSpeedSoftLimits(kortex_driver::SetJointSpeedSoftLimits::Request  &req, kortex_driver::SetJointSpeedSoftLimits::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::JointSpeedSoftLimits input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_controlconfig->SetJointSpeedSoftLimits(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool ControlConfigServices::SetTwistLinearSoftLimit(kortex_driver::SetTwistLinearSoftLimit::Request  &req, kortex_driver::SetTwistLinearSoftLimit::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::TwistLinearSoftLimit input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_controlconfig->SetTwistLinearSoftLimit(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool ControlConfigServices::SetTwistAngularSoftLimit(kortex_driver::SetTwistAngularSoftLimit::Request  &req, kortex_driver::SetTwistAngularSoftLimit::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::TwistAngularSoftLimit input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_controlconfig->SetTwistAngularSoftLimit(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool ControlConfigServices::SetJointAccelerationSoftLimits(kortex_driver::SetJointAccelerationSoftLimits::Request  &req, kortex_driver::SetJointAccelerationSoftLimits::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::JointAccelerationSoftLimits input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_controlconfig->SetJointAccelerationSoftLimits(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool ControlConfigServices::GetKinematicHardLimits(kortex_driver::GetKinematicHardLimits::Request  &req, kortex_driver::GetKinematicHardLimits::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::KinematicLimits output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->GetKinematicHardLimits(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::GetKinematicSoftLimits(kortex_driver::GetKinematicSoftLimits::Request  &req, kortex_driver::GetKinematicSoftLimits::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::ControlModeInformation input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::ControlConfig::KinematicLimits output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->GetKinematicSoftLimits(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::GetAllKinematicSoftLimits(kortex_driver::GetAllKinematicSoftLimits::Request  &req, kortex_driver::GetAllKinematicSoftLimits::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::KinematicLimitsList output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->GetAllKinematicSoftLimits(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::SetDesiredLinearTwist(kortex_driver::SetDesiredLinearTwist::Request  &req, kortex_driver::SetDesiredLinearTwist::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::LinearTwist input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_controlconfig->SetDesiredLinearTwist(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool ControlConfigServices::SetDesiredAngularTwist(kortex_driver::SetDesiredAngularTwist::Request  &req, kortex_driver::SetDesiredAngularTwist::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::AngularTwist input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_controlconfig->SetDesiredAngularTwist(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool ControlConfigServices::SetDesiredJointSpeeds(kortex_driver::SetDesiredJointSpeeds::Request  &req, kortex_driver::SetDesiredJointSpeeds::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::JointSpeeds input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_controlconfig->SetDesiredJointSpeeds(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool ControlConfigServices::GetDesiredSpeeds(kortex_driver::GetDesiredSpeeds::Request  &req, kortex_driver::GetDesiredSpeeds::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::DesiredSpeeds output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->GetDesiredSpeeds(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::ResetGravityVector(kortex_driver::ResetGravityVector::Request  &req, kortex_driver::ResetGravityVector::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::GravityVector output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->ResetGravityVector(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::ResetPayloadInformation(kortex_driver::ResetPayloadInformation::Request  &req, kortex_driver::ResetPayloadInformation::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::PayloadInformation output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->ResetPayloadInformation(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::ResetToolConfiguration(kortex_driver::ResetToolConfiguration::Request  &req, kortex_driver::ResetToolConfiguration::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::ToolConfiguration output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->ResetToolConfiguration(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::ResetJointSpeedSoftLimits(kortex_driver::ResetJointSpeedSoftLimits::Request  &req, kortex_driver::ResetJointSpeedSoftLimits::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::ControlModeInformation input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::ControlConfig::JointSpeedSoftLimits output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->ResetJointSpeedSoftLimits(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::ResetTwistLinearSoftLimit(kortex_driver::ResetTwistLinearSoftLimit::Request  &req, kortex_driver::ResetTwistLinearSoftLimit::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::ControlModeInformation input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::ControlConfig::TwistLinearSoftLimit output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->ResetTwistLinearSoftLimit(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::ResetTwistAngularSoftLimit(kortex_driver::ResetTwistAngularSoftLimit::Request  &req, kortex_driver::ResetTwistAngularSoftLimit::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::ControlModeInformation input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::ControlConfig::TwistAngularSoftLimit output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->ResetTwistAngularSoftLimit(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ControlConfigServices::ResetJointAccelerationSoftLimits(kortex_driver::ResetJointAccelerationSoftLimits::Request  &req, kortex_driver::ResetJointAccelerationSoftLimits::Response &res)
+{
+	
+	Kinova::Api::ControlConfig::ControlModeInformation input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::ControlConfig::JointAccelerationSoftLimits output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_controlconfig->ResetJointAccelerationSoftLimits(input, m_current_device_id, m_api_options);
 	}
 
 	catch (Kinova::Api::KDetailedException& ex)

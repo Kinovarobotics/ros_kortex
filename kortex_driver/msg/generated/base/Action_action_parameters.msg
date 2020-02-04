@@ -1,10 +1,11 @@
 
 TwistCommand[] send_twist_command
 WrenchCommand[] send_wrench_command
-JointSpeeds[] send_joint_speeds
+Base_JointSpeeds[] send_joint_speeds
 ConstrainedPose[] reach_pose
 ConstrainedJointAngles[] reach_joint_angles
 uint32[] toggle_admittance_mode
+Snapshot[] snapshot
 SwitchControlMapping[] switch_control_mapping
 uint32[] navigate_joints
 uint32[] navigate_mappings

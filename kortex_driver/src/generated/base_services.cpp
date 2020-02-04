@@ -94,8 +94,6 @@ BaseServices::BaseServices(ros::NodeHandle& n, Kinova::Api::Base::BaseClient* ba
 	m_serviceReadSequence = m_n.advertiseService("base/read_sequence", &BaseServices::ReadSequence, this);
 	m_serviceDeleteSequence = m_n.advertiseService("base/delete_sequence", &BaseServices::DeleteSequence, this);
 	m_serviceReadAllSequences = m_n.advertiseService("base/read_all_sequences", &BaseServices::ReadAllSequences, this);
-	m_serviceDeleteSequenceTask = m_n.advertiseService("base/delete_sequence_task", &BaseServices::DeleteSequenceTask, this);
-	m_serviceDeleteAllSequenceTasks = m_n.advertiseService("base/delete_all_sequence_tasks", &BaseServices::DeleteAllSequenceTasks, this);
 	m_servicePlaySequence = m_n.advertiseService("base/play_sequence", &BaseServices::PlaySequence, this);
 	m_servicePlayAdvancedSequence = m_n.advertiseService("base/play_advanced_sequence", &BaseServices::PlayAdvancedSequence, this);
 	m_serviceStopSequence = m_n.advertiseService("base/stop_sequence", &BaseServices::StopSequence, this);
@@ -202,19 +200,32 @@ BaseServices::BaseServices(ros::NodeHandle& n, Kinova::Api::Base::BaseClient* ba
 	m_serviceGetBridgeConfig = m_n.advertiseService("base/get_bridge_config", &BaseServices::GetBridgeConfig, this);
 	m_servicePlayPreComputedJointTrajectory = m_n.advertiseService("base/play_pre_computed_joint_trajectory", &BaseServices::PlayPreComputedJointTrajectory, this);
 	m_serviceGetProductConfiguration = m_n.advertiseService("base/get_product_configuration", &BaseServices::GetProductConfiguration, this);
-	m_serviceUpdateDegreeOfFreedomConfiguration = m_n.advertiseService("base/update_degree_of_freedom_configuration", &BaseServices::UpdateDegreeOfFreedomConfiguration, this);
-	m_serviceUpdateBaseTypeConfiguration = m_n.advertiseService("base/update_base_type_configuration", &BaseServices::UpdateBaseTypeConfiguration, this);
 	m_serviceUpdateEndEffectorTypeConfiguration = m_n.advertiseService("base/update_end_effector_type_configuration", &BaseServices::UpdateEndEffectorTypeConfiguration, this);
-	m_serviceUpdateVisionModuleTypeConfiguration = m_n.advertiseService("base/update_vision_module_type_configuration", &BaseServices::UpdateVisionModuleTypeConfiguration, this);
-	m_serviceUpdateInterfaceModuleTypeConfiguration = m_n.advertiseService("base/update_interface_module_type_configuration", &BaseServices::UpdateInterfaceModuleTypeConfiguration, this);
-	m_serviceUpdateArmLateralityConfiguration = m_n.advertiseService("base/update_arm_laterality_configuration", &BaseServices::UpdateArmLateralityConfiguration, this);
-	m_serviceUpdateWristTypeConfiguration = m_n.advertiseService("base/update_wrist_type_configuration", &BaseServices::UpdateWristTypeConfiguration, this);
 	m_serviceRestoreFactoryProductConfiguration = m_n.advertiseService("base/restore_factory_product_configuration", &BaseServices::RestoreFactoryProductConfiguration, this);
 	m_serviceGetTrajectoryErrorReport = m_n.advertiseService("base/get_trajectory_error_report", &BaseServices::GetTrajectoryErrorReport, this);
 	m_serviceGetAllJointsSpeedSoftLimitation = m_n.advertiseService("base/get_all_joints_speed_soft_limitation", &BaseServices::GetAllJointsSpeedSoftLimitation, this);
 	m_serviceGetAllJointsTorqueSoftLimitation = m_n.advertiseService("base/get_all_joints_torque_soft_limitation", &BaseServices::GetAllJointsTorqueSoftLimitation, this);
 	m_serviceGetTwistSoftLimitation = m_n.advertiseService("base/get_twist_soft_limitation", &BaseServices::GetTwistSoftLimitation, this);
 	m_serviceGetWrenchSoftLimitation = m_n.advertiseService("base/get_wrench_soft_limitation", &BaseServices::GetWrenchSoftLimitation, this);
+	m_serviceSetControllerConfigurationMode = m_n.advertiseService("base/set_controller_configuration_mode", &BaseServices::SetControllerConfigurationMode, this);
+	m_serviceGetControllerConfigurationMode = m_n.advertiseService("base/get_controller_configuration_mode", &BaseServices::GetControllerConfigurationMode, this);
+	m_serviceStartTeaching = m_n.advertiseService("base/start_teaching", &BaseServices::StartTeaching, this);
+	m_serviceStopTeaching = m_n.advertiseService("base/stop_teaching", &BaseServices::StopTeaching, this);
+	m_serviceAddSequenceTasks = m_n.advertiseService("base/add_sequence_tasks", &BaseServices::AddSequenceTasks, this);
+	m_serviceUpdateSequenceTask = m_n.advertiseService("base/update_sequence_task", &BaseServices::UpdateSequenceTask, this);
+	m_serviceSwapSequenceTasks = m_n.advertiseService("base/swap_sequence_tasks", &BaseServices::SwapSequenceTasks, this);
+	m_serviceReadSequenceTask = m_n.advertiseService("base/read_sequence_task", &BaseServices::ReadSequenceTask, this);
+	m_serviceReadAllSequenceTasks = m_n.advertiseService("base/read_all_sequence_tasks", &BaseServices::ReadAllSequenceTasks, this);
+	m_serviceDeleteSequenceTask = m_n.advertiseService("base/delete_sequence_task", &BaseServices::DeleteSequenceTask, this);
+	m_serviceDeleteAllSequenceTasks = m_n.advertiseService("base/delete_all_sequence_tasks", &BaseServices::DeleteAllSequenceTasks, this);
+	m_serviceTakeSnapshot = m_n.advertiseService("base/take_snapshot", &BaseServices::TakeSnapshot, this);
+	m_serviceGetFirmwareBundleVersions = m_n.advertiseService("base/get_firmware_bundle_versions", &BaseServices::GetFirmwareBundleVersions, this);
+	m_serviceMoveSequenceTask = m_n.advertiseService("base/move_sequence_task", &BaseServices::MoveSequenceTask, this);
+	m_serviceDuplicateMapping = m_n.advertiseService("base/duplicate_mapping", &BaseServices::DuplicateMapping, this);
+	m_serviceDuplicateMap = m_n.advertiseService("base/duplicate_map", &BaseServices::DuplicateMap, this);
+	m_serviceSetControllerConfiguration = m_n.advertiseService("base/set_controller_configuration", &BaseServices::SetControllerConfiguration, this);
+	m_serviceGetControllerConfiguration = m_n.advertiseService("base/get_controller_configuration", &BaseServices::GetControllerConfiguration, this);
+	m_serviceGetAllControllerConfigurations = m_n.advertiseService("base/get_all_controller_configurations", &BaseServices::GetAllControllerConfigurations, this);
 }
 
 bool BaseServices::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
@@ -628,70 +639,6 @@ bool BaseServices::ReadAllSequences(kortex_driver::ReadAllSequences::Request  &r
 		return false;
 	}
 	ToRosData(output, res.output);
-	return true;
-}
-
-bool BaseServices::DeleteSequenceTask(kortex_driver::DeleteSequenceTask::Request  &req, kortex_driver::DeleteSequenceTask::Response &res)
-{
-	
-	Kinova::Api::Base::SequenceTaskHandle input;
-	ToProtoData(req.input, &input);
-	kortex_driver::KortexError result_error;
-	
-	try
-	{
-		m_base->DeleteSequenceTask(input, m_current_device_id, m_api_options);
-	}
-
-	catch (Kinova::Api::KDetailedException& ex)
-	{
-		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
-		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.toString();
-		m_pub_Error.publish(result_error);
-		ROS_INFO("Kortex exception");
-		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
-		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
-		ROS_INFO("KINOVA exception description: %s\n", ex.what());
-		return false;
-	}
-	catch (std::runtime_error& ex2)
-	{
-		ROS_INFO("%s", ex2.what());
-		return false;
-	}
-	return true;
-}
-
-bool BaseServices::DeleteAllSequenceTasks(kortex_driver::DeleteAllSequenceTasks::Request  &req, kortex_driver::DeleteAllSequenceTasks::Response &res)
-{
-	
-	Kinova::Api::Base::SequenceHandle input;
-	ToProtoData(req.input, &input);
-	kortex_driver::KortexError result_error;
-	
-	try
-	{
-		m_base->DeleteAllSequenceTasks(input, m_current_device_id, m_api_options);
-	}
-
-	catch (Kinova::Api::KDetailedException& ex)
-	{
-		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
-		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.toString();
-		m_pub_Error.publish(result_error);
-		ROS_INFO("Kortex exception");
-		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
-		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
-		ROS_INFO("KINOVA exception description: %s\n", ex.what());
-		return false;
-	}
-	catch (std::runtime_error& ex2)
-	{
-		ROS_INFO("%s", ex2.what());
-		return false;
-	}
 	return true;
 }
 
@@ -3943,6 +3890,7 @@ bool BaseServices::Base_GetCapSenseConfig(kortex_driver::Base_GetCapSenseConfig:
 
 bool BaseServices::GetAllJointsSpeedHardLimitation(kortex_driver::GetAllJointsSpeedHardLimitation::Request  &req, kortex_driver::GetAllJointsSpeedHardLimitation::Response &res)
 {
+	ROS_WARN("The base/get_all_joints_speed_hard_limitation service will be deprecated in a future release.");
 	
 	Kinova::Api::Base::JointsLimitationsList output;
 	
@@ -3976,6 +3924,7 @@ bool BaseServices::GetAllJointsSpeedHardLimitation(kortex_driver::GetAllJointsSp
 
 bool BaseServices::GetAllJointsTorqueHardLimitation(kortex_driver::GetAllJointsTorqueHardLimitation::Request  &req, kortex_driver::GetAllJointsTorqueHardLimitation::Response &res)
 {
+	ROS_WARN("The base/get_all_joints_torque_hard_limitation service will be deprecated in a future release.");
 	
 	Kinova::Api::Base::JointsLimitationsList output;
 	
@@ -4009,6 +3958,7 @@ bool BaseServices::GetAllJointsTorqueHardLimitation(kortex_driver::GetAllJointsT
 
 bool BaseServices::GetTwistHardLimitation(kortex_driver::GetTwistHardLimitation::Request  &req, kortex_driver::GetTwistHardLimitation::Response &res)
 {
+	ROS_WARN("The base/get_twist_hard_limitation service will be deprecated in a future release.");
 	
 	Kinova::Api::Base::TwistLimitation output;
 	
@@ -4042,6 +3992,7 @@ bool BaseServices::GetTwistHardLimitation(kortex_driver::GetTwistHardLimitation:
 
 bool BaseServices::GetWrenchHardLimitation(kortex_driver::GetWrenchHardLimitation::Request  &req, kortex_driver::GetWrenchHardLimitation::Response &res)
 {
+	ROS_WARN("The base/get_wrench_hard_limitation service will be deprecated in a future release.");
 	
 	Kinova::Api::Base::WrenchLimitation output;
 	
@@ -4340,70 +4291,6 @@ bool BaseServices::GetProductConfiguration(kortex_driver::GetProductConfiguratio
 	return true;
 }
 
-bool BaseServices::UpdateDegreeOfFreedomConfiguration(kortex_driver::UpdateDegreeOfFreedomConfiguration::Request  &req, kortex_driver::UpdateDegreeOfFreedomConfiguration::Response &res)
-{
-	
-	Kinova::Api::ProductConfiguration::ProductConfigurationDegreeOfFreedom input;
-	ToProtoData(req.input, &input);
-	kortex_driver::KortexError result_error;
-	
-	try
-	{
-		m_base->UpdateDegreeOfFreedomConfiguration(input, m_current_device_id, m_api_options);
-	}
-
-	catch (Kinova::Api::KDetailedException& ex)
-	{
-		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
-		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.toString();
-		m_pub_Error.publish(result_error);
-		ROS_INFO("Kortex exception");
-		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
-		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
-		ROS_INFO("KINOVA exception description: %s\n", ex.what());
-		return false;
-	}
-	catch (std::runtime_error& ex2)
-	{
-		ROS_INFO("%s", ex2.what());
-		return false;
-	}
-	return true;
-}
-
-bool BaseServices::UpdateBaseTypeConfiguration(kortex_driver::UpdateBaseTypeConfiguration::Request  &req, kortex_driver::UpdateBaseTypeConfiguration::Response &res)
-{
-	
-	Kinova::Api::ProductConfiguration::ProductConfigurationBaseType input;
-	ToProtoData(req.input, &input);
-	kortex_driver::KortexError result_error;
-	
-	try
-	{
-		m_base->UpdateBaseTypeConfiguration(input, m_current_device_id, m_api_options);
-	}
-
-	catch (Kinova::Api::KDetailedException& ex)
-	{
-		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
-		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.toString();
-		m_pub_Error.publish(result_error);
-		ROS_INFO("Kortex exception");
-		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
-		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
-		ROS_INFO("KINOVA exception description: %s\n", ex.what());
-		return false;
-	}
-	catch (std::runtime_error& ex2)
-	{
-		ROS_INFO("%s", ex2.what());
-		return false;
-	}
-	return true;
-}
-
 bool BaseServices::UpdateEndEffectorTypeConfiguration(kortex_driver::UpdateEndEffectorTypeConfiguration::Request  &req, kortex_driver::UpdateEndEffectorTypeConfiguration::Response &res)
 {
 	
@@ -4414,134 +4301,6 @@ bool BaseServices::UpdateEndEffectorTypeConfiguration(kortex_driver::UpdateEndEf
 	try
 	{
 		m_base->UpdateEndEffectorTypeConfiguration(input, m_current_device_id, m_api_options);
-	}
-
-	catch (Kinova::Api::KDetailedException& ex)
-	{
-		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
-		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.toString();
-		m_pub_Error.publish(result_error);
-		ROS_INFO("Kortex exception");
-		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
-		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
-		ROS_INFO("KINOVA exception description: %s\n", ex.what());
-		return false;
-	}
-	catch (std::runtime_error& ex2)
-	{
-		ROS_INFO("%s", ex2.what());
-		return false;
-	}
-	return true;
-}
-
-bool BaseServices::UpdateVisionModuleTypeConfiguration(kortex_driver::UpdateVisionModuleTypeConfiguration::Request  &req, kortex_driver::UpdateVisionModuleTypeConfiguration::Response &res)
-{
-	
-	Kinova::Api::ProductConfiguration::ProductConfigurationVisionModuleType input;
-	ToProtoData(req.input, &input);
-	kortex_driver::KortexError result_error;
-	
-	try
-	{
-		m_base->UpdateVisionModuleTypeConfiguration(input, m_current_device_id, m_api_options);
-	}
-
-	catch (Kinova::Api::KDetailedException& ex)
-	{
-		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
-		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.toString();
-		m_pub_Error.publish(result_error);
-		ROS_INFO("Kortex exception");
-		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
-		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
-		ROS_INFO("KINOVA exception description: %s\n", ex.what());
-		return false;
-	}
-	catch (std::runtime_error& ex2)
-	{
-		ROS_INFO("%s", ex2.what());
-		return false;
-	}
-	return true;
-}
-
-bool BaseServices::UpdateInterfaceModuleTypeConfiguration(kortex_driver::UpdateInterfaceModuleTypeConfiguration::Request  &req, kortex_driver::UpdateInterfaceModuleTypeConfiguration::Response &res)
-{
-	
-	Kinova::Api::ProductConfiguration::ProductConfigurationInterfaceModuleType input;
-	ToProtoData(req.input, &input);
-	kortex_driver::KortexError result_error;
-	
-	try
-	{
-		m_base->UpdateInterfaceModuleTypeConfiguration(input, m_current_device_id, m_api_options);
-	}
-
-	catch (Kinova::Api::KDetailedException& ex)
-	{
-		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
-		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.toString();
-		m_pub_Error.publish(result_error);
-		ROS_INFO("Kortex exception");
-		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
-		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
-		ROS_INFO("KINOVA exception description: %s\n", ex.what());
-		return false;
-	}
-	catch (std::runtime_error& ex2)
-	{
-		ROS_INFO("%s", ex2.what());
-		return false;
-	}
-	return true;
-}
-
-bool BaseServices::UpdateArmLateralityConfiguration(kortex_driver::UpdateArmLateralityConfiguration::Request  &req, kortex_driver::UpdateArmLateralityConfiguration::Response &res)
-{
-	
-	Kinova::Api::ProductConfiguration::ProductConfigurationLaterality input;
-	ToProtoData(req.input, &input);
-	kortex_driver::KortexError result_error;
-	
-	try
-	{
-		m_base->UpdateArmLateralityConfiguration(input, m_current_device_id, m_api_options);
-	}
-
-	catch (Kinova::Api::KDetailedException& ex)
-	{
-		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
-		result_error.code = ex.getErrorInfo().getError().error_code();
-		result_error.description = ex.toString();
-		m_pub_Error.publish(result_error);
-		ROS_INFO("Kortex exception");
-		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
-		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
-		ROS_INFO("KINOVA exception description: %s\n", ex.what());
-		return false;
-	}
-	catch (std::runtime_error& ex2)
-	{
-		ROS_INFO("%s", ex2.what());
-		return false;
-	}
-	return true;
-}
-
-bool BaseServices::UpdateWristTypeConfiguration(kortex_driver::UpdateWristTypeConfiguration::Request  &req, kortex_driver::UpdateWristTypeConfiguration::Response &res)
-{
-	
-	Kinova::Api::ProductConfiguration::ProductConfigurationWristType input;
-	ToProtoData(req.input, &input);
-	kortex_driver::KortexError result_error;
-	
-	try
-	{
-		m_base->UpdateWristTypeConfiguration(input, m_current_device_id, m_api_options);
 	}
 
 	catch (Kinova::Api::KDetailedException& ex)
@@ -4629,6 +4388,7 @@ bool BaseServices::GetTrajectoryErrorReport(kortex_driver::GetTrajectoryErrorRep
 
 bool BaseServices::GetAllJointsSpeedSoftLimitation(kortex_driver::GetAllJointsSpeedSoftLimitation::Request  &req, kortex_driver::GetAllJointsSpeedSoftLimitation::Response &res)
 {
+	ROS_WARN("The base/get_all_joints_speed_soft_limitation service will be deprecated in a future release.");
 	
 	Kinova::Api::Base::JointsLimitationsList output;
 	
@@ -4662,6 +4422,7 @@ bool BaseServices::GetAllJointsSpeedSoftLimitation(kortex_driver::GetAllJointsSp
 
 bool BaseServices::GetAllJointsTorqueSoftLimitation(kortex_driver::GetAllJointsTorqueSoftLimitation::Request  &req, kortex_driver::GetAllJointsTorqueSoftLimitation::Response &res)
 {
+	ROS_WARN("The base/get_all_joints_torque_soft_limitation service will be deprecated in a future release.");
 	
 	Kinova::Api::Base::JointsLimitationsList output;
 	
@@ -4695,6 +4456,7 @@ bool BaseServices::GetAllJointsTorqueSoftLimitation(kortex_driver::GetAllJointsT
 
 bool BaseServices::GetTwistSoftLimitation(kortex_driver::GetTwistSoftLimitation::Request  &req, kortex_driver::GetTwistSoftLimitation::Response &res)
 {
+	ROS_WARN("The base/get_twist_soft_limitation service will be deprecated in a future release.");
 	
 	Kinova::Api::Base::TwistLimitation output;
 	
@@ -4728,6 +4490,7 @@ bool BaseServices::GetTwistSoftLimitation(kortex_driver::GetTwistSoftLimitation:
 
 bool BaseServices::GetWrenchSoftLimitation(kortex_driver::GetWrenchSoftLimitation::Request  &req, kortex_driver::GetWrenchSoftLimitation::Response &res)
 {
+	ROS_WARN("The base/get_wrench_soft_limitation service will be deprecated in a future release.");
 	
 	Kinova::Api::Base::WrenchLimitation output;
 	
@@ -4736,6 +4499,633 @@ bool BaseServices::GetWrenchSoftLimitation(kortex_driver::GetWrenchSoftLimitatio
 	try
 	{
 		output = m_base->GetWrenchSoftLimitation(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::SetControllerConfigurationMode(kortex_driver::SetControllerConfigurationMode::Request  &req, kortex_driver::SetControllerConfigurationMode::Response &res)
+{
+	
+	Kinova::Api::Base::ControllerConfigurationMode input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->SetControllerConfigurationMode(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::GetControllerConfigurationMode(kortex_driver::GetControllerConfigurationMode::Request  &req, kortex_driver::GetControllerConfigurationMode::Response &res)
+{
+	
+	Kinova::Api::Base::ControllerConfigurationMode output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->GetControllerConfigurationMode(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::StartTeaching(kortex_driver::StartTeaching::Request  &req, kortex_driver::StartTeaching::Response &res)
+{
+	
+	Kinova::Api::Base::SequenceTaskHandle input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->StartTeaching(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::StopTeaching(kortex_driver::StopTeaching::Request  &req, kortex_driver::StopTeaching::Response &res)
+{
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->StopTeaching(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::AddSequenceTasks(kortex_driver::AddSequenceTasks::Request  &req, kortex_driver::AddSequenceTasks::Response &res)
+{
+	
+	Kinova::Api::Base::SequenceTasksConfiguration input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::Base::SequenceTasksRange output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->AddSequenceTasks(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::UpdateSequenceTask(kortex_driver::UpdateSequenceTask::Request  &req, kortex_driver::UpdateSequenceTask::Response &res)
+{
+	
+	Kinova::Api::Base::SequenceTaskConfiguration input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->UpdateSequenceTask(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::SwapSequenceTasks(kortex_driver::SwapSequenceTasks::Request  &req, kortex_driver::SwapSequenceTasks::Response &res)
+{
+	
+	Kinova::Api::Base::SequenceTasksPair input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->SwapSequenceTasks(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::ReadSequenceTask(kortex_driver::ReadSequenceTask::Request  &req, kortex_driver::ReadSequenceTask::Response &res)
+{
+	
+	Kinova::Api::Base::SequenceTaskHandle input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::Base::SequenceTask output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->ReadSequenceTask(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::ReadAllSequenceTasks(kortex_driver::ReadAllSequenceTasks::Request  &req, kortex_driver::ReadAllSequenceTasks::Response &res)
+{
+	
+	Kinova::Api::Base::SequenceHandle input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::Base::SequenceTasks output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->ReadAllSequenceTasks(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::DeleteSequenceTask(kortex_driver::DeleteSequenceTask::Request  &req, kortex_driver::DeleteSequenceTask::Response &res)
+{
+	
+	Kinova::Api::Base::SequenceTaskHandle input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->DeleteSequenceTask(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::DeleteAllSequenceTasks(kortex_driver::DeleteAllSequenceTasks::Request  &req, kortex_driver::DeleteAllSequenceTasks::Response &res)
+{
+	
+	Kinova::Api::Base::SequenceHandle input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->DeleteAllSequenceTasks(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::TakeSnapshot(kortex_driver::TakeSnapshot::Request  &req, kortex_driver::TakeSnapshot::Response &res)
+{
+	
+	Kinova::Api::Base::Snapshot input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->TakeSnapshot(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::GetFirmwareBundleVersions(kortex_driver::GetFirmwareBundleVersions::Request  &req, kortex_driver::GetFirmwareBundleVersions::Response &res)
+{
+	
+	Kinova::Api::Base::FirmwareBundleVersions output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->GetFirmwareBundleVersions(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::MoveSequenceTask(kortex_driver::MoveSequenceTask::Request  &req, kortex_driver::MoveSequenceTask::Response &res)
+{
+	
+	Kinova::Api::Base::SequenceTasksPair input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->MoveSequenceTask(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::DuplicateMapping(kortex_driver::DuplicateMapping::Request  &req, kortex_driver::DuplicateMapping::Response &res)
+{
+	
+	Kinova::Api::Base::MappingHandle input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::Base::MappingHandle output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->DuplicateMapping(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::DuplicateMap(kortex_driver::DuplicateMap::Request  &req, kortex_driver::DuplicateMap::Response &res)
+{
+	
+	Kinova::Api::Base::MapHandle input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::Base::MapHandle output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->DuplicateMap(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::SetControllerConfiguration(kortex_driver::SetControllerConfiguration::Request  &req, kortex_driver::SetControllerConfiguration::Response &res)
+{
+	
+	Kinova::Api::Base::ControllerConfiguration input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->SetControllerConfiguration(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseServices::GetControllerConfiguration(kortex_driver::GetControllerConfiguration::Request  &req, kortex_driver::GetControllerConfiguration::Response &res)
+{
+	
+	Kinova::Api::Base::ControllerHandle input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::Base::ControllerConfiguration output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->GetControllerConfiguration(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseServices::GetAllControllerConfigurations(kortex_driver::GetAllControllerConfigurations::Request  &req, kortex_driver::GetAllControllerConfigurations::Response &res)
+{
+	
+	Kinova::Api::Base::ControllerConfigurationList output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->GetAllControllerConfigurations(m_current_device_id, m_api_options);
 	}
 
 	catch (Kinova::Api::KDetailedException& ex)

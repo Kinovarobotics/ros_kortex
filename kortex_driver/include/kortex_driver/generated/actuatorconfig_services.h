@@ -45,6 +45,8 @@
 #include "kortex_driver/GetCommandMode.h"
 #include "kortex_driver/GetServoing.h"
 #include "kortex_driver/GetTorqueOffset.h"
+#include "kortex_driver/SetCoggingFeedforwardMode.h"
+#include "kortex_driver/GetCoggingFeedforwardMode.h"
 
 #include "kortex_driver/KortexError.h"
 #include "kortex_driver/SetDeviceID.h"
@@ -78,6 +80,8 @@ class ActuatorConfigServices
         bool GetCommandMode(kortex_driver::GetCommandMode::Request  &req, kortex_driver::GetCommandMode::Response &res);
         bool GetServoing(kortex_driver::GetServoing::Request  &req, kortex_driver::GetServoing::Response &res);
         bool GetTorqueOffset(kortex_driver::GetTorqueOffset::Request  &req, kortex_driver::GetTorqueOffset::Response &res);
+        bool SetCoggingFeedforwardMode(kortex_driver::SetCoggingFeedforwardMode::Request  &req, kortex_driver::SetCoggingFeedforwardMode::Response &res);
+        bool GetCoggingFeedforwardMode(kortex_driver::GetCoggingFeedforwardMode::Request  &req, kortex_driver::GetCoggingFeedforwardMode::Response &res);
 
 private:
         uint32_t m_current_device_id;
@@ -109,5 +113,7 @@ private:
 	ros::ServiceServer m_serviceGetCommandMode;
 	ros::ServiceServer m_serviceGetServoing;
 	ros::ServiceServer m_serviceGetTorqueOffset;
+	ros::ServiceServer m_serviceSetCoggingFeedforwardMode;
+	ros::ServiceServer m_serviceGetCoggingFeedforwardMode;
 };
 #endif

@@ -133,7 +133,7 @@ enum SubErrorCodes {
 
     ADDRESS_NOT_IN_VALID_RANGE = 120;       // IP Address not valid against netmask
     ADDRESS_NOT_CONFIGURABLE = 121;         // IP Address not configurable on specified interface
-    
+
     SESSION_NOT_IN_CONTROL = 130;           // Trying to perform command from a non-controlling session in single-level mode
 
     METHOD_TIMEOUT = 131;                   // Timeout occured during method execution
@@ -142,5 +142,11 @@ enum SubErrorCodes {
     NVRAM_READ_FAIL = 133;                  // Failed to read in NVRAM.
     NVRAM_WRITE_FAIL = 134;                 // Failed to write in NVRAM.
 
-    NETWORK_NO_ADDRESS_ASSIGNED = 135;      // The specified interface has no assigned IP 
+    NETWORK_NO_ADDRESS_ASSIGNED = 135;      // The specified interface has no assigned IP
+
+    READ_PERMISSION_DENIED = 136;           // Attempting read command on unreadable entity
+
+    CONTROLLER_INVALID_MAPPING = 137;       // Attempting to assign an unsuited mapping to controller
+
+    ACTION_IN_USE = 138;                    // Attempting to delete an Action used by another entity
 }

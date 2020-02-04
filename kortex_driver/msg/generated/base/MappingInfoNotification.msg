@@ -4,3 +4,4 @@ MapHandle active_map_handle
 Timestamp timestamp
 UserProfileHandle user_handle
 Connection connection
+MappingHandle mapping_handle

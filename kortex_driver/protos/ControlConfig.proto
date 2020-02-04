@@ -48,6 +48,63 @@ service ControlConfig {//@PROXY_ID=16 @ERROR=Kinova.Api.Error
 
     // Retrieves the current reference frame used by the twist and wrench commands
     rpc GetCartesianReferenceFrame (Kinova.Api.Common.Empty) returns (CartesianReferenceFrameInfo);//@RPC_ID=10
+
+    // Retrieves current control mode (not implemented yet)
+    rpc GetControlMode (Kinova.Api.Common.Empty) returns (ControlModeInformation);//@RPC_ID=13
+
+    // Set the software joint speed limits.
+    rpc SetJointSpeedSoftLimits (JointSpeedSoftLimits) returns (Kinova.Api.Common.Empty);//@RPC_ID=14
+
+    // Set the software twist linear limit.
+    rpc SetTwistLinearSoftLimit (TwistLinearSoftLimit) returns (Kinova.Api.Common.Empty);//@RPC_ID=15
+
+    // Set the software twist angular limit.
+    rpc SetTwistAngularSoftLimit (TwistAngularSoftLimit) returns (Kinova.Api.Common.Empty);//@RPC_ID=16
+
+    // Set the software joint acceleration limits.
+    rpc SetJointAccelerationSoftLimits (JointAccelerationSoftLimits) returns (Kinova.Api.Common.Empty);//@RPC_ID=17
+
+    // Retrieves angular and twist hard limits.
+    rpc GetKinematicHardLimits (Kinova.Api.Common.Empty) returns (KinematicLimits);//@RPC_ID=18
+
+    // Retrieves the software kinematic limits for a specific control mode.
+    rpc GetKinematicSoftLimits (ControlModeInformation) returns (KinematicLimits);//@RPC_ID=19
+
+    // Retrieves the software kinematic limits for all control modes.
+    rpc GetAllKinematicSoftLimits (Kinova.Api.Common.Empty) returns (KinematicLimitsList);//@RPC_ID=20
+    
+    // Set the desired linear twist when using the joystick.
+    rpc SetDesiredLinearTwist (LinearTwist) returns (Kinova.Api.Common.Empty);//@RPC_ID=21
+
+    // Set the desired angular twist when using the joystick.
+    rpc SetDesiredAngularTwist (AngularTwist) returns (Kinova.Api.Common.Empty);//@RPC_ID=22
+
+    // Set the desired joint speeds when using the joystick in angular mode.
+    rpc SetDesiredJointSpeeds (JointSpeeds) returns (Kinova.Api.Common.Empty);//@RPC_ID=23
+
+    // Retrieves the desired joystick speeds
+    rpc GetDesiredSpeeds (Kinova.Api.Common.Empty) returns (DesiredSpeeds);//@RPC_ID=24
+
+    // Resets gravity vector to default values   
+    rpc ResetGravityVector (Kinova.Api.Common.Empty) returns (GravityVector);//@RPC_ID=25
+
+    // Resets payload information to default values
+    rpc ResetPayloadInformation (Kinova.Api.Common.Empty) returns (PayloadInformation);//@RPC_ID=26
+
+    // Resets tool configuration to default values
+    rpc ResetToolConfiguration (Kinova.Api.Common.Empty) returns (ToolConfiguration);//@RPC_ID=27
+
+    // Resets joint speed soft limits to default values
+    rpc ResetJointSpeedSoftLimits (ControlModeInformation) returns (JointSpeedSoftLimits);//@RPC_ID=28
+
+    // Resets twist linear soft limit to default value
+    rpc ResetTwistLinearSoftLimit (ControlModeInformation) returns (TwistLinearSoftLimit);//@RPC_ID=29
+
+    // Resets twist angular soft limit to default value
+    rpc ResetTwistAngularSoftLimit (ControlModeInformation) returns (TwistAngularSoftLimit);//@RPC_ID=30
+
+    // Resets joint acceleration soft limits to default values
+    rpc ResetJointAccelerationSoftLimits (ControlModeInformation) returns (JointAccelerationSoftLimits);//@RPC_ID=31
 }
 
 // Identifies ControlConfig current version
@@ -102,7 +159,6 @@ enum ControlConfigurationEvent {
     UNSPECIFIED_CONTROL_CONFIGURATION_EVENT = 0;            // Unspecified control configuration event
     ANGLE_UNIT_CHANGED = 1;                                 // Angle unit changed event
     GRAVITY_VECTOR_CHANGED = 2;                             // Gravity vector changed event
-    VISION_JOYSTICK_CONFIGURATION_CHANGED = 3;              // Vision joystick configuration changed event
     JOINT_ADMITTANCE_CONFIGURATION_CHANGED = 4;             // Joint admittance configuration changed event
     NULL_ADMITTANCE_CONFIGURATION_CHANGED = 5;              // Null admittance configuration changed event
     CARTESIAN_ADMITTANCE_CONFIGURATION_CHANGED = 6;         // Cartesian admittance configuration changed event
@@ -114,6 +170,13 @@ enum ControlConfigurationEvent {
     PAYLOAD_CONFIGURATION_CHANGED = 12;                     // Payload configuration event
     CARTESIAN_REFERENCE_CHANGED = 13;                       // Cartesian reference event
     CHANGE_CONTROL_MODE_FAILED = 14;                        // Control mode change fail event
+    JOINT_SPEED_SOFT_LIMITS_CHANGED = 16;                   // Joint speed software limits changed event
+    TWIST_LINEAR_SOFT_LIMIT_CHANGED = 17;                   // Linear speed software limit changed event
+    TWIST_ANGULAR_SOFT_LIMIT_CHANGED = 18;                  // Angular speed software limit changed event
+    JOINT_ACCELERATION_SOFT_LIMITS_CHANGED = 19;            // Joint acceleration software limits changed event
+    DESIRED_TWIST_LINEAR_SPEED_CHANGED = 20;                // Desired joystick twist linear speed changed event
+    DESIRED_TWIST_ANGULAR_SPEED_CHANGED = 21;               // Desired joystick twist angular speed changed event
+    DESIRED_JOINT_SPEED_CHANGED = 22;                       // Desired joystick joint speed changed event
 }
 
 // Notification about a single control configuration event
@@ -127,4 +190,84 @@ message ControlConfigurationNotification {
 // Cartesian reference frame
 message CartesianReferenceFrameInfo {
     Kinova.Api.Common.CartesianReferenceFrame reference_frame = 1;    // Reference frame
+}
+
+// Software twist linear speed limit
+message TwistLinearSoftLimit {
+    ControlMode control_mode = 1;                   // Control mode
+    float twist_linear_soft_limit = 2;              // Software linear twist limit
+}
+
+// Software twist angular speed limit
+message TwistAngularSoftLimit {
+    ControlMode control_mode = 1;                   // Control mode
+    float twist_angular_soft_limit = 2;             // Software angular twist limit                                   
+}
+
+// Software joint speed limits
+message JointSpeedSoftLimits {
+    ControlMode control_mode = 1;                   // Control mode
+    repeated float joint_speed_soft_limits = 2;     // Software joint speed limits
+}
+
+// Software Joint acceleration limits
+message JointAccelerationSoftLimits {
+    ControlMode control_mode = 1;                            // Control mode
+    repeated float joint_acceleration_soft_limits = 2;       // Software acceleration limits
+}
+
+// Kinematic limits
+message KinematicLimits {
+    ControlMode control_mode = 1;                       // Control mode
+    float twist_linear = 2;                             // Linear twist limits
+    float twist_angular = 3;                            // Angular twist limits
+    repeated float joint_speed_limits = 4;              // Joint speed limits          
+    repeated float joint_acceleration_limits = 5;       // Joint Acceleration limits
+}
+
+// Kinematic limits
+message KinematicLimitsList {
+    repeated KinematicLimits kinematic_limits_list = 1;     // List of kinematic limits
+}
+
+// Desired Joystick speeds.   
+message DesiredSpeeds {
+    float linear = 1;                               // Desired linear speed (meters / second)
+    float angular = 2;                              // Desired angular speed (degrees / second)
+    repeated float joint_speed = 3;                 // Desired joint speeds (degrees / second)
+}
+
+// Desired Joystick linear speed.   
+message LinearTwist {
+    float linear = 1;                               // Desired linear speed (meters / second)
+}
+
+// Desired Joystick angular speed.   
+message AngularTwist {
+    float angular = 1;                              // Desired angular speed (degrees / second)
+}
+
+// Desired Joystick joint speeds.   
+message JointSpeeds {
+    repeated float joint_speed = 1;                 // Desired joint speeds (degrees / second)
+}
+
+// Admissible robot control modes
+enum ControlMode {
+    UNSPECIFIED_CONTROL_MODE = 0;           // Unspecified control mode
+    ANGULAR_JOYSTICK = 1;                   // Angular joystick mode
+    CARTESIAN_JOYSTICK = 2;                 // Cartesian joystick mode
+    ANGULAR_TRAJECTORY = 4;                 // Angular trajectory mode
+    CARTESIAN_TRAJECTORY = 5;               // Cartesian trajectory mode
+    CARTESIAN_ADMITTANCE = 6;               // Cartesian admittance mode
+    JOINT_ADMITTANCE = 7;                   // Joint admittance mode
+    NULL_SPACE_ADMITTANCE = 8;              // Null space mode
+    FORCE_CONTROL = 10;                     // Force control mode
+    FORCE_CONTROL_MOTION_RESTRICTED = 11;   // Force control motion restricted mode
+    IDLE = 13;                              // Idle
+};
+
+// Control mode information
+message ControlModeInformation {
+    ControlMode control_mode = 1; // Control mode
 }

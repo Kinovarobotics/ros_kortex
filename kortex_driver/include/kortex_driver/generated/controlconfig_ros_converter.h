@@ -48,6 +48,17 @@
 #include "kortex_driver/ToolConfiguration.h"
 #include "kortex_driver/ControlConfigurationNotification.h"
 #include "kortex_driver/CartesianReferenceFrameInfo.h"
+#include "kortex_driver/TwistLinearSoftLimit.h"
+#include "kortex_driver/TwistAngularSoftLimit.h"
+#include "kortex_driver/JointSpeedSoftLimits.h"
+#include "kortex_driver/JointAccelerationSoftLimits.h"
+#include "kortex_driver/KinematicLimits.h"
+#include "kortex_driver/KinematicLimitsList.h"
+#include "kortex_driver/DesiredSpeeds.h"
+#include "kortex_driver/LinearTwist.h"
+#include "kortex_driver/AngularTwist.h"
+#include "kortex_driver/ControlConfig_JointSpeeds.h"
+#include "kortex_driver/ControlConfig_ControlModeInformation.h"
 
 
 int ToRosData(Kinova::Api::ControlConfig::GravityVector input, kortex_driver::GravityVector &output);
@@ -57,5 +68,16 @@ int ToRosData(Kinova::Api::ControlConfig::CartesianTransform input, kortex_drive
 int ToRosData(Kinova::Api::ControlConfig::ToolConfiguration input, kortex_driver::ToolConfiguration &output);
 int ToRosData(Kinova::Api::ControlConfig::ControlConfigurationNotification input, kortex_driver::ControlConfigurationNotification &output);
 int ToRosData(Kinova::Api::ControlConfig::CartesianReferenceFrameInfo input, kortex_driver::CartesianReferenceFrameInfo &output);
+int ToRosData(Kinova::Api::ControlConfig::TwistLinearSoftLimit input, kortex_driver::TwistLinearSoftLimit &output);
+int ToRosData(Kinova::Api::ControlConfig::TwistAngularSoftLimit input, kortex_driver::TwistAngularSoftLimit &output);
+int ToRosData(Kinova::Api::ControlConfig::JointSpeedSoftLimits input, kortex_driver::JointSpeedSoftLimits &output);
+int ToRosData(Kinova::Api::ControlConfig::JointAccelerationSoftLimits input, kortex_driver::JointAccelerationSoftLimits &output);
+int ToRosData(Kinova::Api::ControlConfig::KinematicLimits input, kortex_driver::KinematicLimits &output);
+int ToRosData(Kinova::Api::ControlConfig::KinematicLimitsList input, kortex_driver::KinematicLimitsList &output);
+int ToRosData(Kinova::Api::ControlConfig::DesiredSpeeds input, kortex_driver::DesiredSpeeds &output);
+int ToRosData(Kinova::Api::ControlConfig::LinearTwist input, kortex_driver::LinearTwist &output);
+int ToRosData(Kinova::Api::ControlConfig::AngularTwist input, kortex_driver::AngularTwist &output);
+int ToRosData(Kinova::Api::ControlConfig::JointSpeeds input, kortex_driver::ControlConfig_JointSpeeds &output);
+int ToRosData(Kinova::Api::ControlConfig::ControlModeInformation input, kortex_driver::ControlConfig_ControlModeInformation &output);
 
 #endif

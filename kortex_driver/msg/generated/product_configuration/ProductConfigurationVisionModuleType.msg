@@ -1,2 +1,0 @@
-
-uint32 vision_module_type
