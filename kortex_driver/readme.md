@@ -22,6 +22,7 @@
 1. [Topics](#topics)
 1. [Services](#services)
 1. [Compatibility break between v1.1.X and v2.0.X](#compatibility)
+1. [About Conan](#conan)
 1. [Support for multiple arms](#multiple)
 1. [Generation (advanced)](#generation)
 
@@ -214,6 +215,27 @@ Many things have been changed in the ros_kortex repository between versions 1.1.
 * The **/my_robot_name/base_feedback/joint_state** topic is now advertised as **/my_robot_name/joint_state**.
 * The [kortex_driver launch file](launch/kortex_driver.launch) is now located in the `kortex_driver` package instead of the `kortex_bringup` package, which was deleted. Some arguments were added to the file.
 
+<a id="conan"></a>
+## About Conan
+
+From release 2.2.0 onwards, the Kortex API is automatically downloaded from our Artifactory Conan server. The steps to install and setup Conan have been added to the root readme file. Conan downloads the binaries and header files in the Conan cache, by default situated in the `~/.conan/` directory.
+
+If you want to learn more about Conan, you can read about it [on their website](https://conan.io/).
+
+If you still want to download the ZIP files for the API, you can find the link in the [Kortex repository](https://github.com/Kinovarobotics/kortex).
+
+You will have to extract the API in the `kortex_api` folder as such:
+```sh
+kortex_api/  
+┬  
+├ include/
+└ lib/  
+```
+
+You will then have to build the catkin workspace and pass it the option to disable Conan so it links with your local API:
+```sh
+catkin_make -DUSE_CONAN=OFF
+```
 
 <a id="multiple"></a>
 ## Support for multiple arms

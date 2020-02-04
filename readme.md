@@ -8,7 +8,6 @@ You can refer to the [Kortex repository "Download links" section](https://github
 ### Accessing the color and depth streams 
 
 To access the color and depth streams, you will need to clone and follow the instructions to install the [ros_kortex_vision repository ](https://github.com/Kinovarobotics/ros_kortex_vision).
-
 ## Installation
 
 ### Setup
@@ -26,13 +25,20 @@ If you have a specific use case that requires you to install it, you can follow 
 
 These are the instructions to run in a terminal to create the workspace, clone the `ros_kortex` repository, install the necessary ROS dependencies and build the package:
 
+        sudo apt install python3 python3-pip
+        sudo python3 -m pip install conan
+        conan config set general.revisions_enabled=1
+        conan profile new default --detect > /dev/null
+        conan profile update settings.compiler.libcxx=libstdc++11 default
         mkdir -p catkin_workspace/src
         cd catkin_workspace/src
         git clone https://github.com/Kinovarobotics/ros_kortex.git
         cd ../
-        rosdep install --from-paths src --ignore-src
+        rosdep install --from-paths src --ignore-src -y
         catkin_make
         source devel/setup.bash
+
+As you see, there are instructions to install the Conan package manager. You can learn more about why we use Conan [in this specific section of the kortex_driver readme](kortex_driver/readme.md#conan).
 
 ## Contents
 
