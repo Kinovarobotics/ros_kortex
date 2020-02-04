@@ -62,7 +62,7 @@
         xyz="0 0 1" />
       <limit
         effort="39"
-        velocity="0.8727" />
+        velocity="1.3963" />
     </joint>
     <link name="${prefix}half_arm_1_link">
       <inertial>
@@ -96,7 +96,7 @@
         link="${prefix}half_arm_1_link" />
       <axis
         xyz="0 0 1" />
-      <limit lower="-2.41" upper="2.41" effort="39" velocity="0.8727" />
+      <limit lower="-2.41" upper="2.41" effort="39" velocity="1.3963" />
     </joint>
     <link name="${prefix}half_arm_2_link">
       <inertial>
@@ -132,7 +132,7 @@
         xyz="0 0 1" />
       <limit
         effort="39"
-        velocity="0.8727" />
+        velocity="1.3963" />
     </joint>
     <link name="${prefix}forearm_link">
       <inertial>
@@ -166,7 +166,7 @@
         link="${prefix}forearm_link" />
       <axis
         xyz="0 0 1" />
-      <limit lower="-2.66" upper="2.66" effort="39" velocity="0.8727" />
+      <limit lower="-2.66" upper="2.66" effort="39" velocity="1.3963" />
     </joint>
     <link name="${prefix}spherical_wrist_1_link">
       <inertial>
@@ -202,7 +202,7 @@
         xyz="0 0 1" />
       <limit
         effort="9"
-        velocity="0.8727" />
+        velocity="1.2218" />
     </joint>
     <link name="${prefix}spherical_wrist_2_link">
       <inertial>
@@ -236,18 +236,19 @@
         link="${prefix}spherical_wrist_2_link" />
       <axis
         xyz="0 0 1" />
-      <limit lower="-2.23" upper="2.23" effort="9" velocity="0.8727" />
+      <limit lower="-2.23" upper="2.23" effort="9" velocity="1.2218" />
     </joint>
+    <xacro:if value="${vision}">
     <link name="${prefix}bracelet_link">
       <inertial>
-        <origin xyz="-0.000281 -0.011402 -0.029798" rpy="0 0 0" />
-        <mass value="0.5006" />
-        <inertia ixx="0.000587" ixy="3E-06" ixz="3E-06" iyy="0.000369" iyz="0.000118" izz="0.000609" />
+        <origin xyz="0.000281 0.011402 -0.029798" rpy="0 0 0" />
+        <mass value="0.5" />
+        <inertia ixx="0.000587" ixy="3E-06" ixz="3E-06" iyy="0.000369" iyz="-0.000118" izz="0.000609" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kortex_description/arms/gen3/${dof}dof/meshes/bracelet_link.STL" />
+          <mesh filename="package://kortex_description/arms/gen3/${dof}dof/meshes/bracelet_with_vision_link.STL" />
         </geometry>
         <material name="">
           <color rgba="0.75294 0.75294 0.75294 1" />
@@ -256,10 +257,35 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kortex_description/arms/gen3/${dof}dof/meshes/bracelet_link.STL" />
+          <mesh filename="package://kortex_description/arms/gen3/${dof}dof/meshes/bracelet_with_vision_link.STL" />
         </geometry>
       </collision>
     </link>
+    </xacro:if>
+    <xacro:unless value="${vision}">
+    <link name="${prefix}bracelet_link">
+      <inertial>
+        <origin xyz="-9.3E-05 0.000132 -0.022905" rpy="0 0 0" />
+        <mass value="0.364" />
+        <inertia ixx="0.000214" ixy="0" ixz="1E-06" iyy="0.000223" iyz="-2E-06" izz="0.00024" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://kortex_description/arms/gen3/${dof}dof/meshes/bracelet_no_vision_link.STL" />
+        </geometry>
+        <material name="">
+          <color rgba="0.75294 0.75294 0.75294 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://kortex_description/arms/gen3/${dof}dof/meshes/bracelet_no_vision_link.STL" />
+        </geometry>
+      </collision>
+    </link>
+    </xacro:unless>
     <joint
       name="${prefix}joint_7"
       type="continuous">
@@ -272,7 +298,7 @@
         xyz="0 0 1" />
       <limit
         effort="9"
-        velocity="0.8727" />
+        velocity="1.2218" />
     </joint>
     <link name="${prefix}end_effector_link" />
     <joint
