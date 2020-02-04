@@ -18,32 +18,37 @@ from kortex_driver.msg import *
 
 class ExampleVisionConfiguration:
     def __init__(self):
-        rospy.init_node('example_vision_configuration_python')
+        try:
+            rospy.init_node('example_vision_configuration_python')
 
-        # Get node params
-        self.robot_name = rospy.get_param('~robot_name', "my_gen3")
-        rospy.loginfo("Using robot_name " + self.robot_name)
+            # Get node params
+            self.robot_name = rospy.get_param('~robot_name', "my_gen3")
+            rospy.loginfo("Using robot_name " + self.robot_name)
 
-        # Init the services
-        get_intrinsic_parameters_full_name = '/' + self.robot_name + '/vision_config/get_intrinsic_parameters'
-        rospy.wait_for_service(get_intrinsic_parameters_full_name)
-        self.get_intrinsic_parameters = rospy.ServiceProxy(get_intrinsic_parameters_full_name, GetIntrinsicParameters)
+            # Init the services
+            get_intrinsic_parameters_full_name = '/' + self.robot_name + '/vision_config/get_intrinsic_parameters'
+            rospy.wait_for_service(get_intrinsic_parameters_full_name, 0.5)
+            self.get_intrinsic_parameters = rospy.ServiceProxy(get_intrinsic_parameters_full_name, GetIntrinsicParameters)
 
-        get_extrinsic_parameters_full_name = '/' + self.robot_name + '/vision_config/get_extrinsic_parameters'
-        rospy.wait_for_service(get_extrinsic_parameters_full_name)
-        self.get_extrinsic_parameters = rospy.ServiceProxy(get_extrinsic_parameters_full_name, GetExtrinsicParameters)
+            get_extrinsic_parameters_full_name = '/' + self.robot_name + '/vision_config/get_extrinsic_parameters'
+            rospy.wait_for_service(get_extrinsic_parameters_full_name, 0.5)
+            self.get_extrinsic_parameters = rospy.ServiceProxy(get_extrinsic_parameters_full_name, GetExtrinsicParameters)
 
-        get_sensor_settings_full_name = '/' + self.robot_name + '/vision_config/get_sensor_settings'
-        rospy.wait_for_service(get_sensor_settings_full_name)
-        self.get_sensor_settings = rospy.ServiceProxy(get_sensor_settings_full_name, GetSensorSettings)
+            get_sensor_settings_full_name = '/' + self.robot_name + '/vision_config/get_sensor_settings'
+            rospy.wait_for_service(get_sensor_settings_full_name, 0.5)
+            self.get_sensor_settings = rospy.ServiceProxy(get_sensor_settings_full_name, GetSensorSettings)
 
-        set_sensor_settings_full_name = '/' + self.robot_name + '/vision_config/set_sensor_settings'
-        rospy.wait_for_service(set_sensor_settings_full_name)
-        self.set_sensor_settings = rospy.ServiceProxy(set_sensor_settings_full_name, SetSensorSettings)
+            set_sensor_settings_full_name = '/' + self.robot_name + '/vision_config/set_sensor_settings'
+            rospy.wait_for_service(set_sensor_settings_full_name, 0.5)
+            self.set_sensor_settings = rospy.ServiceProxy(set_sensor_settings_full_name, SetSensorSettings)
 
-        get_option_value_full_name = '/' + self.robot_name + '/vision_config/get_option_value'
-        rospy.wait_for_service(get_option_value_full_name)
-        self.get_option_value = rospy.ServiceProxy(get_option_value_full_name, GetOptionValue)
+            get_option_value_full_name = '/' + self.robot_name + '/vision_config/get_option_value'
+            rospy.wait_for_service(get_option_value_full_name, 0.5)
+            self.get_option_value = rospy.ServiceProxy(get_option_value_full_name, GetOptionValue)
+        except:
+            self.is_init_success = False
+        else:
+            self.is_init_success = True
 
     def sensor_type_enum_to_string(self, enum_value):
         s = ""
@@ -107,6 +112,7 @@ class ExampleVisionConfiguration:
             res = self.get_intrinsic_parameters(req)
         except rospy.ServiceException:
             rospy.logerr("Failed to call GetIntrinsicParameters")
+            return False
         else:
             # Print them
             # The message description can be seen at msg/generated/vision_config/IntrinsicParameters.msg
@@ -134,12 +140,15 @@ class ExampleVisionConfiguration:
 
             rospy.loginfo(out)
 
+            return True
+
     def example_get_extrinsic_parameters(self):
         # Call the service 
         try:
             res = self.get_extrinsic_parameters()
         except rospy.ServiceException:
             rospy.logerr("Failed to call GetExtrinsicParameters")
+            return False
         else:
             # Print the result
             # The message description can be seen at msg/generated/vision_config/ExtrinsicParameters.msg
@@ -158,6 +167,7 @@ class ExampleVisionConfiguration:
             out += "\n" + "---------------------------------" + "\n"
 
             rospy.loginfo(out)
+            return True
 
     def example_get_sensor_settings(self):
         # Call the service
@@ -167,6 +177,7 @@ class ExampleVisionConfiguration:
             res = self.get_sensor_settings(req)
         except rospy.ServiceException:
             rospy.logerr("Failed to call GetSensorSettings")
+            return False
         else:
             # Print the result
             sensor_settings = res.output
@@ -178,6 +189,8 @@ class ExampleVisionConfiguration:
             out += "---------------------------------"
 
             rospy.loginfo(out)
+
+            return True
 
     def example_change_the_resolution(self):
         rospy.loginfo("Changing the resolution...")
@@ -192,8 +205,10 @@ class ExampleVisionConfiguration:
             self.set_sensor_settings(req)
         except rospy.ServiceException:
             rospy.logerr("Failed to call SetSensorSettings and change the resolution")
+            return False
         else:
             rospy.loginfo("Resolution changed successfully")
+            return True
 
     def example_get_sensor_option_value(self):
         req = GetOptionValueRequest()
@@ -215,6 +230,7 @@ class ExampleVisionConfiguration:
             res = self.get_option_value(req)
         except rospy.ServiceException:
             rospy.logerr("Failed to call GetOptionValue")
+            return False
         else:
             option_value = res.output
             out = "\n---------------------------------\n"
@@ -227,28 +243,44 @@ class ExampleVisionConfiguration:
             out += "---------------------------------\n"
 
             rospy.loginfo(out)
+
+            return True
             
     def main(self):
 
-        #-------------------------------------------------------------
-        # Get the intrinsic parameters for a given sensor
-        self.example_get_intrinsic_parameters()
+         # For testing purposes
+        success = self.is_init_success
+        try:
+            rospy.delete_param("/kortex_examples_test_results/vision_configuration_python")
+        except:
+            pass
 
-        #-------------------------------------------------------------
-        # Get the extrinsic parameters for a given sensor
-        self.example_get_extrinsic_parameters()
+        if success:
+            #-------------------------------------------------------------
+            # Get the intrinsic parameters for a given sensor
+            success &= self.example_get_intrinsic_parameters()
 
-        #-------------------------------------------------------------
-        # Get the sensor settings for a given sensor
-        self.example_get_sensor_settings()
+            #-------------------------------------------------------------
+            # Get the extrinsic parameters for a given sensor
+            success &= self.example_get_extrinsic_parameters()
 
-        #-------------------------------------------------------------
-        # Set the extrinsic parameters for a given sensor
-        self.example_change_the_resolution()
+            #-------------------------------------------------------------
+            # Get the sensor settings for a given sensor
+            success &= self.example_get_sensor_settings()
 
-        #-------------------------------------------------------------
-        # Get an option value
-        self.example_get_sensor_option_value()
+            #-------------------------------------------------------------
+            # Set the extrinsic parameters for a given sensor
+            success &= self.example_change_the_resolution()
+
+            #-------------------------------------------------------------
+            # Get an option value
+            success &= self.example_get_sensor_option_value()
+
+        # For testing purposes
+        rospy.set_param("/kortex_examples_test_results/vision_configuration_python", success)
+
+        if not success:
+            rospy.logerr("The example encountered an error.")
 
 if __name__ == "__main__":
     ex = ExampleVisionConfiguration()

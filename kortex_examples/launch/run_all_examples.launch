@@ -1,0 +1,56 @@
+<launch>
+
+    <!-- Robot namespace -->
+    <arg name="robot_name" default="my_gen3"/>
+
+    <!-- Launch all the examples with delays so they run one after the other -->
+    <include file="$(find kortex_examples)/launch/actuator_config_cpp.launch"> 
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="start_delay_seconds" value="95"/>
+    </include>
+
+    <include file="$(find kortex_examples)/launch/actuator_config_python.launch"> 
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="start_delay_seconds" value="8"/>
+    </include>
+
+    <include file="$(find kortex_examples)/launch/vision_configuration_cpp.launch"> 
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="start_delay_seconds" value="10"/>
+    </include>
+
+    <include file="$(find kortex_examples)/launch/vision_configuration_python.launch"> 
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="start_delay_seconds" value="15"/>
+    </include>
+
+    <include file="$(find kortex_examples)/launch/cartesian_poses_with_notifications_cpp.launch"> 
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="start_delay_seconds" value="20"/>
+    </include>
+
+    <include file="$(find kortex_examples)/launch/cartesian_poses_with_notifications_python.launch"> 
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="start_delay_seconds" value="60"/>
+    </include>
+
+    <include file="$(find kortex_examples)/launch/full_arm_movement_cpp.launch"> 
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="start_delay_seconds" value="100"/>
+    </include>
+
+    <include file="$(find kortex_examples)/launch/full_arm_movement_python.launch"> 
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="start_delay_seconds" value="160"/>
+    </include>
+
+    <include file="$(find kortex_examples)/launch/moveit_example.launch"> 
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="start_delay_seconds" value="220"/>
+    </include>
+
+    <test test-name="test_all_examples_success" pkg="kortex_examples" type="kortex_examples_tests" time-limit="340.0">
+        <param name="robot_name" value="$(arg robot_name)"/>
+    </test>
+
+</launch>

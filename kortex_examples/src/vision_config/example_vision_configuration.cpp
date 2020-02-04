@@ -125,7 +125,7 @@ std::string bitrate_enum_to_string(uint32_t enum_value)
   return s;
 }
 
-void example_get_intrinsic_parameters(ros::NodeHandle n, const std::string& robot_name)
+bool example_get_intrinsic_parameters(ros::NodeHandle n, const std::string& robot_name)
 {
   ros::ServiceClient service_client_get_intrinsic_parameters = n.serviceClient<kortex_driver::GetIntrinsicParameters>("/" + robot_name + "/vision_config/get_intrinsic_parameters");
   kortex_driver::GetIntrinsicParameters service_get_intrinsic_parameters;
@@ -139,7 +139,7 @@ void example_get_intrinsic_parameters(ros::NodeHandle n, const std::string& robo
   {
     std::string error_string = "Failed to call GetIntrinsicParameters";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
   auto output = service_get_intrinsic_parameters.response.output;
   // The message description can be seen at msg/generated/vision_config/IntrinsicParameters.msg
@@ -165,9 +165,11 @@ void example_get_intrinsic_parameters(ros::NodeHandle n, const std::string& robo
   << "---------------------------------";
 
   ROS_INFO("%s", oss.str().c_str());
+
+  return true;
 }
 
-void example_get_extrinsic_parameters(ros::NodeHandle n, const std::string& robot_name)
+bool example_get_extrinsic_parameters(ros::NodeHandle n, const std::string& robot_name)
 {
   ros::ServiceClient service_client_get_extrinsic_parameters = n.serviceClient<kortex_driver::GetExtrinsicParameters>("/" + robot_name + "/vision_config/get_extrinsic_parameters");
   kortex_driver::GetExtrinsicParameters service_get_extrinsic_parameters;
@@ -178,7 +180,7 @@ void example_get_extrinsic_parameters(ros::NodeHandle n, const std::string& robo
   {
     std::string error_string = "Failed to call GetExtrinsicParameters";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
   auto output = service_get_extrinsic_parameters.response.output;
   // The message description can be seen at msg/generated/vision_config/ExtrinsicParameters.msg
@@ -197,9 +199,11 @@ void example_get_extrinsic_parameters(ros::NodeHandle n, const std::string& robo
   << std::endl << "---------------------------------" << std::endl;
 
   ROS_INFO("%s", oss.str().c_str());
+
+  return true;
 }
 
-void example_get_sensor_settings(ros::NodeHandle n, const std::string& robot_name)
+bool example_get_sensor_settings(ros::NodeHandle n, const std::string& robot_name)
 {
   ros::ServiceClient service_client_get_sensor_settings = n.serviceClient<kortex_driver::GetSensorSettings>("/" + robot_name + "/vision_config/get_sensor_settings");
   kortex_driver::GetSensorSettings service_get_sensor_settings;
@@ -214,7 +218,7 @@ void example_get_sensor_settings(ros::NodeHandle n, const std::string& robot_nam
   {
     std::string error_string = "Failed to call GetSensorSettings";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   auto output = service_get_sensor_settings.response.output;
@@ -229,9 +233,11 @@ void example_get_sensor_settings(ros::NodeHandle n, const std::string& robot_nam
   "---------------------------------";
 
   ROS_INFO("%s", oss.str().c_str());
+
+  return true;
 }
 
-void example_change_the_resolution(ros::NodeHandle n, const std::string& robot_name)
+bool example_change_the_resolution(ros::NodeHandle n, const std::string& robot_name)
 {
   ros::ServiceClient service_client_set_sensor_settings = n.serviceClient<kortex_driver::SetSensorSettings>("/" + robot_name + "/vision_config/set_sensor_settings");
   kortex_driver::SetSensorSettings service_set_sensor_settings;
@@ -253,13 +259,15 @@ void example_change_the_resolution(ros::NodeHandle n, const std::string& robot_n
   {
     std::string error_string = "Failed to call SetSensorSettings";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   ROS_INFO("Resolution changed successfully.");
+
+  return true;
 }
 
-void example_get_sensor_option_value(ros::NodeHandle n, const std::string& robot_name)
+bool example_get_sensor_option_value(ros::NodeHandle n, const std::string& robot_name)
 {
   ros::ServiceClient service_client_get_sensor_option_value = n.serviceClient<kortex_driver::GetOptionValue>("/" + robot_name + "/vision_config/get_option_value");
   kortex_driver::GetOptionValue service_get_sensor_option_value;
@@ -285,7 +293,7 @@ void example_get_sensor_option_value(ros::NodeHandle n, const std::string& robot
   {
     std::string error_string = "Failed to call GetOptionValue";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   auto output = service_get_sensor_option_value.response.output;
@@ -299,12 +307,19 @@ void example_get_sensor_option_value(ros::NodeHandle n, const std::string& robot
   << "---------------------------------" << std::endl;
 
   ROS_INFO("%s", oss.str().c_str());
+
+  return true;
 }
 
 int main(int argc, char **argv)
 {
   // Init the node and get the namespace parameter
   ros::init(argc, argv, "vision_configuration_example_cpp");
+
+  // For testing purpose
+  ros::param::del("/kortex_examples_test_results/vision_configuration_cpp");
+
+  bool success = true;
 
   ros::NodeHandle n;
   std::string robot_name = "my_gen3";
@@ -323,23 +338,26 @@ int main(int argc, char **argv)
 
   //-------------------------------------------------------------
   // Get the intrinsic parameters for a given sensor
-  example_get_intrinsic_parameters(n, robot_name);
+  success &= example_get_intrinsic_parameters(n, robot_name);
 
   //-------------------------------------------------------------
   // Get the extrinsic parameters for a given sensor
-  example_get_extrinsic_parameters(n, robot_name);
+  success &= example_get_extrinsic_parameters(n, robot_name);
 
   //-------------------------------------------------------------
   // Get the sensor settings for a given sensor
-  example_get_sensor_settings(n, robot_name);
+  success &= example_get_sensor_settings(n, robot_name);
 
   //-------------------------------------------------------------
   // Set the extrinsic parameters for a given sensor
-  example_change_the_resolution(n, robot_name);
+  success &= example_change_the_resolution(n, robot_name);
 
   //-------------------------------------------------------------
   // Get an option value
-  example_get_sensor_option_value(n, robot_name);
+  success &= example_get_sensor_option_value(n, robot_name);
 
-  return 0;
+  // Report success for testing purposes
+  ros::param::set("/kortex_examples_test_results/vision_configuration_cpp", success);
+  
+  return success ? 0 : 1;
 }

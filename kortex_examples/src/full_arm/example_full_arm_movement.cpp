@@ -26,7 +26,7 @@
 
 #define HOME_ACTION_IDENTIFIER 2
 
-void example_clear_faults(ros::NodeHandle n, std::string robot_name)
+bool example_clear_faults(ros::NodeHandle n, std::string robot_name)
 {
   ros::ServiceClient service_client_clear_faults = n.serviceClient<kortex_driver::Base_ClearFaults>("/" + robot_name + "/base/clear_faults");
   kortex_driver::Base_ClearFaults service_clear_faults;
@@ -36,14 +36,15 @@ void example_clear_faults(ros::NodeHandle n, std::string robot_name)
   {
     std::string error_string = "Failed to clear the faults";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   // Wait a bit
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  return true;
 }
 
-void example_home_the_robot(ros::NodeHandle n, std::string robot_name)
+bool example_home_the_robot(ros::NodeHandle n, std::string robot_name)
 {
   ros::ServiceClient service_client_read_action = n.serviceClient<kortex_driver::ReadAction>("/" + robot_name + "/base/read_action");
   kortex_driver::ReadAction service_read_action;
@@ -55,7 +56,7 @@ void example_home_the_robot(ros::NodeHandle n, std::string robot_name)
   {
     std::string error_string = "Failed to call ReadAction";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   // We can now execute the Action that we read 
@@ -72,11 +73,13 @@ void example_home_the_robot(ros::NodeHandle n, std::string robot_name)
   {
     std::string error_string = "Failed to call ExecuteAction";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
+
+  return true;
 }
 
-void example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_name)
+bool example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_name)
 {
   // Initialize the ServiceClient
   ros::ServiceClient service_client_set_cartesian_reference_frame = n.serviceClient<kortex_driver::SetCartesianReferenceFrame>("/" + robot_name + "/control_config/set_cartesian_reference_frame");
@@ -87,14 +90,16 @@ void example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_
   {
     std::string error_string = "Failed to call SetCartesianReferenceFrame";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   // Wait a bit
   std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
+  return true;
 }
 
-void example_send_cartesian_pose(ros::NodeHandle n, std::string robot_name)
+bool example_send_cartesian_pose(ros::NodeHandle n, std::string robot_name)
 {
   // Get the actual cartesian pose to increment it
   // You can create a subscriber to listen to the base_feedback
@@ -137,11 +142,13 @@ void example_send_cartesian_pose(ros::NodeHandle n, std::string robot_name)
   {
     std::string error_string = "Failed to call PlayCartesianTrajectory";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
+
+  return true;
 }
 
-void example_send_joint_angles(ros::NodeHandle n, std::string robot_name, int degrees_of_freedom)
+bool example_send_joint_angles(ros::NodeHandle n, std::string robot_name, int degrees_of_freedom)
 {
   // Initialize the ServiceClient
   ros::ServiceClient service_client_play_joint_trajectory = n.serviceClient<kortex_driver::PlayJointTrajectory>("/" + robot_name + "/base/play_joint_trajectory");
@@ -169,11 +176,13 @@ void example_send_joint_angles(ros::NodeHandle n, std::string robot_name, int de
   {
     std::string error_string = "Failed to call PlayJointTrajectory";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
+
+  return true;
 }
 
-void example_send_gripper_command(ros::NodeHandle n, std::string robot_name, double value)
+bool example_send_gripper_command(ros::NodeHandle n, std::string robot_name, double value)
 {
   // Initialize the ServiceClient
   ros::ServiceClient service_client_send_gripper_command = n.serviceClient<kortex_driver::SendGripperCommand>("/" + robot_name + "/base/send_gripper_command");
@@ -194,13 +203,20 @@ void example_send_gripper_command(ros::NodeHandle n, std::string robot_name, dou
   {
     std::string error_string = "Failed to call SendGripperCommand";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
+
+  return true;
 }
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "full_arm_movement_example_cpp");
+
+  // For testing purpose
+  ros::param::del("/kortex_examples_test_results/full_arm_movement_cpp");
+
+  bool success = true;
 
   //*******************************************************************************
   // ROS Parameters
@@ -248,12 +264,12 @@ int main(int argc, char **argv)
 
   //*******************************************************************************
   // Make sure to clear the robot's faults else it won't move if it's already in fault
-  example_clear_faults(n, robot_name);
+  success &= example_clear_faults(n, robot_name);
   //*******************************************************************************
 
   //*******************************************************************************
   // Move the robot to the Home position with an Action
-  example_home_the_robot(n, robot_name);
+  success &= example_home_the_robot(n, robot_name);
   std::this_thread::sleep_for(std::chrono::milliseconds(10000));
   //*******************************************************************************
 
@@ -262,25 +278,25 @@ int main(int argc, char **argv)
   // Let's close the gripper
   if (is_gripper_present)
   {
-    example_send_gripper_command(n, robot_name, 0.0);
+    success &= example_send_gripper_command(n, robot_name, 0.0);
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));  
   }
   //*******************************************************************************
 
   //*******************************************************************************
   // Set the reference frame to "Mixed"
-  example_set_cartesian_reference_frame(n, robot_name);
+  success &= example_set_cartesian_reference_frame(n, robot_name);
 
   // Example of cartesian pose
   // Let's make it move in Z
-  example_send_cartesian_pose(n, robot_name);
+  success &= example_send_cartesian_pose(n, robot_name);
   std::this_thread::sleep_for(std::chrono::milliseconds(10000));
   //*******************************************************************************
 
   //*******************************************************************************
   // Example of angular position
   // Let's send the arm to vertical position
-  example_send_joint_angles(n, robot_name, degrees_of_freedom);
+  success &= example_send_joint_angles(n, robot_name, degrees_of_freedom);
   std::this_thread::sleep_for(std::chrono::milliseconds(10000));
   //*******************************************************************************
 
@@ -289,10 +305,13 @@ int main(int argc, char **argv)
   // Let's close the gripper
   if (is_gripper_present)
   {
-    example_send_gripper_command(n, robot_name, 0.5);
+    success &= example_send_gripper_command(n, robot_name, 0.5);
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));  
   }
   //*******************************************************************************
 
-  return 0;
+  // Report success for testing purposes
+  ros::param::set("/kortex_examples_test_results/full_arm_movement_cpp", success);
+  
+  return success ? 0 : 1;
 }

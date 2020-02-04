@@ -1,6 +1,6 @@
 <package>
   <name>kortex_control</name>
-  <version>2.0.0</version>
+  <version>2.2.0</version>
   <description>
     <p>Gazebo Ros Control package for Kortex robots</p>
     <p>This package contains launch and configuration files for the ros_control controllers for simulation</p>

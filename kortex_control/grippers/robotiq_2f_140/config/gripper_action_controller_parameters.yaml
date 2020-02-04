@@ -1,4 +1,4 @@
-robotiq_2f_85_gripper_controller:
+robotiq_2f_140_gripper_controller:
     type: position_controllers/GripperActionController
     joint: finger_joint
     action_monitor_rate: 100

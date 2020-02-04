@@ -28,9 +28,13 @@
 #include <kortex_driver/GetMeasuredCartesianPose.h>
 #include <kortex_driver/OnNotificationActionTopic.h>
 
+#define HOME_ACTION_IDENTIFIER 2
+
 bool Pose1Done = false;
 bool Pose2Done = false;
 bool Pose3Done = false;
+
+bool all_notifs_succeeded = true;
 
 //Callback that is called when the robot publish a ActionNotification
 void notification_callback(const kortex_driver::ActionNotification::ConstPtr& notif)
@@ -40,7 +44,6 @@ void notification_callback(const kortex_driver::ActionNotification::ConstPtr& no
     //This event is published when an action has ended or was aborted
     case kortex_driver::ActionEvent::ACTION_END:
     {
-      ROS_INFO("Action has ended!");
       if(notif->handle.identifier == 1001)
       {
         Pose1Done = true;
@@ -60,6 +63,7 @@ void notification_callback(const kortex_driver::ActionNotification::ConstPtr& no
     case kortex_driver::ActionEvent::ACTION_ABORT:
     {
       ROS_ERROR("Action was aborted!");
+      all_notifs_succeeded = false;
       if(notif->handle.identifier == 1001)
       {
         Pose1Done = true;
@@ -82,7 +86,42 @@ void notification_callback(const kortex_driver::ActionNotification::ConstPtr& no
   
 }
 
-void example_cartesian_action(ros::NodeHandle n, std::string robot_name)
+bool example_home_the_robot(ros::NodeHandle n, std::string robot_name)
+{
+  ros::ServiceClient service_client_read_action = n.serviceClient<kortex_driver::ReadAction>("/" + robot_name + "/base/read_action");
+  kortex_driver::ReadAction service_read_action;
+
+  // The Home Action is used to home the robot. It cannot be deleted and is always ID #2:
+  service_read_action.request.input.identifier = HOME_ACTION_IDENTIFIER;
+
+  if (!service_client_read_action.call(service_read_action))
+  {
+    std::string error_string = "Failed to call ReadAction";
+    ROS_ERROR("%s", error_string.c_str());
+    return false;
+  }
+
+  // We can now execute the Action that we read 
+  ros::ServiceClient service_client_execute_action = n.serviceClient<kortex_driver::ExecuteAction>("/" + robot_name + "/base/execute_action");
+  kortex_driver::ExecuteAction service_execute_action;
+
+  service_execute_action.request.input = service_read_action.response.output;
+  
+  if (service_client_execute_action.call(service_execute_action))
+  {
+    ROS_INFO("The Home position action was sent to the robot.");
+  }
+  else
+  {
+    std::string error_string = "Failed to call ExecuteAction";
+    ROS_ERROR("%s", error_string.c_str());
+    return false;
+  }
+
+  return true;
+}
+
+bool example_cartesian_action(ros::NodeHandle n, std::string robot_name)
 {
   ros::ServiceClient service_client_activate_notif = n.serviceClient<kortex_driver::OnNotificationActionTopic>("/" + robot_name + "/base/activate_publishing_of_action_topic");
   kortex_driver::OnNotificationActionTopic service_activate_notif;
@@ -96,7 +135,7 @@ void example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   {
     std::string error_string = "Action notification publication failed";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   ros::Duration(1.00).sleep();
@@ -131,7 +170,7 @@ void example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   {
     std::string error_string = "Failed to call ExecuteAction on pose 1";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   // Waiting for the pose 1 to end
@@ -157,7 +196,7 @@ void example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   {
     std::string error_string = "Failed to call ExecuteAction on pose 2";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   //Waiting for the pose 2 to end.
@@ -170,7 +209,7 @@ void example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   service_execute_action.request.input.handle.identifier = 1003;
   service_execute_action.request.input.name = "pose3";
   
-  my_constrained_pose.target_pose.z = 0.20f;
+  my_constrained_pose.target_pose.x = 0.45f;
 
   service_execute_action.request.input.oneof_action_parameters.reach_pose.clear();
   service_execute_action.request.input.oneof_action_parameters.reach_pose.push_back(my_constrained_pose);
@@ -181,9 +220,9 @@ void example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   }
   else
   {
-    std::string error_string = "Failed to call ExecuteAction on pose 1";
+    std::string error_string = "Failed to call ExecuteAction on pose 3";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   // Waiting for the pose 3 to end
@@ -191,10 +230,12 @@ void example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   {
     ros::spinOnce();
   }
+
+  return true;
 }
 
 // This function sets the reference frame to the robot's base
-void example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_name)
+bool example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_name)
 {
   // Initialize the ServiceClient
   ros::ServiceClient service_client_set_cartesian_reference_frame = n.serviceClient<kortex_driver::SetCartesianReferenceFrame>("/" + robot_name + "/control_config/set_cartesian_reference_frame");
@@ -205,7 +246,7 @@ void example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_
   {
     std::string error_string = "Failed to call SetCartesianReferenceFrame";
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
   else
   {
@@ -214,11 +255,18 @@ void example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_
 
   // Wait a bit
   std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
+  return true;
 }
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "full_arm_cartesian_action_cpp");
+
+  // For testing purpose
+  ros::param::del("/kortex_examples_test_results/cartesian_poses_with_notifications_cpp");
+
+  bool success = true;
 
   //*******************************************************************************
   // ROS Parameters
@@ -238,9 +286,17 @@ int main(int argc, char **argv)
   }
 
   ros::Subscriber sub = n.subscribe("/" + robot_name  + "/action_topic", 1000, notification_callback);
-  example_set_cartesian_reference_frame(n, robot_name);
+  success &= example_set_cartesian_reference_frame(n, robot_name);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  example_cartesian_action(n, robot_name);
+  success &= example_home_the_robot(n, robot_name);
+  std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+  success &= example_cartesian_action(n, robot_name);
+  success &= all_notifs_succeeded;
+
+  // Report success for testing purposes
+  ros::param::set("/kortex_examples_test_results/cartesian_poses_with_notifications_cpp", success);
+  
+  return success ? 0 : 1;
 
   return 0;
 }

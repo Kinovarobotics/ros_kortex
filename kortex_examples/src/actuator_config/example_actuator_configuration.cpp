@@ -11,6 +11,7 @@
  */
 
 #include "ros/ros.h"
+#include <std_msgs/Empty.h>
 #include <iostream>
 #include <kortex_driver/ReadAllDevices.h>
 #include <kortex_driver/DeviceHandle.h>
@@ -20,6 +21,8 @@
 #include <kortex_driver/SetControlLoopParameters.h>
 #include <kortex_driver/ActuatorConfig_ClearFaults.h>
 #include <kortex_driver/ControlLoopSelection.h>
+
+typedef kortex_driver::GetControlLoopParameters::Response::_output_type ControlLoopParameters;
 
 std::string control_loop_to_string(uint32_t int_control_loop)
 {
@@ -44,7 +47,7 @@ std::string control_loop_to_string(uint32_t int_control_loop)
   }
 }
 
-void example_find_actuators_and_set_device_id(ros::NodeHandle& n, const std::string& robot_name, uint32_t device_id)
+bool example_find_actuators_and_set_device_id(ros::NodeHandle& n, const std::string& robot_name, uint32_t device_id)
 {
   ros::ServiceClient service_client_read_all_devices = n.serviceClient<kortex_driver::ReadAllDevices>("/" + robot_name + "/device_manager/read_all_devices");
   kortex_driver::ReadAllDevices service_read_all_devices;
@@ -75,7 +78,7 @@ void example_find_actuators_and_set_device_id(ros::NodeHandle& n, const std::str
   {
     std::string error_string = "Failed to call ReadAllDevices"; 
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   oss << "----------------------------";
@@ -91,7 +94,7 @@ void example_find_actuators_and_set_device_id(ros::NodeHandle& n, const std::str
   {
     std::string error_string = "Device id " + std::to_string(device_id) + " does not correspond to an actuator's device id."; 
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 
   // We need to set the device ID of the actuator we want to configure
@@ -106,28 +109,31 @@ void example_find_actuators_and_set_device_id(ros::NodeHandle& n, const std::str
   {
     std::string error_string = "Failed to call SetDeviceID"; 
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
+
+  return true;
 
 }
 
-void example_clear_actuator_faults(ros::NodeHandle& n, const std::string& robot_name)
+bool example_clear_actuator_faults(ros::NodeHandle& n, const std::string& robot_name)
 {
   ros::ServiceClient service_client_clear_faults = n.serviceClient<kortex_driver::ActuatorConfig_ClearFaults>("/" + robot_name + "/actuator_config/clear_faults");
   kortex_driver::ActuatorConfig_ClearFaults service_clear_faults;
   if (service_client_clear_faults.call(service_clear_faults))
   {
     ROS_INFO("Faults were cleared properly.");
+    return true;
   }
   else
   {
     std::string error_string = "Failed to call ActuatorConfig_ClearFaults"; 
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 }
 
-kortex_driver::GetControlLoopParameters::Response::_output_type example_get_control_loop_parameters(ros::NodeHandle& n, const std::string& robot_name)
+bool example_get_control_loop_parameters(ros::NodeHandle& n, const std::string& robot_name, ControlLoopParameters& output)
 {
   // Get the actuator control loop parameters
   ros::ServiceClient service_client_get_control_loop_parameters = n.serviceClient<kortex_driver::GetControlLoopParameters>("/" + robot_name + "/actuator_config/get_control_loop_parameters");
@@ -151,13 +157,14 @@ kortex_driver::GetControlLoopParameters::Response::_output_type example_get_cont
     oss << "]" << std::endl; 
     oss << "Error dead band : " << initial_parameters.error_dead_band << std::endl;
     ROS_INFO("%s", oss.str().c_str());
-    return initial_parameters;
+    output = initial_parameters;
+    return true;
   }
   else
   {
     std::string error_string = "Failed to call GetControlLoopParameters"; 
     ROS_ERROR("%s", error_string.c_str());
-    throw new std::runtime_error(error_string);
+    return false;
   }
 }
 
@@ -165,6 +172,11 @@ int main(int argc, char **argv)
 {
   // Init the node and get the namespace parameter
   ros::init(argc, argv, "actuator_configuration_example_cpp");
+
+  // For testing purpose
+  ros::param::del("/kortex_examples_test_results/actuator_configuration_cpp");
+
+  bool success = true;
 
   ros::NodeHandle n;
   std::string robot_name = "my_gen3";
@@ -196,15 +208,19 @@ int main(int argc, char **argv)
 
   //-------------------------------------------------------------
   // Find actuators and set which one we want to configure
-  example_find_actuators_and_set_device_id(n, robot_name, device_id);
+  success &= example_find_actuators_and_set_device_id(n, robot_name, device_id);
 
   //-------------------------------------------------------------
   // Clear the faults on a specific actuator
-  example_clear_actuator_faults(n, robot_name);
+  success &= example_clear_actuator_faults(n, robot_name);
 
   //-------------------------------------------------------------
   // Get the control loop parameters on a specific actuator
-  auto control_loop_parameters = example_get_control_loop_parameters(n, robot_name);
+  ControlLoopParameters parameters;
+  success &= example_get_control_loop_parameters(n, robot_name, parameters);
 
-  return 0;
+  // Report success for testing purposes
+  ros::param::set("/kortex_examples_test_results/actuator_configuration_cpp", success);
+  
+  return success ? 0 : 1;
 }

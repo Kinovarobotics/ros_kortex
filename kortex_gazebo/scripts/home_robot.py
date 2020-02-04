@@ -45,40 +45,63 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 from std_srvs.srv import Empty
 
-class home_robot(object):
+class ExampleInitializeGazeboRobot(object):
   """home_robot"""
   def __init__(self):
-
     # Initialize the node
-    super(home_robot, self).__init__()
+    super(ExampleInitializeGazeboRobot, self).__init__()
     rospy.init_node('init_robot')
 
-    # Create the MoveItInterface necessary objects
-    moveit_commander.roscpp_initialize(sys.argv)
-    group_name = "arm"
-    self.robot = moveit_commander.RobotCommander()
-    self.scene = moveit_commander.PlanningSceneInterface()
-    self.group = moveit_commander.MoveGroupCommander(group_name)
+    try:
+      # Create the MoveItInterface necessary objects
+      moveit_commander.roscpp_initialize(sys.argv)
+      group_name = "arm"
+      self.robot = moveit_commander.RobotCommander()
+      self.scene = moveit_commander.PlanningSceneInterface()
+      self.group = moveit_commander.MoveGroupCommander(group_name)
+    except Exception as e:
+      rospy.logerr(e)
+      self.is_init_success = False
+    else:
+      self.is_init_success = True
 
+  def home_the_robot(self):
     # Home the robot
     self.group.set_named_target("home")
-    self.group.go(wait=True)
+    return self.group.go(wait=True)
 
 def main():
   try:
-    # Sleep before unpausing Gazebo so the robot does not fall
-    time.sleep(5)
+    # For testing purposes
+    try:
+        rospy.delete_param("is_initialized")
+    except:
+        pass
 
     # Unpause the physics
     # This will let MoveIt finish its initialization
+    rospy.loginfo("Unpausing")
     rospy.wait_for_service('/gazebo/unpause_physics')
     unpause_gazebo = rospy.ServiceProxy('/gazebo/unpause_physics', Empty)
     resp = unpause_gazebo()
+    rospy.loginfo("Unpaused")
 
-    home_robot()
+    example = ExampleInitializeGazeboRobot()
+    rospy.loginfo("Created example")
+    success = example.is_init_success
+    rospy.loginfo("success = {}".format(success))
+    if success:
+      success &= example.home_the_robot()
 
-  except KeyboardInterrupt:
-    return
+  except:
+    success = False
+  
+  # For testing purposes
+  rospy.set_param("is_initialized", success)
+  if not success:
+    rospy.logerr("The Gazebo initialization encountered an error.")
+  else:
+    rospy.loginfo("The Gazebo initialization executed without fail.")
 
 if __name__ == '__main__':
   main()
