@@ -14,6 +14,9 @@
 
 KortexArmDriver::KortexArmDriver(ros::NodeHandle nh): m_node_handle(nh), m_node_is_running(true), m_consecutive_base_cyclic_timeouts(0)
 {
+    // Parameter to let the other nodes know this node is up
+    ros::param::set("is_initialized", false);
+
     // Start the node in the different initialization functions
     parseRosArguments();
     initApi();
@@ -29,6 +32,7 @@ KortexArmDriver::KortexArmDriver(ros::NodeHandle nh): m_node_handle(nh), m_node_
 
     // If we get here and no error was thrown we started the node correctly
     ROS_INFO("%sThe Kortex driver has been initialized correctly!%s", GREEN_COLOR_CONSOLE, RESET_COLOR_CONSOLE);
+    ros::param::set("is_initialized", true);
 }
 
 KortexArmDriver::~KortexArmDriver()
@@ -276,6 +280,8 @@ void KortexArmDriver::verifyProductConfiguration()
             ROS_ERROR("%s", error_string.c_str());
             throw new std::runtime_error(error_string);
         }
+        // Set Angular Trajectories soft limits to max
+        setAngularTrajectorySoftLimitsToMax();
     }
     else if (m_arm_name == "gen3_lite")
     {
@@ -319,6 +325,15 @@ void KortexArmDriver::verifyProductConfiguration()
             throw new std::runtime_error(error_string);
         }
     }
+    else if (m_gripper_name == "robotiq_2f_140")
+    {
+        if (product_config.end_effector_type() != Kinova::Api::ProductConfiguration::EndEffectorType::END_EFFECTOR_TYPE_ROBOTIQ_2F_140)
+        {
+            std::string error_string = "The gripper model specified in the launch file doesn't match the detected arm's gripper model, shutting down the node...";
+            ROS_ERROR("%s", error_string.c_str());
+            throw new std::runtime_error(error_string);
+        }
+    }
     else if (m_gripper_name == "gen3_lite_2f")
     {
         if (product_config.end_effector_type() != Kinova::Api::ProductConfiguration::EndEffectorType::END_EFFECTOR_TYPE_L31_GRIPPER_2F)
@@ -334,11 +349,6 @@ void KortexArmDriver::verifyProductConfiguration()
         ROS_ERROR("%s", error_string.c_str());
         throw new std::runtime_error(error_string);
     }
-
-    // Set the ROS Param for the degrees of freedom
-    m_node_handle.setParam("degrees_of_freedom", int(product_config.degree_of_freedom()));
-    m_node_handle.setParam("is_gripper_present", isGripperPresent());
-    m_node_handle.setParam("gripper_joint_names", m_gripper_joint_names);
 
     // Find all the devices and print the device ID's
     ROS_INFO("-------------------------------------------------");
@@ -377,6 +387,13 @@ void KortexArmDriver::verifyProductConfiguration()
         }
     }
     ROS_INFO("-------------------------------------------------");
+	
+	// Set the ROS Param for the degrees of freedom
+    m_node_handle.setParam("degrees_of_freedom", int(product_config.degree_of_freedom()));
+    m_node_handle.setParam("is_gripper_present", isGripperPresent());
+    m_node_handle.setParam("gripper_joint_names", m_gripper_joint_names);
+	m_node_handle.setParam("has_vision_module", m_is_vision_module_present);
+    m_node_handle.setParam("has_interconnect_module", m_is_interconnect_module_present);
 }
 
 void KortexArmDriver::initSubscribers()
@@ -429,6 +446,40 @@ void KortexArmDriver::startActionServers()
 bool KortexArmDriver::isGripperPresent()
 {
     return m_gripper_name != "";
+}
+
+void KortexArmDriver::setAngularTrajectorySoftLimitsToMax()
+{
+    try
+    {
+        auto hard_limits = m_control_config->GetKinematicHardLimits();
+        Kinova::Api::ControlConfig::ControlMode target_control_mode = Kinova::Api::ControlConfig::ANGULAR_TRAJECTORY;
+        
+        // Set Joint Speed limits to max
+        Kinova::Api::ControlConfig::JointSpeedSoftLimits jpsl;
+        jpsl.set_control_mode(target_control_mode);
+        for (auto j : hard_limits.joint_speed_limits())
+        {
+            jpsl.add_joint_speed_soft_limits(j);
+        }
+        m_control_config->SetJointSpeedSoftLimits(jpsl);
+
+        // Set Joint Acceleration limits to max
+        Kinova::Api::ControlConfig::JointAccelerationSoftLimits jasl;
+        jasl.set_control_mode(target_control_mode);
+        for (auto j : hard_limits.joint_acceleration_limits())
+        {
+            jasl.add_joint_acceleration_soft_limits(j);
+        }
+        m_control_config->SetJointAccelerationSoftLimits(jasl);
+    }
+    catch (Kinova::Api::KDetailedException& ex)
+    {
+        ROS_WARN("Kortex exception while getting the base_feedback");
+        ROS_WARN("Error code: %s\n", Kinova::Api::ErrorCodes_Name(ex.getErrorInfo().getError().error_code()).c_str());
+        ROS_WARN("Error sub code: %s\n", Kinova::Api::SubErrorCodes_Name(Kinova::Api::SubErrorCodes(ex.getErrorInfo().getError().error_sub_code())).c_str());
+        ROS_WARN("Error description: %s\n", ex.what());
+    }
 }
 
 void KortexArmDriver::publishFeedback()

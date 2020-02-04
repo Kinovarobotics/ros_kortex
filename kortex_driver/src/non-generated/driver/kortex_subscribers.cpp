@@ -28,10 +28,10 @@ KortexSubscribers::~KortexSubscribers()
 {
 }
 
-void KortexSubscribers::new_joint_speeds_cb(const kortex_driver::JointSpeeds& joint_speeds)
+void KortexSubscribers::new_joint_speeds_cb(const kortex_driver::Base_JointSpeeds& joint_speeds)
 {
     Kinova::Api::Base::JointSpeeds speeds;
-    kortex_driver::JointSpeeds joint_speeds_in_rad(joint_speeds); // Since joint_speeds is const we need this copy
+    kortex_driver::Base_JointSpeeds joint_speeds_in_rad(joint_speeds); // Since joint_speeds is const we need this copy
 
     // Convert radians in degrees
     for (unsigned int i = 0; i < joint_speeds.joint_speeds.size(); i++)

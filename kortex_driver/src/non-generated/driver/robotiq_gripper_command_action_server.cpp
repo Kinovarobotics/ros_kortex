@@ -116,7 +116,7 @@ void RobotiqGripperCommandActionServer::gripper_position_polling_thread()
         // Get gripper position and find if we're stuck
         feedback = m_base_cyclic->RefreshFeedback();
         actual_gripper_position = feedback.interconnect().gripper_feedback().motor(0).position() / 100.0;
-        if (fabs(actual_gripper_position - previous_gripper_position) > 0.01)
+        if (fabs(actual_gripper_position - previous_gripper_position) > MAX_CONSECUTIVE_POSITION_DIFFERENCE)
         {
             n_stuck = 0;
         }
@@ -127,7 +127,7 @@ void RobotiqGripperCommandActionServer::gripper_position_polling_thread()
         previous_gripper_position = actual_gripper_position;
 
         // If we're stuck, the trajectory is over
-        if (n_stuck >= 4) // 200ms in the same position
+        if (n_stuck >= MAX_CONSECUTIVE_IDENTICAL_POSITIONS) // 200ms in the same position
         {
             m_is_trajectory_running_lock.lock();
             m_is_trajectory_running = false;

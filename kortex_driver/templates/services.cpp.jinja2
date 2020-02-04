@@ -58,6 +58,10 @@ bool {{package.short_name}}Services::SetApiOptions(kortex_driver::SetApiOptions:
 {% for method in package.methods %}
 bool {{package.short_name}}Services::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}(kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Request  &req, kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Response &res)
 {
+	{% if method.is_rpc_deprecated -%}
+	ROS_WARN("The {{package.short_name_lowercase_with_underscores}}/{%- if method.prepend_on_notification -%}activate_publishing_of_{%- endif -%}{{method.name_lowercase_with_underscores}} service is now deprecated and will be removed in a future release.");
+	{% endif -%}
+
 	{% if method.is_notification_rpc %}
 	// If the notification is already activated, don't activate multiple times
 	if (m_is_activated_{{method.name}})

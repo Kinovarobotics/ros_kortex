@@ -30,7 +30,7 @@ PreComputedJointTrajectoryActionServer::PreComputedJointTrajectoryActionServer(c
     }
     if (!ros::param::get("~default_goal_tolerance", m_default_goal_tolerance))
     {
-        ROS_WARN("Parameter default_goal_tolerance was not specified; assuming 0.005 radians as default value.");
+        ROS_WARN("Parameter default_goal_tolerance was not specified; assuming 0.005 as default value.");
         m_default_goal_tolerance = 0.005;
     }
     if (!ros::param::get("~joint_names", m_joint_names))
@@ -92,6 +92,10 @@ void PreComputedJointTrajectoryActionServer::goal_received_callback(actionlib::A
     
     Kinova::Api::Base::PreComputedJointTrajectory proto_trajectory;
 
+    // For logging purposes
+    std::ofstream myfile;
+    myfile.open ("moveit_trajectory.csv");
+
     // Set the continuity mode
     proto_trajectory.set_mode(Kinova::Api::Base::TrajectoryContinuityMode::TRAJECTORY_CONTINUITY_MODE_POSITION);
 
@@ -99,20 +103,27 @@ void PreComputedJointTrajectoryActionServer::goal_received_callback(actionlib::A
     for (auto traj_point : m_goal.getGoal()->trajectory.points)
     {
         Kinova::Api::Base::PreComputedJointTrajectoryElement* proto_element = proto_trajectory.add_trajectory_elements();
+        myfile << traj_point.time_from_start.toSec() << ",";
         for (auto position : traj_point.positions)
         {
             proto_element->add_joint_angles(m_math_util.toDeg(position));
+            myfile << position << ",";
         }
         for (auto velocity : traj_point.velocities)
         {
             proto_element->add_joint_speeds(m_math_util.toDeg(velocity));
+            myfile << velocity << ",";
         }
         for (auto acceleration : traj_point.accelerations)
         {
             proto_element->add_joint_accelerations(m_math_util.toDeg(acceleration));
+            myfile << acceleration << ",";
         }
+        myfile << "\n";
         proto_element->set_time_from_start(traj_point.time_from_start.toSec());
     }
+
+    myfile.close();
 
     // Send the trajectory to the robot
     try

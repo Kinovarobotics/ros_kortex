@@ -147,6 +147,7 @@ class KortexArmDriver
     
     // Private methods
     bool isGripperPresent();
+    void setAngularTrajectorySoftLimitsToMax();
     void publishFeedback();
 };
 

@@ -25,6 +25,7 @@ import os
 import shutil
 import sys
 import re
+from pathlib import PurePath
 
 from enum import Enum
 from collections import OrderedDict
@@ -42,6 +43,7 @@ FORBIDDEN_RPC_METHODS = ["Reboot", \
 
 # There are some packages we don't want to generate because the use of their RPC's as ROS services doesn't make sense at all and could cause some undefined behaviour
 NON_GENERATED_PACKAGES = ["Session"]
+PROTO_FILES_RELATIVE_PATH = PurePath("..", "protos")
 
 class DetailedOneOf:
     '''
@@ -247,7 +249,7 @@ class DetailedRPC:
     - prepend_on_notification: If the RPC is a Notification RPC, is put to "OnNotification". Otherwise, it is empty [string]
     - notification_message_cpp_namespace: Full C++ namespace of the message that corresponds to the Notification RPC ("SafetyNotification" for the RPC "SafetyTopic") [string]
     '''
-    def __init__(self, rpc, package, is_rpc_duplicated, is_input_type_duplicated, is_output_type_duplicated, notification_message=None):
+    def __init__(self, rpc, package, is_rpc_duplicated, is_rpc_deprecated, is_input_type_duplicated, is_output_type_duplicated, notification_message=None):
         '''
         Constructor for the DetailedRPC
 
@@ -255,6 +257,7 @@ class DetailedRPC:
         - rpc: Protobuf object for the RPC [ServiceDescriptorProto]
         - package: Full name of the message's package (ex. "Kinova.Api.Common") [string]
         - is_rpc_duplicated: True if the message type is duplicated in the generation context (ex. Feedback) [bool]
+        - is_rpc_deprecated: True if the message type is deprecated in the C++ Kortex API [bool]
         - is_input_type_duplicated: True if the input type of the RPC is duplicated in the generation context [bool]
         - is_output_type_duplicated: True if the output type of the RPC is duplicated in the generation context [bool]
         - notification_message: Protobuf object for the Notification message that corresponds to the Notification RPC (optional) [DescrptorProto]
@@ -262,6 +265,7 @@ class DetailedRPC:
         self.name = rpc.name
         self.name_lowercase_with_underscores = '_'.join(re.findall('[A-Z][^A-Z]*', self.name)).lower()
         self.rpc = rpc
+        self.is_rpc_deprecated = is_rpc_deprecated
 
         self.cpp_namespace = package.replace(".", "::")
         self.full_proto_package_name = package
@@ -324,7 +328,9 @@ def generate_code(request, response):
     rpcs_unordered_set = set()
     duplicated_messages_unordered_set = set()
     duplicated_rpcs_unordered_set = set()
+    deprecated_rpcs_dict_of_lists = OrderedDict()
     for filename, proto_file in file_map.items():
+        # Traverse proto files with the recursive calls
         for item, package in traverse(proto_file):
             
             # Skip the packages we don't want to generate
@@ -349,18 +355,30 @@ def generate_code(request, response):
                     else:
                         duplicated_rpcs_unordered_set.add(method.name)
 
+        # Parse through the proto files to find deprecation tags that the recursive function cannot find
+        proto_file_reader = open(str(PurePath(PROTO_FILES_RELATIVE_PATH, filename)), encoding='utf8', mode='r')
+        filename_without_extension = filename.replace('.proto', '') 
+        deprecated_rpcs_dict_of_lists[filename_without_extension] = list()
+        RPC_REGULAR_EXPRESSION = r'.*rpc (\w*) * \((\S*)\) *returns* \((\S*)\).*'
+        text_line = "_"
+        while text_line != "":
+            text_line = proto_file_reader.readline()
+            if "rpc " in text_line:
+                if re.search(r'@DEPRECATED', text_line):
+                    rpc_name = re.sub(RPC_REGULAR_EXPRESSION, r'\1', text_line).strip()
+                    deprecated_rpcs_dict_of_lists[filename_without_extension].append(rpc_name)
+
+        # print (deprecated_rpcs_dict_of_lists.items())
+
     # Remove old generated files and create new directories
     for package in packages_dict.values():
         for s in ['srv', 'msg']:
-            try:
-                shutil.rmtree("../{}/generated/{}".format(s, package.short_name_lowercase_with_underscores))
-            except:
-                pass
-            os.mkdir("../{}/generated/{}".format(s, package.short_name_lowercase_with_underscores))
-    shutil.rmtree("../src/generated")
-    shutil.rmtree("../include/kortex_driver/generated")
-    os.mkdir("../src/generated")
-    os.mkdir("../include/kortex_driver/generated")
+            shutil.rmtree("../{}/generated/{}".format(s, package.short_name_lowercase_with_underscores), ignore_errors=True)
+            os.makedirs("../{}/generated/{}".format(s, package.short_name_lowercase_with_underscores))
+    shutil.rmtree("../src/generated", ignore_errors=True)
+    shutil.rmtree("../include/kortex_driver/generated", ignore_errors=True)
+    os.makedirs("../src/generated")
+    os.makedirs("../include/kortex_driver/generated")
 
     ###########################################
     # Parse the proto files to add the messages and RPC's to the DetailedPackage's
@@ -411,6 +429,8 @@ def generate_code(request, response):
 
             # If this is a Protobuf service (a group of RPC's)
             if isinstance(item, ServiceDescriptorProto):
+                # Get sublist of all deprecated methods in this service
+                deprecated_rpcs_in_this_service = deprecated_rpcs_dict_of_lists[item.name]
                 # Register every RPC in the Protobuf service
                 for rpc in item.method:
                     # Do not generate the services that cause generation bugs
@@ -421,7 +441,10 @@ def generate_code(request, response):
                     is_output_type_duplicated = rpc.output_type.split(".")[-1] in duplicated_messages_unordered_set
                     notification_message = list(filter(lambda x: x.name == rpc.name.replace("Topic", "Notification") , notification_messages_list))
 
-                    temp_rpc = DetailedRPC(rpc, package, is_rpc_duplicated, is_input_type_duplicated, is_output_type_duplicated, notification_message)
+                    # Find out if this RPC is deprecated
+                    is_rpc_deprecated = True if rpc.name in deprecated_rpcs_in_this_service else False
+
+                    temp_rpc = DetailedRPC(rpc, package, is_rpc_duplicated, is_rpc_deprecated, is_input_type_duplicated, is_output_type_duplicated, notification_message)
                     current_package.addRPC(temp_rpc)
 
     ###########################################
