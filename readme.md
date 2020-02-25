@@ -18,9 +18,6 @@ You can find the instructions to install ROS Kinetic (for Ubuntu 16.04) [here](h
 
 [Google Protocol Buffers](https://developers.google.com/protocol-buffers/) is used by Kinova to define the Kortex APIs and to automatically generate ROS messages, services and C++ classes from the Kortex API `.proto` files. The installation of Google Protocol Buffers is required by developers implementing new APIs with the robot. However, since we already provide all the necessary generated files on GitHub, this is not required for most end users of the robot.
 
-If you have a specific use case that requires you to install it, you can follow the instructions provided [at the end of this readme file](#protobuf-installation). We recommend that you contact Kinova if you have any specific questions about this.
-
-
 ### Build
 
 These are the instructions to run in a terminal to create the workspace, clone the `ros_kortex` repository, install the necessary ROS dependencies and build the package:
@@ -67,13 +64,3 @@ This metapackage contains the auto-generated MoveIt! files to use the Kinova Gen
 
 ### third_party
 This folder contains the third-party packages we use with the ROS Kortex packages. Currently, it consists of two packages used for the simulation of the Robotiq Gripper in Gazebo. We use [gazebo-pkgs](third_party/gazebo-pkgs/README.md) for grasping support in Gazebo and [roboticsgroup_gazebo_plugins](third_party/roboticsgroup_gazebo_plugins/README.md) to mimic joint support in Gazebo.
-
-<a id="protobuf-installation"></a>
-## Instructions to install Protocol Buffers (optional)
-
-You can clone the Protocol Buffers repository from GitHub with this command: 
-
-```cpp
-git clone https://github.com/protocolbuffers/protobuf --branch 3.5.1.1   (you must use this specific version)
-```
-You can install Protocol Buffers by following these [instructions](https://github.com/protocolbuffers/protobuf/blob/master/src/README.md).
