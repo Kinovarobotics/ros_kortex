@@ -57,7 +57,7 @@ The `kortex_driver` node is the node responsible for the communication between t
 - **ip_address** : The IP address of the robot you're connecting to. The default value is **192.168.1.10**.
 - **username** : The username for the robot connection. The default value is **admin**.
 - **password** : The password for the robot connection. The default value is **admin**.
-- **use_hard_limits** : [**Gen3 only**] If set to **true**, the arm's soft speed and acceleration limits are set to the hard limits and the MoveIt configuration uses those limits for the trajectories. If **false**, the default soft limit values are used. The default value for the parameter is **false**.
+- **use_hard_limits** : [**Gen3 only**] If set to **true**, the arm's soft speed and acceleration limits are set to the hard limits and the MoveIt configuration uses those limits for the trajectories. If **false**, the default soft limit values are used. The default value for the parameter is **false**. **Be aware that setting this argument to true will set you arm's speed and acceleration limits to the maximum, so it will move way faster! Be cautious when using it for the first time as it may cause unwanted behaviour.**
 - **cyclic_data_publish_rate** : Publish rate of the *base_feedback* and *joint_state* topics, in Hz. The default value is **100** Hz.
 - **api_rpc_timeout_ms** : The default X-axis position of the robot in Gazebo. The default value is **0.0**.
 - **api_session_inactivity_timeout_ms** : The duration after which the robot will clean the client session if the client hangs up the connection brutally (should not happen with the ROS driver). The default value is **35000** ms and is not normally changed.
