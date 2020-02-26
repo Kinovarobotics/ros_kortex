@@ -79,6 +79,7 @@ class KortexArmDriver
     std::string m_ip_address;
     std::string m_username;
     std::string m_password;
+    bool m_use_hard_limits;
     int m_cyclic_data_publish_rate;
     int m_api_rpc_timeout_ms;
     int m_api_session_inactivity_timeout_ms;

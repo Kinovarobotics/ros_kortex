@@ -124,6 +124,13 @@ void KortexArmDriver::parseRosArguments()
         throw new std::runtime_error(error_string);
     }
 
+    if (!ros::param::get("~use_hard_limits", m_use_hard_limits))
+    {
+        std::string error_string = "Usage of hard limits as soft was not specified in the launch file, shutting down the node...";
+        ROS_ERROR("%s", error_string.c_str());
+        throw new std::runtime_error(error_string);
+    }
+
     if (!ros::param::get("~cyclic_data_publish_rate", m_cyclic_data_publish_rate))
     {
         std::string error_string = "Publish rate of the cyclic data was not specified in the launch file, shutting down the node...";
@@ -280,8 +287,11 @@ void KortexArmDriver::verifyProductConfiguration()
             ROS_ERROR("%s", error_string.c_str());
             throw new std::runtime_error(error_string);
         }
-        // Set Angular Trajectories soft limits to max
-        setAngularTrajectorySoftLimitsToMax();
+        // Set Angular Trajectories soft limits to max if the option is true in the launch file
+        if (m_use_hard_limits)
+        {
+            setAngularTrajectorySoftLimitsToMax();   
+        }
     }
     else if (m_arm_name == "gen3_lite")
     {

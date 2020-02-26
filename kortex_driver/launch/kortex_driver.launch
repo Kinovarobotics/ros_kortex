@@ -6,6 +6,7 @@
     <arg name="dof" default="7" if="$(eval arg('arm') == 'gen3')"/> <!-- Number of degrees of freedom of the arm -->
     <arg name="dof" default="6" if="$(eval arg('arm') == 'gen3_lite')"/> <!-- Number of degrees of freedom of the arm -->
     <arg name="vision" default="true"/> <!-- True if the arm has a Vision module -->
+    <arg name="use_hard_limits" default="false"/> <!-- Set soft limits as hard limits (Gen3 only) -->
 
     <!-- Gripper configuration -->
     <arg name="gripper" default=""/>
@@ -67,6 +68,7 @@
             <param name="arm" value="$(arg arm)"/>
             <param name="gripper" value="$(arg gripper)"/>
             <param name="dof" value="$(arg dof)"/>
+            <param name="use_hard_limits" value="$(arg use_hard_limits)"/>
             <param name="prefix" value="$(arg prefix)"/>
             <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/joint_limits.yaml"/>
             <!-- If there is a gripper, load the active joint names for it -->
@@ -80,10 +82,12 @@
             <!-- Without gripper -->
             <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_move_it_config/launch/move_group.launch" if="$(eval not arg('gripper'))"> 
                 <arg name="dof" value="$(arg dof)"/>
+                <arg name="use_hard_limits" value="$(arg use_hard_limits)"/>
             </include>
             <!-- With gripper -->
             <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_$(arg gripper)_move_it_config/launch/move_group.launch" unless="$(eval not arg('gripper'))"> 
                 <arg name="dof" value="$(arg dof)"/>
+                <arg name="use_hard_limits" value="$(arg use_hard_limits)"/>
             </include>
 
         </group>

@@ -2,9 +2,11 @@
 
   <!-- The number of degrees of freedom of the Gen3 arm -->
   <arg name="dof" default="7"/>
+  <arg name="use_hard_limits" default="false"/>
 
   <include file="$(find gen3_robotiq_2f_85_move_it_config)/launch/planning_context.launch">
     <arg name="dof" value="$(arg dof)"/>
+    <arg name="use_hard_limits" value="$(arg use_hard_limits)"/>
   </include>
 
   <!-- GDB Debug Option -->
