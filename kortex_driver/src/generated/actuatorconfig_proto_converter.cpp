@@ -91,7 +91,7 @@ int ToProtoData(kortex_driver::EncoderDerivativeParameters input, Kinova::Api::A
 {
 	
 	output->set_max_window_width(input.max_window_width);
-	output->set_min_encoder_tick_count(input.min_encoder_tick_count);
+	output->set_min_angle(input.min_angle);
 	
 	return 0;
 }
@@ -177,6 +177,13 @@ int ToProtoData(kortex_driver::PositionCommand input, Kinova::Api::ActuatorConfi
 	output->set_position(input.position);
 	output->set_velocity(input.velocity);
 	output->set_acceleration(input.acceleration);
+	
+	return 0;
+}
+int ToProtoData(kortex_driver::CoggingFeedforwardModeInformation input, Kinova::Api::ActuatorConfig::CoggingFeedforwardModeInformation *output)
+{
+	
+	output->set_cogging_feedforward_mode((Kinova::Api::ActuatorConfig::CoggingFeedforwardMode)input.cogging_feedforward_mode);
 	
 	return 0;
 }

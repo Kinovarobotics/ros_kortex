@@ -48,6 +48,17 @@
 #include "kortex_driver/ToolConfiguration.h"
 #include "kortex_driver/ControlConfigurationNotification.h"
 #include "kortex_driver/CartesianReferenceFrameInfo.h"
+#include "kortex_driver/TwistLinearSoftLimit.h"
+#include "kortex_driver/TwistAngularSoftLimit.h"
+#include "kortex_driver/JointSpeedSoftLimits.h"
+#include "kortex_driver/JointAccelerationSoftLimits.h"
+#include "kortex_driver/KinematicLimits.h"
+#include "kortex_driver/KinematicLimitsList.h"
+#include "kortex_driver/DesiredSpeeds.h"
+#include "kortex_driver/LinearTwist.h"
+#include "kortex_driver/AngularTwist.h"
+#include "kortex_driver/ControlConfig_JointSpeeds.h"
+#include "kortex_driver/ControlConfig_ControlModeInformation.h"
 
 
 int ToProtoData(kortex_driver::GravityVector input, Kinova::Api::ControlConfig::GravityVector *output);
@@ -57,5 +68,16 @@ int ToProtoData(kortex_driver::CartesianTransform input, Kinova::Api::ControlCon
 int ToProtoData(kortex_driver::ToolConfiguration input, Kinova::Api::ControlConfig::ToolConfiguration *output);
 int ToProtoData(kortex_driver::ControlConfigurationNotification input, Kinova::Api::ControlConfig::ControlConfigurationNotification *output);
 int ToProtoData(kortex_driver::CartesianReferenceFrameInfo input, Kinova::Api::ControlConfig::CartesianReferenceFrameInfo *output);
+int ToProtoData(kortex_driver::TwistLinearSoftLimit input, Kinova::Api::ControlConfig::TwistLinearSoftLimit *output);
+int ToProtoData(kortex_driver::TwistAngularSoftLimit input, Kinova::Api::ControlConfig::TwistAngularSoftLimit *output);
+int ToProtoData(kortex_driver::JointSpeedSoftLimits input, Kinova::Api::ControlConfig::JointSpeedSoftLimits *output);
+int ToProtoData(kortex_driver::JointAccelerationSoftLimits input, Kinova::Api::ControlConfig::JointAccelerationSoftLimits *output);
+int ToProtoData(kortex_driver::KinematicLimits input, Kinova::Api::ControlConfig::KinematicLimits *output);
+int ToProtoData(kortex_driver::KinematicLimitsList input, Kinova::Api::ControlConfig::KinematicLimitsList *output);
+int ToProtoData(kortex_driver::DesiredSpeeds input, Kinova::Api::ControlConfig::DesiredSpeeds *output);
+int ToProtoData(kortex_driver::LinearTwist input, Kinova::Api::ControlConfig::LinearTwist *output);
+int ToProtoData(kortex_driver::AngularTwist input, Kinova::Api::ControlConfig::AngularTwist *output);
+int ToProtoData(kortex_driver::ControlConfig_JointSpeeds input, Kinova::Api::ControlConfig::JointSpeeds *output);
+int ToProtoData(kortex_driver::ControlConfig_ControlModeInformation input, Kinova::Api::ControlConfig::ControlModeInformation *output);
 
 #endif

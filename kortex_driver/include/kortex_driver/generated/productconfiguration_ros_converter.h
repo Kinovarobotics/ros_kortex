@@ -42,22 +42,10 @@
 
 
 #include "kortex_driver/CompleteProductConfiguration.h"
-#include "kortex_driver/ProductConfigurationDegreeOfFreedom.h"
-#include "kortex_driver/ProductConfigurationBaseType.h"
 #include "kortex_driver/ProductConfigurationEndEffectorType.h"
-#include "kortex_driver/ProductConfigurationVisionModuleType.h"
-#include "kortex_driver/ProductConfigurationInterfaceModuleType.h"
-#include "kortex_driver/ProductConfigurationLaterality.h"
-#include "kortex_driver/ProductConfigurationWristType.h"
 
 
 int ToRosData(Kinova::Api::ProductConfiguration::CompleteProductConfiguration input, kortex_driver::CompleteProductConfiguration &output);
-int ToRosData(Kinova::Api::ProductConfiguration::ProductConfigurationDegreeOfFreedom input, kortex_driver::ProductConfigurationDegreeOfFreedom &output);
-int ToRosData(Kinova::Api::ProductConfiguration::ProductConfigurationBaseType input, kortex_driver::ProductConfigurationBaseType &output);
 int ToRosData(Kinova::Api::ProductConfiguration::ProductConfigurationEndEffectorType input, kortex_driver::ProductConfigurationEndEffectorType &output);
-int ToRosData(Kinova::Api::ProductConfiguration::ProductConfigurationVisionModuleType input, kortex_driver::ProductConfigurationVisionModuleType &output);
-int ToRosData(Kinova::Api::ProductConfiguration::ProductConfigurationInterfaceModuleType input, kortex_driver::ProductConfigurationInterfaceModuleType &output);
-int ToRosData(Kinova::Api::ProductConfiguration::ProductConfigurationLaterality input, kortex_driver::ProductConfigurationLaterality &output);
-int ToRosData(Kinova::Api::ProductConfiguration::ProductConfigurationWristType input, kortex_driver::ProductConfigurationWristType &output);
 
 #endif

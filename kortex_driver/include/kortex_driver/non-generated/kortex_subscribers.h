@@ -19,7 +19,7 @@
 #include "BaseClientRpc.h"
 
 #include "kortex_driver/TwistCommand.h"
-#include "kortex_driver/JointSpeeds.h"
+#include "kortex_driver/Base_JointSpeeds.h"
 
 #include "kortex_driver/generated/base_proto_converter.h"
 #include "kortex_driver/non-generated/kortex_math_util.h"
@@ -45,7 +45,7 @@ private:
     ros::Subscriber m_emergency_stop_sub;
 
     // Callbacks
-    void new_joint_speeds_cb(const kortex_driver::JointSpeeds& joint_speeds);
+    void new_joint_speeds_cb(const kortex_driver::Base_JointSpeeds& joint_speeds);
     void new_twist_cb(const kortex_driver::TwistCommand& twist);
     void clear_faults_cb(const std_msgs::Empty& empty);
     void stop_cb(const std_msgs::Empty& empty);

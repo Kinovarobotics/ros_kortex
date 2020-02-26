@@ -20,4 +20,4 @@ controller_list:
     default: True
     type: GripperCommand
     joints:
-      - gripper_finger1_joint
+      - finger_joint

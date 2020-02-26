@@ -1,0 +1,31 @@
+<launch>
+  <!-- By default we do not overwrite the URDF. Change the following to true to change the default behavior -->
+  <arg name="load_robot_description" default="false"/>
+
+  <!-- The name of the parameter under which the URDF is loaded -->
+  <arg name="robot_description" default="robot_description"/>
+
+  <!-- The number of degrees of freedom of the Gen3 arm -->
+  <arg name="dof" default="7"/>
+
+  <!-- Use the slower (2.0 default) joint speed and acceleration limits, or the hard limits (fastest) -->
+  <arg name="use_hard_limits" default="false"/>
+
+  <!-- Load universal robot description format (URDF) -->
+  <param if="$(arg load_robot_description)" name="$(arg robot_description)" command="xacro --inorder arm:=gen3 gripper:=robotiq_2f_140 '$(find kortex_description)/robots/gen3_robotiq_2f_140.xacro'"/>
+
+  <!-- The semantic description that corresponds to the URDF -->
+  <param name="$(arg robot_description)_semantic" textfile="$(find gen3_robotiq_2f_140_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_140.srdf" />
+
+  <!-- Load updated joint limits (override information from URDF) -->
+  <group ns="$(arg robot_description)_planning">
+    <rosparam command="load" file="$(find gen3_robotiq_2f_140_move_it_config)/config/$(arg dof)dof/default_joint_limits.yaml" unless="$(arg use_hard_limits)"/>
+    <rosparam command="load" file="$(find gen3_robotiq_2f_140_move_it_config)/config/$(arg dof)dof/hard_joint_limits.yaml" if="$(arg use_hard_limits)"/>
+  </group>
+
+  <!-- Load default settings for kinematics; these settings are overridden by settings in a node's namespace -->
+  <group ns="$(arg robot_description)_kinematics">
+    <rosparam command="load" file="$(find gen3_robotiq_2f_140_move_it_config)/config/kinematics.yaml"/>
+  </group>
+
+</launch>

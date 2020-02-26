@@ -38,6 +38,25 @@
 #include "kortex_driver/ControlConfig_Unsubscribe.h"
 #include "kortex_driver/SetCartesianReferenceFrame.h"
 #include "kortex_driver/GetCartesianReferenceFrame.h"
+#include "kortex_driver/ControlConfig_GetControlMode.h"
+#include "kortex_driver/SetJointSpeedSoftLimits.h"
+#include "kortex_driver/SetTwistLinearSoftLimit.h"
+#include "kortex_driver/SetTwistAngularSoftLimit.h"
+#include "kortex_driver/SetJointAccelerationSoftLimits.h"
+#include "kortex_driver/GetKinematicHardLimits.h"
+#include "kortex_driver/GetKinematicSoftLimits.h"
+#include "kortex_driver/GetAllKinematicSoftLimits.h"
+#include "kortex_driver/SetDesiredLinearTwist.h"
+#include "kortex_driver/SetDesiredAngularTwist.h"
+#include "kortex_driver/SetDesiredJointSpeeds.h"
+#include "kortex_driver/GetDesiredSpeeds.h"
+#include "kortex_driver/ResetGravityVector.h"
+#include "kortex_driver/ResetPayloadInformation.h"
+#include "kortex_driver/ResetToolConfiguration.h"
+#include "kortex_driver/ResetJointSpeedSoftLimits.h"
+#include "kortex_driver/ResetTwistLinearSoftLimit.h"
+#include "kortex_driver/ResetTwistAngularSoftLimit.h"
+#include "kortex_driver/ResetJointAccelerationSoftLimits.h"
 
 #include "kortex_driver/KortexError.h"
 #include "kortex_driver/SetDeviceID.h"
@@ -64,6 +83,25 @@ class ControlConfigServices
         bool ControlConfig_Unsubscribe(kortex_driver::ControlConfig_Unsubscribe::Request  &req, kortex_driver::ControlConfig_Unsubscribe::Response &res);
         bool SetCartesianReferenceFrame(kortex_driver::SetCartesianReferenceFrame::Request  &req, kortex_driver::SetCartesianReferenceFrame::Response &res);
         bool GetCartesianReferenceFrame(kortex_driver::GetCartesianReferenceFrame::Request  &req, kortex_driver::GetCartesianReferenceFrame::Response &res);
+        bool ControlConfig_GetControlMode(kortex_driver::ControlConfig_GetControlMode::Request  &req, kortex_driver::ControlConfig_GetControlMode::Response &res);
+        bool SetJointSpeedSoftLimits(kortex_driver::SetJointSpeedSoftLimits::Request  &req, kortex_driver::SetJointSpeedSoftLimits::Response &res);
+        bool SetTwistLinearSoftLimit(kortex_driver::SetTwistLinearSoftLimit::Request  &req, kortex_driver::SetTwistLinearSoftLimit::Response &res);
+        bool SetTwistAngularSoftLimit(kortex_driver::SetTwistAngularSoftLimit::Request  &req, kortex_driver::SetTwistAngularSoftLimit::Response &res);
+        bool SetJointAccelerationSoftLimits(kortex_driver::SetJointAccelerationSoftLimits::Request  &req, kortex_driver::SetJointAccelerationSoftLimits::Response &res);
+        bool GetKinematicHardLimits(kortex_driver::GetKinematicHardLimits::Request  &req, kortex_driver::GetKinematicHardLimits::Response &res);
+        bool GetKinematicSoftLimits(kortex_driver::GetKinematicSoftLimits::Request  &req, kortex_driver::GetKinematicSoftLimits::Response &res);
+        bool GetAllKinematicSoftLimits(kortex_driver::GetAllKinematicSoftLimits::Request  &req, kortex_driver::GetAllKinematicSoftLimits::Response &res);
+        bool SetDesiredLinearTwist(kortex_driver::SetDesiredLinearTwist::Request  &req, kortex_driver::SetDesiredLinearTwist::Response &res);
+        bool SetDesiredAngularTwist(kortex_driver::SetDesiredAngularTwist::Request  &req, kortex_driver::SetDesiredAngularTwist::Response &res);
+        bool SetDesiredJointSpeeds(kortex_driver::SetDesiredJointSpeeds::Request  &req, kortex_driver::SetDesiredJointSpeeds::Response &res);
+        bool GetDesiredSpeeds(kortex_driver::GetDesiredSpeeds::Request  &req, kortex_driver::GetDesiredSpeeds::Response &res);
+        bool ResetGravityVector(kortex_driver::ResetGravityVector::Request  &req, kortex_driver::ResetGravityVector::Response &res);
+        bool ResetPayloadInformation(kortex_driver::ResetPayloadInformation::Request  &req, kortex_driver::ResetPayloadInformation::Response &res);
+        bool ResetToolConfiguration(kortex_driver::ResetToolConfiguration::Request  &req, kortex_driver::ResetToolConfiguration::Response &res);
+        bool ResetJointSpeedSoftLimits(kortex_driver::ResetJointSpeedSoftLimits::Request  &req, kortex_driver::ResetJointSpeedSoftLimits::Response &res);
+        bool ResetTwistLinearSoftLimit(kortex_driver::ResetTwistLinearSoftLimit::Request  &req, kortex_driver::ResetTwistLinearSoftLimit::Response &res);
+        bool ResetTwistAngularSoftLimit(kortex_driver::ResetTwistAngularSoftLimit::Request  &req, kortex_driver::ResetTwistAngularSoftLimit::Response &res);
+        bool ResetJointAccelerationSoftLimits(kortex_driver::ResetJointAccelerationSoftLimits::Request  &req, kortex_driver::ResetJointAccelerationSoftLimits::Response &res);
 
 private:
         uint32_t m_current_device_id;
@@ -89,5 +127,24 @@ private:
 	ros::ServiceServer m_serviceControlConfig_Unsubscribe;
 	ros::ServiceServer m_serviceSetCartesianReferenceFrame;
 	ros::ServiceServer m_serviceGetCartesianReferenceFrame;
+	ros::ServiceServer m_serviceControlConfig_GetControlMode;
+	ros::ServiceServer m_serviceSetJointSpeedSoftLimits;
+	ros::ServiceServer m_serviceSetTwistLinearSoftLimit;
+	ros::ServiceServer m_serviceSetTwistAngularSoftLimit;
+	ros::ServiceServer m_serviceSetJointAccelerationSoftLimits;
+	ros::ServiceServer m_serviceGetKinematicHardLimits;
+	ros::ServiceServer m_serviceGetKinematicSoftLimits;
+	ros::ServiceServer m_serviceGetAllKinematicSoftLimits;
+	ros::ServiceServer m_serviceSetDesiredLinearTwist;
+	ros::ServiceServer m_serviceSetDesiredAngularTwist;
+	ros::ServiceServer m_serviceSetDesiredJointSpeeds;
+	ros::ServiceServer m_serviceGetDesiredSpeeds;
+	ros::ServiceServer m_serviceResetGravityVector;
+	ros::ServiceServer m_serviceResetPayloadInformation;
+	ros::ServiceServer m_serviceResetToolConfiguration;
+	ros::ServiceServer m_serviceResetJointSpeedSoftLimits;
+	ros::ServiceServer m_serviceResetTwistLinearSoftLimit;
+	ros::ServiceServer m_serviceResetTwistAngularSoftLimit;
+	ros::ServiceServer m_serviceResetJointAccelerationSoftLimits;
 };
 #endif

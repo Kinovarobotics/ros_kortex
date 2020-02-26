@@ -72,6 +72,8 @@ ActuatorConfigServices::ActuatorConfigServices(ros::NodeHandle& n, Kinova::Api::
 	m_serviceGetCommandMode = m_n.advertiseService("actuator_config/get_command_mode", &ActuatorConfigServices::GetCommandMode, this);
 	m_serviceGetServoing = m_n.advertiseService("actuator_config/get_servoing", &ActuatorConfigServices::GetServoing, this);
 	m_serviceGetTorqueOffset = m_n.advertiseService("actuator_config/get_torque_offset", &ActuatorConfigServices::GetTorqueOffset, this);
+	m_serviceSetCoggingFeedforwardMode = m_n.advertiseService("actuator_config/set_cogging_feedforward_mode", &ActuatorConfigServices::SetCoggingFeedforwardMode, this);
+	m_serviceGetCoggingFeedforwardMode = m_n.advertiseService("actuator_config/get_cogging_feedforward_mode", &ActuatorConfigServices::GetCoggingFeedforwardMode, this);
 }
 
 bool ActuatorConfigServices::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
@@ -650,6 +652,71 @@ bool ActuatorConfigServices::GetTorqueOffset(kortex_driver::GetTorqueOffset::Req
 	try
 	{
 		output = m_actuatorconfig->GetTorqueOffset(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool ActuatorConfigServices::SetCoggingFeedforwardMode(kortex_driver::SetCoggingFeedforwardMode::Request  &req, kortex_driver::SetCoggingFeedforwardMode::Response &res)
+{
+	
+	Kinova::Api::ActuatorConfig::CoggingFeedforwardModeInformation input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_actuatorconfig->SetCoggingFeedforwardMode(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool ActuatorConfigServices::GetCoggingFeedforwardMode(kortex_driver::GetCoggingFeedforwardMode::Request  &req, kortex_driver::GetCoggingFeedforwardMode::Response &res)
+{
+	
+	Kinova::Api::ActuatorConfig::CoggingFeedforwardModeInformation output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_actuatorconfig->GetCoggingFeedforwardMode(m_current_device_id, m_api_options);
 	}
 
 	catch (Kinova::Api::KDetailedException& ex)

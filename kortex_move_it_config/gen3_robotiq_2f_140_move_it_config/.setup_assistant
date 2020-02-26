@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: kortex_description
+    relative_path: robots/gen3_robotiq_2f_85.xacro
+    xacro_args: --inorder arm:=gen3 gripper:=robotiq_2f_85
+  SRDF:
+    relative_path: config/gen3_robotiq_2f_85.srdf
+  CONFIG:
+    author_name: Alexandre Vannobel
+    author_email: avannobel@kinova.ca
+    generated_timestamp: 1551813671

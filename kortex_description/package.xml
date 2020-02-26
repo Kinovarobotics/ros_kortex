@@ -1,6 +1,6 @@
 <package>
   <name>kortex_description</name>
-  <version>2.0.0</version>
+  <version>2.2.0</version>
   <description>
     <p>URDF Description package for Kortex-compatible robots</p>
     <p>This package contains configuration data, 3D models and launch files

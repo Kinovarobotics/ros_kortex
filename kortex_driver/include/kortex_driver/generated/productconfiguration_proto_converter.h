@@ -42,22 +42,10 @@
 
 
 #include "kortex_driver/CompleteProductConfiguration.h"
-#include "kortex_driver/ProductConfigurationDegreeOfFreedom.h"
-#include "kortex_driver/ProductConfigurationBaseType.h"
 #include "kortex_driver/ProductConfigurationEndEffectorType.h"
-#include "kortex_driver/ProductConfigurationVisionModuleType.h"
-#include "kortex_driver/ProductConfigurationInterfaceModuleType.h"
-#include "kortex_driver/ProductConfigurationLaterality.h"
-#include "kortex_driver/ProductConfigurationWristType.h"
 
 
 int ToProtoData(kortex_driver::CompleteProductConfiguration input, Kinova::Api::ProductConfiguration::CompleteProductConfiguration *output);
-int ToProtoData(kortex_driver::ProductConfigurationDegreeOfFreedom input, Kinova::Api::ProductConfiguration::ProductConfigurationDegreeOfFreedom *output);
-int ToProtoData(kortex_driver::ProductConfigurationBaseType input, Kinova::Api::ProductConfiguration::ProductConfigurationBaseType *output);
 int ToProtoData(kortex_driver::ProductConfigurationEndEffectorType input, Kinova::Api::ProductConfiguration::ProductConfigurationEndEffectorType *output);
-int ToProtoData(kortex_driver::ProductConfigurationVisionModuleType input, Kinova::Api::ProductConfiguration::ProductConfigurationVisionModuleType *output);
-int ToProtoData(kortex_driver::ProductConfigurationInterfaceModuleType input, Kinova::Api::ProductConfiguration::ProductConfigurationInterfaceModuleType *output);
-int ToProtoData(kortex_driver::ProductConfigurationLaterality input, Kinova::Api::ProductConfiguration::ProductConfigurationLaterality *output);
-int ToProtoData(kortex_driver::ProductConfigurationWristType input, Kinova::Api::ProductConfiguration::ProductConfigurationWristType *output);
 
 #endif

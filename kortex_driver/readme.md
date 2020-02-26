@@ -22,6 +22,7 @@
 1. [Topics](#topics)
 1. [Services](#services)
 1. [Compatibility break between v1.1.X and v2.0.X](#compatibility)
+1. [About Conan](#conan)
 1. [Support for multiple arms](#multiple)
 1. [Generation (advanced)](#generation)
 
@@ -48,12 +49,15 @@ The `kortex_driver` node is the node responsible for the communication between t
 
 **Arguments**:
 - **arm** : Name of your robot arm model. See the `kortex_description/arms` folder to see the available robot models. The default value is **gen3**.
+- **dof** : Number of DOFs of your robot. The default value is for Gen3 is **7** and the default value for Gen3 lite is **6**. You will have to specify this value only if you have a Gen3 6DOF.
+- **vision** : Boolean value to indicate if your arm has a Vision Module. The default value is for Gen3 is **true** and the default value for Gen3 lite is **false**. You will have to specify this value only if you have a Gen3 6DOF without a Vision Module. This argument only affects the visual representation of the arm in RViz. 
 - **gripper** : Name of your robot arm's tool / gripper. See the `kortex_description/grippers` folder to see the available end effector models (or to add your own). The default value is **""**. For Gen3, you can also put **robotiq_2f_85**. For Gen3 lite, you need to put **gen3_lite_2f**.
 - **robot_name** : This is the namespace in which the driver will run. It defaults to **my_$(arg arm)** (so "my_gen3" for arm="gen3").
 - **prefix** : This is an optional prefix for all joint and link names in the kortex_description. It is used to allow differentiating between different arms in the same URDF. It defaults to **an empty string**. **Note** : Changing the prefix invalidates the MoveIt! configuration, and requires modifying said configuration, plus the .yaml files with harcoded joint names.
 - **ip_address** : The IP address of the robot you're connecting to. The default value is **192.168.1.10**.
 - **username** : The username for the robot connection. The default value is **admin**.
 - **password** : The password for the robot connection. The default value is **admin**.
+- **use_hard_limits** : [**Gen3 only**] If set to **true**, the arm's soft speed and acceleration limits are set to the hard limits and the MoveIt configuration uses those limits for the trajectories. If **false**, the default soft limit values are used. The default value for the parameter is **false**. **Be aware that setting this argument to true will set you arm's speed and acceleration limits to the maximum, so it will move way faster! Be cautious when using it for the first time as it may cause unwanted behaviour.**
 - **cyclic_data_publish_rate** : Publish rate of the *base_feedback* and *joint_state* topics, in Hz. The default value is **100** Hz.
 - **api_rpc_timeout_ms** : The default X-axis position of the robot in Gazebo. The default value is **0.0**.
 - **api_session_inactivity_timeout_ms** : The duration after which the robot will clean the client session if the client hangs up the connection brutally (should not happen with the ROS driver). The default value is **35000** ms and is not normally changed.
@@ -214,6 +218,27 @@ Many things have been changed in the ros_kortex repository between versions 1.1.
 * The **/my_robot_name/base_feedback/joint_state** topic is now advertised as **/my_robot_name/joint_state**.
 * The [kortex_driver launch file](launch/kortex_driver.launch) is now located in the `kortex_driver` package instead of the `kortex_bringup` package, which was deleted. Some arguments were added to the file.
 
+<a id="conan"></a>
+## About Conan
+
+From release 2.2.0 onwards, the Kortex API is automatically downloaded from our Artifactory Conan server. The steps to install and setup Conan have been added to the root readme file. Conan downloads the binaries and header files in the Conan cache, by default situated in the `~/.conan/` directory.
+
+If you want to learn more about Conan, you can read about it [on their website](https://conan.io/).
+
+If you still want to download the ZIP files for the API, you can find the link in the [Kortex repository](https://github.com/Kinovarobotics/kortex).
+
+You will have to extract the API in the `kortex_api` folder as such:
+```sh
+kortex_api/  
+┬  
+├ include/
+└ lib/  
+```
+
+You will then have to build the catkin workspace and pass it the option to disable Conan so it links with your local API:
+```sh
+catkin_make -DUSE_CONAN=OFF
+```
 
 <a id="multiple"></a>
 ## Support for multiple arms

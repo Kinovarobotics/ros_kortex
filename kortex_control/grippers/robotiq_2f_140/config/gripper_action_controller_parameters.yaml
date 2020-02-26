@@ -1,0 +1,13 @@
+robotiq_2f_140_gripper_controller:
+    type: position_controllers/GripperActionController
+    joint: finger_joint
+    action_monitor_rate: 100
+
+gazebo_ros_control:
+  pid_gains:
+        finger_joint: {p: 10.0, i: 0.0, d: 0.01} 
+        right_outer_knuckle_joint: {p: 10.0, i: 0.0, d: 0.00} 
+        right_inner_knuckle_joint: {p: 10.0, i: 0.0, d: 0.01} 
+        left_inner_knuckle_joint: {p: 10.0, i: 0.0, d: 0.01} 
+        left_inner_finger_joint: {p: 0.5, i: 0.0, d: 0.001} 
+        right_inner_finger_joint: {p: 0.5, i: 0.0, d: 0.001} 

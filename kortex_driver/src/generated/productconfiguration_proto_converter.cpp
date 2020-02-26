@@ -34,52 +34,10 @@ int ToProtoData(kortex_driver::CompleteProductConfiguration input, Kinova::Api::
 	
 	return 0;
 }
-int ToProtoData(kortex_driver::ProductConfigurationDegreeOfFreedom input, Kinova::Api::ProductConfiguration::ProductConfigurationDegreeOfFreedom *output)
-{
-	
-	output->set_degree_of_freedom(input.degree_of_freedom);
-	
-	return 0;
-}
-int ToProtoData(kortex_driver::ProductConfigurationBaseType input, Kinova::Api::ProductConfiguration::ProductConfigurationBaseType *output)
-{
-	
-	output->set_base_type((Kinova::Api::ProductConfiguration::BaseType)input.base_type);
-	
-	return 0;
-}
 int ToProtoData(kortex_driver::ProductConfigurationEndEffectorType input, Kinova::Api::ProductConfiguration::ProductConfigurationEndEffectorType *output)
 {
 	
 	output->set_end_effector_type((Kinova::Api::ProductConfiguration::EndEffectorType)input.end_effector_type);
-	
-	return 0;
-}
-int ToProtoData(kortex_driver::ProductConfigurationVisionModuleType input, Kinova::Api::ProductConfiguration::ProductConfigurationVisionModuleType *output)
-{
-	
-	output->set_vision_module_type((Kinova::Api::ProductConfiguration::VisionModuleType)input.vision_module_type);
-	
-	return 0;
-}
-int ToProtoData(kortex_driver::ProductConfigurationInterfaceModuleType input, Kinova::Api::ProductConfiguration::ProductConfigurationInterfaceModuleType *output)
-{
-	
-	output->set_interface_module_type((Kinova::Api::ProductConfiguration::InterfaceModuleType)input.interface_module_type);
-	
-	return 0;
-}
-int ToProtoData(kortex_driver::ProductConfigurationLaterality input, Kinova::Api::ProductConfiguration::ProductConfigurationLaterality *output)
-{
-	
-	output->set_arm_laterality((Kinova::Api::ProductConfiguration::ArmLaterality)input.arm_laterality);
-	
-	return 0;
-}
-int ToProtoData(kortex_driver::ProductConfigurationWristType input, Kinova::Api::ProductConfiguration::ProductConfigurationWristType *output)
-{
-	
-	output->set_wrist_type((Kinova::Api::ProductConfiguration::WristType)input.wrist_type);
 	
 	return 0;
 }

@@ -50,12 +50,18 @@
 #include "kortex_driver/AdvancedSequenceHandle.h"
 #include "kortex_driver/SequenceTaskHandle.h"
 #include "kortex_driver/SequenceTask.h"
+#include "kortex_driver/SequenceTasks.h"
+#include "kortex_driver/SequenceTasksConfiguration.h"
+#include "kortex_driver/SequenceTaskConfiguration.h"
+#include "kortex_driver/SequenceTasksRange.h"
+#include "kortex_driver/SequenceTasksPair.h"
 #include "kortex_driver/Sequence.h"
 #include "kortex_driver/SequenceList.h"
 #include "kortex_driver/AppendActionInformation.h"
 #include "kortex_driver/ActionHandle.h"
 #include "kortex_driver/RequestedActionType.h"
 #include "kortex_driver/Action.h"
+#include "kortex_driver/Snapshot.h"
 #include "kortex_driver/SwitchControlMapping.h"
 #include "kortex_driver/ChangeTwist.h"
 #include "kortex_driver/ChangeJointSpeeds.h"
@@ -162,7 +168,7 @@
 #include "kortex_driver/ConstrainedJointAngle.h"
 #include "kortex_driver/JointAngles.h"
 #include "kortex_driver/JointAngle.h"
-#include "kortex_driver/JointSpeeds.h"
+#include "kortex_driver/Base_JointSpeeds.h"
 #include "kortex_driver/JointSpeed.h"
 #include "kortex_driver/JointTorques.h"
 #include "kortex_driver/JointTorque.h"
@@ -171,6 +177,9 @@
 #include "kortex_driver/Gripper.h"
 #include "kortex_driver/Finger.h"
 #include "kortex_driver/SystemTime.h"
+#include "kortex_driver/ControllerConfigurationMode.h"
+#include "kortex_driver/ControllerConfiguration.h"
+#include "kortex_driver/ControllerConfigurationList.h"
 #include "kortex_driver/ActuatorInformation.h"
 #include "kortex_driver/ArmStateInformation.h"
 #include "kortex_driver/ArmStateNotification.h"
@@ -184,6 +193,8 @@
 #include "kortex_driver/PreComputedJointTrajectoryElement.h"
 #include "kortex_driver/TrajectoryErrorElement.h"
 #include "kortex_driver/TrajectoryErrorReport.h"
+#include "kortex_driver/FirmwareBundleVersions.h"
+#include "kortex_driver/FirmwareComponentVersion.h"
 
 
 int ToRosData(Kinova::Api::Base::FullUserProfile input, kortex_driver::FullUserProfile &output);
@@ -195,12 +206,18 @@ int ToRosData(Kinova::Api::Base::SequenceHandle input, kortex_driver::SequenceHa
 int ToRosData(Kinova::Api::Base::AdvancedSequenceHandle input, kortex_driver::AdvancedSequenceHandle &output);
 int ToRosData(Kinova::Api::Base::SequenceTaskHandle input, kortex_driver::SequenceTaskHandle &output);
 int ToRosData(Kinova::Api::Base::SequenceTask input, kortex_driver::SequenceTask &output);
+int ToRosData(Kinova::Api::Base::SequenceTasks input, kortex_driver::SequenceTasks &output);
+int ToRosData(Kinova::Api::Base::SequenceTasksConfiguration input, kortex_driver::SequenceTasksConfiguration &output);
+int ToRosData(Kinova::Api::Base::SequenceTaskConfiguration input, kortex_driver::SequenceTaskConfiguration &output);
+int ToRosData(Kinova::Api::Base::SequenceTasksRange input, kortex_driver::SequenceTasksRange &output);
+int ToRosData(Kinova::Api::Base::SequenceTasksPair input, kortex_driver::SequenceTasksPair &output);
 int ToRosData(Kinova::Api::Base::Sequence input, kortex_driver::Sequence &output);
 int ToRosData(Kinova::Api::Base::SequenceList input, kortex_driver::SequenceList &output);
 int ToRosData(Kinova::Api::Base::AppendActionInformation input, kortex_driver::AppendActionInformation &output);
 int ToRosData(Kinova::Api::Base::ActionHandle input, kortex_driver::ActionHandle &output);
 int ToRosData(Kinova::Api::Base::RequestedActionType input, kortex_driver::RequestedActionType &output);
 int ToRosData(Kinova::Api::Base::Action input, kortex_driver::Action &output);
+int ToRosData(Kinova::Api::Base::Snapshot input, kortex_driver::Snapshot &output);
 int ToRosData(Kinova::Api::Base::SwitchControlMapping input, kortex_driver::SwitchControlMapping &output);
 int ToRosData(Kinova::Api::Base::ChangeTwist input, kortex_driver::ChangeTwist &output);
 int ToRosData(Kinova::Api::Base::ChangeJointSpeeds input, kortex_driver::ChangeJointSpeeds &output);
@@ -307,7 +324,7 @@ int ToRosData(Kinova::Api::Base::ConstrainedJointAngles input, kortex_driver::Co
 int ToRosData(Kinova::Api::Base::ConstrainedJointAngle input, kortex_driver::ConstrainedJointAngle &output);
 int ToRosData(Kinova::Api::Base::JointAngles input, kortex_driver::JointAngles &output);
 int ToRosData(Kinova::Api::Base::JointAngle input, kortex_driver::JointAngle &output);
-int ToRosData(Kinova::Api::Base::JointSpeeds input, kortex_driver::JointSpeeds &output);
+int ToRosData(Kinova::Api::Base::JointSpeeds input, kortex_driver::Base_JointSpeeds &output);
 int ToRosData(Kinova::Api::Base::JointSpeed input, kortex_driver::JointSpeed &output);
 int ToRosData(Kinova::Api::Base::JointTorques input, kortex_driver::JointTorques &output);
 int ToRosData(Kinova::Api::Base::JointTorque input, kortex_driver::JointTorque &output);
@@ -316,6 +333,9 @@ int ToRosData(Kinova::Api::Base::GripperRequest input, kortex_driver::GripperReq
 int ToRosData(Kinova::Api::Base::Gripper input, kortex_driver::Gripper &output);
 int ToRosData(Kinova::Api::Base::Finger input, kortex_driver::Finger &output);
 int ToRosData(Kinova::Api::Base::SystemTime input, kortex_driver::SystemTime &output);
+int ToRosData(Kinova::Api::Base::ControllerConfigurationMode input, kortex_driver::ControllerConfigurationMode &output);
+int ToRosData(Kinova::Api::Base::ControllerConfiguration input, kortex_driver::ControllerConfiguration &output);
+int ToRosData(Kinova::Api::Base::ControllerConfigurationList input, kortex_driver::ControllerConfigurationList &output);
 int ToRosData(Kinova::Api::Base::ActuatorInformation input, kortex_driver::ActuatorInformation &output);
 int ToRosData(Kinova::Api::Base::ArmStateInformation input, kortex_driver::ArmStateInformation &output);
 int ToRosData(Kinova::Api::Base::ArmStateNotification input, kortex_driver::ArmStateNotification &output);
@@ -329,5 +349,7 @@ int ToRosData(Kinova::Api::Base::PreComputedJointTrajectory input, kortex_driver
 int ToRosData(Kinova::Api::Base::PreComputedJointTrajectoryElement input, kortex_driver::PreComputedJointTrajectoryElement &output);
 int ToRosData(Kinova::Api::Base::TrajectoryErrorElement input, kortex_driver::TrajectoryErrorElement &output);
 int ToRosData(Kinova::Api::Base::TrajectoryErrorReport input, kortex_driver::TrajectoryErrorReport &output);
+int ToRosData(Kinova::Api::Base::FirmwareBundleVersions input, kortex_driver::FirmwareBundleVersions &output);
+int ToRosData(Kinova::Api::Base::FirmwareComponentVersion input, kortex_driver::FirmwareComponentVersion &output);
 
 #endif

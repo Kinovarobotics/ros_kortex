@@ -25,7 +25,7 @@
         <xacro:if value="${sim}">
             <link name="world" />
             <joint name="world_to_root" type="fixed">
-                <child link="base_link" />
+                <child link="${prefix}base_link" />
                 <parent link="world" />
                 <origin xyz="0 0 0" rpy="0 0 0" />    
             </joint> 

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="arm" default="gen3"/>
+    <arg name="dof" default="7" if="$(eval arg('arm') == 'gen3')"/> <!-- Number of degrees of freedom of the arm -->
+    <arg name="dof" default="6" if="$(eval arg('arm') == 'gen3_lite')"/> <!-- Number of degrees of freedom of the arm -->
+    <arg name="vision" default="true"/> <!-- True if the arm has a Vision module -->
+
+    <!-- Gripper configuration -->
+    <arg name="gripper" default=""/>
+
+    <!-- Start Rviz -->
+    <arg name="start_rviz" default="true"/>
+
+    <!-- Load the description for the robot -->
+    <!-- Without gripper -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true"
+        if="$(eval not arg('gripper'))"/>
+    <!-- With gripper -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true"
+        unless="$(eval not arg('gripper'))"/>
+
+    <!-- Joint state publisher and robot state publisher -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <rosparam param="source_list">[base_feedback/joint_state]</rosparam>
+        <param name="use_gui" value="true"/>
+        <param name="rate" value="30" />
+    </node>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+
+    <!-- Start RViz -->
+    <node name="rviz" pkg="rviz" type="rviz" output="log" args="-f base_link" if="$(arg start_rviz)"/> 
+</launch>

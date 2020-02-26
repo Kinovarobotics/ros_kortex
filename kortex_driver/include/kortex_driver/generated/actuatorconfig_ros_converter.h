@@ -58,6 +58,7 @@
 #include "kortex_driver/CommandModeInformation.h"
 #include "kortex_driver/Servoing.h"
 #include "kortex_driver/PositionCommand.h"
+#include "kortex_driver/CoggingFeedforwardModeInformation.h"
 
 
 int ToRosData(Kinova::Api::ActuatorConfig::AxisPosition input, kortex_driver::AxisPosition &output);
@@ -77,5 +78,6 @@ int ToRosData(Kinova::Api::ActuatorConfig::CustomDataSelection input, kortex_dri
 int ToRosData(Kinova::Api::ActuatorConfig::CommandModeInformation input, kortex_driver::CommandModeInformation &output);
 int ToRosData(Kinova::Api::ActuatorConfig::Servoing input, kortex_driver::Servoing &output);
 int ToRosData(Kinova::Api::ActuatorConfig::PositionCommand input, kortex_driver::PositionCommand &output);
+int ToRosData(Kinova::Api::ActuatorConfig::CoggingFeedforwardModeInformation input, kortex_driver::CoggingFeedforwardModeInformation &output);
 
 #endif

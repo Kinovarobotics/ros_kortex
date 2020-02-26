@@ -9,3 +9,4 @@ ProtectionZoneHandle[] protection_zone_handle
 SafetyHandle[] safety_handle
 NetworkHandle[] network_handle
 Ssid[] ssid
+ControllerHandle[] controller_handle

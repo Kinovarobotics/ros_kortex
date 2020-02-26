@@ -4,28 +4,33 @@ project(kortex_driver)
 add_compile_options(-std=c++11)
 add_definitions(-D_OS_UNIX)
 
-find_path (KORTEX_API_DOWNLOADER_PATH  # Set this variable
-			download_kortex_api.bash  # To the Working dir of this file 
-			${PROJECT_SOURCE_DIR}/../kortex_api/scripts) # Search this file here
+option(USE_CONAN "Use the Conan package manager to automatically fetch the Kortex API" ON)
 
-if(KORTEX_API_DOWNLOADER_PATH)
-	execute_process(COMMAND ./download_kortex_api.bash
-			WORKING_DIRECTORY ${KORTEX_API_DOWNLOADER_PATH}
-                        RESULT_VARIABLE DOWNLOAD_API_RESULT)
-else()
-	message(FATAL_ERROR "Could not find download_kortex_api.bash in current workspace")
+# Explicitely specify the build type in case the user did not do it
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
 endif()
 
-if(NOT DOWNLOAD_API_RESULT EQUAL 0)
-  message(FATAL_ERROR "Download of the Kortex API failed")
+if(USE_CONAN)
+  # Include conan.cmake module and download Kortex API from artifactory
+  include(${PROJECT_SOURCE_DIR}/cmake/conan.cmake)
+  conan_check(REQUIRED)
+  conan_add_remote(NAME kinova_public
+                  URL https://artifactory.kinovaapps.com/artifactory/api/conan/conan-public)
+  conan_cmake_run(CONANFILE conanfile.py
+                  UPDATE
+                  BASIC_SETUP CMAKE_TARGETS
+                  NO_OUTPUT_DIRS
+                  SETTINGS kortex_api_cpp:compiler=gcc kortex_api_cpp:compiler.version=5 kortex_api_cpp:compiler.libcxx=libstdc++11)
 endif()
 
 ## find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation actionlib control_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation actionlib control_msgs urdf)
 find_package(Boost REQUIRED COMPONENTS system)
 
 file(GLOB_RECURSE generated_files RELATIVE ${PROJECT_SOURCE_DIR} "src/generated/*.cpp")
-file(GLOB_RECURSE non_generated_files RELATIVE ${PROJECT_SOURCE_DIR} "src/non-generated/*.cpp")
+file(GLOB_RECURSE non_generated_files RELATIVE ${PROJECT_SOURCE_DIR} "src/non-generated/driver/*.cpp")
+file(GLOB_RECURSE test_files RELATIVE ${PROJECT_SOURCE_DIR} "src/non-generated/tests/*.cc")
 
 # Find all auto-generated subdirectories in msg/generated
 file(GLOB children RELATIVE ${PROJECT_SOURCE_DIR}/msg/generated ${PROJECT_SOURCE_DIR}/msg/generated/*)
@@ -67,39 +72,49 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(include ${Boost_INCLUDE_DIRS})
 include_directories(include ${PROJECT_SOURCE_DIR}/src)
 include_directories(include ${PROJECT_SOURCE_DIR}/include)
-include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/client)
-include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/client_stubs)
-include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/messages)
-include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/common)
-include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include)
 
-link_directories(${PROJECT_SOURCE_DIR}/../kortex_api/lib/release)
+if(NOT USE_CONAN)
+  include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/client)
+  include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/client_stubs)
+  include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/messages)
+  include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include/common)
+  include_directories(include ${PROJECT_SOURCE_DIR}/../kortex_api/include)
+  link_directories(${PROJECT_SOURCE_DIR}/../kortex_api/lib/release)
+endif()
 
+# Generated files library
 add_library(kortex_driver_generated_files ${generated_files})
-target_link_libraries(kortex_driver_generated_files ${catkin_LIBRARIES} KortexApi gcov)
+if(USE_CONAN)
+  target_link_libraries(kortex_driver_generated_files CONAN_PKG::kortex_api_cpp ${catkin_LIBRARIES} gcov)
+else()
+  target_link_libraries(kortex_driver_generated_files KortexApiCpp ${catkin_LIBRARIES} gcov)
+endif()
 add_dependencies(kortex_driver_generated_files ${PROJECT_NAME}_gencpp)
+# Remove deprecation warnings from Kortex API
+target_compile_options(kortex_driver_generated_files PRIVATE "-Wno-deprecated-declarations")
 
-add_executable(kortex_arm_driver ${non_generated_files})
-target_link_libraries(kortex_arm_driver ${catkin_LIBRARIES} KortexApi gcov kortex_driver_generated_files)
-add_dependencies(kortex_arm_driver kortex_driver_generated_files)
+# Non-generated files library (driver implementation)
+add_library(kortex_arm_driver_implementation ${non_generated_files})
+if(USE_CONAN)
+  target_link_libraries(kortex_arm_driver_implementation CONAN_PKG::kortex_api_cpp ${catkin_LIBRARIES} gcov kortex_driver_generated_files)
+else()
+  target_link_libraries(kortex_arm_driver_implementation KortexApiCpp ${catkin_LIBRARIES} gcov kortex_driver_generated_files)
+endif()
+add_dependencies(kortex_arm_driver_implementation kortex_driver_generated_files)
 
-# Install
+# Entry point executable for the driver
+add_executable(kortex_arm_driver src/non-generated/main.cpp)
+if(USE_CONAN)
+  target_link_libraries(kortex_arm_driver CONAN_PKG::kortex_api_cpp ${catkin_LIBRARIES} gcov kortex_arm_driver_implementation)
+else()
+  target_link_libraries(kortex_arm_driver KortexApiCpp ${catkin_LIBRARIES} gcov kortex_arm_driver_implementation)
+endif()
+add_dependencies(kortex_arm_driver kortex_arm_driver_implementation)
 
-install(TARGETS kortex_driver_generated_files kortex_arm_driver
-   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-install(DIRECTORY include/${PROJECT_NAME}/
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
-
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/../kortex_api/include/
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
-
-install(DIRECTORY launch
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-  FILES_MATCHING PATTERN "*.launch"
-)
+## Add gtest based cpp test target and link libraries
+if(CATKIN_ENABLE_TESTING)
+	find_package(rostest REQUIRED)
+	catkin_add_gtest(kortex_arm_driver_func_tests ${test_files})
+  target_link_libraries(kortex_arm_driver_func_tests ${catkin_LIBRARIES} kortex_arm_driver_implementation)
+  add_dependencies(kortex_arm_driver_func_tests kortex_arm_driver_implementation)
+endif()

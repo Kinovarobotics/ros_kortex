@@ -1,0 +1,6 @@
+initial_joint_positions: "-J joint_1 1.57
+                          -J joint_2 -0.35
+                          -J joint_3 -2.00
+                          -J joint_4 0
+                          -J joint_5 -1.00
+                          -J joint_6 1.57 "

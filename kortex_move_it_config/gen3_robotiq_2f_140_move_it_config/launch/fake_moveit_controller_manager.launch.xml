@@ -1,0 +1,12 @@
+<launch>
+
+    <!-- The number of degrees of freedom of the Gen3 arm -->
+  <arg name="dof" default="7"/>
+
+  <!-- Set the param that trajectory_execution_manager needs to find the controller plugin -->
+  <param name="moveit_controller_manager" value="moveit_fake_controller_manager/MoveItFakeControllerManager"/>
+
+  <!-- The rest of the params are specific to this plugin -->
+  <rosparam file="$(find gen3_robotiq_2f_140_move_it_config)/config/$(arg dof)dof/fake_controllers.yaml"/>
+
+</launch>

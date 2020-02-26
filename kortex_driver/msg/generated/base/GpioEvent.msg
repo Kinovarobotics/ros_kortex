@@ -1,3 +1,4 @@
 
-uint32 gpio_state
-uint32 device_identifier
+uint32 input_type
+uint32 behavior
+uint32 input_identifier

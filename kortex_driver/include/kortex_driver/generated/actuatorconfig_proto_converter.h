@@ -58,6 +58,7 @@
 #include "kortex_driver/CommandModeInformation.h"
 #include "kortex_driver/Servoing.h"
 #include "kortex_driver/PositionCommand.h"
+#include "kortex_driver/CoggingFeedforwardModeInformation.h"
 
 
 int ToProtoData(kortex_driver::AxisPosition input, Kinova::Api::ActuatorConfig::AxisPosition *output);
@@ -77,5 +78,6 @@ int ToProtoData(kortex_driver::CustomDataSelection input, Kinova::Api::ActuatorC
 int ToProtoData(kortex_driver::CommandModeInformation input, Kinova::Api::ActuatorConfig::CommandModeInformation *output);
 int ToProtoData(kortex_driver::Servoing input, Kinova::Api::ActuatorConfig::Servoing *output);
 int ToProtoData(kortex_driver::PositionCommand input, Kinova::Api::ActuatorConfig::PositionCommand *output);
+int ToProtoData(kortex_driver::CoggingFeedforwardModeInformation input, Kinova::Api::ActuatorConfig::CoggingFeedforwardModeInformation *output);
 
 #endif
