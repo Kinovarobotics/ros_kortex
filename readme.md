@@ -14,7 +14,8 @@ To access the color and depth streams, you will need to clone and follow the ins
 
 - [Robot Operating System (ROS)](http://wiki.ros.org) (middleware for robotics)
 
-You can find the instructions to install ROS Kinetic (for Ubuntu 16.04) [here](http://wiki.ros.org/kinetic/Installation/Ubuntu).
+This package has been tested under ROS Kinetic (Ubuntu 16.04) and ROS Melodic (Ubuntu 18.04).
+You can find the instructions to install ROS Kinetic [here](http://wiki.ros.org/kinetic/Installation/Ubuntu) and ROS Melodic [here](http://wiki.ros.org/melodic/Installation/Ubuntu).
 
 [Google Protocol Buffers](https://developers.google.com/protocol-buffers/) is used by Kinova to define the Kortex APIs and to automatically generate ROS messages, services and C++ classes from the Kortex API `.proto` files. The installation of Google Protocol Buffers is required by developers implementing new APIs with the robot. However, since we already provide all the necessary generated files on GitHub, this is not required for most end users of the robot.
 
