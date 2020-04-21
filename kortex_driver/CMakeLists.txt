@@ -11,19 +11,6 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-if(USE_CONAN)
-  # Include conan.cmake module and download Kortex API from artifactory
-  include(${PROJECT_SOURCE_DIR}/cmake/conan.cmake)
-  conan_check(REQUIRED)
-  conan_add_remote(NAME kinova_public
-                  URL https://artifactory.kinovaapps.com/artifactory/api/conan/conan-public)
-  conan_cmake_run(CONANFILE conanfile.py
-                  UPDATE
-                  BASIC_SETUP CMAKE_TARGETS
-                  NO_OUTPUT_DIRS
-                  SETTINGS kortex_api_cpp:compiler=gcc kortex_api_cpp:compiler.version=5 kortex_api_cpp:compiler.libcxx=libstdc++11)
-endif()
-
 ## find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation actionlib control_msgs urdf)
 find_package(Boost REQUIRED COMPONENTS system)
@@ -67,6 +54,19 @@ generate_messages(DEPENDENCIES std_msgs)
 
 ## declare a catkin package
 catkin_package()
+
+if(USE_CONAN)
+  # Include conan.cmake module and download Kortex API from artifactory
+  include(${PROJECT_SOURCE_DIR}/cmake/conan.cmake)
+  conan_check(REQUIRED)
+  conan_add_remote(NAME kinova_public
+                  URL https://artifactory.kinovaapps.com/artifactory/api/conan/conan-public)
+  conan_cmake_run(CONANFILE conanfile.py
+                  UPDATE
+                  BASIC_SETUP CMAKE_TARGETS
+                  NO_OUTPUT_DIRS
+                  SETTINGS kortex_api_cpp:compiler=gcc kortex_api_cpp:compiler.version=5 kortex_api_cpp:compiler.libcxx=libstdc++11)
+endif()
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(include ${Boost_INCLUDE_DIRS})
