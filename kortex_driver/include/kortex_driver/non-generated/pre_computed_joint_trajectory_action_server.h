@@ -44,8 +44,8 @@ class PreComputedJointTrajectoryActionServer
 
         ActionServerState getState() {return m_server_state;};
 
-        const char* actionServerStateNames[int(ActionServerState::TRAJECTORY_EXECUTION_IN_PROGRESS) + 1] = 
-        {           
+        const char* actionServerStateNames[int(ActionServerState::TRAJECTORY_EXECUTION_IN_PROGRESS) + 1] =
+        {
             "INITIALIZING",
             "IDLE",
             "PRE_PROCESSING_PENDING",
@@ -53,7 +53,7 @@ class PreComputedJointTrajectoryActionServer
             "TRAJECTORY_EXECUTION_PENDING",
             "TRAJECTORY_EXECUTION_IN_PROGRESS"
         };
-    
+
     private:
         // Members
         ros::NodeHandle m_node_handle;
@@ -70,7 +70,7 @@ class PreComputedJointTrajectoryActionServer
         actionlib::ActionServer<control_msgs::FollowJointTrajectoryAction>::GoalHandle m_goal;
         std::chrono::system_clock::time_point m_trajectory_start_time;
         std::chrono::system_clock::time_point m_trajectory_end_time;
-        
+
         std::mutex m_server_state_lock;
         std::mutex m_action_notification_thread_lock;
         ActionServerState m_server_state;
@@ -81,6 +81,7 @@ class PreComputedJointTrajectoryActionServer
         double m_default_goal_time_tolerance;
         double m_default_goal_tolerance;
         std::vector<std::string> m_joint_names;
+        std::string m_prefix;
 
         // Action Server Callbacks
         void goal_received_callback(actionlib::ActionServer<control_msgs::FollowJointTrajectoryAction>::GoalHandle new_goal_handle);

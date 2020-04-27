@@ -33,16 +33,28 @@ PreComputedJointTrajectoryActionServer::PreComputedJointTrajectoryActionServer(c
         ROS_WARN("Parameter default_goal_tolerance was not specified; assuming 0.005 as default value.");
         m_default_goal_tolerance = 0.005;
     }
+    if (!ros::param::get("~prefix", m_prefix))
+    {
+        std::string error_string = "Prefix name was not specified in the launch file, shutting down the node...";
+        ROS_ERROR("%s", error_string.c_str());
+        throw new std::runtime_error(error_string);
+    }
     if (!ros::param::get("~joint_names", m_joint_names))
     {
         std::string error_string = "Parameter joint_names was not specified";
         ROS_ERROR("%s", error_string.c_str());
         throw new std::runtime_error(error_string);
     }
-
+    else
+    {
+      for (int i = 0; i < m_joint_names.size(); i++)
+      {
+        m_joint_names[i] = m_prefix + m_joint_names[i];
+      }
+    }
     // Subscribe to the arm's Action Notifications
     m_sub_action_notif_handle = m_base->OnNotificationActionTopic(std::bind(&PreComputedJointTrajectoryActionServer::action_notif_callback, this, std::placeholders::_1), Kinova::Api::Common::NotificationOptions());
-    
+
     // Ready to receive goal
     m_server.start();
     set_server_state(ActionServerState::IDLE);
@@ -69,11 +81,11 @@ void PreComputedJointTrajectoryActionServer::goal_received_callback(actionlib::A
         // We have to call Stop after having received the ACTION_START notification from the arm
         stop_all_movement();
     }
-    
+
     // Make sure to clear the faults before moving the robot
     m_base->ClearFaults();
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    
+
     // Accept the goal
     ROS_INFO("Joint Trajectory Goal is accepted.");
     m_goal = new_goal_handle;
@@ -89,7 +101,7 @@ void PreComputedJointTrajectoryActionServer::goal_received_callback(actionlib::A
 
     // Construct the Protobuf object trajectory
     trajectory_msgs::JointTrajectory ros_trajectory = m_goal.getGoal()->trajectory;
-    
+
     Kinova::Api::Base::PreComputedJointTrajectory proto_trajectory;
 
     // For logging purposes
@@ -202,7 +214,7 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
                 ROS_INFO("Preprocessing has finished in the arm and goal has been accepted.");
                 set_server_state(ActionServerState::TRAJECTORY_EXECUTION_PENDING);
             }
-            // FIXME KOR-3563 Sometimes the notifications arrive in the wrong order so it is possible to receive 
+            // FIXME KOR-3563 Sometimes the notifications arrive in the wrong order so it is possible to receive
             // a ACTION_PREPROCESS_END notification after the ACTION_START
             // When this bug will be fixed this else if can be removed
             else if (m_server_state == ActionServerState::TRAJECTORY_EXECUTION_IN_PROGRESS)
@@ -243,12 +255,12 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
                         oss << "Additional message is : " << error_element.message() << std::endl;
                     }
                     oss << "-----------------------------" << std::endl;
-                    
+
                     i++;
                 }
 
                 ROS_ERROR("%s", oss.str().c_str());
-                
+
                 result.error_string = oss.str();
                 m_goal.setAborted(result);
 
@@ -385,7 +397,8 @@ bool PreComputedJointTrajectoryActionServer::is_goal_acceptable(actionlib::Actio
 {
     // First check if goal is valid
     if (!goal_handle.isValid())
-    { 
+    {
+        ROS_ERROR("Invalid goal.");
         return false;
     }
 
@@ -429,6 +442,10 @@ bool PreComputedJointTrajectoryActionServer::is_goal_acceptable(actionlib::Actio
         {
             result = (fabs(difference-0.001) < 10.0*FLT_EPSILON);
         }
+    }
+    if(!result)
+    {
+      ROS_ERROR("Insufficient point spacing.");
     }
     return result;
 }
@@ -496,7 +513,7 @@ bool PreComputedJointTrajectoryActionServer::is_goal_tolerance_respected(bool en
         {
             tolerance = m_math_util.toDeg(goal_tolerances[current_index]);
         }
-        
+
         double error = m_math_util.wrapDegreesFromZeroTo360(std::min(fabs(actual_position - desired_position), fabs(fabs(actual_position - desired_position) - 360.0)));
         if (error > tolerance)
         {
@@ -527,6 +544,6 @@ void PreComputedJointTrajectoryActionServer::set_server_state(ActionServerState 
 {
     std::lock_guard<std::mutex> guard(m_server_state_lock);
     ActionServerState old_state = m_server_state;
-    m_server_state = s;   
+    m_server_state = s;
     ROS_INFO("State changed from %s to %s\n", actionServerStateNames[int(old_state)], actionServerStateNames[int(s)]);
 }
