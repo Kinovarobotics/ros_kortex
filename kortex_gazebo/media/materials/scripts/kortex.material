@@ -1,0 +1,23 @@
+material Kortex/Gray
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 0.803 0.824 0.820
+      diffuse 0.803 0.824 0.820
+    }
+  }
+}
+
+material Kortex/Blue
+{
+  technique
+  {
+    pass ambient
+    {
+      ambient 0 0.055 0.525
+      diffuse 0 0.055 0.525
+    }
+  }
+}
