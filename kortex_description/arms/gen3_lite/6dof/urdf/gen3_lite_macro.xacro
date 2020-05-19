@@ -18,7 +18,7 @@
           <mesh filename="package://kortex_description/arms/gen3_lite/${dof}dof/meshes/base_link.STL" />
         </geometry>
         <material name="">
-          <color rgba="0.75294 0.75294 0.75294 1" />
+          <color rgba="0.803 0.824 0.820 1" />
         </material>
       </visual>
       <collision>
@@ -43,7 +43,7 @@
           <mesh filename="package://kortex_description/arms/gen3_lite/${dof}dof/meshes/shoulder_link.STL" />
         </geometry>
         <material name="">
-          <color rgba="0.75294 0.75294 0.75294 1" />
+          <color rgba="0.803 0.824 0.820 1" />
         </material>
       </visual>
       <collision>
@@ -75,7 +75,7 @@
           <mesh filename="package://kortex_description/arms/gen3_lite/${dof}dof/meshes/arm_link.STL" />
         </geometry>
         <material name="">
-          <color rgba="0.75294 0.75294 0.75294 1" />
+          <color rgba="0.803 0.824 0.820 1" />
         </material>
       </visual>
       <collision>
@@ -107,7 +107,7 @@
           <mesh filename="package://kortex_description/arms/gen3_lite/${dof}dof/meshes/forearm_link.STL" />
         </geometry>
         <material name="">
-          <color rgba="0.75294 0.75294 0.75294 1" />
+          <color rgba="0.803 0.824 0.820 1" />
         </material>
       </visual>
       <collision>
@@ -139,7 +139,7 @@
           <mesh filename="package://kortex_description/arms/gen3_lite/${dof}dof/meshes/lower_wrist_link.STL" />
         </geometry>
         <material name="">
-          <color rgba="0.75294 0.75294 0.75294 1" />
+          <color rgba="0.803 0.824 0.820 1" />
         </material>
       </visual>
       <collision>
@@ -171,7 +171,7 @@
           <mesh filename="package://kortex_description/arms/gen3_lite/${dof}dof/meshes/upper_wrist_link.STL" />
         </geometry>
         <material name="">
-          <color rgba="0.75294 0.75294 0.75294 1" />
+          <color rgba="0.803 0.824 0.820 1" />
         </material>
       </visual>
       <collision>

@@ -22,7 +22,7 @@
           <mesh filename="package://kortex_description/grippers/gen3_lite_2f/meshes/gripper_base_link.STL" />
         </geometry>
         <material name="">
-          <color rgba="0.75294 0.75294 0.75294 1" />
+          <color rgba="0.803 0.824 0.820 1" />
         </material>
       </visual>
       <collision>
@@ -48,7 +48,7 @@
         <mesh filename="package://kortex_description/grippers/gen3_lite_2f/meshes/right_finger_prox_link.STL" />
       </geometry>
       <material name="">
-          <color rgba="0.75294 0.75294 0.75294 1" />
+          <color rgba="0.803 0.824 0.820 1" />
       </material>
     </visual>
     <collision>
@@ -59,7 +59,7 @@
     </collision>
     </link>
     <gazebo reference="${prefix}right_finger_prox_link">
-      <material>Gazebo/Black</material>
+      <material>Kortex/Gray</material>
     </gazebo>
     <joint name="${prefix}right_finger_bottom_joint" type="revolute">
       <origin xyz="0 -0.030501 0.070003" rpy="0 1.5708 0" />
@@ -80,7 +80,7 @@
           <mesh filename="package://kortex_description/grippers/gen3_lite_2f/meshes/right_finger_dist_link.STL" />
         </geometry>
         <material name="">
-          <color rgba="0.75294 0.75294 0.75294 1" />
+          <color rgba="0 0.055 0.525 1" />
         </material>
       </visual>
       <collision>
@@ -114,7 +114,7 @@
           <mesh filename="package://kortex_description/grippers/gen3_lite_2f/meshes/left_finger_prox_link.STL" />
         </geometry>
         <material name="">
-          <color rgba="0.75294 0.75294 0.75294 1" />
+          <color rgba="0.803 0.824 0.820 1" />
         </material>
       </visual>
       <collision>
@@ -125,7 +125,7 @@
       </collision>
     </link>
     <gazebo reference="${prefix}left_finger_prox_link">
-      <material>Gazebo/Black</material>
+      <material>Kortex/Gray</material>
     </gazebo>
     <joint name="${prefix}left_finger_bottom_joint" type="revolute">
       <origin xyz="0 0.0305 0.070003" rpy="0 1.5708 0" />
@@ -147,7 +147,7 @@
           <mesh filename="package://kortex_description/grippers/gen3_lite_2f/meshes/left_finger_dist_link.STL" />
         </geometry>
         <material name="">
-          <color rgba="0.75294 0.75294 0.75294 1" />
+          <color rgba="0 0.055 0.525 1" />
         </material>
       </visual>
       <collision>
