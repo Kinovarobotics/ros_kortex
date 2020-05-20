@@ -21,7 +21,7 @@ You can find the instructions to install ROS Kinetic [here](http://wiki.ros.org/
 
 ### Build
 
-These are the instructions to run in a terminal to create the workspace, clone the `ros_kortex` repository, install the necessary ROS dependencies and build the package:
+These are the instructions to run in a terminal to create the workspace, clone the `ros_kortex` repository and install the necessary ROS dependencies:
 
         sudo apt install python3 python3-pip
         sudo python3 -m pip install conan
@@ -33,10 +33,29 @@ These are the instructions to run in a terminal to create the workspace, clone t
         git clone https://github.com/Kinovarobotics/ros_kortex.git
         cd ../
         rosdep install --from-paths src --ignore-src -y
+
+Then, to build and source the workspace:
         catkin_make
         source devel/setup.bash
 
-As you see, there are instructions to install the Conan package manager. You can learn more about why we use Conan [in this specific section of the kortex_driver readme](kortex_driver/readme.md#conan).
+You can also build against one of the ARMv8 builds of the Kortex API with Conan if you specify the `CONAN_TARGET_PLATFORM` CMake argument when using `catkin_make`. The following platforms are supported:
+
+- Artik 710: 
+
+        catkin_make --cmake-args -DCONAN_TARGET_PLATFORM=artik710
+        source devel/setup.bash
+
+- IMX6:
+
+        catkin_make --cmake-args -DCONAN_TARGET_PLATFORM=imx6
+        source devel/setup.bash
+
+- NVidia Jetson: 
+
+        catkin_make --cmake-args -DCONAN_TARGET_PLATFORM=jetson
+        source devel/setup.bash
+
+As you see, there are instructions to install the Conan package manager. You can learn more about why we use Conan or how to simply download the API and link against it [in this specific section of the kortex_driver readme](kortex_driver/readme.md#conan). You can also decide 
 
 ## Contents
 
