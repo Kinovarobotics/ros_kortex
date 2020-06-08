@@ -29,6 +29,15 @@
         </geometry>
       </collision>
     </link>
+    <gazebo reference="${prefix}${fingerprefix}_outer_knuckle">
+      <visual>  
+        <material>  
+          <ambient>0.792156862745098 0.819607843137255 0.933333333333333 1</ambient>  
+          <diffuse>0.792156862745098 0.819607843137255 0.933333333333333 1</diffuse>  
+        </material>  
+      </visual> 
+    </gazebo>
+    
   </xacro:macro>
 
   <xacro:macro name="outer_finger" params="prefix fingerprefix stroke">
@@ -60,6 +69,9 @@
         </geometry>
       </collision>
     </link>
+    <gazebo reference="${prefix}${fingerprefix}_outer_finger">
+      <material>Gazebo/Black</material>
+    </gazebo>
   </xacro:macro>
 
   <xacro:macro name="inner_knuckle" params="prefix fingerprefix stroke">
@@ -91,6 +103,9 @@
         </geometry>
       </collision>
     </link>
+    <gazebo reference="${prefix}${fingerprefix}_inner_knuckle">
+      <material>Gazebo/Black</material>
+    </gazebo>
   </xacro:macro>
 
   <xacro:macro name="inner_finger" params="prefix fingerprefix stroke">
@@ -122,6 +137,9 @@
         </geometry>
       </collision>
     </link>
+    <gazebo reference="${prefix}${fingerprefix}_inner_finger">
+      <material>Gazebo/Black</material>
+    </gazebo>
   </xacro:macro>
 
   <!-- Finger pad link, the default are the "big pads" with rubber-->
