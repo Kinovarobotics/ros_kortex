@@ -21,6 +21,7 @@
                 <multiplier>-1.0</multiplier>
                 <offset>0.0</offset>
                 <maxEffort>5.0</maxEffort>
+                <hasPID/>
             </plugin>
             <plugin filename="libroboticsgroup_gazebo_mimic_joint_plugin.so" name="mimic_robotiq_140_2">
                 <joint>finger_joint</joint>
@@ -28,6 +29,7 @@
                 <multiplier>-1.0</multiplier>
                 <offset>0.0</offset>
                 <maxEffort>5.0</maxEffort>
+                <hasPID/>
             </plugin>
             <plugin filename="libroboticsgroup_gazebo_mimic_joint_plugin.so" name="mimic_robotiq_140_3">
                 <joint>finger_joint</joint>
@@ -35,6 +37,7 @@
                 <multiplier>-1.0</multiplier>
                 <offset>0.0</offset>
                 <maxEffort>5.0</maxEffort>
+                <hasPID/>
             </plugin>
             <plugin filename="libroboticsgroup_gazebo_mimic_joint_plugin.so" name="mimic_robotiq_140_4">
                 <joint>finger_joint</joint>
@@ -42,6 +45,7 @@
                 <multiplier>1.0</multiplier>
                 <offset>0.0</offset>
                 <maxEffort>5.0</maxEffort>
+                <hasPID/>
             </plugin>
             <plugin filename="libroboticsgroup_gazebo_mimic_joint_plugin.so" name="mimic_robotiq_140_5">
                 <joint>finger_joint</joint>
@@ -49,6 +53,7 @@
                 <multiplier>1.0</multiplier>
                 <offset>0.0</offset>
                 <maxEffort>5.0</maxEffort>
+                <hasPID/>
             </plugin>
 
             <plugin name="gazebo_grasp_fix" filename="libgazebo_grasp_fix.so">
