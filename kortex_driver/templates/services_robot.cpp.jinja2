@@ -19,36 +19,36 @@
 {% endfor -%}
 #include "{{current_header_filename}}"
 
-{{package.short_name}}Services::{{package.short_name}}Services(ros::NodeHandle& n, {{package.cpp_namespace}}::{{package.short_name}}Client* {{package.short_name|lower}}, uint32_t device_id, uint32_t timeout_ms): 
-	m_n(n),
+{{package.short_name}}RobotServices::{{package.short_name}}RobotServices(ros::NodeHandle& node_handle, {{package.cpp_namespace}}::{{package.short_name}}Client* {{package.short_name|lower}}, uint32_t device_id, uint32_t timeout_ms): 
+	I{{package.short_name}}Services(node_handle),
 	m_{{package.short_name|lower}}({{package.short_name|lower}}),
 	m_current_device_id(device_id)
 {
 	m_api_options.timeout_ms = timeout_ms;
 
-	m_pub_Error = m_n.advertise<kortex_driver::KortexError>("kortex_error", 1000);
+	m_pub_Error = m_node_handle.advertise<kortex_driver::KortexError>("kortex_error", 1000);
 {%- for method in package.methods -%}
 {%- if method.is_notification_rpc %}
-	m_pub_{{method.name}} = m_n.advertise<kortex_driver::{{method_prepend_rpc_package_name}}{{method.name|replace("Topic", "")}}Notification>("{{method.name_lowercase_with_underscores}}", 1000);
+	m_pub_{{method.name}} = m_node_handle.advertise<kortex_driver::{{method_prepend_rpc_package_name}}{{method.name|replace("Topic", "")}}Notification>("{{method.name_lowercase_with_underscores}}", 1000);
 	m_is_activated_{{method.name}} = false;
 {%- endif -%}
 {%- endfor %}
 
-	m_serviceSetDeviceID = n.advertiseService("{{package.short_name_lowercase_with_underscores}}/set_device_id", &{{package.short_name}}Services::SetDeviceID, this);
-	m_serviceSetApiOptions = n.advertiseService("{{package.short_name_lowercase_with_underscores}}/set_api_options", &{{package.short_name}}Services::SetApiOptions, this);
+	m_serviceSetDeviceID = n.advertiseService("{{package.short_name_lowercase_with_underscores}}/set_device_id", &{{package.short_name}}RobotServices::SetDeviceID, this);
+	m_serviceSetApiOptions = n.advertiseService("{{package.short_name_lowercase_with_underscores}}/set_api_options", &{{package.short_name}}RobotServices::SetApiOptions, this);
 {% for method in package.methods %}
-	m_service{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}} = m_n.advertiseService("{{package.short_name_lowercase_with_underscores}}/{%- if method.prepend_on_notification -%}activate_publishing_of_{%- endif -%}{{method.name_lowercase_with_underscores}}", &{{package.short_name}}Services::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}, this);
+	m_service{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}} = m_node_handle.advertiseService("{{package.short_name_lowercase_with_underscores}}/{%- if method.prepend_on_notification -%}activate_publishing_of_{%- endif -%}{{method.name_lowercase_with_underscores}}", &{{package.short_name}}RobotServices::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}, this);
 {%- endfor %}
 }
 
-bool {{package.short_name}}Services::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
+bool {{package.short_name}}RobotServices::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
 {
 	m_current_device_id = req.device_id;
 
 	return true;
 }
 
-bool {{package.short_name}}Services::SetApiOptions(kortex_driver::SetApiOptions::Request  &req, kortex_driver::SetApiOptions::Response &res)
+bool {{package.short_name}}RobotServices::SetApiOptions(kortex_driver::SetApiOptions::Request  &req, kortex_driver::SetApiOptions::Response &res)
 {
 	m_api_options.timeout_ms = req.input.timeout_ms;
 
@@ -56,7 +56,7 @@ bool {{package.short_name}}Services::SetApiOptions(kortex_driver::SetApiOptions:
 }
 
 {% for method in package.methods %}
-bool {{package.short_name}}Services::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}(kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Request  &req, kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Response &res)
+bool {{package.short_name}}RobotServices::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}(kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Request  &req, kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Response &res)
 {
 	{% if method.is_rpc_deprecated -%}
 	ROS_WARN("The {{package.short_name_lowercase_with_underscores}}/{%- if method.prepend_on_notification -%}activate_publishing_of_{%- endif -%}{{method.name_lowercase_with_underscores}} service is now deprecated and will be removed in a future release.");
@@ -82,7 +82,7 @@ bool {{package.short_name}}Services::{{method.prepend_rpc_package_name}}{{method
 		{%- if not method.output_type_short_name == "Empty" %}
 		{%- if not method.input_type_short_name == "Empty" %}
 		{%- if method.is_notification_rpc %}
-		std::function< void ({{method.notification_message_cpp_namespace}}::{{method.name|replace("Topic", "")}}Notification) > callback = std::bind(&{{package.short_name}}Services::cb_{{method.name}}, this, std::placeholders::_1);
+		std::function< void ({{method.notification_message_cpp_namespace}}::{{method.name|replace("Topic", "")}}Notification) > callback = std::bind(&{{package.short_name}}RobotServices::cb_{{method.name}}, this, std::placeholders::_1);
 		output = m_{{package.short_name|lower}}->{{method.prepend_on_notification}}{{method.name}}(callback, input, m_current_device_id);
 		m_is_activated_{{method.name}} = true;
 		{%- else %}
@@ -123,7 +123,7 @@ bool {{package.short_name}}Services::{{method.prepend_rpc_package_name}}{{method
 	return true;
 }
 {%- if method.is_notification_rpc %}
-void {{package.short_name}}Services::cb_{{method.name}}({{method.notification_message_cpp_namespace}}::{{method.name|replace("Topic", "")}}Notification notif)
+void {{package.short_name}}RobotServices::cb_{{method.name}}({{method.notification_message_cpp_namespace}}::{{method.name|replace("Topic", "")}}Notification notif)
 {
 	kortex_driver::{{method.name|replace("Topic", "")}}Notification ros_msg;
 	ToRosData(notif, ros_msg);
