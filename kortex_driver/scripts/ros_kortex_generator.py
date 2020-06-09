@@ -523,13 +523,13 @@ def generate_code(request, response):
         if package.methods: # package contains at least one RPC
             # Generate interface files
             current_header_filename = "kortex_driver/generated/interfaces/{}_services_interface.h".format(package.short_name.lower())
+            current_interface_header_filename = current_header_filename
+            this_package_context.current_interface_header_filename = current_interface_header_filename
             with open(os.path.join("..", "include/" + current_header_filename), 'wt') as services_file:  
                 services_file.write(render("../templates/services_interface.h.jinja2", this_package_context.__dict__))
             
             # Generate robot files
-            current_interface_header_filename = current_header_filename
             current_header_filename = "kortex_driver/generated/robot/{}_services.h".format(package.short_name.lower())
-            this_package_context.current_interface_header_filename = current_interface_header_filename
             this_package_context.current_header_filename = current_header_filename
             this_package_context.include_file_names = include_file_names
             with open(os.path.join("..", "include/" + current_header_filename), 'wt') as services_file:  
@@ -538,13 +538,13 @@ def generate_code(request, response):
                 services_file.write(render("../templates/services_robot.cpp.jinja2", this_package_context.__dict__))
 
             # Generate simulation files
-            # current_header_filename = "kortex_driver/generated/simulation/{}_services.h".format(package.short_name.lower())
-            # this_package_context.current_header_filename = current_header_filename
-            # this_package_context.include_file_names = include_file_names
-            # with open(os.path.join("..", "include/" + current_header_filename), 'wt') as services_file:  
-            #     services_file.write(render("../templates/services.h.jinja2", this_package_context.__dict__))
-            # with open(os.path.join("..", "src/generated/{}_services.cpp".format(package.short_name.lower())), 'wt') as services_file:  
-            #     services_file.write(render("../templates/services.cpp.jinja2", this_package_context.__dict__))
+            current_header_filename = "kortex_driver/generated/simulation/{}_services.h".format(package.short_name.lower())
+            this_package_context.current_header_filename = current_header_filename
+            this_package_context.include_file_names = include_file_names
+            with open(os.path.join("..", "include/" + current_header_filename), 'wt') as services_file:  
+                services_file.write(render("../templates/services_simulation.h.jinja2", this_package_context.__dict__))
+            with open(os.path.join("..", "src/generated/simulation/{}_services.cpp".format(package.short_name.lower())), 'wt') as services_file:  
+                services_file.write(render("../templates/services_simulation.cpp.jinja2", this_package_context.__dict__))
 
     # Delete unused folders we created for None
     for package in packages_dict.values():
