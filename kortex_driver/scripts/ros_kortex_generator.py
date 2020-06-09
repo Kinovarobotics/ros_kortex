@@ -456,7 +456,7 @@ def generate_code(request, response):
     include_file_names = []
     for p in packages_with_messages:
         for s in ["proto", "ros"]:
-            include_file_names.append("kortex_driver/generated/{}_{}_converter.h".format(p.short_name.lower(), s))
+            include_file_names.append("kortex_driver/generated/robot/{}_{}_converter.h".format(p.short_name.lower(), s))
 
     # Generate the ROS files for each package
     for package in packages_dict.values():

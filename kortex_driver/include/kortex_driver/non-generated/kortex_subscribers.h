@@ -21,7 +21,7 @@
 #include "kortex_driver/TwistCommand.h"
 #include "kortex_driver/Base_JointSpeeds.h"
 
-#include "kortex_driver/generated/base_proto_converter.h"
+#include "kortex_driver/generated/robot/base_proto_converter.h"
 #include "kortex_driver/non-generated/kortex_math_util.h"
 
 class KortexSubscribers
