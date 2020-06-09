@@ -17,6 +17,7 @@
         <joint name="joint_5" />
         <joint name="joint_6" />
         <joint name="end_effector" />
+        <joint name="tool_frame_joint" />
     </group>
     <group name="gripper">
         <joint name="gripper_base_joint" />

@@ -27,3 +27,7 @@ For example:
 
 - To load the Gen3 lite description, you would put in your launch file : 
 <code><param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/gen3_lite_gen3_lite_2f.xacro sim:=false"\/></code>
+
+## Tool frame
+
+The `tool_frame` link refers to the tool frame used by the arm when it reports end effector position feedback.

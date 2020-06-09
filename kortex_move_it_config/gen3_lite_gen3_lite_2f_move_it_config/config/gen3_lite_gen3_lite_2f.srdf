@@ -17,6 +17,7 @@
         <joint name="joint_5" />
         <joint name="joint_6" />
         <joint name="end_effector" />
+        <joint name="tool_frame_joint" />
     </group>
     <group name="gripper">
         <link name="gripper_base_link" />
@@ -63,7 +64,7 @@
         <joint name="right_finger_tip_joint" value="0" />
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
-    <end_effector name="end_effector" parent_link="dummy_link" group="arm" />
+    <end_effector name="end_effector" parent_link="tool_frame" group="arm" />
     <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
     <passive_joint name="right_finger_tip_joint" />
     <passive_joint name="left_finger_tip_joint" />

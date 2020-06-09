@@ -232,6 +232,15 @@
   </xacro:macro>
 
   <xacro:macro name="robotiq_arg2f_140" params="parent prefix">
+    <!-- Tool frame used by the arm -->
+    <link name="${prefix}tool_frame"/>
+    <joint name="${prefix}tool_frame_joint" type="fixed">
+        <origin xyz="0 0 0.20" rpy="0 0 0" />
+        <parent link="${parent}" />
+        <child link="${prefix}tool_frame" />
+        <axis xyz="0 0 0" />
+    </joint>
+    <!-- Gripper description -->
     <xacro:robotiq_arg2f_base_link prefix="${prefix}" parent="${parent}"/>
     <xacro:finger_links prefix="${prefix}" fingerprefix="left" stroke="140"/>
     <xacro:finger_links prefix="${prefix}" fingerprefix="right" stroke="140"/>
