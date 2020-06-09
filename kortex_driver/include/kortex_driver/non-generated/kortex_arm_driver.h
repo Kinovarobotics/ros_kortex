@@ -45,6 +45,14 @@
 #include "kortex_driver/generated/robot/visionconfig_services.h"
 #include "kortex_driver/generated/robot/controlconfig_services.h"
 
+#include "kortex_driver/generated/simulation/actuatorconfig_services.h"
+#include "kortex_driver/generated/simulation/base_services.h"
+#include "kortex_driver/generated/simulation/deviceconfig_services.h"
+#include "kortex_driver/generated/simulation/devicemanager_services.h"
+#include "kortex_driver/generated/simulation/interconnectconfig_services.h"
+#include "kortex_driver/generated/simulation/visionconfig_services.h"
+#include "kortex_driver/generated/simulation/controlconfig_services.h"
+
 #include "kortex_driver/non-generated/pre_computed_joint_trajectory_action_server.h"
 #include "kortex_driver/non-generated/robotiq_gripper_command_action_server.h"
 #include "kortex_driver/non-generated/kortex_subscribers.h"
