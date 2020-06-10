@@ -71,9 +71,9 @@
             <param name="dof" value="$(arg dof)"/>
             <param name="use_hard_limits" value="$(arg use_hard_limits)"/>
             <param name="prefix" value="$(arg prefix)"/>
-            <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/joint_limits.yaml"/>
+            <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/joint_limits.yaml" subst_value="true"/>
             <!-- If there is a gripper, load the active joint names for it -->
-            <rosparam command="load" file="$(find kortex_description)/grippers/$(arg gripper)/config/joint_limits.yaml" unless="$(eval not arg('gripper'))"/>
+            <rosparam command="load" file="$(find kortex_description)/grippers/$(arg gripper)/config/joint_limits.yaml" unless="$(eval not arg('gripper'))" subst_value="true"/>
         </node>
         
         <!-- Start MoveIt! main executable -->
@@ -99,7 +99,7 @@
             <param name="use_gui" value="false"/>
             <param name="rate" value="$(arg cyclic_data_publish_rate)" />
         </node>
-        <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
         <!-- Start RViz -->
         <node name="rviz" pkg="rviz" type="rviz" output="log" args="-f base_link" if="$(arg start_rviz)"/> 
@@ -117,9 +117,9 @@
             <param name="arm" value="$(arg arm)"/>
             <param name="gripper" value="$(arg gripper)"/>
             <param name="dof" value="$(arg dof)"/>
-            <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/joint_limits.yaml"/>
+            <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/joint_limits.yaml" subst_value="true"/>
             <!-- If there is a gripper, load the active joint names for it -->
-            <rosparam command="load" file="$(find kortex_description)/grippers/$(arg gripper)/config/joint_limits.yaml" unless="$(eval not arg('gripper'))"/>
+            <rosparam command="load" file="$(find kortex_description)/grippers/$(arg gripper)/config/joint_limits.yaml" unless="$(eval not arg('gripper'))" subst_value="true"/>
         </test>
 
         <!-- Test feedback and joint state publishing -->

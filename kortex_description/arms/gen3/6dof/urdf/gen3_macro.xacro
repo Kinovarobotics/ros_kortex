@@ -228,7 +228,7 @@
       <axis xyz="0 0 1" />
       <limit effort="9" velocity="1.2218" />
     </joint>
-    <link name="end_effector_link" />
+    <link name="${prefix}end_effector_link" />
     <joint
       name="${prefix}end_effector"
       type="fixed">

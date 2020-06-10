@@ -1,5 +1,5 @@
 gripper_joint_names:
-  - right_finger_bottom_joint
+  - $(arg prefix)right_finger_bottom_joint
 
 gripper_joint_limits_min:
   - 0.96
