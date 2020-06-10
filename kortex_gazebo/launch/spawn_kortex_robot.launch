@@ -44,10 +44,10 @@
 
         <!-- Load the description for the robot -->
         <!-- Without gripper -->
-        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true"
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix)"
             if="$(eval not arg('gripper'))"/>
         <!-- With gripper -->
-        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true"
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix)"
             unless="$(eval not arg('gripper'))"/>
 
         <!-- Spawn the robot in Gazebo -->
@@ -57,30 +57,30 @@
         <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
             args="-urdf -param robot_description -model $(arg robot_name) -x $(arg x0) -y $(arg y0) -z $(arg z0)
                 -robot_namespace $(arg robot_name)
-                -J joint_1 1.57
-                -J joint_2 0.35
-                -J joint_3 3.14
-                -J joint_4 -2.00
-                -J joint_5 0
-                -J joint_6 -1.00
-                -J joint_7 1.57"  
+                -J $(arg prefix)joint_1 1.57
+                -J $(arg prefix)joint_2 0.35
+                -J $(arg prefix)joint_3 3.14
+                -J $(arg prefix)joint_4 -2.00
+                -J $(arg prefix)joint_5 0
+                -J $(arg prefix)joint_6 -1.00
+                -J $(arg prefix)joint_7 1.57"  
             if="$(eval not arg('gripper'))"/> <!--TODO-->
         <!-- With gripper -->
         <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
         args="-urdf -param robot_description -model $(arg robot_name) -x $(arg x0) -y $(arg y0) -z $(arg z0)
             -robot_namespace $(arg robot_name)
-            -J joint_1 1.57
-                -J joint_2 0.35
-                -J joint_3 3.14
-                -J joint_4 -2.00
-                -J joint_5 0
-                -J joint_6 -1.00
-                -J joint_7 1.57"
+                -J $(arg prefix)joint_1 1.57
+                -J $(arg prefix)joint_2 0.35
+                -J $(arg prefix)joint_3 3.14
+                -J $(arg prefix)joint_4 -2.00
+                -J $(arg prefix)joint_5 0
+                -J $(arg prefix)joint_6 -1.00
+                -J $(arg prefix)joint_7 1.57"
         unless="$(eval not arg('gripper'))"/> <!--TODO-->
 
         <!-- Load controller configuration file from kortex_control package -->
-        <rosparam file="$(find kortex_control)/arms/$(arg arm)/$(arg dof)dof/config/joint_position_controllers.yaml" command="load"/>
-        <rosparam file="$(find kortex_control)/grippers/$(arg gripper)/config/gripper_action_controller_parameters.yaml" command="load"
+        <rosparam file="$(find kortex_control)/arms/$(arg arm)/$(arg dof)dof/config/joint_position_controllers.yaml" command="load" subst_value="true"/>
+        <rosparam file="$(find kortex_control)/grippers/$(arg gripper)/config/gripper_action_controller_parameters.yaml" command="load" subst_value="true"
             unless="$(eval not arg('gripper'))"/>
 
         <!-- Start the controllers -->
@@ -89,13 +89,13 @@
         <group if="$(arg use_trajectory_controller)">
         
             <!-- Without gripper -->
-            <node name="$(arg arm)_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-                output="screen" args="$(arg arm)_joint_trajectory_controller joint_state_controller"
+            <node name="$(arg prefix)$(arg arm)_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+                output="screen" args="$(arg prefix)$(arg arm)_joint_trajectory_controller joint_state_controller"
                 if="$(eval not arg('gripper'))"/>
 
             <!-- With gripper -->
-            <node name="$(arg arm)_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-                output="screen" args="$(arg arm)_joint_trajectory_controller joint_state_controller $(arg gripper)_gripper_controller"
+            <node name="$(arg prefix)$(arg arm)_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+                output="screen" args="$(arg prefix)$(arg arm)_joint_trajectory_controller $(arg prefix)joint_state_controller $(arg prefix)$(arg gripper)_gripper_controller"
                 unless="$(eval not arg('gripper'))"/>
 
         </group>
@@ -105,20 +105,26 @@
 
             <!-- Without gripper -->
             <node name="$(arg arm)_controller_spawner" pkg="controller_manager" type="spawner" respawn="false" if="$(eval not arg('gripper'))"
-                output="screen" args="joint_1_position_controller
-                                      joint_2_position_controller
-                                      joint_3_position_controller
-                                      joint_4_position_controller
-                                      joint_5_position_controller
-                                      joint_6_position_controller
-                                      joint_7_position_controller
-                                      joint_state_controller" />
-            
-            <!-- With gripper -->
-            <node name="$(arg arm)_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-                output="screen" args="$(arg arm)_joint_trajectory_controller joint_state_controller $(arg gripper)_gripper_controller"
-                unless="$(eval not arg('gripper'))"/>
+                output="screen" args="$(arg prefix)joint_1_position_controller
+                                      $(arg prefix)joint_2_position_controller
+                                      $(arg prefix)joint_3_position_controller
+                                      $(arg prefix)joint_4_position_controller
+                                      $(arg prefix)joint_5_position_controller
+                                      $(arg prefix)joint_6_position_controller
+                                      $(arg prefix)joint_7_position_controller
+                                      $(arg prefix)joint_state_controller" />
 
+            <!-- With gripper -->
+            <node name="$(arg arm)_controller_spawner" pkg="controller_manager" type="spawner" respawn="false" unless="$(eval not arg('gripper'))"
+                output="screen" args="$(arg prefix)joint_1_position_controller
+                                      $(arg prefix)joint_2_position_controller
+                                      $(arg prefix)joint_3_position_controller
+                                      $(arg prefix)joint_4_position_controller
+                                      $(arg prefix)joint_5_position_controller
+                                      $(arg prefix)joint_6_position_controller
+                                      $(arg prefix)joint_7_position_controller
+                                      $(arg prefix)joint_state_controller
+                                      $(arg prefix)$(arg gripper)_gripper_controller" />
         </group>
 
         <!-- Start simulated Kortex Driver -->
