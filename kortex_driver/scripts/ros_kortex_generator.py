@@ -377,8 +377,11 @@ def generate_code(request, response):
             os.makedirs("../{}/generated/{}".format(s, package.short_name_lowercase_with_underscores))
     shutil.rmtree("../src/generated", ignore_errors=True)
     shutil.rmtree("../include/kortex_driver/generated", ignore_errors=True)
-    os.makedirs("../src/generated")
-    os.makedirs("../include/kortex_driver/generated")
+    os.makedirs("../src/generated/robot")
+    os.makedirs("../src/generated/simulation")
+    os.makedirs("../include/kortex_driver/generated/interfaces")
+    os.makedirs("../include/kortex_driver/generated/robot")
+    os.makedirs("../include/kortex_driver/generated/simulation")
 
     ###########################################
     # Parse the proto files to add the messages and RPC's to the DetailedPackage's
@@ -453,7 +456,7 @@ def generate_code(request, response):
     include_file_names = []
     for p in packages_with_messages:
         for s in ["proto", "ros"]:
-            include_file_names.append("kortex_driver/generated/{}_{}_converter.h".format(p.short_name.lower(), s))
+            include_file_names.append("kortex_driver/generated/robot/{}_{}_converter.h".format(p.short_name.lower(), s))
 
     # Generate the ROS files for each package
     for package in packages_dict.values():
@@ -498,33 +501,50 @@ def generate_code(request, response):
         
         if package.messages: # package contains at least one message
             # Proto converter header file
-            current_header_filename = "kortex_driver/generated/{}_proto_converter.h".format(package.short_name.lower())
+            current_header_filename = "kortex_driver/generated/robot/{}_proto_converter.h".format(package.short_name.lower())
             this_package_context.include_file_names = filter(lambda x : "proto_converter" in x and x != current_header_filename, include_file_names)
             with open(os.path.join("..", "include/" + current_header_filename), 'wt') as converterFile:
                 converterFile.write(render("../templates/proto_converter.h.jinja2", this_package_context.__dict__))
             # Proto converter cpp file
             this_package_context.current_header_filename = current_header_filename
-            with open(os.path.join("..", "src/generated/{}_proto_converter.cpp".format(package.short_name.lower())), 'wt') as converterFile:
+            with open(os.path.join("..", "src/generated/robot/{}_proto_converter.cpp".format(package.short_name.lower())), 'wt') as converterFile:
                 converterFile.write(render("../templates/proto_converter.cpp.jinja2", this_package_context.__dict__))
             # ROS converter header file
-            current_header_filename = "kortex_driver/generated/{}_ros_converter.h".format(package.short_name.lower())
+            current_header_filename = "kortex_driver/generated/robot/{}_ros_converter.h".format(package.short_name.lower())
             this_package_context.include_file_names = filter(lambda x : "ros_converter" in x and x != current_header_filename, include_file_names)
             with open(os.path.join("..", "include/" + current_header_filename), 'wt') as converterFile:
                 converterFile.write(render("../templates/ros_converter.h.jinja2", this_package_context.__dict__))
             # ROS converter cpp file
             this_package_context.current_header_filename = current_header_filename
-            with open(os.path.join("..", "src/generated/{}_ros_converter.cpp".format(package.short_name.lower())), 'wt') as converterFile:
+            with open(os.path.join("..", "src/generated/robot/{}_ros_converter.cpp".format(package.short_name.lower())), 'wt') as converterFile:
                 converterFile.write(render("../templates/ros_converter.cpp.jinja2", this_package_context.__dict__))
 
         # Generate the ServiceProxy's for every Kortex API method
         if package.methods: # package contains at least one RPC
-            current_header_filename = "kortex_driver/generated/{}_services.h".format(package.short_name.lower())
+            # Generate interface files
+            current_header_filename = "kortex_driver/generated/interfaces/{}_services_interface.h".format(package.short_name.lower())
+            current_interface_header_filename = current_header_filename
+            this_package_context.current_interface_header_filename = current_interface_header_filename
+            with open(os.path.join("..", "include/" + current_header_filename), 'wt') as services_file:  
+                services_file.write(render("../templates/services_interface.h.jinja2", this_package_context.__dict__))
+            
+            # Generate robot files
+            current_header_filename = "kortex_driver/generated/robot/{}_services.h".format(package.short_name.lower())
             this_package_context.current_header_filename = current_header_filename
             this_package_context.include_file_names = include_file_names
             with open(os.path.join("..", "include/" + current_header_filename), 'wt') as services_file:  
-                services_file.write(render("../templates/services.h.jinja2", this_package_context.__dict__))
-            with open(os.path.join("..", "src/generated/{}_services.cpp".format(package.short_name.lower())), 'wt') as services_file:  
-                services_file.write(render("../templates/services.cpp.jinja2", this_package_context.__dict__))
+                services_file.write(render("../templates/services_robot.h.jinja2", this_package_context.__dict__))
+            with open(os.path.join("..", "src/generated/robot/{}_services.cpp".format(package.short_name.lower())), 'wt') as services_file:  
+                services_file.write(render("../templates/services_robot.cpp.jinja2", this_package_context.__dict__))
+
+            # Generate simulation files
+            current_header_filename = "kortex_driver/generated/simulation/{}_services.h".format(package.short_name.lower())
+            this_package_context.current_header_filename = current_header_filename
+            this_package_context.include_file_names = include_file_names
+            with open(os.path.join("..", "include/" + current_header_filename), 'wt') as services_file:  
+                services_file.write(render("../templates/services_simulation.h.jinja2", this_package_context.__dict__))
+            with open(os.path.join("..", "src/generated/simulation/{}_services.cpp".format(package.short_name.lower())), 'wt') as services_file:  
+                services_file.write(render("../templates/services_simulation.cpp.jinja2", this_package_context.__dict__))
 
     # Delete unused folders we created for None
     for package in packages_dict.values():

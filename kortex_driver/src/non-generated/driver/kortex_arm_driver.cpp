@@ -415,14 +415,14 @@ void KortexArmDriver::initRosServices()
 {
     ROS_INFO("-------------------------------------------------");
     ROS_INFO("Initializing Kortex Driver's services...");
-    m_actuator_config_ros_services = new ActuatorConfigServices(m_node_handle, m_actuator_config, 0, m_api_rpc_timeout_ms);
-    m_base_ros_services = new BaseServices(m_node_handle, m_base, 0, m_api_rpc_timeout_ms);
-    m_control_config_ros_services = new ControlConfigServices(m_node_handle, m_control_config, 0, m_api_rpc_timeout_ms);
-    m_device_config_ros_services = new DeviceConfigServices(m_node_handle, m_device_config, 0, m_api_rpc_timeout_ms);
-    m_device_manager_ros_services = new DeviceManagerServices(m_node_handle, m_device_manager, 0, m_api_rpc_timeout_ms);
+    m_actuator_config_ros_services = new ActuatorConfigRobotServices(m_node_handle, m_actuator_config, 0, m_api_rpc_timeout_ms);
+    m_base_ros_services = new BaseRobotServices(m_node_handle, m_base, 0, m_api_rpc_timeout_ms);
+    m_control_config_ros_services = new ControlConfigRobotServices(m_node_handle, m_control_config, 0, m_api_rpc_timeout_ms);
+    m_device_config_ros_services = new DeviceConfigRobotServices(m_node_handle, m_device_config, 0, m_api_rpc_timeout_ms);
+    m_device_manager_ros_services = new DeviceManagerRobotServices(m_node_handle, m_device_manager, 0, m_api_rpc_timeout_ms);
     if (m_is_interconnect_module_present)
     {
-        m_interconnect_config_ros_services = new InterconnectConfigServices(m_node_handle, m_interconnect_config, m_interconnect_device_id, m_api_rpc_timeout_ms);
+        m_interconnect_config_ros_services = new InterconnectConfigRobotServices(m_node_handle, m_interconnect_config, m_interconnect_device_id, m_api_rpc_timeout_ms);
     }
     else 
     {
@@ -430,7 +430,7 @@ void KortexArmDriver::initRosServices()
     }
     if (m_is_vision_module_present)
     {
-        m_vision_config_ros_services = new VisionConfigServices(m_node_handle, m_vision_config, m_vision_device_id, m_api_rpc_timeout_ms);
+        m_vision_config_ros_services = new VisionConfigRobotServices(m_node_handle, m_vision_config, m_vision_device_id, m_api_rpc_timeout_ms);
     }
     else
     {
