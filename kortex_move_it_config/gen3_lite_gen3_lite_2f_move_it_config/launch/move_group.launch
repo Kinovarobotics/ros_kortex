@@ -10,7 +10,7 @@
 
   <include file="$(find gen3_lite_gen3_lite_2f_move_it_config)/launch/planning_context.launch">
     <arg name="prefix" value="$(arg prefix)"/>
-  </include
+  </include>
 
   <!-- GDB Debug Option -->
   <arg name="debug" default="false" />

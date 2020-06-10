@@ -1,0 +1,199 @@
+<?xml version="1.0" ?>
+<!--This does not replace URDF, and is not an extension of URDF.
+    This is a format for representing semantic information about the robot structure.
+    A URDF file must exist for this robot as well, where the joints and the links that are referenced are defined
+-->
+<robot name="gen3_robotiq_2f_85" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:arg name="prefix" default="" />
+    <!--GROUPS: Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
+    <!--LINKS: When a link is specified, the parent joint of that link (if it exists) is automatically included-->
+    <!--JOINTS: When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
+    <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
+    <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
+    <group name="arm">
+        <joint name="$(arg prefix)joint_1" />
+        <joint name="$(arg prefix)joint_2" />
+        <joint name="$(arg prefix)joint_3" />
+        <joint name="$(arg prefix)joint_4" />
+        <joint name="$(arg prefix)joint_5" />
+        <joint name="$(arg prefix)joint_6" />
+        <joint name="$(arg prefix)end_effector" />
+        <joint name="$(arg prefix)tool_frame_joint" />
+    </group>
+    <group name="gripper">
+        <joint name="$(arg prefix)gripper_base_joint" />
+        <joint name="$(arg prefix)finger_joint" />
+        <joint name="$(arg prefix)left_outer_finger_joint" />
+        <joint name="$(arg prefix)left_inner_finger_joint" />
+        <joint name="$(arg prefix)left_inner_finger_pad_joint" />
+        <joint name="$(arg prefix)left_inner_knuckle_joint" />
+        <joint name="$(arg prefix)right_inner_knuckle_joint" />
+        <joint name="$(arg prefix)right_outer_knuckle_joint" />
+        <joint name="$(arg prefix)right_outer_finger_joint" />
+        <joint name="$(arg prefix)right_inner_finger_joint" />
+        <joint name="$(arg prefix)right_inner_finger_pad_joint" />
+    </group>
+    <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
+    <group_state name="home" group="arm">
+        <joint name="$(arg prefix)joint_1" value="0" />
+        <joint name="$(arg prefix)joint_2" value="0.26" />
+        <joint name="$(arg prefix)joint_3" value="-2.27" />
+        <joint name="$(arg prefix)joint_4" value="0" />
+        <joint name="$(arg prefix)joint_5" value="0.96" />
+        <joint name="$(arg prefix)joint_6" value="1.57" />
+    </group_state>
+    <group_state name="retract" group="arm">
+        <joint name="$(arg prefix)joint_1" value="0" />
+        <joint name="$(arg prefix)joint_2" value="-0.35" />
+        <joint name="$(arg prefix)joint_3" value="-2.54" />
+        <joint name="$(arg prefix)joint_4" value="0" />
+        <joint name="$(arg prefix)joint_5" value="-0.87" />
+        <joint name="$(arg prefix)joint_6" value="1.57" />
+    </group_state>
+    <group_state name="vertical" group="arm">
+        <joint name="$(arg prefix)joint_1" value="0" />
+        <joint name="$(arg prefix)joint_2" value="0" />
+        <joint name="$(arg prefix)joint_3" value="0" />
+        <joint name="$(arg prefix)joint_4" value="0" />
+        <joint name="$(arg prefix)joint_5" value="0" />
+        <joint name="$(arg prefix)joint_6" value="0" />
+    </group_state>
+    <group_state name="opened" group="gripper">
+        <joint name="$(arg prefix)left_inner_finger_joint" value="0" />
+        <joint name="$(arg prefix)right_inner_knuckle_joint" value="0" />
+        <joint name="$(arg prefix)finger_joint" value="0" />
+        <joint name="$(arg prefix)right_inner_finger_joint" value="0" />
+        <joint name="$(arg prefix)left_inner_knuckle_joint" value="0" />
+        <joint name="$(arg prefix)right_outer_knuckle_joint" value="0" />
+    </group_state>
+    <group_state name="closed" group="gripper">
+        <joint name="$(arg prefix)left_inner_finger_joint" value="0.8" />
+        <joint name="$(arg prefix)right_inner_knuckle_joint" value="0.8" />
+        <joint name="$(arg prefix)finger_joint" value="0.8" />
+        <joint name="$(arg prefix)right_inner_finger_joint" value="-0.8" />
+        <joint name="$(arg prefix)left_inner_knuckle_joint" value="0.8" />
+        <joint name="$(arg prefix)right_outer_knuckle_joint" value="0.8" />
+    </group_state>
+    <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
+    <end_effector name="gripper" parent_link="$(arg prefix)base_link" group="gripper" />
+    <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
+    <passive_joint name="$(arg prefix)left_inner_finger_joint" />
+    <passive_joint name="$(arg prefix)left_inner_knuckle_joint" />
+    <passive_joint name="$(arg prefix)right_inner_knuckle_joint" />
+    <passive_joint name="$(arg prefix)right_outer_knuckle_joint" />
+    <passive_joint name="$(arg prefix)right_inner_finger_joint" />
+    <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
+    <disable_collisions link1="$(arg prefix)base_link" link2="$(arg prefix)bicep_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)base_link" link2="$(arg prefix)forearm_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)base_link" link2="$(arg prefix)shoulder_link" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)bicep_link" link2="$(arg prefix)forearm_link" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)bicep_link" link2="$(arg prefix)shoulder_link" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)bicep_link" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)forearm_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)left_inner_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)left_inner_finger_pad" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)left_inner_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)left_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)left_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)right_inner_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)right_inner_finger_pad" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)right_inner_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)right_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)right_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)bracelet_link" link2="$(arg prefix)spherical_wrist_2_link" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)left_inner_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)left_inner_finger_pad" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)left_inner_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)left_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)left_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)right_inner_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)right_inner_finger_pad" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)right_inner_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)right_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)right_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)shoulder_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)spherical_wrist_1_link" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)left_inner_finger_pad" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)left_inner_knuckle" reason="Default" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)left_outer_finger" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)left_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)right_inner_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)right_inner_finger_pad" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)right_inner_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)right_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)right_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger_pad" link2="$(arg prefix)left_inner_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger_pad" link2="$(arg prefix)left_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger_pad" link2="$(arg prefix)left_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger_pad" link2="$(arg prefix)right_inner_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger_pad" link2="$(arg prefix)right_inner_finger_pad" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger_pad" link2="$(arg prefix)right_inner_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger_pad" link2="$(arg prefix)right_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger_pad" link2="$(arg prefix)right_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger_pad" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger_pad" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_finger_pad" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_knuckle" link2="$(arg prefix)left_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_knuckle" link2="$(arg prefix)left_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_knuckle" link2="$(arg prefix)right_inner_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_knuckle" link2="$(arg prefix)right_inner_finger_pad" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_knuckle" link2="$(arg prefix)right_inner_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_knuckle" link2="$(arg prefix)right_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_knuckle" link2="$(arg prefix)right_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_knuckle" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)left_inner_knuckle" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_inner_knuckle" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_finger" link2="$(arg prefix)left_outer_knuckle" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)left_outer_finger" link2="$(arg prefix)right_inner_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_finger" link2="$(arg prefix)right_inner_finger_pad" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_finger" link2="$(arg prefix)right_inner_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_finger" link2="$(arg prefix)right_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_finger" link2="$(arg prefix)right_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_finger" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_finger" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_finger" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_knuckle" link2="$(arg prefix)right_inner_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_knuckle" link2="$(arg prefix)right_inner_finger_pad" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_knuckle" link2="$(arg prefix)right_inner_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_knuckle" link2="$(arg prefix)right_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_knuckle" link2="$(arg prefix)right_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_knuckle" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)left_outer_knuckle" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)left_outer_knuckle" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger" link2="$(arg prefix)right_inner_finger_pad" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger" link2="$(arg prefix)right_inner_knuckle" reason="Default" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger" link2="$(arg prefix)right_outer_finger" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger" link2="$(arg prefix)right_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger_pad" link2="$(arg prefix)right_inner_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger_pad" link2="$(arg prefix)right_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger_pad" link2="$(arg prefix)right_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger_pad" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger_pad" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_finger_pad" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_knuckle" link2="$(arg prefix)right_outer_finger" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_knuckle" link2="$(arg prefix)right_outer_knuckle" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_knuckle" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)right_inner_knuckle" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_inner_knuckle" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_outer_finger" link2="$(arg prefix)right_outer_knuckle" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)right_outer_finger" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_outer_finger" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_outer_finger" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_outer_knuckle" link2="$(arg prefix)robotiq_arg2f_base_link" reason="Adjacent" />
+    <disable_collisions link1="$(arg prefix)right_outer_knuckle" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)right_outer_knuckle" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)robotiq_arg2f_base_link" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)robotiq_arg2f_base_link" link2="$(arg prefix)spherical_wrist_2_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)shoulder_link" link2="$(arg prefix)spherical_wrist_1_link" reason="Never" />
+    <disable_collisions link1="$(arg prefix)spherical_wrist_1_link" link2="$(arg prefix)spherical_wrist_2_link" reason="Adjacent" />
+</robot>
