@@ -18,6 +18,8 @@
     <arg name="vision" default="true"/> <!-- True if the arm has a Vision module -->
     <arg name="gripper" default="" />
     <arg name="robot_name" default="my_$(arg arm)"/>
+    <arg name="prefix" default=""/>
+    <arg name="cyclic_data_publish_rate" default="40"/> <!--Hz-->
 
     <!-- Use trajectory controllers and MoveIt -->
     <arg name="use_trajectory_controller" default="true"/>
@@ -118,6 +120,19 @@
                 unless="$(eval not arg('gripper'))"/>
 
         </group>
+
+        <!-- Start simulated Kortex Driver -->
+        <node name="$(arg robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver" output="screen"> <!--launch-prefix="gdb -ex run args"-->
+            <param name="sim" value="true"/>
+            <param name="cyclic_data_publish_rate" value="$(arg cyclic_data_publish_rate)"/>
+            <param name="arm" value="$(arg arm)"/>
+            <param name="gripper" value="$(arg gripper)"/>
+            <param name="dof" value="$(arg dof)"/>
+            <param name="prefix" value="$(arg prefix)"/>
+            <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/joint_limits.yaml"/>
+            <!-- If there is a gripper, load the active joint names for it -->
+            <rosparam command="load" file="$(find kortex_description)/grippers/$(arg gripper)/config/joint_limits.yaml" unless="$(eval not arg('gripper'))"/>
+        </node>
 
         <!-- Start robot state publisher -->
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"

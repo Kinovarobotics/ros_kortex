@@ -56,6 +56,7 @@
 
         <!-- Start the kortex_driver node -->
         <node name="$(arg robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver" output="screen"> <!--launch-prefix="gdb -ex run args"-->
+            <param name="sim" value="false"/>
             <param name="ip_address" value="$(arg ip_address)"/>
             <param name="username" value="$(arg username)"/>
             <param name="password" value="$(arg password)"/>
