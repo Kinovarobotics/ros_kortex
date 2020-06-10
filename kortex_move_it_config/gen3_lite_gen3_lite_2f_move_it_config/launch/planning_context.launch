@@ -5,6 +5,9 @@
   <!-- The name of the parameter under which the URDF is loaded -->
   <arg name="robot_description" default="robot_description"/>
 
+  <!-- The joint and link names prefix used in kortex_description -->
+  <arg name="prefix" default=""/>
+
   <!-- Load universal robot description format (URDF) -->
   <param if="$(arg load_robot_description)" name="$(arg robot_description)" command="xacro --inorder  '$(find kortex_description)/robots/gen3_lite_gen3_lite_2f.xacro'"/>
 
@@ -13,7 +16,7 @@
 
   <!-- Load updated joint limits (override information from URDF) -->
   <group ns="$(arg robot_description)_planning">
-    <rosparam command="load" file="$(find gen3_lite_gen3_lite_2f_move_it_config)/config/joint_limits.yaml"/>
+    <rosparam command="load" file="$(find gen3_lite_gen3_lite_2f_move_it_config)/config/joint_limits.yaml" subst_value="true"/>
   </group>
 
   <!-- Load default settings for kinematics; these settings are overridden by settings in a node's namespace -->

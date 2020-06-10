@@ -151,10 +151,12 @@
             <!-- Without gripper -->
             <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_move_it_config/launch/move_group.launch" if="$(eval not arg('gripper'))"> 
                 <arg name="dof" value="$(arg dof)"/>
+                <arg name="prefix" value="$(arg prefix)"/>
             </include>
             <!-- With gripper -->
             <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_$(arg gripper)_move_it_config/launch/move_group.launch" unless="$(eval not arg('gripper'))">
                 <arg name="dof" value="$(arg dof)"/>
+                <arg name="prefix" value="$(arg prefix)"/>
             </include>
 
             <!-- Unpause the physics in Gazebo and home the robot -->
