@@ -9,7 +9,9 @@
     <arg name="use_hard_limits" default="false"/> <!-- Set soft limits as hard limits (Gen3 only) -->
 
     <!-- Gripper configuration -->
-    <arg name="gripper" default=""/>
+    <!-- Default gripper for Gen3 is none, default gripper for Gen3 lite is gen3_lite_2f -->
+    <arg name="gripper" default="" if="$(eval arg('arm') == 'gen3')"/>
+    <arg name="gripper" default="gen3_lite_2f" if="$(eval arg('arm') == 'gen3_lite')"/>
 
     <!-- Namespace -->
     <arg name="robot_name" default="my_$(arg arm)"/>
