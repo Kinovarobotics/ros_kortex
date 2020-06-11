@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>kortex_driver</name>
-  <version>2.2.0</version>
+  <version>2.2.1</version>
   <description>THe kortex package that act as a robot's driver.</description>
 
   <maintainer email="support@kinova.ca" />
