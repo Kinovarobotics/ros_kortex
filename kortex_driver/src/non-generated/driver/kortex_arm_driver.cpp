@@ -16,7 +16,8 @@ KortexArmDriver::KortexArmDriver(ros::NodeHandle nh):   m_node_handle(nh),
                                                         m_node_is_running(true), 
                                                         m_consecutive_base_cyclic_timeouts(0),
                                                         m_is_interconnect_module_present(false),
-                                                        m_is_vision_module_present(false)
+                                                        m_is_vision_module_present(false),
+                                                        m_simulator{}
 {
     // Parameter to let the other nodes know this node is up
     ros::param::set("is_initialized", false);
@@ -31,6 +32,11 @@ KortexArmDriver::KortexArmDriver(ros::NodeHandle nh):   m_node_handle(nh),
         initSubscribers();
         startActionServers();
     }
+    else
+    {
+        m_simulator.reset(new KortexArmSimulation(nh));
+    }
+    
 
     // ROS Services are always started
     initRosServices();
@@ -214,6 +220,13 @@ void KortexArmDriver::parseRosArguments()
     if (!ros::param::get("~gripper", m_gripper_name))
     {
         std::string error_string = "Gripper name was not specified in the launch file, shutting down the node...";
+        ROS_ERROR("%s", error_string.c_str());
+        throw new std::runtime_error(error_string);
+    }
+    std::string robot_name;
+    if (!ros::param::get("~robot_name", robot_name))
+    {
+        std::string error_string = "Robot name was not specified in the launch file, shutting down the node...";
         ROS_ERROR("%s", error_string.c_str());
         throw new std::runtime_error(error_string);
     }

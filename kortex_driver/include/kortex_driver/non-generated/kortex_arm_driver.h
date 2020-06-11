@@ -56,6 +56,7 @@
 #include "kortex_driver/non-generated/pre_computed_joint_trajectory_action_server.h"
 #include "kortex_driver/non-generated/robotiq_gripper_command_action_server.h"
 #include "kortex_driver/non-generated/kortex_subscribers.h"
+#include "kortex_driver/non-generated/kortex_arm_simulation.h"
 
 #define TCP_PORT 10000
 #define UDP_PORT 10001
@@ -85,6 +86,7 @@ class KortexArmDriver
 
     // False if in simulation
     bool m_is_real_robot;
+    std::unique_ptr<KortexArmSimulation> m_simulator;
 
     // Api options
     std::string m_ip_address;
