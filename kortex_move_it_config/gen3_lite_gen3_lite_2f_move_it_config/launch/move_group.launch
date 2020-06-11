@@ -51,6 +51,7 @@
   <!-- Planning Functionality -->
   <include ns="move_group" file="$(find gen3_lite_gen3_lite_2f_move_it_config)/launch/planning_pipeline.launch.xml">
     <arg name="pipeline" value="ompl" />
+    <arg name="prefix" value="$(arg prefix)"/>
   </include>
 
   <!-- Trajectory Execution Functionality -->

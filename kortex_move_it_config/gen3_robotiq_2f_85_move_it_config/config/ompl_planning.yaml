@@ -146,7 +146,7 @@ arm:
     - LazyPRMstar
     - SPARS
     - SPARStwo
-  projection_evaluator: joints(joint_1,joint_2)
+  projection_evaluator: joints($(arg prefix)joint_1,$(arg prefix)joint_2)
   longest_valid_segment_fraction: 0.005
 gripper:
   default_planner_config: RRTConnect
