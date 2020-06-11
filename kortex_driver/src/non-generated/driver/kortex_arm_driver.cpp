@@ -31,15 +31,17 @@ KortexArmDriver::KortexArmDriver(ros::NodeHandle nh):   m_node_handle(nh),
         verifyProductConfiguration();
         initSubscribers();
         startActionServers();
-    }
-    else
-    {
-        m_simulator.reset(new KortexArmSimulation(nh));
-    }
-    
+    }    
 
     // ROS Services are always started
     initRosServices();
+
+    // Enable ROS Service simulation if not with a real robot
+    if (!m_is_real_robot)
+    {
+        m_simulator.reset(new KortexArmSimulation(nh));
+        registerSimulationHandlers();
+    }
 
     // Start the thread to publish the feedback and joint states
     m_pub_base_feedback = m_node_handle.advertise<kortex_driver::BaseCyclic_Feedback>("base_feedback", 1000);
@@ -635,4 +637,19 @@ void KortexArmDriver::publishRobotFeedback()
 
         rate.sleep();
     }
+}
+
+void KortexArmDriver::registerSimulationHandlers()
+{
+    BaseSimulationServices* base_services_simulation = dynamic_cast<BaseSimulationServices*>(m_base_ros_services);
+    // Link the m_simulator handlers to the ROS services callbacks
+    base_services_simulation->CreateActionHandler = std::bind(&KortexArmSimulation::CreateAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ReadActionHandler = std::bind(&KortexArmSimulation::ReadAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ReadAllActionsHandler = std::bind(&KortexArmSimulation::ReadAllActions, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->DeleteActionHandler = std::bind(&KortexArmSimulation::DeleteAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->UpdateActionHandler = std::bind(&KortexArmSimulation::UpdateAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ExecuteActionFromReferenceHandler = std::bind(&KortexArmSimulation::ExecuteActionFromReference, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ExecuteActionHandler = std::bind(&KortexArmSimulation::ExecuteAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->PauseActionHandler = std::bind(&KortexArmSimulation::PauseAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->StopActionHandler = std::bind(&KortexArmSimulation::StopAction, m_simulator.get(), std::placeholders::_1);
 }

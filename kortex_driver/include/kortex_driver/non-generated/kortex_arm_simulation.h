@@ -17,6 +17,17 @@
 
 #include "kortex_driver/non-generated/kortex_math_util.h"
 
+#include "kortex_driver/CreateAction.h"
+#include "kortex_driver/ReadAction.h"
+#include "kortex_driver/ReadAllActions.h"
+#include "kortex_driver/DeleteAction.h"
+#include "kortex_driver/UpdateAction.h"
+#include "kortex_driver/ExecuteActionFromReference.h"
+#include "kortex_driver/ExecuteAction.h"
+#include "kortex_driver/PauseAction.h"
+#include "kortex_driver/StopAction.h"
+#include "kortex_driver/ResumeAction.h"
+
 class KortexArmSimulation
 {
   public:
@@ -25,7 +36,18 @@ class KortexArmSimulation
     ~KortexArmSimulation();
 
     // Handlers for simulated Kortex API functions
-    // TODO Add handlers
+    // Actions API
+    kortex_driver::CreateAction::Response CreateAction(const kortex_driver::CreateAction::Request& req);
+    kortex_driver::ReadAction::Response ReadAction(const kortex_driver::ReadAction::Request& req);
+    kortex_driver::ReadAllActions::Response ReadAllActions(const kortex_driver::ReadAllActions::Request& req);
+    kortex_driver::DeleteAction::Response DeleteAction(const kortex_driver::DeleteAction::Request& req);
+    kortex_driver::UpdateAction::Response UpdateAction(const kortex_driver::UpdateAction::Request& req);
+    kortex_driver::ExecuteActionFromReference::Response ExecuteActionFromReference(const kortex_driver::ExecuteActionFromReference::Request& req);
+    kortex_driver::ExecuteAction::Response ExecuteAction(const kortex_driver::ExecuteAction::Request& req);
+    kortex_driver::PauseAction::Response PauseAction(const kortex_driver::PauseAction::Request& req);
+    kortex_driver::StopAction::Response StopAction(const kortex_driver::StopAction::Request& req);
+    // Sequences API
+    // Velocity control RPCs
 
   private:
 

@@ -49,3 +49,57 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
 KortexArmSimulation::~KortexArmSimulation()
 {
 }
+
+kortex_driver::CreateAction::Response KortexArmSimulation::CreateAction(const kortex_driver::CreateAction::Request& req)
+{
+    kortex_driver::CreateAction::Response response;
+    return response;
+}
+
+kortex_driver::ReadAction::Response KortexArmSimulation::ReadAction(const kortex_driver::ReadAction::Request& req)
+{
+    kortex_driver::ReadAction::Response response;
+    return response;
+}
+
+kortex_driver::ReadAllActions::Response KortexArmSimulation::ReadAllActions(const kortex_driver::ReadAllActions::Request& req)
+{
+    kortex_driver::ReadAllActions::Response response;
+    return response;
+}
+
+kortex_driver::DeleteAction::Response KortexArmSimulation::DeleteAction(const kortex_driver::DeleteAction::Request& req)
+{
+    kortex_driver::DeleteAction::Response response;
+    return response;
+}
+
+kortex_driver::UpdateAction::Response KortexArmSimulation::UpdateAction(const kortex_driver::UpdateAction::Request& req)
+{
+    kortex_driver::UpdateAction::Response response;
+    return response;
+}
+
+kortex_driver::ExecuteActionFromReference::Response KortexArmSimulation::ExecuteActionFromReference(const kortex_driver::ExecuteActionFromReference::Request& req)
+{
+    kortex_driver::ExecuteActionFromReference::Response response;
+    return response;
+}
+
+kortex_driver::ExecuteAction::Response KortexArmSimulation::ExecuteAction(const kortex_driver::ExecuteAction::Request& req)
+{
+    kortex_driver::ExecuteAction::Response response;
+    return response;
+}
+
+kortex_driver::PauseAction::Response KortexArmSimulation::PauseAction(const kortex_driver::PauseAction::Request& req)
+{
+    kortex_driver::PauseAction::Response response;
+    return response;
+}
+
+kortex_driver::StopAction::Response KortexArmSimulation::StopAction(const kortex_driver::StopAction::Request& req)
+{
+    kortex_driver::StopAction::Response response;
+    return response;
+}

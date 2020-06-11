@@ -163,6 +163,7 @@ class KortexArmDriver
     bool isGripperPresent();
     void setAngularTrajectorySoftLimitsToMax();
     void publishRobotFeedback();
+    void registerSimulationHandlers();
 };
 
 #endif
