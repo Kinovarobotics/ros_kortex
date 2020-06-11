@@ -9,10 +9,10 @@
   <arg name="prefix" default=""/>
 
   <!-- Load universal robot description format (URDF) -->
-  <param if="$(arg load_robot_description)" name="$(arg robot_description)" command="xacro --inorder  '$(find kortex_description)/robots/gen3_lite_gen3_lite_2f.xacro'"/>
+  <param if="$(arg load_robot_description)" name="$(arg robot_description)" command="xacro  '$(find kortex_description)/robots/gen3_lite_gen3_lite_2f.xacro'"/>
 
   <!-- The semantic description that corresponds to the URDF -->
-  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro --inorder $(find gen3_lite_gen3_lite_2f_move_it_config)/config/gen3_lite_gen3_lite_2f.srdf.xacro prefix:=$(arg prefix)"/>
+  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro $(find gen3_lite_gen3_lite_2f_move_it_config)/config/gen3_lite_gen3_lite_2f.srdf.xacro prefix:=$(arg prefix)"/>
   <!-- Load updated joint limits (override information from URDF) -->
   <group ns="$(arg robot_description)_planning">
     <rosparam command="load" file="$(find gen3_lite_gen3_lite_2f_move_it_config)/config/joint_limits.yaml" subst_value="true"/>

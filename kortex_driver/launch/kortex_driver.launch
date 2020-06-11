@@ -36,19 +36,19 @@
         <group if="$(eval not arg('prefix'))">
             <!-- Load the description for the robot -->
             <!-- Without gripper -->
-            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false"
+            <param name="robot_description" command="$(find xacro)/xacro $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false"
                 if="$(eval not arg('gripper'))"/>
             <!-- With gripper -->
-            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false"
+            <param name="robot_description" command="$(find xacro)/xacro $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false"
                 unless="$(eval not arg('gripper'))"/>
         </group>
         <group unless="$(eval not arg('prefix'))">
             <!-- Load the description for the robot -->
             <!-- Without gripper -->
-            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false prefix:=$(arg prefix)"
+            <param name="robot_description" command="$(find xacro)/xacro $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false prefix:=$(arg prefix)"
                 if="$(eval not arg('gripper'))"/>
             <!-- With gripper -->
-            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false prefix:=$(arg prefix)"
+            <param name="robot_description" command="$(find xacro)/xacro $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false prefix:=$(arg prefix)"
                 unless="$(eval not arg('gripper'))"/>
         </group>
 

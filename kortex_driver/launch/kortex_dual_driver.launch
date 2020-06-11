@@ -60,7 +60,7 @@
     <!-- Load arms descriptions -->
    <param 
         name="robot_description" 
-        command="$(find xacro)/xacro --inorder $(find kortex_description)/multiple_robots/kortex_dual_robots.xacro 
+        command="$(find xacro)/xacro $(find kortex_description)/multiple_robots/kortex_dual_robots.xacro 
             left_arm:=$(arg left_arm) 
             left_gripper:=$(arg left_gripper)
             left_dof:=$(arg left_dof)
