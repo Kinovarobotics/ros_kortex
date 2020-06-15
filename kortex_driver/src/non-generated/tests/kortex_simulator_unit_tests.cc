@@ -41,6 +41,23 @@ TEST_F(KortexSimulatorTest, DefaultActions)
     ASSERT_FALSE(other);
 }
 
+// Tests DeleteAction so default actions are not deleted
+TEST_F(KortexSimulatorTest, DeleteDefaultActions)
+{
+    static const std::vector<unsigned int> DEFAULT_ACTIONS_IDENTIFIERS{1,2,3};
+    // Make sure the action can be deleted properly
+    kortex_driver::DeleteAction::Request req;
+    kortex_driver::ActionHandle handle;
+    for (unsigned int i : DEFAULT_ACTIONS_IDENTIFIERS)
+    {
+        handle.identifier = i;
+        req.input = handle;
+        m_simulator->DeleteAction(req);
+        auto actions_map = m_simulator->GetActionsMap();
+        ASSERT_EQ(actions_map.count(i), 1);
+    }
+}
+
 // Tests ReadAllActions
 TEST_F(KortexSimulatorTest, ReadAllActions)
 {
@@ -61,7 +78,7 @@ TEST_F(KortexSimulatorTest, ReadAllActions)
     ASSERT_TRUE(action_list.action_list.empty());
 }
 
-// Tests CreateAction handler for a supported Action
+// Tests CreateAction handler for a supported Action, and DeleteAction
 TEST_F(KortexSimulatorTest, CreateSupportedAction)
 {
     static const std::string name = "MyNewAction";
@@ -88,6 +105,13 @@ TEST_F(KortexSimulatorTest, CreateSupportedAction)
     ASSERT_EQ(actions_map.count(handle.identifier), 1);
     ASSERT_EQ(actions_map[handle.identifier].name, name);
     ASSERT_EQ(actions_map[handle.identifier].handle.action_type, kortex_driver::ActionType::REACH_JOINT_ANGLES);
+
+    // Make sure the action can be deleted properly
+    kortex_driver::DeleteAction::Request del_req;
+    del_req.input = handle;
+    m_simulator->DeleteAction(del_req);
+    actions_map = m_simulator->GetActionsMap();
+    ASSERT_EQ(actions_map.count(handle.identifier), 0);
 }
 
 // Tests CreateAction handler for an unsupported Action

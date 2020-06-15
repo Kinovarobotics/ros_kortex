@@ -11,12 +11,14 @@
 */
 
 #include "kortex_driver/non-generated/kortex_arm_simulation.h"
+#include <set>
 
 namespace 
 {
     static const std::string ARM_PLANNING_GROUP = "arm";
     static const std::string GRIPPER_PLANNING_GROUP = "gripper";
     static constexpr unsigned int FIRST_CREATED_ACTION_ID = 10000;
+    static const std::set<unsigned int> DEFAULT_ACTIONS_IDENTIFIERS{1,2,3};
 }
 
 KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_handle(node_handle),
@@ -140,7 +142,25 @@ kortex_driver::ReadAllActions::Response KortexArmSimulation::ReadAllActions(cons
 
 kortex_driver::DeleteAction::Response KortexArmSimulation::DeleteAction(const kortex_driver::DeleteAction::Request& req)
 {
-    auto input = req.input;
+    auto handle = req.input;
+    // If the action is not a default action
+    if (DEFAULT_ACTIONS_IDENTIFIERS.find(handle.identifier) == DEFAULT_ACTIONS_IDENTIFIERS.end())
+    {
+        auto it = m_map_actions.find(handle.identifier);
+        if (it != m_map_actions.end())
+        {
+            m_map_actions.erase(it);
+            ROS_INFO("Simulated action #%u properly deleted.", handle.identifier);
+        }
+        else
+        {
+            ROS_WARN("Could not find simulated action #%u to delete in actions map.", handle.identifier);
+        }
+    }
+    else
+    {
+        ROS_ERROR("Cannot delete default simulated actions.");
+    }
     kortex_driver::DeleteAction::Response response;
     return response;
 }
