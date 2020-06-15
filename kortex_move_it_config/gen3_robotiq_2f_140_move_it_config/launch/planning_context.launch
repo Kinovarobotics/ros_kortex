@@ -18,7 +18,12 @@
   <param if="$(arg load_robot_description)" name="$(arg robot_description)" command="xacro arm:=gen3 gripper:=robotiq_2f_140 '$(find kortex_description)/robots/gen3_robotiq_2f_140.xacro'"/>
 
   <!-- The semantic description that corresponds to the URDF -->
-  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro $(find gen3_robotiq_2f_140_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_140.srdf.xacro prefix:=$(arg prefix)"/>
+  <!-- No prefix -->
+  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro $(find gen3_robotiq_2f_140_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_140.srdf.xacro prefix:=$(arg prefix)"
+    if="$(eval not arg('prefix'))"/>
+  <!-- With prefix -->
+  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro $(find gen3_robotiq_2f_140_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_140.srdf.xacro prefix:=$(arg prefix)"
+    unless="$(eval not arg('prefix'))"/>
 
   <!-- Load updated joint limits (override information from URDF) -->
   <group ns="$(arg robot_description)_planning">
