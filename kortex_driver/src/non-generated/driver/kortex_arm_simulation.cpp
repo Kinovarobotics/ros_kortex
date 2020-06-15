@@ -16,6 +16,7 @@ namespace
 {
     static const std::string ARM_PLANNING_GROUP = "arm";
     static const std::string GRIPPER_PLANNING_GROUP = "gripper";
+    static constexpr unsigned int FIRST_CREATED_ACTION_ID = 10000;
 }
 
 KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_handle(node_handle),
@@ -64,10 +65,43 @@ KortexArmSimulation::~KortexArmSimulation()
 {
 }
 
+std::unordered_map<uint32_t, kortex_driver::Action> KortexArmSimulation::GetActionsMap() const
+{
+    return m_map_actions;
+}
+
 kortex_driver::CreateAction::Response KortexArmSimulation::CreateAction(const kortex_driver::CreateAction::Request& req)
 {
-    auto input = req.input;
+    auto new_action = req.input;
+    unsigned int identifier = FIRST_CREATED_ACTION_ID;
+    bool identifier_taken = true;
+    // Find unique identifier for new action
+    while (identifier_taken)
+    {
+        identifier_taken = m_map_actions.count(identifier) == 1;
+        if (identifier_taken)
+        {
+            ++identifier;
+        }
+    }
+    // Add Action to map if type is supported
+    switch (new_action.handle.action_type)
+    {
+        case kortex_driver::ActionType::REACH_JOINT_ANGLES:
+        case kortex_driver::ActionType::REACH_POSE:
+        case kortex_driver::ActionType::SEND_GRIPPER_COMMAND:
+        case kortex_driver::ActionType::TIME_DELAY:
+            new_action.handle.identifier = identifier;
+            new_action.handle.permission = 7;
+            m_map_actions.emplace(std::make_pair(identifier, new_action));
+            break;
+        default:
+            ROS_ERROR("Unsupported action type %d : could not create simulated action.", new_action.handle.action_type);
+            break;
+    }
+    // Return ActionHandle for added action
     kortex_driver::CreateAction::Response response;
+    response.output = new_action.handle;
     return response;
 }
 

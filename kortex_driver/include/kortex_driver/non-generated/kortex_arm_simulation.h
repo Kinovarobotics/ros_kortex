@@ -40,6 +40,7 @@ class KortexArmSimulation
     KortexArmSimulation() = delete;
     KortexArmSimulation(ros::NodeHandle& nh);
     ~KortexArmSimulation();
+    std::unordered_map<uint32_t, kortex_driver::Action> GetActionsMap() const;
 
     // Handlers for simulated Kortex API functions
     // Actions API

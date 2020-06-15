@@ -54,15 +54,3 @@ TEST_F(KortexDriverTest, parseURDF)
     urdf::Model model;
     ASSERT_TRUE(model.initParam("robot_description"));
 }
-
-int main(int argc, char** argv){
-  ros::init(argc, argv, "KortexArmDriverInitTestsNode");
-  testing::InitGoogleTest(&argc, argv);
-
-  std::thread t([]{while(ros::ok()) ros::spin();});
-
-  auto res = RUN_ALL_TESTS();
-
-  ros::shutdown();
-  return res;
-}
