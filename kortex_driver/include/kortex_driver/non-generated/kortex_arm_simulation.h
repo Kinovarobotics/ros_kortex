@@ -15,7 +15,11 @@
 
 #include <ros/ros.h>
 
+#include <unordered_map>
+
 #include "kortex_driver/non-generated/kortex_math_util.h"
+
+#include "kortex_driver/ActionType.h"
 
 #include "kortex_driver/CreateAction.h"
 #include "kortex_driver/ReadAction.h"
@@ -27,6 +31,8 @@
 #include "kortex_driver/PauseAction.h"
 #include "kortex_driver/StopAction.h"
 #include "kortex_driver/ResumeAction.h"
+
+#include <moveit/move_group_interface/move_group_interface.h>
 
 class KortexArmSimulation
 {
@@ -66,11 +72,19 @@ class KortexArmSimulation
     std::vector<float> m_gripper_joint_limits_min;
     int m_degrees_of_freedom;
 
+    // Action-related
+    std::unordered_map<uint32_t, kortex_driver::Action> m_map_actions;
+
     // ROS and thread objects to publish the feedback from the robot
     KortexMathUtil m_math_util;
 
+    // MoveIt-related
+    std::unique_ptr<moveit::planning_interface::MoveGroupInterface> m_moveit_arm_interface;
+    std::unique_ptr<moveit::planning_interface::MoveGroupInterface> m_moveit_gripper_interface;
+
     // Helper functions
     bool IsGripperPresent() const {return !m_gripper_name.empty();}
+    void CreateDefaultActions();
 };
 
 #endif //_KORTEX_ARM_SIMULATION_H_
