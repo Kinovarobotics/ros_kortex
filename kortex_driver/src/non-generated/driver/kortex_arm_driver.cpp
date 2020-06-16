@@ -643,6 +643,7 @@ void KortexArmDriver::registerSimulationHandlers()
 {
     BaseSimulationServices* base_services_simulation = dynamic_cast<BaseSimulationServices*>(m_base_ros_services);
     // Link the m_simulator handlers to the ROS services callbacks
+    // Action services
     base_services_simulation->CreateActionHandler = std::bind(&KortexArmSimulation::CreateAction, m_simulator.get(), std::placeholders::_1);
     base_services_simulation->ReadActionHandler = std::bind(&KortexArmSimulation::ReadAction, m_simulator.get(), std::placeholders::_1);
     base_services_simulation->ReadAllActionsHandler = std::bind(&KortexArmSimulation::ReadAllActions, m_simulator.get(), std::placeholders::_1);
@@ -651,4 +652,19 @@ void KortexArmDriver::registerSimulationHandlers()
     base_services_simulation->ExecuteActionFromReferenceHandler = std::bind(&KortexArmSimulation::ExecuteActionFromReference, m_simulator.get(), std::placeholders::_1);
     base_services_simulation->ExecuteActionHandler = std::bind(&KortexArmSimulation::ExecuteAction, m_simulator.get(), std::placeholders::_1);
     base_services_simulation->StopActionHandler = std::bind(&KortexArmSimulation::StopAction, m_simulator.get(), std::placeholders::_1);
+    // Other services
+    base_services_simulation->PlayCartesianTrajectoryHandler = std::bind(&KortexArmSimulation::PlayCartesianTrajectory, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->StopHandler = std::bind(&KortexArmSimulation::Stop, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->GetMeasuredCartesianPoseHandler = std::bind(&KortexArmSimulation::GetMeasuredCartesianPose, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->SendTwistCommandHandler = std::bind(&KortexArmSimulation::SendTwistCommand, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->PlayJointTrajectoryHandler = std::bind(&KortexArmSimulation::PlayJointTrajectory, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->SendJointSpeedsCommandHandler = std::bind(&KortexArmSimulation::SendJointSpeedsCommand, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->SendGripperCommandHandler = std::bind(&KortexArmSimulation::SendGripperCommand, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ApplyEmergencyStopHandler = std::bind(&KortexArmSimulation::ApplyEmergencyStop, m_simulator.get(), std::placeholders::_1);
+
+    // Prospects
+    //SendSelectedJointSpeedCommand
+    //PlaySelectedJointTrajectory
+    //PlayCartesianTrajectoryPosition
+    //PlayCartesianTrajectoryOrientation
 }

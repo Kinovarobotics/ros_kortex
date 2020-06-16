@@ -266,6 +266,62 @@ kortex_driver::StopAction::Response KortexArmSimulation::StopAction(const kortex
     return kortex_driver::StopAction::Response();
 }
 
+kortex_driver::PlayCartesianTrajectory::Response KortexArmSimulation::PlayCartesianTrajectory(const kortex_driver::PlayCartesianTrajectory::Request& req)
+{
+    auto input = req.input;
+    kortex_driver::PlayCartesianTrajectory::Response response;
+    return response;
+}
+
+kortex_driver::Stop::Response KortexArmSimulation::Stop(const kortex_driver::Stop::Request& req)
+{
+    auto input = req.input;
+    kortex_driver::Stop::Response response;
+    return response;
+}
+
+kortex_driver::GetMeasuredCartesianPose::Response KortexArmSimulation::GetMeasuredCartesianPose(const kortex_driver::GetMeasuredCartesianPose::Request& req)
+{
+    auto input = req.input;
+    kortex_driver::GetMeasuredCartesianPose::Response response;
+    return response;
+}
+
+kortex_driver::SendTwistCommand::Response KortexArmSimulation::SendTwistCommand(const kortex_driver::SendTwistCommand::Request& req)
+{
+    auto input = req.input;
+    kortex_driver::SendTwistCommand::Response response;
+    return response;
+}
+
+kortex_driver::PlayJointTrajectory::Response KortexArmSimulation::PlayJointTrajectory(const kortex_driver::PlayJointTrajectory::Request& req)
+{
+    auto input = req.input;
+    kortex_driver::PlayJointTrajectory::Response response;
+    return response;
+}
+
+kortex_driver::SendJointSpeedsCommand::Response KortexArmSimulation::SendJointSpeedsCommand(const kortex_driver::SendJointSpeedsCommand::Request& req)
+{
+    auto input = req.input;
+    kortex_driver::SendJointSpeedsCommand::Response response;
+    return response;
+}
+
+kortex_driver::SendGripperCommand::Response KortexArmSimulation::SendGripperCommand(const kortex_driver::SendGripperCommand::Request& req)
+{
+    auto input = req.input;
+    kortex_driver::SendGripperCommand::Response response;
+    return response;
+}
+
+kortex_driver::ApplyEmergencyStop::Response KortexArmSimulation::ApplyEmergencyStop(const kortex_driver::ApplyEmergencyStop::Request& req)
+{
+    auto input = req.input;
+    kortex_driver::ApplyEmergencyStop::Response response;
+    return response;
+}
+
 void KortexArmSimulation::CreateDefaultActions()
 {
     kortex_driver::Action retract, home, zero;

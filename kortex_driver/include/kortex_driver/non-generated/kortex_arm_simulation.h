@@ -34,6 +34,15 @@
 #include "kortex_driver/StopAction.h"
 #include "kortex_driver/ResumeAction.h"
 
+#include "kortex_driver/PlayCartesianTrajectory.h"
+#include "kortex_driver/Stop.h"
+#include "kortex_driver/GetMeasuredCartesianPose.h"
+#include "kortex_driver/SendTwistCommand.h"
+#include "kortex_driver/PlayJointTrajectory.h"
+#include "kortex_driver/SendJointSpeedsCommand.h"
+#include "kortex_driver/SendGripperCommand.h"
+#include "kortex_driver/ApplyEmergencyStop.h"
+
 #include <moveit/move_group_interface/move_group_interface.h>
 
 class KortexArmSimulation
@@ -55,8 +64,15 @@ class KortexArmSimulation
     kortex_driver::ExecuteActionFromReference::Response ExecuteActionFromReference(const kortex_driver::ExecuteActionFromReference::Request& req);
     kortex_driver::ExecuteAction::Response ExecuteAction(const kortex_driver::ExecuteAction::Request& req);
     kortex_driver::StopAction::Response StopAction(const kortex_driver::StopAction::Request& req);
-    // Sequences API
-    // Velocity control RPCs
+    // Other RPCs
+    kortex_driver::PlayCartesianTrajectory::Response PlayCartesianTrajectory(const kortex_driver::PlayCartesianTrajectory::Request& req);
+    kortex_driver::Stop::Response Stop(const kortex_driver::Stop::Request& req);
+    kortex_driver::GetMeasuredCartesianPose::Response GetMeasuredCartesianPose(const kortex_driver::GetMeasuredCartesianPose::Request& req);
+    kortex_driver::SendTwistCommand::Response SendTwistCommand(const kortex_driver::SendTwistCommand::Request& req);
+    kortex_driver::PlayJointTrajectory::Response PlayJointTrajectory(const kortex_driver::PlayJointTrajectory::Request& req);
+    kortex_driver::SendJointSpeedsCommand::Response SendJointSpeedsCommand(const kortex_driver::SendJointSpeedsCommand::Request& req);
+    kortex_driver::SendGripperCommand::Response SendGripperCommand(const kortex_driver::SendGripperCommand::Request& req);
+    kortex_driver::ApplyEmergencyStop::Response ApplyEmergencyStop(const kortex_driver::ApplyEmergencyStop::Request& req);
 
   private:
 
