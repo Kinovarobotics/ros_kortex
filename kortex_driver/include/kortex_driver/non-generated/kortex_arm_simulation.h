@@ -16,10 +16,12 @@
 #include <ros/ros.h>
 
 #include <unordered_map>
+#include <thread>
 
 #include "kortex_driver/non-generated/kortex_math_util.h"
 
 #include "kortex_driver/ActionType.h"
+#include "kortex_driver/KortexError.h"
 
 #include "kortex_driver/CreateAction.h"
 #include "kortex_driver/ReadAction.h"
@@ -52,7 +54,6 @@ class KortexArmSimulation
     kortex_driver::UpdateAction::Response UpdateAction(const kortex_driver::UpdateAction::Request& req);
     kortex_driver::ExecuteActionFromReference::Response ExecuteActionFromReference(const kortex_driver::ExecuteActionFromReference::Request& req);
     kortex_driver::ExecuteAction::Response ExecuteAction(const kortex_driver::ExecuteAction::Request& req);
-    kortex_driver::PauseAction::Response PauseAction(const kortex_driver::PauseAction::Request& req);
     kortex_driver::StopAction::Response StopAction(const kortex_driver::StopAction::Request& req);
     // Sequences API
     // Velocity control RPCs
@@ -77,8 +78,13 @@ class KortexArmSimulation
     // Action-related
     std::unordered_map<uint32_t, kortex_driver::Action> m_map_actions;
 
-    // ROS and thread objects to publish the feedback from the robot
+    // Math utility
     KortexMathUtil m_math_util;
+
+    // Threading
+    std::atomic<bool> m_is_action_being_executed;
+    std::atomic<bool> m_action_preempted;
+    std::thread m_action_executor_thread;
 
     // MoveIt-related
     std::unique_ptr<moveit::planning_interface::MoveGroupInterface> m_moveit_arm_interface;
@@ -87,6 +93,16 @@ class KortexArmSimulation
     // Helper functions
     bool IsGripperPresent() const {return !m_gripper_name.empty();}
     void CreateDefaultActions();
+    void CancelAction();
+    void PlayAction(const kortex_driver::Action& action);
+
+    // Executors
+    kortex_driver::KortexError ExecuteReachJointAngles(const kortex_driver::Action& action);
+    kortex_driver::KortexError ExecuteReachPose(const kortex_driver::Action& action);
+    kortex_driver::KortexError ExecuteSendJointSpeeds(const kortex_driver::Action& action);
+    kortex_driver::KortexError ExecuteSendTwist(const kortex_driver::Action& action);
+    kortex_driver::KortexError ExecuteSendGripperCommand(const kortex_driver::Action& action);
+    kortex_driver::KortexError ExecuteTimeDelay(const kortex_driver::Action& action);
 };
 
 #endif //_KORTEX_ARM_SIMULATION_H_

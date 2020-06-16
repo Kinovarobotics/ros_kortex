@@ -11,6 +11,8 @@
 */
 
 #include "kortex_driver/non-generated/kortex_arm_simulation.h"
+#include "kortex_driver/ErrorCodes.h"
+#include "kortex_driver/SubErrorCodes.h"
 #include <set>
 
 namespace 
@@ -22,7 +24,9 @@ namespace
 }
 
 KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_handle(node_handle),
-                                                                        m_map_actions{}
+                                                                        m_map_actions{},
+                                                                        m_is_action_being_executed{false},
+                                                                        m_action_preempted{false}
 {
     // Namespacing and prefixing information
     ros::param::get("~robot_name", m_robot_name);
@@ -211,13 +215,6 @@ kortex_driver::ExecuteAction::Response KortexArmSimulation::ExecuteAction(const 
     return response;
 }
 
-kortex_driver::PauseAction::Response KortexArmSimulation::PauseAction(const kortex_driver::PauseAction::Request& req)
-{
-    auto input = req.input;
-    kortex_driver::PauseAction::Response response;
-    return response;
-}
-
 kortex_driver::StopAction::Response KortexArmSimulation::StopAction(const kortex_driver::StopAction::Request& req)
 {
     auto input = req.input;
@@ -278,4 +275,108 @@ void KortexArmSimulation::CreateDefaultActions()
     m_map_actions.emplace(std::make_pair(retract.handle.identifier, retract));
     m_map_actions.emplace(std::make_pair(home.handle.identifier, home));
     m_map_actions.emplace(std::make_pair(zero.handle.identifier, zero));
+}
+
+void KortexArmSimulation::CancelAction()
+{
+    m_action_preempted = true;
+    if (m_action_executor_thread.joinable())
+    {
+        m_action_executor_thread.join();
+    }
+    m_action_preempted = false;
+}
+
+void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
+{
+    kortex_driver::KortexError action_result;
+    m_is_action_being_executed = true;
+    
+    // Switch on the action type
+    switch (action.handle.action_type)
+    {
+        case kortex_driver::ActionType::REACH_JOINT_ANGLES:
+            action_result = ExecuteReachJointAngles(action);
+            break;
+        case kortex_driver::ActionType::REACH_POSE:
+            action_result = ExecuteReachPose(action);
+            break;
+        case kortex_driver::ActionType::SEND_JOINT_SPEEDS:
+            action_result = ExecuteSendJointSpeeds(action);
+            break;
+        case kortex_driver::ActionType::SEND_TWIST_COMMAND:
+            action_result = ExecuteSendTwist(action);
+            break;
+        case kortex_driver::ActionType::SEND_GRIPPER_COMMAND:
+            action_result = ExecuteSendGripperCommand(action);
+            break;
+        case kortex_driver::ActionType::TIME_DELAY:
+            action_result = ExecuteTimeDelay(action);
+            break;
+        default:
+            action_result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
+            action_result.subCode = kortex_driver::SubErrorCodes::UNSUPPORTED_ACTION;
+            break;
+    }
+    
+    // Action was cancelled by user
+    if (m_action_preempted.load())
+    {
+        // Notify ACTION_ABORT
+    }
+    // Action ended on its own
+    else
+    {
+        // Notify ACTION_END
+    }
+    
+    m_is_action_being_executed = false;
+}
+
+kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const kortex_driver::Action& action)
+{
+    kortex_driver::KortexError result;
+    result.code = kortex_driver::ErrorCodes::ERROR_NONE;
+    result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    return result;
+}
+
+kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_driver::Action& action)
+{
+    kortex_driver::KortexError result;
+    result.code = kortex_driver::ErrorCodes::ERROR_NONE;
+    result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    return result;
+}
+
+kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kortex_driver::Action& action)
+{
+    kortex_driver::KortexError result;
+    result.code = kortex_driver::ErrorCodes::ERROR_NONE;
+    result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    return result;
+}
+
+kortex_driver::KortexError KortexArmSimulation::ExecuteSendTwist(const kortex_driver::Action& action)
+{
+    kortex_driver::KortexError result;
+    result.code = kortex_driver::ErrorCodes::ERROR_NONE;
+    result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    return result;
+}
+
+kortex_driver::KortexError KortexArmSimulation::ExecuteSendGripperCommand(const kortex_driver::Action& action)
+{
+    kortex_driver::KortexError result;
+    result.code = kortex_driver::ErrorCodes::ERROR_NONE;
+    result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    return result;
+}
+
+kortex_driver::KortexError KortexArmSimulation::ExecuteTimeDelay(const kortex_driver::Action& action)
+{
+    kortex_driver::KortexError result;
+    result.code = kortex_driver::ErrorCodes::ERROR_NONE;
+    result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    return result;
 }

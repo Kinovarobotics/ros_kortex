@@ -650,6 +650,5 @@ void KortexArmDriver::registerSimulationHandlers()
     base_services_simulation->UpdateActionHandler = std::bind(&KortexArmSimulation::UpdateAction, m_simulator.get(), std::placeholders::_1);
     base_services_simulation->ExecuteActionFromReferenceHandler = std::bind(&KortexArmSimulation::ExecuteActionFromReference, m_simulator.get(), std::placeholders::_1);
     base_services_simulation->ExecuteActionHandler = std::bind(&KortexArmSimulation::ExecuteAction, m_simulator.get(), std::placeholders::_1);
-    base_services_simulation->PauseActionHandler = std::bind(&KortexArmSimulation::PauseAction, m_simulator.get(), std::placeholders::_1);
     base_services_simulation->StopActionHandler = std::bind(&KortexArmSimulation::StopAction, m_simulator.get(), std::placeholders::_1);
 }
