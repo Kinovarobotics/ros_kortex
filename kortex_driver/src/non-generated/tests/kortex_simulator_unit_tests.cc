@@ -3,6 +3,7 @@
 #include <kortex_driver/non-generated/kortex_arm_simulation.h>
 #include <gtest/gtest.h>
 #include <urdf/model.h>
+#include "kortex_driver/ActionEvent.h"
 
 class KortexSimulatorTest : public ::testing::Test {
   protected:
@@ -25,7 +26,11 @@ class KortexSimulatorTest : public ::testing::Test {
             angles.joint_angles.joint_angles.push_back(angle);
         }
         dummy_action.oneof_action_parameters.reach_joint_angles.push_back(angles);
-        }
+
+        // Create action topic subscriber
+        m_action_topic_sub = n.subscribe("action_topic", 5, &KortexSimulatorTest::ActionTopicHandler, this);
+        m_received_notifications.clear();
+    }
 
     void TearDown() override 
     {
@@ -43,10 +48,16 @@ class KortexSimulatorTest : public ::testing::Test {
         }
     }
 
+    void ActionTopicHandler(const kortex_driver::ActionNotification& notif)
+    {
+        m_received_notifications.push_back(notif);
+    }
+
     kortex_driver::Action dummy_action;
     ros::NodeHandle n;
     std::unique_ptr<KortexArmSimulation> m_simulator;
-
+    ros::Subscriber m_action_topic_sub;
+    std::vector<kortex_driver::ActionNotification> m_received_notifications;
 };
 
 // Make sure after initialisation the default actions are
@@ -210,4 +221,95 @@ TEST_F(KortexSimulatorTest, UpdateAction)
     ASSERT_EQ(actions_map.count(handle.identifier), 1);
     ASSERT_EQ(dummy_action.name, actions_map[handle.identifier].name);
     ASSERT_EQ(kortex_driver::ActionType::REACH_JOINT_ANGLES, actions_map[handle.identifier].handle.action_type);
+}
+
+// This uses a TIME_DELAY action to test execution
+TEST_F(KortexSimulatorTest, ExecuteAction)
+{
+    static constexpr uint32_t SLEEP_DURATION_SECONDS = 4;
+
+    dummy_action.oneof_action_parameters.reach_joint_angles.clear();
+    dummy_action.handle.action_type = kortex_driver::ActionType::TIME_DELAY;
+    kortex_driver::Delay delay;
+    delay.duration = SLEEP_DURATION_SECONDS;
+    dummy_action.oneof_action_parameters.delay.push_back(delay);
+    kortex_driver::ExecuteAction::Request req;
+    req.input = dummy_action;
+
+    ASSERT_EQ(m_received_notifications.size(), 0);
+    m_simulator->ExecuteAction(req);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    // Make sure after a couple seconds we received the ACTION_START
+    ASSERT_EQ(m_received_notifications.size(), 1);
+    ASSERT_EQ(m_received_notifications[0].action_event, kortex_driver::ActionEvent::ACTION_START);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    ASSERT_EQ(m_received_notifications.size(), 2);
+    ASSERT_EQ(m_received_notifications[1].action_event, kortex_driver::ActionEvent::ACTION_END);
+}
+
+// This uses a TIME_DELAY action to test execution from reference
+TEST_F(KortexSimulatorTest, ExecuteActionFromReference)
+{
+    static constexpr uint32_t SLEEP_DURATION_SECONDS = 4;
+
+    // Create the Delay action
+    dummy_action.oneof_action_parameters.reach_joint_angles.clear();
+    dummy_action.handle.action_type = kortex_driver::ActionType::TIME_DELAY;
+    kortex_driver::Delay delay;
+    delay.duration = SLEEP_DURATION_SECONDS;
+    dummy_action.oneof_action_parameters.delay.push_back(delay);
+    kortex_driver::CreateAction::Request req;
+    req.input = dummy_action;
+    auto res = m_simulator->CreateAction(req);
+    dummy_action.handle = res.output;
+    auto actions_map = m_simulator->GetActionsMap();
+    ASSERT_EQ(actions_map.count(dummy_action.handle.identifier), 1);
+
+    // Execute the Delay action by reference
+    ASSERT_EQ(m_received_notifications.size(), 0);
+    kortex_driver::ExecuteActionFromReference::Request execute_req;
+    execute_req.input = dummy_action.handle;
+    m_simulator->ExecuteActionFromReference(execute_req);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    // Make sure after a couple seconds we received the ACTION_START
+    ASSERT_EQ(m_received_notifications.size(), 1);
+    ASSERT_EQ(m_received_notifications[0].action_event, kortex_driver::ActionEvent::ACTION_START);
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    ASSERT_EQ(m_received_notifications.size(), 2);
+    ASSERT_EQ(m_received_notifications[1].action_event, kortex_driver::ActionEvent::ACTION_END);
+}
+
+// This uses a TIME_DELAY action to test aborting
+TEST_F(KortexSimulatorTest, StopAction)
+{
+    static constexpr uint32_t SLEEP_DURATION_SECONDS = 4;
+
+    // Create delay action object
+    dummy_action.oneof_action_parameters.reach_joint_angles.clear();
+    dummy_action.handle.action_type = kortex_driver::ActionType::TIME_DELAY;
+    kortex_driver::Delay delay;
+    delay.duration = SLEEP_DURATION_SECONDS;
+    dummy_action.oneof_action_parameters.delay.push_back(delay);
+    kortex_driver::ExecuteAction::Request req;
+    req.input = dummy_action;
+
+    // Prepare StopAction request
+    kortex_driver::StopAction::Request stop_req;
+
+    // Execute the action
+    ASSERT_EQ(m_received_notifications.size(), 0);
+    m_simulator->ExecuteAction(req);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // Make sure after one second we received the ACTION_START
+    ASSERT_EQ(m_received_notifications.size(), 1);
+    ASSERT_EQ(m_received_notifications[0].action_event, kortex_driver::ActionEvent::ACTION_START);
+
+    // Abort the action now
+    m_simulator->StopAction(stop_req);
+
+    // Wait a biut and make sure we received the ACTION_ABORT
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    ASSERT_EQ(m_received_notifications.size(), 2);
+    ASSERT_EQ(m_received_notifications[1].action_event, kortex_driver::ActionEvent::ACTION_ABORT);
 }

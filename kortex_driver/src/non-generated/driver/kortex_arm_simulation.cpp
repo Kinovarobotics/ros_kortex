@@ -17,6 +17,7 @@
 #include "kortex_driver/ActionEvent.h"
 
 #include <set>
+#include <chrono>
 
 namespace 
 {
@@ -78,6 +79,7 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
 
 KortexArmSimulation::~KortexArmSimulation()
 {
+    CancelAction();
 }
 
 std::unordered_map<uint32_t, kortex_driver::Action> KortexArmSimulation::GetActionsMap() const
@@ -171,8 +173,8 @@ kortex_driver::DeleteAction::Response KortexArmSimulation::DeleteAction(const ko
     {
         ROS_ERROR("Cannot delete default simulated actions.");
     }
-    kortex_driver::DeleteAction::Response response;
-    return response;
+    
+    return kortex_driver::DeleteAction::Response();
 }
 
 kortex_driver::UpdateAction::Response KortexArmSimulation::UpdateAction(const kortex_driver::UpdateAction::Request& req)
@@ -203,29 +205,65 @@ kortex_driver::UpdateAction::Response KortexArmSimulation::UpdateAction(const ko
     {
        ROS_ERROR("Cannot update default simulated actions."); 
     }
-    kortex_driver::UpdateAction::Response response;
-    return response;
+
+    return kortex_driver::UpdateAction::Response();
 }
 
 kortex_driver::ExecuteActionFromReference::Response KortexArmSimulation::ExecuteActionFromReference(const kortex_driver::ExecuteActionFromReference::Request& req)
 {
-    auto input = req.input;
-    kortex_driver::ExecuteActionFromReference::Response response;
-    return response;
+    auto handle = req.input;
+    auto it = m_map_actions.find(handle.identifier);
+    if (it != m_map_actions.end())
+    {
+        // If an action is ongoing, cancel it first
+        if (m_is_action_being_executed.load())
+        {
+            CancelAction(); // this will block until the thread is joined and current action finished
+        }
+        m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, it->second);
+    }
+    else
+    {
+        ROS_ERROR("Could not find action with given identifier %d", handle.identifier);
+    }
+    
+    return kortex_driver::ExecuteActionFromReference::Response();
 }
 
 kortex_driver::ExecuteAction::Response KortexArmSimulation::ExecuteAction(const kortex_driver::ExecuteAction::Request& req)
 {
-    auto input = req.input;
-    kortex_driver::ExecuteAction::Response response;
-    return response;
+    auto action = req.input;
+
+    // Add Action to map if type is supported
+    switch (action.handle.action_type)
+    {
+        case kortex_driver::ActionType::REACH_JOINT_ANGLES:
+        case kortex_driver::ActionType::REACH_POSE:
+        case kortex_driver::ActionType::SEND_GRIPPER_COMMAND:
+        case kortex_driver::ActionType::TIME_DELAY:
+            // If an action is ongoing, cancel it first
+            if (m_is_action_being_executed.load())
+            {
+                CancelAction(); // this will block until the thread is joined and current action finished
+            }
+            m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
+            break;
+        default:
+            ROS_ERROR("Unsupported action type %d : could not execute simulated action.", action.handle.action_type);
+            break;
+    }
+
+    return kortex_driver::ExecuteAction::Response();
 }
 
 kortex_driver::StopAction::Response KortexArmSimulation::StopAction(const kortex_driver::StopAction::Request& req)
 {
-    auto input = req.input;
-    kortex_driver::StopAction::Response response;
-    return response;
+    if (m_is_action_being_executed.load())
+    {
+        CancelAction(); // this will block until the thread is joined and current action finished
+    }
+    
+    return kortex_driver::StopAction::Response();
 }
 
 void KortexArmSimulation::CreateDefaultActions()
@@ -357,7 +395,6 @@ void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
         {
             // Notify ACTION_END
             end_notif.action_event = kortex_driver::ActionEvent::ACTION_END;
-            ROS_WARN("Action ended.");
         }
     }
     m_pub_action_topic.publish(end_notif);
@@ -365,6 +402,7 @@ void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
     m_is_action_being_executed = false;
 }
 
+// TODO Fill implementation
 kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const kortex_driver::Action& action)
 {
     kortex_driver::KortexError result;
@@ -373,6 +411,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
     return result;
 }
 
+// TODO Fill implementation
 kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_driver::Action& action)
 {
     kortex_driver::KortexError result;
@@ -381,6 +420,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     return result;
 }
 
+// TODO Fill implementation
 kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kortex_driver::Action& action)
 {
     kortex_driver::KortexError result;
@@ -389,6 +429,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kor
     return result;
 }
 
+// TODO Fill implementation
 kortex_driver::KortexError KortexArmSimulation::ExecuteSendTwist(const kortex_driver::Action& action)
 {
     kortex_driver::KortexError result;
@@ -397,6 +438,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendTwist(const kortex_dr
     return result;
 }
 
+// TODO Fill implementation
 kortex_driver::KortexError KortexArmSimulation::ExecuteSendGripperCommand(const kortex_driver::Action& action)
 {
     kortex_driver::KortexError result;
@@ -410,5 +452,22 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteTimeDelay(const kortex_dr
     kortex_driver::KortexError result;
     result.code = kortex_driver::ErrorCodes::ERROR_NONE;
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    if (!action.oneof_action_parameters.delay.empty())
+    {
+        auto start = std::chrono::system_clock::now();
+        uint32_t delay_seconds = action.oneof_action_parameters.delay[0].duration;
+        // While not preempted and duration not elapsed
+        while (!m_action_preempted.load() && (std::chrono::system_clock::now() - start) < std::chrono::seconds(delay_seconds))
+        {
+            // sleep a bit
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+    }
+    else
+    {
+        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
+        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
+        result.description = "Error playing time delay action : action is malformed.";
+    }
     return result;
 }
