@@ -27,7 +27,6 @@
     <arg name="api_connection_inactivity_timeout_ms" default="20000"/> <!--milliseconds-->
 
     <!-- Automatically start other modules -->
-    <arg name="start_rviz" default="true"/>
     <arg name="start_moveit" default="true"/>
 
     <!-- Action server params -->
@@ -82,9 +81,6 @@
             <param name="rate" value="$(arg cyclic_data_publish_rate)" />
         </node>
         <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
-        <!-- Start RViz -->
-        <node name="rviz" pkg="rviz" type="rviz" output="log" args="-f base_link" if="$(arg start_rviz)"/> 
 
         <!-- Start the kortex_driver node -->
         <test test-name="$(arg robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver_func_tests" args=" --gtest_filter=KortexSim*"> <!--launch-prefix="gdb -ex run args"-->

@@ -41,6 +41,7 @@ class KortexArmSimulation
     KortexArmSimulation(ros::NodeHandle& nh);
     ~KortexArmSimulation();
     std::unordered_map<uint32_t, kortex_driver::Action> GetActionsMap() const;
+    int GetDOF() const {return m_degrees_of_freedom;}
 
     // Handlers for simulated Kortex API functions
     // Actions API

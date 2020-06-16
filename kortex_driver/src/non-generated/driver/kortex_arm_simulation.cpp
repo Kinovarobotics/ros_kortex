@@ -167,7 +167,32 @@ kortex_driver::DeleteAction::Response KortexArmSimulation::DeleteAction(const ko
 
 kortex_driver::UpdateAction::Response KortexArmSimulation::UpdateAction(const kortex_driver::UpdateAction::Request& req)
 {
-    auto input = req.input;
+    auto action = req.input;
+    // If the action is not a default action
+    if (DEFAULT_ACTIONS_IDENTIFIERS.find(action.handle.identifier) == DEFAULT_ACTIONS_IDENTIFIERS.end())
+    {
+        auto it = m_map_actions.find(action.handle.identifier);
+        if (it != m_map_actions.end())
+        {
+            if (it->second.handle.action_type == action.handle.action_type)
+            {
+                it->second = action;
+                ROS_INFO("Simulated action #%u properly updated.", action.handle.identifier);
+            }
+            else
+            {
+                ROS_ERROR("Cannot update action with different type.");
+            }
+        }
+        else
+        {
+            ROS_ERROR("Could not find simulated action #%u to update in actions map.", action.handle.identifier);
+        }
+    }
+    else
+    {
+       ROS_ERROR("Cannot update default simulated actions."); 
+    }
     kortex_driver::UpdateAction::Response response;
     return response;
 }
