@@ -268,58 +268,112 @@ kortex_driver::StopAction::Response KortexArmSimulation::StopAction(const kortex
 
 kortex_driver::PlayCartesianTrajectory::Response KortexArmSimulation::PlayCartesianTrajectory(const kortex_driver::PlayCartesianTrajectory::Request& req)
 {
-    auto input = req.input;
-    kortex_driver::PlayCartesianTrajectory::Response response;
-    return response;
-}
+    auto constrained_pose = req.input;
+    kortex_driver::Action action;
+    action.name = "PlayCartesianTrajectory";
+    action.handle.action_type = kortex_driver::ActionType::REACH_POSE;
+    action.oneof_action_parameters.reach_pose.push_back(constrained_pose);
 
-kortex_driver::Stop::Response KortexArmSimulation::Stop(const kortex_driver::Stop::Request& req)
-{
-    auto input = req.input;
-    kortex_driver::Stop::Response response;
-    return response;
-}
-
-kortex_driver::GetMeasuredCartesianPose::Response KortexArmSimulation::GetMeasuredCartesianPose(const kortex_driver::GetMeasuredCartesianPose::Request& req)
-{
-    auto input = req.input;
-    kortex_driver::GetMeasuredCartesianPose::Response response;
-    return response;
+    // If an action is ongoing, cancel it first
+    if (m_is_action_being_executed.load())
+    {
+        CancelAction(); // this will block until the thread is joined and current action finished
+    }
+    m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
+    
+    return kortex_driver::PlayCartesianTrajectory::Response();
 }
 
 kortex_driver::SendTwistCommand::Response KortexArmSimulation::SendTwistCommand(const kortex_driver::SendTwistCommand::Request& req)
 {
-    auto input = req.input;
-    kortex_driver::SendTwistCommand::Response response;
-    return response;
+    auto twist_command = req.input;
+    kortex_driver::Action action;
+    action.name = "SendTwistCommand";
+    action.handle.action_type = kortex_driver::ActionType::SEND_TWIST_COMMAND;
+    action.oneof_action_parameters.send_twist_command.push_back(twist_command);
+
+    // If an action is ongoing, cancel it first
+    if (m_is_action_being_executed.load())
+    {
+        CancelAction(); // this will block until the thread is joined and current action finished
+    }
+    m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
+    
+    return kortex_driver::SendTwistCommand::Response();
 }
 
 kortex_driver::PlayJointTrajectory::Response KortexArmSimulation::PlayJointTrajectory(const kortex_driver::PlayJointTrajectory::Request& req)
 {
-    auto input = req.input;
-    kortex_driver::PlayJointTrajectory::Response response;
-    return response;
+    auto constrained_joint_angles = req.input;
+    kortex_driver::Action action;
+    action.name = "PlayJointTrajectory";
+    action.handle.action_type = kortex_driver::ActionType::REACH_JOINT_ANGLES;
+    action.oneof_action_parameters.reach_joint_angles.push_back(constrained_joint_angles);
+
+    // If an action is ongoing, cancel it first
+    if (m_is_action_being_executed.load())
+    {
+        CancelAction(); // this will block until the thread is joined and current action finished
+    }
+    m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
+    
+    return kortex_driver::PlayJointTrajectory::Response();
 }
 
 kortex_driver::SendJointSpeedsCommand::Response KortexArmSimulation::SendJointSpeedsCommand(const kortex_driver::SendJointSpeedsCommand::Request& req)
 {
-    auto input = req.input;
-    kortex_driver::SendJointSpeedsCommand::Response response;
-    return response;
+    auto joint_speeds = req.input;
+    kortex_driver::Action action;
+    action.name = "SendJointSpeedsCommand";
+    action.handle.action_type = kortex_driver::ActionType::SEND_JOINT_SPEEDS;
+    action.oneof_action_parameters.send_joint_speeds.push_back(joint_speeds);
+
+    // If an action is ongoing, cancel it first
+    if (m_is_action_being_executed.load())
+    {
+        CancelAction(); // this will block until the thread is joined and current action finished
+    }
+    m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
+    
+    return kortex_driver::SendJointSpeedsCommand::Response();
 }
 
 kortex_driver::SendGripperCommand::Response KortexArmSimulation::SendGripperCommand(const kortex_driver::SendGripperCommand::Request& req)
 {
-    auto input = req.input;
-    kortex_driver::SendGripperCommand::Response response;
-    return response;
+    auto gripper_command = req.input;
+    kortex_driver::Action action;
+    action.name = "GripperCommand";
+    action.handle.action_type = kortex_driver::ActionType::SEND_GRIPPER_COMMAND;
+    action.oneof_action_parameters.send_gripper_command.push_back(gripper_command);
+
+    // If an action is ongoing, cancel it first
+    if (m_is_action_being_executed.load())
+    {
+        CancelAction(); // this will block until the thread is joined and current action finished
+    }
+    m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
+    
+    return kortex_driver::SendGripperCommand::Response();
+}
+
+kortex_driver::Stop::Response KortexArmSimulation::Stop(const kortex_driver::Stop::Request& req)
+{
+    // If an action is ongoing, cancel it first
+    if (m_is_action_being_executed.load())
+    {
+        CancelAction(); // this will block until the thread is joined and current action finished
+    }   
+    return kortex_driver::Stop::Response();
 }
 
 kortex_driver::ApplyEmergencyStop::Response KortexArmSimulation::ApplyEmergencyStop(const kortex_driver::ApplyEmergencyStop::Request& req)
 {
-    auto input = req.input;
-    kortex_driver::ApplyEmergencyStop::Response response;
-    return response;
+    // If an action is ongoing, cancel it first
+    if (m_is_action_being_executed.load())
+    {
+        CancelAction(); // this will block until the thread is joined and current action finished
+    }   
+    return kortex_driver::ApplyEmergencyStop::Response();
 }
 
 void KortexArmSimulation::CreateDefaultActions()

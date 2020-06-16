@@ -67,7 +67,6 @@ class KortexArmSimulation
     // Other RPCs
     kortex_driver::PlayCartesianTrajectory::Response PlayCartesianTrajectory(const kortex_driver::PlayCartesianTrajectory::Request& req);
     kortex_driver::Stop::Response Stop(const kortex_driver::Stop::Request& req);
-    kortex_driver::GetMeasuredCartesianPose::Response GetMeasuredCartesianPose(const kortex_driver::GetMeasuredCartesianPose::Request& req);
     kortex_driver::SendTwistCommand::Response SendTwistCommand(const kortex_driver::SendTwistCommand::Request& req);
     kortex_driver::PlayJointTrajectory::Response PlayJointTrajectory(const kortex_driver::PlayJointTrajectory::Request& req);
     kortex_driver::SendJointSpeedsCommand::Response SendJointSpeedsCommand(const kortex_driver::SendJointSpeedsCommand::Request& req);
