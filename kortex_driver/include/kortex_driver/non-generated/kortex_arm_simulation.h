@@ -66,11 +66,11 @@ class KortexArmSimulation
     kortex_driver::StopAction::Response StopAction(const kortex_driver::StopAction::Request& req);
     // Other RPCs
     kortex_driver::PlayCartesianTrajectory::Response PlayCartesianTrajectory(const kortex_driver::PlayCartesianTrajectory::Request& req);
-    kortex_driver::Stop::Response Stop(const kortex_driver::Stop::Request& req);
     kortex_driver::SendTwistCommand::Response SendTwistCommand(const kortex_driver::SendTwistCommand::Request& req);
     kortex_driver::PlayJointTrajectory::Response PlayJointTrajectory(const kortex_driver::PlayJointTrajectory::Request& req);
     kortex_driver::SendJointSpeedsCommand::Response SendJointSpeedsCommand(const kortex_driver::SendJointSpeedsCommand::Request& req);
     kortex_driver::SendGripperCommand::Response SendGripperCommand(const kortex_driver::SendGripperCommand::Request& req);
+    kortex_driver::Stop::Response Stop(const kortex_driver::Stop::Request& req);
     kortex_driver::ApplyEmergencyStop::Response ApplyEmergencyStop(const kortex_driver::ApplyEmergencyStop::Request& req);
 
   private:

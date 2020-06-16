@@ -578,7 +578,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kor
     {
         result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
         result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing joint speeds action : action contains " + std::to_string(constrained_joint_angles.joint_angles.joint_angles.size()) + " joint speeds but arm has " + std::to_string(GetDOF());
+        result.description = "Error playing joint speeds action : action contains " + std::to_string(joint_speeds.joint_speeds.size()) + " joint speeds but arm has " + std::to_string(GetDOF());
         return result;
     }
 

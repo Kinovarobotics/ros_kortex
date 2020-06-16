@@ -4,6 +4,8 @@
 #include <gtest/gtest.h>
 #include <urdf/model.h>
 #include "kortex_driver/ActionEvent.h"
+#include "kortex_driver/CartesianReferenceFrame.h"
+#include "kortex_driver/GripperMode.h"
 
 class KortexSimulatorTest : public ::testing::Test {
   protected:
@@ -307,6 +309,197 @@ TEST_F(KortexSimulatorTest, StopAction)
 
     // Abort the action now
     m_simulator->StopAction(stop_req);
+
+    // Wait a biut and make sure we received the ACTION_ABORT
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    ASSERT_EQ(m_received_notifications.size(), 2);
+    ASSERT_EQ(m_received_notifications[1].action_event, kortex_driver::ActionEvent::ACTION_ABORT);
+}
+
+TEST_F(KortexSimulatorTest, PlayCartesianTrajectory)
+{
+    kortex_driver::PlayCartesianTrajectory::Request req;
+    kortex_driver::ConstrainedPose pose;
+    pose.target_pose.x = 0.1;
+    pose.target_pose.y = 0.1;
+    pose.target_pose.z = 0.1;
+    pose.target_pose.theta_x = 0.1;
+    pose.target_pose.theta_y = 0.1;
+    pose.target_pose.theta_z = 0.1;
+    req.input = pose;
+
+    // Execute the action
+    ASSERT_EQ(m_received_notifications.size(), 0);
+    m_simulator->PlayCartesianTrajectory(req);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // TODO Change when implementation is filled
+    // Make sure after one second we received the ACTION_START and ACTION_END
+    ASSERT_EQ(m_received_notifications.size(), 2);
+    ASSERT_EQ(m_received_notifications[0].action_event, kortex_driver::ActionEvent::ACTION_START);
+    ASSERT_EQ(m_received_notifications[1].action_event, kortex_driver::ActionEvent::ACTION_END);
+}
+
+TEST_F(KortexSimulatorTest, SendTwistCommand)
+{
+    kortex_driver::SendTwistCommand::Request req;
+    kortex_driver::TwistCommand twist_command;
+    twist_command.reference_frame = kortex_driver::CartesianReferenceFrame::CARTESIAN_REFERENCE_FRAME_BASE;
+    twist_command.twist.linear_x = 0.1;
+    twist_command.twist.linear_y = 0.1;
+    twist_command.twist.linear_z = 0.1;
+    twist_command.twist.angular_x = 0.1;
+    twist_command.twist.angular_y = 0.1;
+    twist_command.twist.angular_z = 0.1;
+    req.input = twist_command;
+
+    // Execute the action
+    ASSERT_EQ(m_received_notifications.size(), 0);
+    m_simulator->SendTwistCommand(req);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // TODO Change when implementation is filled
+    // Make sure after one second we received the ACTION_START and ACTION_END
+    ASSERT_EQ(m_received_notifications.size(), 2);
+    ASSERT_EQ(m_received_notifications[0].action_event, kortex_driver::ActionEvent::ACTION_START);
+    ASSERT_EQ(m_received_notifications[1].action_event, kortex_driver::ActionEvent::ACTION_END);
+}
+
+TEST_F(KortexSimulatorTest, PlayJointTrajectory)
+{
+    kortex_driver::PlayJointTrajectory::Request req;
+    kortex_driver::ConstrainedJointAngles constrained_joint_angles;
+    for (int i = 0; i < m_simulator->GetDOF(); i++)
+    {
+        kortex_driver::JointAngle angle;
+        angle.joint_identifier = i;
+        angle.value = i*10.0f;
+        constrained_joint_angles.joint_angles.joint_angles.push_back(angle);
+    }
+    req.input = constrained_joint_angles;
+
+    // Execute the action
+    ASSERT_EQ(m_received_notifications.size(), 0);
+    m_simulator->PlayJointTrajectory(req);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // TODO Change when implementation is filled
+    // Make sure after one second we received the ACTION_START and ACTION_END
+    ASSERT_EQ(m_received_notifications.size(), 2);
+    ASSERT_EQ(m_received_notifications[0].action_event, kortex_driver::ActionEvent::ACTION_START);
+    ASSERT_EQ(m_received_notifications[1].action_event, kortex_driver::ActionEvent::ACTION_END);
+}
+
+TEST_F(KortexSimulatorTest, SendJointSpeedsCommand)
+{
+    kortex_driver::SendJointSpeedsCommand::Request req;
+    kortex_driver::Base_JointSpeeds joint_speeds;
+    for (int i = 0; i < m_simulator->GetDOF(); i++)
+    {
+        kortex_driver::JointSpeed speed;
+        speed.joint_identifier = i;
+        speed.value = i*10.0f;
+        joint_speeds.joint_speeds.push_back(speed);
+    }
+    req.input = joint_speeds;
+
+    // Execute the action
+    ASSERT_EQ(m_received_notifications.size(), 0);
+    m_simulator->SendJointSpeedsCommand(req);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // TODO Change when implementation is filled
+    // Make sure after one second we received the ACTION_START and ACTION_END
+    ASSERT_EQ(m_received_notifications.size(), 2);
+    ASSERT_EQ(m_received_notifications[0].action_event, kortex_driver::ActionEvent::ACTION_START);
+    ASSERT_EQ(m_received_notifications[1].action_event, kortex_driver::ActionEvent::ACTION_END);
+}
+
+TEST_F(KortexSimulatorTest, SendGripperCommand)
+{
+    kortex_driver::SendGripperCommand::Request req;
+    kortex_driver::GripperCommand gripper_command;
+    gripper_command.mode = kortex_driver::GripperMode::GRIPPER_POSITION;
+    kortex_driver::Finger finger;
+    finger.finger_identifier = 0;
+    finger.value = 10.0f;
+    gripper_command.gripper.finger.push_back(finger);
+    req.input = gripper_command;
+
+    // Execute the action
+    ASSERT_EQ(m_received_notifications.size(), 0);
+    m_simulator->SendGripperCommand(req);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // TODO Change when implementation is filled
+    // Make sure after one second we received the ACTION_START and ACTION_END
+    ASSERT_EQ(m_received_notifications.size(), 2);
+    ASSERT_EQ(m_received_notifications[0].action_event, kortex_driver::ActionEvent::ACTION_START);
+    ASSERT_EQ(m_received_notifications[1].action_event, kortex_driver::ActionEvent::ACTION_END);
+}
+
+// Use a TIME_DELAY action to test the Stop RPC
+TEST_F(KortexSimulatorTest, Stop)
+{
+    static constexpr uint32_t SLEEP_DURATION_SECONDS = 4;
+
+    // Create delay action object
+    dummy_action.oneof_action_parameters.reach_joint_angles.clear();
+    dummy_action.handle.action_type = kortex_driver::ActionType::TIME_DELAY;
+    kortex_driver::Delay delay;
+    delay.duration = SLEEP_DURATION_SECONDS;
+    dummy_action.oneof_action_parameters.delay.push_back(delay);
+    kortex_driver::ExecuteAction::Request req;
+    req.input = dummy_action;
+
+    // Prepare Stop request
+    kortex_driver::Stop::Request stop_req;
+
+    // Execute the action
+    ASSERT_EQ(m_received_notifications.size(), 0);
+    m_simulator->ExecuteAction(req);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // Make sure after one second we received the ACTION_START
+    ASSERT_EQ(m_received_notifications.size(), 1);
+    ASSERT_EQ(m_received_notifications[0].action_event, kortex_driver::ActionEvent::ACTION_START);
+
+    // Abort the action now
+    m_simulator->Stop(stop_req);
+
+    // Wait a biut and make sure we received the ACTION_ABORT
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    ASSERT_EQ(m_received_notifications.size(), 2);
+    ASSERT_EQ(m_received_notifications[1].action_event, kortex_driver::ActionEvent::ACTION_ABORT);
+}
+
+TEST_F(KortexSimulatorTest, ApplyEmergencyStop)
+{
+    static constexpr uint32_t SLEEP_DURATION_SECONDS = 4;
+
+    // Create delay action object
+    dummy_action.oneof_action_parameters.reach_joint_angles.clear();
+    dummy_action.handle.action_type = kortex_driver::ActionType::TIME_DELAY;
+    kortex_driver::Delay delay;
+    delay.duration = SLEEP_DURATION_SECONDS;
+    dummy_action.oneof_action_parameters.delay.push_back(delay);
+    kortex_driver::ExecuteAction::Request req;
+    req.input = dummy_action;
+
+    // Prepare Stop request
+    kortex_driver::ApplyEmergencyStop::Request stop_req;
+
+    // Execute the action
+    ASSERT_EQ(m_received_notifications.size(), 0);
+    m_simulator->ExecuteAction(req);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    // Make sure after one second we received the ACTION_START
+    ASSERT_EQ(m_received_notifications.size(), 1);
+    ASSERT_EQ(m_received_notifications[0].action_event, kortex_driver::ActionEvent::ACTION_START);
+
+    // Abort the action now
+    m_simulator->ApplyEmergencyStop(stop_req);
 
     // Wait a biut and make sure we received the ACTION_ABORT
     std::this_thread::sleep_for(std::chrono::seconds(1));
