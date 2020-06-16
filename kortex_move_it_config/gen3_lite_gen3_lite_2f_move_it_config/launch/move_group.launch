@@ -5,7 +5,12 @@
   <arg name="dof" default="6"/>
   <arg name="use_hard_limits" default="false"/>
 
-  <include file="$(find gen3_lite_gen3_lite_2f_move_it_config)/launch/planning_context.launch" />
+  <!-- The joint and link names prefix used in kortex_description -->
+  <arg name="prefix" default=""/>
+
+  <include file="$(find gen3_lite_gen3_lite_2f_move_it_config)/launch/planning_context.launch">
+    <arg name="prefix" value="$(arg prefix)"/>
+  </include>
 
   <!-- GDB Debug Option -->
   <arg name="debug" default="false" />
@@ -46,6 +51,7 @@
   <!-- Planning Functionality -->
   <include ns="move_group" file="$(find gen3_lite_gen3_lite_2f_move_it_config)/launch/planning_pipeline.launch.xml">
     <arg name="pipeline" value="ompl" />
+    <arg name="prefix" value="$(arg prefix)"/>
   </include>
 
   <!-- Trajectory Execution Functionality -->
@@ -53,6 +59,7 @@
     <arg name="moveit_manage_controllers" value="true" />
     <arg name="moveit_controller_manager" value="gen3_lite_gen3_lite_2f" unless="$(arg fake_execution)"/>
     <arg name="moveit_controller_manager" value="fake" if="$(arg fake_execution)"/>
+    <arg name="prefix" value="$(arg prefix)"/>
   </include>
 
   <!-- Sensors Functionality -->

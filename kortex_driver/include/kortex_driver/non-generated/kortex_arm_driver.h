@@ -83,6 +83,9 @@ class KortexArmDriver
 
     ros::NodeHandle m_node_handle;
 
+    // False if in simulation
+    bool m_is_real_robot;
+
     // Api options
     std::string m_ip_address;
     std::string m_username;
@@ -157,7 +160,7 @@ class KortexArmDriver
     // Private methods
     bool isGripperPresent();
     void setAngularTrajectorySoftLimitsToMax();
-    void publishFeedback();
+    void publishRobotFeedback();
 };
 
 #endif
