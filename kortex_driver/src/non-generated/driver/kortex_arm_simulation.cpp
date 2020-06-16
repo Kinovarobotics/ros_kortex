@@ -512,12 +512,30 @@ void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
     m_is_action_being_executed = false;
 }
 
-// TODO Fill implementation
 kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const kortex_driver::Action& action)
 {
     kortex_driver::KortexError result;
     result.code = kortex_driver::ErrorCodes::ERROR_NONE;
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    if (action.oneof_action_parameters.reach_joint_angles.size() != 1)
+    {
+        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
+        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
+        result.description = "Error playing joint angles action : action is malformed.";
+        return result;
+    }
+    auto constrained_joint_angles = action.oneof_action_parameters.reach_joint_angles[0];
+    if (constrained_joint_angles.joint_angles.joint_angles.size() != GetDOF())
+    {
+        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
+        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
+        result.description = "Error playing joint angles action : action contains " + std::to_string(constrained_joint_angles.joint_angles.joint_angles.size()) + " joint angles but arm has " + std::to_string(GetDOF());
+        return result;
+    }
+
+    // TODO Handle constraints and warn if some cannot be applied in simulation
+    // TODO Fill implementation to move simulated arm to angular position
+
     return result;
 }
 
@@ -527,6 +545,18 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     kortex_driver::KortexError result;
     result.code = kortex_driver::ErrorCodes::ERROR_NONE;
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    if (action.oneof_action_parameters.reach_pose.size() != 1)
+    {
+        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
+        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
+        result.description = "Error playing pose action : action is malformed.";
+        return result;
+    }
+    auto constrained_pose = action.oneof_action_parameters.reach_pose[0];
+    
+    // TODO Handle constraints and warn if some cannot be applied in simulation
+    // TODO Fill implementation to move simulated arm to Cartesian pose
+
     return result;
 }
 
@@ -536,6 +566,25 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kor
     kortex_driver::KortexError result;
     result.code = kortex_driver::ErrorCodes::ERROR_NONE;
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    if (action.oneof_action_parameters.send_joint_speeds.size() != 1)
+    {
+        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
+        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
+        result.description = "Error playing joints speeds : action is malformed.";
+        return result;
+    }
+    auto joint_speeds = action.oneof_action_parameters.send_joint_speeds[0];
+    if (joint_speeds.joint_speeds.size() != GetDOF())
+    {
+        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
+        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
+        result.description = "Error playing joint speeds action : action contains " + std::to_string(constrained_joint_angles.joint_angles.joint_angles.size()) + " joint speeds but arm has " + std::to_string(GetDOF());
+        return result;
+    }
+
+    // TODO Handle constraints and warn if some cannot be applied in simulation
+    // TODO Fill implementation to move simulated arm at angular speeds
+
     return result;
 }
 
@@ -545,6 +594,18 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendTwist(const kortex_dr
     kortex_driver::KortexError result;
     result.code = kortex_driver::ErrorCodes::ERROR_NONE;
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    if (action.oneof_action_parameters.send_twist_command.size() != 1)
+    {
+        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
+        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
+        result.description = "Error playing twist action : action is malformed.";
+        return result;
+    }
+    auto twist = action.oneof_action_parameters.send_twist_command[0];
+
+    // TODO Handle constraints and warn if some cannot be applied in simulation
+    // TODO Fill implementation to move simulated arm at Cartesian twist
+    
     return result;
 }
 
@@ -554,6 +615,19 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendGripperCommand(const 
     kortex_driver::KortexError result;
     result.code = kortex_driver::ErrorCodes::ERROR_NONE;
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    if (action.oneof_action_parameters.send_gripper_command.size() != 1)
+    {
+        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
+        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
+        result.description = "Error playing gripper command action : action is malformed.";
+        return result;
+    }
+    auto gripper_command = action.oneof_action_parameters.send_gripper_command[0];
+
+    // TODO Handle constraints and warn if some cannot be applied in simulation
+    // TODO Handle velocity mode too?
+    // TODO Fill implementation to move simulated gripper to given position
+
     return result;
 }
 
