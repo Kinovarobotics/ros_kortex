@@ -62,6 +62,9 @@ class KortexArmSimulation
 
     ros::NodeHandle m_node_handle;
 
+    // Publishers
+    ros::Publisher m_pub_action_topic;
+
     // Namespacing and prefixing information
     std::string m_prefix;
     std::string m_robot_name;
@@ -93,10 +96,10 @@ class KortexArmSimulation
     // Helper functions
     bool IsGripperPresent() const {return !m_gripper_name.empty();}
     void CreateDefaultActions();
-    void CancelAction();
-    void PlayAction(const kortex_driver::Action& action);
 
     // Executors
+    void CancelAction();
+    void PlayAction(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteReachJointAngles(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteReachPose(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteSendJointSpeeds(const kortex_driver::Action& action);
