@@ -14,9 +14,13 @@
 */
 
 #include <ros/ros.h>
+#include <control_msgs/JointTrajectoryControllerState.h>
+#include <control_msgs/FollowJointTrajectoryAction.h>
+#include <actionlib/client/simple_action_client.h>
 
 #include <unordered_map>
 #include <thread>
+#include <mutex>
 
 #include "kortex_driver/non-generated/kortex_math_util.h"
 
@@ -80,6 +84,12 @@ class KortexArmSimulation
     // Publishers
     ros::Publisher m_pub_action_topic;
 
+    // Subscribers
+    ros::Subscriber m_sub_joint_trajectory_controller_state;
+
+    // Action clients
+    std::unique_ptr<actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>> m_follow_joint_trajectory_action_client;
+
     // Namespacing and prefixing information
     std::string m_prefix;
     std::string m_robot_name;
@@ -108,12 +118,17 @@ class KortexArmSimulation
     std::unique_ptr<moveit::planning_interface::MoveGroupInterface> m_moveit_arm_interface;
     std::unique_ptr<moveit::planning_interface::MoveGroupInterface> m_moveit_gripper_interface;
 
+    // Subscription callbacks and data structures with their mutexes
+    void cb_joint_trajectory_controller_state(const control_msgs::JointTrajectoryControllerState& state);
+    control_msgs::JointTrajectoryControllerState m_current_state;
+    std::mutex m_state_mutex;
+
     // Helper functions
     bool IsGripperPresent() const {return !m_gripper_name.empty();}
     void CreateDefaultActions();
 
     // Executors
-    void CancelAction();
+    void JoinThreadAndCancelAction();
     void PlayAction(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteReachJointAngles(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteReachPose(const kortex_driver::Action& action);

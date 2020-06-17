@@ -15,6 +15,9 @@
 #include "kortex_driver/SubErrorCodes.h"
 #include "kortex_driver/ActionNotification.h"
 #include "kortex_driver/ActionEvent.h"
+#include "kortex_driver/JointTrajectoryConstraintType.h"
+
+#include "trajectory_msgs/JointTrajectory.h"
 
 #include <set>
 #include <chrono>
@@ -73,13 +76,20 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     // Create default actions
     CreateDefaultActions();
 
-    // Create publishers
+    // Create publishers and subscribers
+    static const std::string joint_trajectory_controller_topic = "/" + m_robot_name + "/" + m_prefix + m_arm_name + "_joint_trajectory_controller";
     m_pub_action_topic = m_node_handle.advertise<kortex_driver::ActionNotification>("action_topic", 1000);
+    //m_pub_joint_trajectory_controller_command = m_node_handle.advertise<trajectory_msgs::JointTrajectory>(joint_trajectory_controller_topic + "/command", 1000);
+    m_sub_joint_trajectory_controller_state = m_node_handle.subscribe(joint_trajectory_controller_topic + "/state", 1, &KortexArmSimulation::cb_joint_trajectory_controller_state, this);
+
+    // Create and connect action clients
+    m_follow_joint_trajectory_action_client.reset(new actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>(joint_trajectory_controller_topic + "/follow_joint_trajectory", true));
+    m_follow_joint_trajectory_action_client->waitForServer();
 }
 
 KortexArmSimulation::~KortexArmSimulation()
 {
-    CancelAction();
+    JoinThreadAndCancelAction();
 }
 
 std::unordered_map<uint32_t, kortex_driver::Action> KortexArmSimulation::GetActionsMap() const
@@ -215,11 +225,7 @@ kortex_driver::ExecuteActionFromReference::Response KortexArmSimulation::Execute
     auto it = m_map_actions.find(handle.identifier);
     if (it != m_map_actions.end())
     {
-        // If an action is ongoing, cancel it first
-        if (m_is_action_being_executed.load())
-        {
-            CancelAction(); // this will block until the thread is joined and current action finished
-        }
+        JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
         m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, it->second);
     }
     else
@@ -233,7 +239,6 @@ kortex_driver::ExecuteActionFromReference::Response KortexArmSimulation::Execute
 kortex_driver::ExecuteAction::Response KortexArmSimulation::ExecuteAction(const kortex_driver::ExecuteAction::Request& req)
 {
     auto action = req.input;
-
     // Add Action to map if type is supported
     switch (action.handle.action_type)
     {
@@ -241,11 +246,7 @@ kortex_driver::ExecuteAction::Response KortexArmSimulation::ExecuteAction(const 
         case kortex_driver::ActionType::REACH_POSE:
         case kortex_driver::ActionType::SEND_GRIPPER_COMMAND:
         case kortex_driver::ActionType::TIME_DELAY:
-            // If an action is ongoing, cancel it first
-            if (m_is_action_being_executed.load())
-            {
-                CancelAction(); // this will block until the thread is joined and current action finished
-            }
+            JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
             m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
             break;
         default:
@@ -260,7 +261,7 @@ kortex_driver::StopAction::Response KortexArmSimulation::StopAction(const kortex
 {
     if (m_is_action_being_executed.load())
     {
-        CancelAction(); // this will block until the thread is joined and current action finished
+        JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     }
     
     return kortex_driver::StopAction::Response();
@@ -274,11 +275,7 @@ kortex_driver::PlayCartesianTrajectory::Response KortexArmSimulation::PlayCartes
     action.handle.action_type = kortex_driver::ActionType::REACH_POSE;
     action.oneof_action_parameters.reach_pose.push_back(constrained_pose);
 
-    // If an action is ongoing, cancel it first
-    if (m_is_action_being_executed.load())
-    {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }
+    JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
     
     return kortex_driver::PlayCartesianTrajectory::Response();
@@ -292,11 +289,7 @@ kortex_driver::SendTwistCommand::Response KortexArmSimulation::SendTwistCommand(
     action.handle.action_type = kortex_driver::ActionType::SEND_TWIST_COMMAND;
     action.oneof_action_parameters.send_twist_command.push_back(twist_command);
 
-    // If an action is ongoing, cancel it first
-    if (m_is_action_being_executed.load())
-    {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }
+    JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
     
     return kortex_driver::SendTwistCommand::Response();
@@ -310,11 +303,7 @@ kortex_driver::PlayJointTrajectory::Response KortexArmSimulation::PlayJointTraje
     action.handle.action_type = kortex_driver::ActionType::REACH_JOINT_ANGLES;
     action.oneof_action_parameters.reach_joint_angles.push_back(constrained_joint_angles);
 
-    // If an action is ongoing, cancel it first
-    if (m_is_action_being_executed.load())
-    {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }
+    JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
     
     return kortex_driver::PlayJointTrajectory::Response();
@@ -328,11 +317,7 @@ kortex_driver::SendJointSpeedsCommand::Response KortexArmSimulation::SendJointSp
     action.handle.action_type = kortex_driver::ActionType::SEND_JOINT_SPEEDS;
     action.oneof_action_parameters.send_joint_speeds.push_back(joint_speeds);
 
-    // If an action is ongoing, cancel it first
-    if (m_is_action_being_executed.load())
-    {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }
+    JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
     
     return kortex_driver::SendJointSpeedsCommand::Response();
@@ -346,11 +331,7 @@ kortex_driver::SendGripperCommand::Response KortexArmSimulation::SendGripperComm
     action.handle.action_type = kortex_driver::ActionType::SEND_GRIPPER_COMMAND;
     action.oneof_action_parameters.send_gripper_command.push_back(gripper_command);
 
-    // If an action is ongoing, cancel it first
-    if (m_is_action_being_executed.load())
-    {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }
+    JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
     
     return kortex_driver::SendGripperCommand::Response();
@@ -361,7 +342,7 @@ kortex_driver::Stop::Response KortexArmSimulation::Stop(const kortex_driver::Sto
     // If an action is ongoing, cancel it first
     if (m_is_action_being_executed.load())
     {
-        CancelAction(); // this will block until the thread is joined and current action finished
+        JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     }   
     return kortex_driver::Stop::Response();
 }
@@ -371,9 +352,15 @@ kortex_driver::ApplyEmergencyStop::Response KortexArmSimulation::ApplyEmergencyS
     // If an action is ongoing, cancel it first
     if (m_is_action_being_executed.load())
     {
-        CancelAction(); // this will block until the thread is joined and current action finished
+        JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     }   
     return kortex_driver::ApplyEmergencyStop::Response();
+}
+
+void KortexArmSimulation::cb_joint_trajectory_controller_state(const control_msgs::JointTrajectoryControllerState& state)
+{
+    const std::lock_guard<std::mutex> lock(m_state_mutex);
+    m_current_state = state;
 }
 
 void KortexArmSimulation::CreateDefaultActions()
@@ -431,7 +418,7 @@ void KortexArmSimulation::CreateDefaultActions()
     m_map_actions.emplace(std::make_pair(zero.handle.identifier, zero));
 }
 
-void KortexArmSimulation::CancelAction()
+void KortexArmSimulation::JoinThreadAndCancelAction()
 {
     m_action_preempted = true;
     if (m_action_executor_thread.joinable())
@@ -533,9 +520,77 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
         return result;
     }
 
-    // TODO Handle constraints and warn if some cannot be applied in simulation
-    // TODO Fill implementation to move simulated arm to angular position
+    // Initialize trajectory object
+    trajectory_msgs::JointTrajectory traj;
+    traj.header.frame_id = m_prefix + "base_link";
+    traj.header.stamp = ros::Time::now();
+    for (int i = 0; i < constrained_joint_angles.joint_angles.joint_angles.size(); i++)
+    {
+        const std::string joint_name = m_prefix + "joint_" + std::to_string(i+1); //joint names are 1-based
+        traj.joint_names.push_back(joint_name);
+    }
 
+    // Get current position and add it as first waypoint
+    // control_msgs::JointTrajectoryControllerState current_state;
+    // {
+    //     const std::lock_guard<std::mutex> lock(m_state_mutex);
+    //     current_state = m_current_state;
+    // }
+    // current_state.actual.time_from_start = ros::Duration(0.0f);
+    // traj.points.push_back(current_state.actual);
+
+    // Transform kortex structure to trajectory_msgs to fill endpoint and add it
+    trajectory_msgs::JointTrajectoryPoint endpoint;
+    for (int i = 0; i < constrained_joint_angles.joint_angles.joint_angles.size(); i++)
+    {
+        const float rad_wrapped_goal = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(constrained_joint_angles.joint_angles.joint_angles[i].value));
+        endpoint.positions.push_back(rad_wrapped_goal);
+    }
+    switch (constrained_joint_angles.constraint.type)
+    {
+        case kortex_driver::JointTrajectoryConstraintType::JOINT_CONSTRAINT_DURATION:
+            endpoint.time_from_start = ros::Duration(constrained_joint_angles.constraint.value);
+            break;
+        case kortex_driver::JointTrajectoryConstraintType::JOINT_CONSTRAINT_SPEED:
+            ROS_WARN("Warning : Joint velocity limits will be applied instead of constrained ones.");
+            //[[fallthrough]];
+        default:
+            // TODO calculate optimal duration
+            endpoint.time_from_start = ros::Duration(5.0f);
+            break;
+    }
+    traj.points.push_back(endpoint);
+
+    // Verify if goal has been cancelled before sending it
+    if (m_action_preempted.load())
+    {
+        return result;
+    }
+    
+    // Send goal
+    control_msgs::FollowJointTrajectoryActionGoal goal;
+    goal.goal.trajectory = traj;
+    m_follow_joint_trajectory_action_client->sendGoal(goal.goal);
+
+    // Wait for goal to be done, or for preempt to be called (check every 10ms)
+    while(!m_action_preempted.load() && !m_follow_joint_trajectory_action_client->waitForResult(ros::Duration(0.01f))) {}
+
+    // If we got out of the loop because we're preempted, cancel the goal before returning
+    if (m_action_preempted.load())
+    {
+        m_follow_joint_trajectory_action_client->cancelAllGoals();
+    }
+    // Fill result depending on action final status if user didn't cancel
+    else
+    {
+        auto status = m_follow_joint_trajectory_action_client->getResult();
+        if (status->error_code != status->SUCCESSFUL)
+        {
+            result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
+            result.subCode = kortex_driver::SubErrorCodes::METHOD_FAILED;
+            result.description = status->error_string;
+        }
+    }
     return result;
 }
 
