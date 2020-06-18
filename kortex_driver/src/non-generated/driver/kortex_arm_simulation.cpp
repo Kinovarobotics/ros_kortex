@@ -19,6 +19,8 @@
 
 #include "trajectory_msgs/JointTrajectory.h"
 
+#include <kdl_parser/kdl_parser.hpp>
+
 #include <set>
 #include <chrono>
 
@@ -65,6 +67,25 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     ROS_INFO("Gripper type : %s", m_gripper_name.empty() ? "None" : m_gripper_name.c_str());
     ROS_INFO("Arm namespace : %s", m_robot_name.c_str());
     ROS_INFO("URDF prefix : %s", m_prefix.c_str());
+
+    // Building the KDL chain from the robot description
+    // The chain goes from 'base_link' to 'tool_frame'
+    KDL::Tree tree;
+    if (!kdl_parser::treeFromParam("robot_description", tree))
+    {
+        const std::string error_string("Failed to parse robot_description parameter to build the kinematic tree!"); 
+        ROS_ERROR("%s", error_string.c_str());
+        throw(std::runtime_error(error_string));
+    }
+    if (!tree.getChain(m_prefix + "base_link", m_prefix + "tool_frame", m_chain))
+    {
+        const std::string error_string("Failed to extract kinematic chain from parsed tree!"); 
+        ROS_ERROR("%s", error_string.c_str());
+        throw(std::runtime_error(error_string));
+    }
+    m_fk_solver.reset(new KDL::ChainFkSolverPos_recursive(m_chain));
+    m_ik_vel_solver.reset(new KDL::ChainIkSolverVel_pinv(m_chain));
+    m_ik_pos_solver.reset(new KDL::ChainIkSolverPos_NR(m_chain, *m_fk_solver, *m_ik_vel_solver));
 
     // Start MoveIt client
     m_moveit_arm_interface.reset(new moveit::planning_interface::MoveGroupInterface(ARM_PLANNING_GROUP));
@@ -530,15 +551,6 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
         traj.joint_names.push_back(joint_name);
     }
 
-    // Get current position and add it as first waypoint
-    // control_msgs::JointTrajectoryControllerState current_state;
-    // {
-    //     const std::lock_guard<std::mutex> lock(m_state_mutex);
-    //     current_state = m_current_state;
-    // }
-    // current_state.actual.time_from_start = ros::Duration(0.0f);
-    // traj.points.push_back(current_state.actual);
-
     // Transform kortex structure to trajectory_msgs to fill endpoint and add it
     trajectory_msgs::JointTrajectoryPoint endpoint;
     for (int i = 0; i < constrained_joint_angles.joint_angles.joint_angles.size(); i++)
@@ -552,11 +564,12 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
             endpoint.time_from_start = ros::Duration(constrained_joint_angles.constraint.value);
             break;
         case kortex_driver::JointTrajectoryConstraintType::JOINT_CONSTRAINT_SPEED:
-            ROS_WARN("Warning : Joint velocity limits will be applied instead of constrained ones.");
+            ROS_WARN("Warning : URDF joint velocity limits will be applied instead of specified ones!");
             //[[fallthrough]];
         default:
-            // TODO calculate optimal duration
-            endpoint.time_from_start = ros::Duration(5.0f);
+            float optimal_duration = 0.0f;
+            
+            endpoint.time_from_start = ros::Duration(optimal_duration);
             break;
     }
     traj.points.push_back(endpoint);

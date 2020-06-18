@@ -13,15 +13,27 @@
 *
 */
 
+// ROS
 #include <ros/ros.h>
 #include <control_msgs/JointTrajectoryControllerState.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <actionlib/client/simple_action_client.h>
 
+// MoveIt
+#include <moveit/move_group_interface/move_group_interface.h>
+
+// KDL
+#include <kdl/chain.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <kdl/chainiksolverpos_nr.hpp>
+#include <kdl/chainiksolvervel_pinv.hpp>
+
+// Standard
 #include <unordered_map>
 #include <thread>
 #include <mutex>
 
+// Kortex
 #include "kortex_driver/non-generated/kortex_math_util.h"
 
 #include "kortex_driver/ActionType.h"
@@ -46,8 +58,6 @@
 #include "kortex_driver/SendJointSpeedsCommand.h"
 #include "kortex_driver/SendGripperCommand.h"
 #include "kortex_driver/ApplyEmergencyStop.h"
-
-#include <moveit/move_group_interface/move_group_interface.h>
 
 class KortexArmSimulation
 {
@@ -78,7 +88,7 @@ class KortexArmSimulation
     kortex_driver::ApplyEmergencyStop::Response ApplyEmergencyStop(const kortex_driver::ApplyEmergencyStop::Request& req);
 
   private:
-
+    // ROS
     ros::NodeHandle m_node_handle;
 
     // Publishers
@@ -108,6 +118,12 @@ class KortexArmSimulation
 
     // Math utility
     KortexMathUtil m_math_util;
+
+    // KDL chain and solvers
+    KDL::Chain m_chain;
+    std::unique_ptr<KDL::ChainFkSolverPos_recursive> m_fk_solver;
+    std::unique_ptr<KDL::ChainIkSolverPos_NR> m_ik_pos_solver;
+    std::unique_ptr<KDL::ChainIkSolverVel_pinv> m_ik_vel_solver;
 
     // Threading
     std::atomic<bool> m_is_action_being_executed;
