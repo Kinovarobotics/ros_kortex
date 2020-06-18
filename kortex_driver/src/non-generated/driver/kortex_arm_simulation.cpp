@@ -30,6 +30,7 @@ namespace
     static const std::string GRIPPER_PLANNING_GROUP = "gripper";
     static constexpr unsigned int FIRST_CREATED_ACTION_ID = 10000;
     static const std::set<unsigned int> DEFAULT_ACTIONS_IDENTIFIERS{1,2,3};
+    static constexpr double JOINT_TRAJECTORY_TIMESTEP = 0.01;
 }
 
 KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_handle(node_handle),
@@ -571,31 +572,42 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
         current = m_current_state.actual;
     }
 
-    // Transform kortex structure to trajectory_msgs to fill endpoint and add it
+    // Transform kortex structure to trajectory_msgs to fill endpoint structure
     trajectory_msgs::JointTrajectoryPoint endpoint;
     for (int i = 0; i < constrained_joint_angles.joint_angles.joint_angles.size(); i++)
     {
         const double rad_wrapped_goal = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(constrained_joint_angles.joint_angles.joint_angles[i].value));
         endpoint.positions.push_back(rad_wrapped_goal);
+        endpoint.velocities.push_back(0.0);
+        endpoint.accelerations.push_back(0.0);
     }
 
     // Calculate velocity profiles to know how much time this trajectory must last
     switch (constrained_joint_angles.constraint.type)
     {
-        // If the duration is supplied, no need to use the velocity profiles
+        // If the duration is supplied, set the duration of the velocity profiles with that value
         case kortex_driver::JointTrajectoryConstraintType::JOINT_CONSTRAINT_DURATION:
+        {
+            // Error check on the given duration
             if (constrained_joint_angles.constraint.value <= 0.0f)
             {
                 return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
                                 kortex_driver::SubErrorCodes::INVALID_PARAM,
                                 "Invalid duration constraint : it has to be higher than 0.0!");
             }
+            // Set the velocity profiles
+            for (int i = 0; i < GetDOF(); i++)
+            {
+                m_velocity_profiles[i].SetProfileDuration(current.positions[i], endpoint.positions[i], constrained_joint_angles.constraint.value);
+            }
             endpoint.time_from_start = ros::Duration(constrained_joint_angles.constraint.value);
             ROS_DEBUG("Using supplied duration : %2.2f", constrained_joint_angles.constraint.value);
             break;
+        }
         // If a max velocity is supplied for each joint, we need to find the limiting duration with this velocity constraint
         case kortex_driver::JointTrajectoryConstraintType::JOINT_CONSTRAINT_SPEED:
         {
+            // Error check on the given velocity
             float max_velocity = m_math_util.toRad(constrained_joint_angles.constraint.value);
             if (max_velocity <= 0.0f)
             {
@@ -603,6 +615,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
                                 kortex_driver::SubErrorCodes::INVALID_PARAM,
                                 "Invalid velocity constraint : it has to be higher than 0.0!");
             }
+            // Find the limiting duration with given velocity
             double max_duration = 0.0;
             for (int i = 0; i < GetDOF(); i++)
             {
@@ -612,10 +625,17 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
                 ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.positions[i], endpoint.positions[i], m_velocity_profiles[i].Duration());
             }
             ROS_DEBUG("max_duration is : %2.2f", max_duration);
+            // Set the velocity profiles
+            for (int i = 0; i < GetDOF(); i++)
+            {
+                m_velocity_profiles[i].SetProfileDuration(current.positions[i], endpoint.positions[i], max_duration);
+            }
             endpoint.time_from_start = ros::Duration(max_duration);
             break;
         }
         default:
+        {
+            // Find the optimal duration based on actual velocity and acceleration limits
             double optimal_duration = 0.0;
             for (int i = 0; i < GetDOF(); i++)
             {
@@ -624,12 +644,45 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
                 ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.positions[i], endpoint.positions[i], m_velocity_profiles[i].Duration());
             }
             ROS_DEBUG("optimal_duration is : %2.2f", optimal_duration);
+            // Set the velocity profiles
+            for (int i = 0; i < GetDOF(); i++)
+            {
+                m_velocity_profiles[i].SetProfileDuration(current.positions[i], endpoint.positions[i], optimal_duration);
+            }
             endpoint.time_from_start = ros::Duration(optimal_duration);
             break;
+        }
     }
 
-    // Add endpoint to trajectory
-    traj.points.push_back(endpoint);
+    // Copy velocity profile data into trajectory using JOINT_TRAJECTORY_TIMESTEP timesteps
+    // For each timestep
+    for (double t = 0.0; t < m_velocity_profiles[0].Duration(); t += JOINT_TRAJECTORY_TIMESTEP)
+    {
+        // Create trajectory point
+        trajectory_msgs::JointTrajectoryPoint p;
+        p.time_from_start = ros::Duration(t);
+        // Add position, velocity, acceleration from each velocity profile
+        for (int i = 0; i < GetDOF(); i++)
+        {
+            p.positions.push_back(m_velocity_profiles[i].Pos(t));
+            p.velocities.push_back(m_velocity_profiles[i].Vel(t));
+            p.accelerations.push_back(m_velocity_profiles[i].Acc(t));
+        }
+        // Add trajectory point to goal
+        traj.points.push_back(p);
+    }
+    // Finally, add endpoint to trajectory
+    // Add position, velocity, acceleration from each velocity profile
+    trajectory_msgs::JointTrajectoryPoint p;
+    p.time_from_start = ros::Duration(m_velocity_profiles[0].Duration());
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        p.positions.push_back(m_velocity_profiles[i].Pos(m_velocity_profiles[i].Duration()));
+        p.velocities.push_back(m_velocity_profiles[i].Vel(m_velocity_profiles[i].Duration()));
+        p.accelerations.push_back(m_velocity_profiles[i].Acc(m_velocity_profiles[i].Duration()));
+    }
+    // Add trajectory point to goal
+    traj.points.push_back(p);
 
     // Verify if goal has been cancelled before sending it
     if (m_action_preempted.load())
