@@ -45,6 +45,9 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     ros::param::get("~dof", m_degrees_of_freedom);
     ros::param::get("~arm", m_arm_name);
     ros::param::get("~joint_names", m_arm_joint_names);
+    ros::param::get("~maximum_velocities", m_arm_velocity_max_limits);
+    ros::param::get("~maximum_accelerations", m_arm_acceleration_max_limits);
+    
     for (auto s : m_arm_joint_names)
     {
         s.insert(0, m_prefix);
@@ -86,6 +89,12 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     m_fk_solver.reset(new KDL::ChainFkSolverPos_recursive(m_chain));
     m_ik_vel_solver.reset(new KDL::ChainIkSolverVel_pinv(m_chain));
     m_ik_pos_solver.reset(new KDL::ChainIkSolverPos_NR(m_chain, *m_fk_solver, *m_ik_vel_solver));
+
+    // Build the velocity profile for each joint using the max velocities and max accelerations
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        m_velocity_profiles.push_back(KDL::VelocityProfile_Trap(m_arm_velocity_max_limits[i], m_arm_acceleration_max_limits[i]));
+    }
 
     // Start MoveIt client
     m_moveit_arm_interface.reset(new moveit::planning_interface::MoveGroupInterface(ARM_PLANNING_GROUP));
@@ -439,6 +448,15 @@ void KortexArmSimulation::CreateDefaultActions()
     m_map_actions.emplace(std::make_pair(zero.handle.identifier, zero));
 }
 
+kortex_driver::KortexError KortexArmSimulation::FillKortexError(uint32_t code, uint32_t subCode, const std::string& description) const
+{
+    kortex_driver::KortexError error;
+    error.code = code;
+    error.subCode = subCode;
+    error.description = description;
+    return error;
+}
+
 void KortexArmSimulation::JoinThreadAndCancelAction()
 {
     m_action_preempted = true;
@@ -451,7 +469,7 @@ void KortexArmSimulation::JoinThreadAndCancelAction()
 
 void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
 {
-    kortex_driver::KortexError action_result;
+    auto action_result = FillKortexError(kortex_driver::ErrorCodes::ERROR_NONE, kortex_driver::SubErrorCodes::SUB_ERROR_NONE);
 
     // Notify action started
     kortex_driver::ActionNotification start_notif;
@@ -482,8 +500,7 @@ void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
             action_result = ExecuteTimeDelay(action);
             break;
         default:
-            action_result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-            action_result.subCode = kortex_driver::SubErrorCodes::UNSUPPORTED_ACTION;
+            action_result = FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE, kortex_driver::SubErrorCodes::UNSUPPORTED_ACTION);
             break;
     }
     
@@ -522,23 +539,19 @@ void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
 
 kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const kortex_driver::Action& action)
 {
-    kortex_driver::KortexError result;
-    result.code = kortex_driver::ErrorCodes::ERROR_NONE;
-    result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    auto result = FillKortexError(kortex_driver::ErrorCodes::ERROR_NONE, kortex_driver::SubErrorCodes::SUB_ERROR_NONE);
     if (action.oneof_action_parameters.reach_joint_angles.size() != 1)
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing joint angles action : action is malformed.";
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                    kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                    "Error playing joint angles action : action is malformed.");
     }
     auto constrained_joint_angles = action.oneof_action_parameters.reach_joint_angles[0];
     if (constrained_joint_angles.joint_angles.joint_angles.size() != GetDOF())
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing joint angles action : action contains " + std::to_string(constrained_joint_angles.joint_angles.joint_angles.size()) + " joint angles but arm has " + std::to_string(GetDOF());
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing joint angles action : action contains " + std::to_string(constrained_joint_angles.joint_angles.joint_angles.size()) + " joint angles but arm has " + std::to_string(GetDOF()));
     }
 
     // Initialize trajectory object
@@ -551,27 +564,71 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
         traj.joint_names.push_back(joint_name);
     }
 
+    // Get current position
+    trajectory_msgs::JointTrajectoryPoint current;
+    {
+        const std::lock_guard<std::mutex> lock(m_state_mutex);
+        current = m_current_state.actual;
+    }
+
     // Transform kortex structure to trajectory_msgs to fill endpoint and add it
     trajectory_msgs::JointTrajectoryPoint endpoint;
     for (int i = 0; i < constrained_joint_angles.joint_angles.joint_angles.size(); i++)
     {
-        const float rad_wrapped_goal = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(constrained_joint_angles.joint_angles.joint_angles[i].value));
+        const double rad_wrapped_goal = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(constrained_joint_angles.joint_angles.joint_angles[i].value));
         endpoint.positions.push_back(rad_wrapped_goal);
     }
+
+    // Calculate velocity profiles to know how much time this trajectory must last
     switch (constrained_joint_angles.constraint.type)
     {
+        // If the duration is supplied, no need to use the velocity profiles
         case kortex_driver::JointTrajectoryConstraintType::JOINT_CONSTRAINT_DURATION:
+            if (constrained_joint_angles.constraint.value <= 0.0f)
+            {
+                return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Invalid duration constraint : it has to be higher than 0.0!");
+            }
             endpoint.time_from_start = ros::Duration(constrained_joint_angles.constraint.value);
+            ROS_DEBUG("Using supplied duration : %2.2f", constrained_joint_angles.constraint.value);
             break;
+        // If a max velocity is supplied for each joint, we need to find the limiting duration with this velocity constraint
         case kortex_driver::JointTrajectoryConstraintType::JOINT_CONSTRAINT_SPEED:
-            ROS_WARN("Warning : URDF joint velocity limits will be applied instead of specified ones!");
-            //[[fallthrough]];
+        {
+            float max_velocity = m_math_util.toRad(constrained_joint_angles.constraint.value);
+            if (max_velocity <= 0.0f)
+            {
+                return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Invalid velocity constraint : it has to be higher than 0.0!");
+            }
+            double max_duration = 0.0;
+            for (int i = 0; i < GetDOF(); i++)
+            {
+                double velocity_ratio = std::min(1.0, double(max_velocity)/m_arm_velocity_max_limits[i]);
+                m_velocity_profiles[i].SetProfileVelocity(current.positions[i], endpoint.positions[i], velocity_ratio);
+                max_duration = std::max(max_duration, m_velocity_profiles[i].Duration());
+                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.positions[i], endpoint.positions[i], m_velocity_profiles[i].Duration());
+            }
+            ROS_DEBUG("max_duration is : %2.2f", max_duration);
+            endpoint.time_from_start = ros::Duration(max_duration);
+            break;
+        }
         default:
-            float optimal_duration = 0.0f;
-            
+            double optimal_duration = 0.0;
+            for (int i = 0; i < GetDOF(); i++)
+            {
+                m_velocity_profiles[i].SetProfile(current.positions[i], endpoint.positions[i]);
+                optimal_duration = std::max(optimal_duration, m_velocity_profiles[i].Duration());
+                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.positions[i], endpoint.positions[i], m_velocity_profiles[i].Duration());
+            }
+            ROS_DEBUG("optimal_duration is : %2.2f", optimal_duration);
             endpoint.time_from_start = ros::Duration(optimal_duration);
             break;
     }
+
+    // Add endpoint to trajectory
     traj.points.push_back(endpoint);
 
     // Verify if goal has been cancelled before sending it
@@ -599,9 +656,9 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
         auto status = m_follow_joint_trajectory_action_client->getResult();
         if (status->error_code != status->SUCCESSFUL)
         {
-            result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-            result.subCode = kortex_driver::SubErrorCodes::METHOD_FAILED;
-            result.description = status->error_string;
+            result = FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                        kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                        status->error_string);
         }
     }
     return result;
@@ -615,10 +672,9 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
     if (action.oneof_action_parameters.reach_pose.size() != 1)
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing pose action : action is malformed.";
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing pose action : action is malformed.");
     }
     auto constrained_pose = action.oneof_action_parameters.reach_pose[0];
     
@@ -636,18 +692,16 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kor
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
     if (action.oneof_action_parameters.send_joint_speeds.size() != 1)
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing joints speeds : action is malformed.";
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing joints speeds : action is malformed.");
     }
     auto joint_speeds = action.oneof_action_parameters.send_joint_speeds[0];
     if (joint_speeds.joint_speeds.size() != GetDOF())
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing joint speeds action : action contains " + std::to_string(joint_speeds.joint_speeds.size()) + " joint speeds but arm has " + std::to_string(GetDOF());
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing joint speeds action : action contains " + std::to_string(joint_speeds.joint_speeds.size()) + " joint speeds but arm has " + std::to_string(GetDOF()));
     }
 
     // TODO Handle constraints and warn if some cannot be applied in simulation
@@ -664,10 +718,9 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendTwist(const kortex_dr
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
     if (action.oneof_action_parameters.send_twist_command.size() != 1)
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing twist action : action is malformed.";
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing twist action : action is malformed.");
     }
     auto twist = action.oneof_action_parameters.send_twist_command[0];
 
@@ -685,10 +738,9 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendGripperCommand(const 
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
     if (action.oneof_action_parameters.send_gripper_command.size() != 1)
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing gripper command action : action is malformed.";
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing gripper command action : action is malformed.");
     }
     auto gripper_command = action.oneof_action_parameters.send_gripper_command[0];
 
@@ -701,9 +753,8 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendGripperCommand(const 
 
 kortex_driver::KortexError KortexArmSimulation::ExecuteTimeDelay(const kortex_driver::Action& action)
 {
-    kortex_driver::KortexError result;
-    result.code = kortex_driver::ErrorCodes::ERROR_NONE;
-    result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    auto result = FillKortexError(kortex_driver::ErrorCodes::ERROR_NONE,
+                                kortex_driver::SubErrorCodes::SUB_ERROR_NONE);
     if (!action.oneof_action_parameters.delay.empty())
     {
         auto start = std::chrono::system_clock::now();

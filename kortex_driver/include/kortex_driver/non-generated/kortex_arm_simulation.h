@@ -27,6 +27,7 @@
 #include <kdl/chainfksolverpos_recursive.hpp>
 #include <kdl/chainiksolverpos_nr.hpp>
 #include <kdl/chainiksolvervel_pinv.hpp>
+#include <kdl/velocityprofile_trap.hpp>
 
 // Standard
 #include <unordered_map>
@@ -107,6 +108,8 @@ class KortexArmSimulation
     // Arm and gripper information
     std::string m_arm_name;
     std::vector<std::string> m_arm_joint_names;
+    std::vector<float> m_arm_velocity_max_limits;
+    std::vector<float> m_arm_acceleration_max_limits;
     std::string m_gripper_name;
     std::vector<std::string> m_gripper_joint_names;
     std::vector<float> m_gripper_joint_limits_max;
@@ -119,11 +122,12 @@ class KortexArmSimulation
     // Math utility
     KortexMathUtil m_math_util;
 
-    // KDL chain and solvers
+    // KDL chain, solvers and motions
     KDL::Chain m_chain;
     std::unique_ptr<KDL::ChainFkSolverPos_recursive> m_fk_solver;
     std::unique_ptr<KDL::ChainIkSolverPos_NR> m_ik_pos_solver;
     std::unique_ptr<KDL::ChainIkSolverVel_pinv> m_ik_vel_solver;
+    std::vector<KDL::VelocityProfile_Trap> m_velocity_profiles;
 
     // Threading
     std::atomic<bool> m_is_action_being_executed;
@@ -142,6 +146,7 @@ class KortexArmSimulation
     // Helper functions
     bool IsGripperPresent() const {return !m_gripper_name.empty();}
     void CreateDefaultActions();
+    kortex_driver::KortexError FillKortexError(uint32_t code, uint32_t subCode, const std::string& description = "") const;
 
     // Executors
     void JoinThreadAndCancelAction();
