@@ -27,7 +27,6 @@
     <arg name="api_connection_inactivity_timeout_ms" default="20000"/> <!--milliseconds-->
 
     <!-- Automatically start other modules -->
-    <arg name="start_rviz" default="true"/>
     <arg name="start_moveit" default="true"/>
 
     <!-- Action server params -->
@@ -54,11 +53,38 @@
                 unless="$(eval not arg('gripper'))"/>
         </group>
 
+        <!-- Start MoveIt! main executable -->
+        <group if="$(arg start_moveit)">
 
+            <!-- TODO Find cleaner way to do that and that will work with other arms -->
+            <!-- Without gripper -->
+            <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_move_it_config/launch/move_group.launch" if="$(eval not arg('gripper'))"> 
+                <arg name="dof" value="$(arg dof)"/>
+                <arg name="use_hard_limits" value="$(arg use_hard_limits)"/>
+                <arg name="prefix" value="$(arg prefix)"/>
+                <arg name="fake_execution" value="true"/>
+            </include>
+            <!-- With gripper -->
+            <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_$(arg gripper)_move_it_config/launch/move_group.launch" unless="$(eval not arg('gripper'))"> 
+                <arg name="dof" value="$(arg dof)"/>
+                <arg name="use_hard_limits" value="$(arg use_hard_limits)"/>
+                <arg name="prefix" value="$(arg prefix)"/>
+                <arg name="fake_execution" value="true"/>
+            </include>
+
+        </group>
+
+        <!-- Start joint and robot state publisher -->
+        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+            <rosparam param="source_list">[base_feedback/joint_state]</rosparam>
+            <param name="use_gui" value="false"/>
+            <param name="rate" value="$(arg cyclic_data_publish_rate)" />
+        </node>
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
         <!-- Start the kortex_driver node -->
-        <node name="$(arg robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver" output="screen"> <!--launch-prefix="gdb -ex run args"-->
-            <param name="sim" value="false"/>
+        <test test-name="$(arg robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver_func_tests" args=" --gtest_filter=KortexSim*"> <!--launch-prefix="gdb -ex run args"-->
+            <param name="sim" value="true"/>
             <param name="ip_address" value="$(arg ip_address)"/>
             <param name="username" value="$(arg username)"/>
             <param name="password" value="$(arg password)"/>
@@ -77,94 +103,6 @@
             <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/joint_limits.yaml" subst_value="true"/>
             <!-- If there is a gripper, load the active joint names for it -->
             <rosparam command="load" file="$(find kortex_description)/grippers/$(arg gripper)/config/joint_limits.yaml" unless="$(eval not arg('gripper'))" subst_value="true"/>
-        </node>
-        
-        <!-- Start MoveIt! main executable -->
-        <group if="$(arg start_moveit)">
-
-            <!-- TODO Find cleaner way to do that and that will work with other arms -->
-            <!-- Without gripper -->
-            <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_move_it_config/launch/move_group.launch" if="$(eval not arg('gripper'))"> 
-                <arg name="dof" value="$(arg dof)"/>
-                <arg name="use_hard_limits" value="$(arg use_hard_limits)"/>
-                <arg name="prefix" value="$(arg prefix)"/>
-            </include>
-            <!-- With gripper -->
-            <include file="$(find kortex_description)/../kortex_move_it_config/$(arg arm)_$(arg gripper)_move_it_config/launch/move_group.launch" unless="$(eval not arg('gripper'))"> 
-                <arg name="dof" value="$(arg dof)"/>
-                <arg name="use_hard_limits" value="$(arg use_hard_limits)"/>
-                <arg name="prefix" value="$(arg prefix)"/>
-            </include>
-
-        </group>
-
-        <!-- Start joint and robot state publisher -->
-        <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-            <rosparam param="source_list">[base_feedback/joint_state]</rosparam>
-            <param name="use_gui" value="false"/>
-            <param name="rate" value="$(arg cyclic_data_publish_rate)" />
-        </node>
-        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
-        <!-- Start RViz -->
-        <node name="rviz" pkg="rviz" type="rviz" output="log" args="-f base_link" if="$(arg start_rviz)"/> 
-
-        <!-- Tests -->
-        <!-- Initialization test and custom functional tests -->
-        <test test-name="kortex_driver_tests" pkg="kortex_driver" type="kortex_arm_driver_func_tests">
-            <param name="ip_address" value="$(arg ip_address)"/>
-            <param name="cyclic_data_publish_rate" value="$(arg cyclic_data_publish_rate)"/>
-            <param name="api_rpc_timeout_ms" value="$(arg api_rpc_timeout_ms)"/>
-            <param name="api_session_inactivity_timeout_ms" value="$(arg api_session_inactivity_timeout_ms)"/>
-            <param name="api_connection_inactivity_timeout_ms" value="$(arg api_connection_inactivity_timeout_ms)"/>
-            <param name="default_goal_time_tolerance" value="$(arg default_goal_time_tolerance)"/>
-            <param name="default_goal_tolerance" value="$(arg default_goal_tolerance)"/>
-            <param name="arm" value="$(arg arm)"/>
-            <param name="gripper" value="$(arg gripper)"/>
-            <param name="dof" value="$(arg dof)"/>
-            <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/joint_limits.yaml" subst_value="true"/>
-            <!-- If there is a gripper, load the active joint names for it -->
-            <rosparam command="load" file="$(find kortex_description)/grippers/$(arg gripper)/config/joint_limits.yaml" unless="$(eval not arg('gripper'))" subst_value="true"/>
         </test>
-
-        <!-- Test feedback and joint state publishing -->
-        <test test-name="publish_test_kortex_driver" pkg="rostest" type="publishtest">
-            <rosparam subst_value="true">
-            topics:
-                - name: /$(arg robot_name)/base_feedback
-                  timeout: 10
-                  negative: False
-                - name: /$(arg robot_name)/base_feedback/joint_state
-                  timeout: 10
-                  negative: False
-                - name: /$(arg robot_name)/joint_states
-                  timeout: 10
-                  negative: False
-            </rosparam>
-        </test>
-
-        <!-- Test publishers rate -->
-        <test test-name="hztest_test_base_feedback" pkg="rostest" type="hztest">
-            <param name="topic" value="base_feedback" />
-            <param name="hz" value="$(arg cyclic_data_publish_rate)" />
-            <param name="hzerror" value="5.0" />
-            <param name="test_duration" value="30.0" />
-            <param name="wait_time" value="10.0" />
-        </test>
-        <test test-name="hztest_test_driver_joint_state" pkg="rostest" type="hztest">
-            <param name="topic" value="base_feedback/joint_state" />
-            <param name="hz" value="$(arg cyclic_data_publish_rate)" />
-            <param name="hzerror" value="5.0" />
-            <param name="test_duration" value="30.0" />
-            <param name="wait_time" value="10.0" />
-        </test>
-        <test test-name="hztest_test_joint_state_publisher_joint_states" pkg="rostest" type="hztest">
-            <param name="topic" value="joint_states" />
-            <param name="hz" value="$(arg cyclic_data_publish_rate)" />
-            <param name="hzerror" value="5.0" />
-            <param name="test_duration" value="30.0" />
-            <param name="wait_time" value="10.0" />
-        </test>
-
     </group>
 </launch>

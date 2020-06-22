@@ -16,7 +16,8 @@ KortexArmDriver::KortexArmDriver(ros::NodeHandle nh):   m_node_handle(nh),
                                                         m_node_is_running(true), 
                                                         m_consecutive_base_cyclic_timeouts(0),
                                                         m_is_interconnect_module_present(false),
-                                                        m_is_vision_module_present(false)
+                                                        m_is_vision_module_present(false),
+                                                        m_simulator{}
 {
     // Parameter to let the other nodes know this node is up
     ros::param::set("is_initialized", false);
@@ -30,10 +31,17 @@ KortexArmDriver::KortexArmDriver(ros::NodeHandle nh):   m_node_handle(nh),
         verifyProductConfiguration();
         initSubscribers();
         startActionServers();
-    }
+    }    
 
     // ROS Services are always started
     initRosServices();
+
+    // Enable ROS Service simulation if not with a real robot
+    if (!m_is_real_robot)
+    {
+        m_simulator.reset(new KortexArmSimulation(nh));
+        registerSimulationHandlers();
+    }
 
     // Start the thread to publish the feedback and joint states
     m_pub_base_feedback = m_node_handle.advertise<kortex_driver::BaseCyclic_Feedback>("base_feedback", 1000);
@@ -214,6 +222,13 @@ void KortexArmDriver::parseRosArguments()
     if (!ros::param::get("~gripper", m_gripper_name))
     {
         std::string error_string = "Gripper name was not specified in the launch file, shutting down the node...";
+        ROS_ERROR("%s", error_string.c_str());
+        throw new std::runtime_error(error_string);
+    }
+    std::string robot_name;
+    if (!ros::param::get("~robot_name", robot_name))
+    {
+        std::string error_string = "Robot name was not specified in the launch file, shutting down the node...";
         ROS_ERROR("%s", error_string.c_str());
         throw new std::runtime_error(error_string);
     }
@@ -622,4 +637,33 @@ void KortexArmDriver::publishRobotFeedback()
 
         rate.sleep();
     }
+}
+
+void KortexArmDriver::registerSimulationHandlers()
+{
+    BaseSimulationServices* base_services_simulation = dynamic_cast<BaseSimulationServices*>(m_base_ros_services);
+    // Link the m_simulator handlers to the ROS services callbacks
+    // Action services
+    base_services_simulation->CreateActionHandler = std::bind(&KortexArmSimulation::CreateAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ReadActionHandler = std::bind(&KortexArmSimulation::ReadAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ReadAllActionsHandler = std::bind(&KortexArmSimulation::ReadAllActions, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->DeleteActionHandler = std::bind(&KortexArmSimulation::DeleteAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->UpdateActionHandler = std::bind(&KortexArmSimulation::UpdateAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ExecuteActionFromReferenceHandler = std::bind(&KortexArmSimulation::ExecuteActionFromReference, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ExecuteActionHandler = std::bind(&KortexArmSimulation::ExecuteAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->StopActionHandler = std::bind(&KortexArmSimulation::StopAction, m_simulator.get(), std::placeholders::_1);
+    // Other services
+    base_services_simulation->PlayCartesianTrajectoryHandler = std::bind(&KortexArmSimulation::PlayCartesianTrajectory, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->SendTwistCommandHandler = std::bind(&KortexArmSimulation::SendTwistCommand, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->PlayJointTrajectoryHandler = std::bind(&KortexArmSimulation::PlayJointTrajectory, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->SendJointSpeedsCommandHandler = std::bind(&KortexArmSimulation::SendJointSpeedsCommand, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->SendGripperCommandHandler = std::bind(&KortexArmSimulation::SendGripperCommand, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->StopHandler = std::bind(&KortexArmSimulation::Stop, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ApplyEmergencyStopHandler = std::bind(&KortexArmSimulation::ApplyEmergencyStop, m_simulator.get(), std::placeholders::_1);
+
+    // Prospects
+    //SendSelectedJointSpeedCommand
+    //PlaySelectedJointTrajectory
+    //PlayCartesianTrajectoryPosition
+    //PlayCartesianTrajectoryOrientation
 }

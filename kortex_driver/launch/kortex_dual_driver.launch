@@ -90,6 +90,7 @@
         <param name="gripper" value="$(arg left_gripper)"/>
         <param name="dof" value="$(arg left_dof)"/>
         <param name="prefix" value="$(arg left_prefix)"/>
+        <param name="robot_name" value="$(arg left_robot_name)"/>
         <rosparam command="load" file="$(find kortex_description)/arms/$(arg left_arm)/$(arg left_dof)dof/config/joint_limits.yaml" subst_value="true"/>
         <!-- If there is a gripper, load the active joint names for it -->
         <rosparam command="load" file="$(find kortex_description)/grippers/$(arg left_gripper)/config/joint_limits.yaml" unless="$(eval not arg('left_gripper'))" subst_value="true"/>
@@ -109,6 +110,7 @@
         <param name="gripper" value="$(arg right_gripper)"/>
         <param name="dof" value="$(arg right_dof)"/>
         <param name="prefix" value="$(arg right_prefix)"/>
+        <param name="robot_name" value="$(arg right_robot_name)"/>
         <rosparam command="load" file="$(find kortex_description)/arms/$(arg right_arm)/$(arg right_dof)dof/config/joint_limits.yaml" subst_value="true"/>
         <!-- If there is a gripper, load the active joint names for it -->
         <rosparam command="load" file="$(find kortex_description)/grippers/$(arg right_gripper)/config/joint_limits.yaml" unless="$(eval not arg('right_gripper'))" subst_value="true"/>

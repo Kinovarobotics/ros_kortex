@@ -11,12 +11,16 @@
     <arg name="y0" default="0"/>
     <arg name="z0" default="0"/>
 
-    <!-- Arm and gripper type -->
+    <!-- Arm type -->
     <arg name="arm" default="gen3"/>
     <arg name="dof" default="7" if="$(eval arg('arm') == 'gen3')"/> <!-- Number of degrees of freedom of the arm -->
     <arg name="dof" default="6" if="$(eval arg('arm') == 'gen3_lite')"/> <!-- Number of degrees of freedom of the arm -->
     <arg name="vision" default="true"/> <!-- True if the arm has a Vision module -->
-    <arg name="gripper" default="" />
+    
+    <!-- Default gripper for Gen3 is none, default gripper for Gen3 lite is gen3_lite_2f -->
+    <arg name="gripper" default="" if="$(eval arg('arm') == 'gen3')"/>
+    <arg name="gripper" default="gen3_lite_2f" if="$(eval arg('arm') == 'gen3_lite')"/>
+    
     <arg name="robot_name" default="my_$(arg arm)"/>
     <arg name="prefix" default=""/>
     <arg name="cyclic_data_publish_rate" default="40"/> <!--Hz-->
@@ -134,6 +138,7 @@
             <param name="arm" value="$(arg arm)"/>
             <param name="gripper" value="$(arg gripper)"/>
             <param name="dof" value="$(arg dof)"/>
+            <param name="robot_name" value="$(arg robot_name)"/>
             <param name="prefix" value="$(arg prefix)"/>
             <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/joint_limits.yaml" subst_value="true"/>
             <!-- If there is a gripper, load the active joint names for it -->
