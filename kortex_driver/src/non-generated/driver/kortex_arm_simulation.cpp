@@ -122,11 +122,6 @@ KortexArmSimulation::~KortexArmSimulation()
     JoinThreadAndCancelAction();
 }
 
-std::unordered_map<uint32_t, kortex_driver::Action> KortexArmSimulation::GetActionsMap() const
-{
-    return m_map_actions;
-}
-
 kortex_driver::CreateAction::Response KortexArmSimulation::CreateAction(const kortex_driver::CreateAction::Request& req)
 {
     auto new_action = req.input;
