@@ -115,6 +115,13 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     // Create and connect action clients
     m_follow_joint_trajectory_action_client.reset(new actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>(joint_trajectory_controller_topic + "/follow_joint_trajectory", true));
     m_follow_joint_trajectory_action_client->waitForServer();
+
+    // Create usual ROS parameters
+    m_node_handle.setParam("degrees_of_freedom", m_degrees_of_freedom);
+    m_node_handle.setParam("is_gripper_present", IsGripperPresent());
+    m_node_handle.setParam("gripper_joint_names", m_gripper_joint_names);
+	m_node_handle.setParam("has_vision_module", false);
+    m_node_handle.setParam("has_interconnect_module", false);
 }
 
 KortexArmSimulation::~KortexArmSimulation()
@@ -654,7 +661,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
 
     // Copy velocity profile data into trajectory using JOINT_TRAJECTORY_TIMESTEP_SECONDS timesteps
     // For each timestep
-    for (double t = 0.0; t < m_velocity_trap_profiles[0].Duration(); t += JOINT_TRAJECTORY_TIMESTEP_SECONDS)
+    for (double t = JOINT_TRAJECTORY_TIMESTEP_SECONDS; t < m_velocity_trap_profiles[0].Duration(); t += JOINT_TRAJECTORY_TIMESTEP_SECONDS)
     {
         // Create trajectory point
         trajectory_msgs::JointTrajectoryPoint p;
