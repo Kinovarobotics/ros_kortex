@@ -30,7 +30,7 @@ namespace
     static const std::string GRIPPER_PLANNING_GROUP = "gripper";
     static constexpr unsigned int FIRST_CREATED_ACTION_ID = 10000;
     static const std::set<unsigned int> DEFAULT_ACTIONS_IDENTIFIERS{1,2,3};
-    static constexpr double JOINT_TRAJECTORY_TIMESTEP = 0.01;
+    static constexpr double JOINT_TRAJECTORY_TIMESTEP_SECONDS = 0.01;
 }
 
 KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_handle(node_handle),
@@ -94,7 +94,7 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     // Build the velocity profile for each joint using the max velocities and max accelerations
     for (int i = 0; i < GetDOF(); i++)
     {
-        m_velocity_profiles.push_back(KDL::VelocityProfile_Trap(m_arm_velocity_max_limits[i], m_arm_acceleration_max_limits[i]));
+        m_velocity_trap_profiles.push_back(KDL::VelocityProfile_Trap(m_arm_velocity_max_limits[i], m_arm_acceleration_max_limits[i]));
     }
 
     // Start MoveIt client
@@ -110,7 +110,6 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     // Create publishers and subscribers
     static const std::string joint_trajectory_controller_topic = "/" + m_robot_name + "/" + m_prefix + m_arm_name + "_joint_trajectory_controller";
     m_pub_action_topic = m_node_handle.advertise<kortex_driver::ActionNotification>("action_topic", 1000);
-    //m_pub_joint_trajectory_controller_command = m_node_handle.advertise<trajectory_msgs::JointTrajectory>(joint_trajectory_controller_topic + "/command", 1000);
     m_sub_joint_trajectory_controller_state = m_node_handle.subscribe(joint_trajectory_controller_topic + "/state", 1, &KortexArmSimulation::cb_joint_trajectory_controller_state, this);
 
     // Create and connect action clients
@@ -294,6 +293,8 @@ kortex_driver::StopAction::Response KortexArmSimulation::StopAction(const kortex
     {
         JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     }
+
+    m_follow_joint_trajectory_action_client->cancelAllGoals();
     
     return kortex_driver::StopAction::Response();
 }
@@ -374,7 +375,8 @@ kortex_driver::Stop::Response KortexArmSimulation::Stop(const kortex_driver::Sto
     if (m_is_action_being_executed.load())
     {
         JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
-    }   
+    }
+    m_follow_joint_trajectory_action_client->cancelAllGoals();
     return kortex_driver::Stop::Response();
 }
 
@@ -384,7 +386,8 @@ kortex_driver::ApplyEmergencyStop::Response KortexArmSimulation::ApplyEmergencyS
     if (m_is_action_being_executed.load())
     {
         JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
-    }   
+    }
+    m_follow_joint_trajectory_action_client->cancelAllGoals();
     return kortex_driver::ApplyEmergencyStop::Response();
 }
 
@@ -598,7 +601,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
             // Set the velocity profiles
             for (int i = 0; i < GetDOF(); i++)
             {
-                m_velocity_profiles[i].SetProfileDuration(current.positions[i], endpoint.positions[i], constrained_joint_angles.constraint.value);
+                m_velocity_trap_profiles[i].SetProfileDuration(current.positions[i], endpoint.positions[i], constrained_joint_angles.constraint.value);
             }
             endpoint.time_from_start = ros::Duration(constrained_joint_angles.constraint.value);
             ROS_DEBUG("Using supplied duration : %2.2f", constrained_joint_angles.constraint.value);
@@ -620,15 +623,15 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
             for (int i = 0; i < GetDOF(); i++)
             {
                 double velocity_ratio = std::min(1.0, double(max_velocity)/m_arm_velocity_max_limits[i]);
-                m_velocity_profiles[i].SetProfileVelocity(current.positions[i], endpoint.positions[i], velocity_ratio);
-                max_duration = std::max(max_duration, m_velocity_profiles[i].Duration());
-                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.positions[i], endpoint.positions[i], m_velocity_profiles[i].Duration());
+                m_velocity_trap_profiles[i].SetProfileVelocity(current.positions[i], endpoint.positions[i], velocity_ratio);
+                max_duration = std::max(max_duration, m_velocity_trap_profiles[i].Duration());
+                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.positions[i], endpoint.positions[i], m_velocity_trap_profiles[i].Duration());
             }
             ROS_DEBUG("max_duration is : %2.2f", max_duration);
             // Set the velocity profiles
             for (int i = 0; i < GetDOF(); i++)
             {
-                m_velocity_profiles[i].SetProfileDuration(current.positions[i], endpoint.positions[i], max_duration);
+                m_velocity_trap_profiles[i].SetProfileDuration(current.positions[i], endpoint.positions[i], max_duration);
             }
             endpoint.time_from_start = ros::Duration(max_duration);
             break;
@@ -639,24 +642,24 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
             double optimal_duration = 0.0;
             for (int i = 0; i < GetDOF(); i++)
             {
-                m_velocity_profiles[i].SetProfile(current.positions[i], endpoint.positions[i]);
-                optimal_duration = std::max(optimal_duration, m_velocity_profiles[i].Duration());
-                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.positions[i], endpoint.positions[i], m_velocity_profiles[i].Duration());
+                m_velocity_trap_profiles[i].SetProfile(current.positions[i], endpoint.positions[i]);
+                optimal_duration = std::max(optimal_duration, m_velocity_trap_profiles[i].Duration());
+                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.positions[i], endpoint.positions[i], m_velocity_trap_profiles[i].Duration());
             }
             ROS_DEBUG("optimal_duration is : %2.2f", optimal_duration);
             // Set the velocity profiles
             for (int i = 0; i < GetDOF(); i++)
             {
-                m_velocity_profiles[i].SetProfileDuration(current.positions[i], endpoint.positions[i], optimal_duration);
+                m_velocity_trap_profiles[i].SetProfileDuration(current.positions[i], endpoint.positions[i], optimal_duration);
             }
             endpoint.time_from_start = ros::Duration(optimal_duration);
             break;
         }
     }
 
-    // Copy velocity profile data into trajectory using JOINT_TRAJECTORY_TIMESTEP timesteps
+    // Copy velocity profile data into trajectory using JOINT_TRAJECTORY_TIMESTEP_SECONDS timesteps
     // For each timestep
-    for (double t = 0.0; t < m_velocity_profiles[0].Duration(); t += JOINT_TRAJECTORY_TIMESTEP)
+    for (double t = 0.0; t < m_velocity_trap_profiles[0].Duration(); t += JOINT_TRAJECTORY_TIMESTEP_SECONDS)
     {
         // Create trajectory point
         trajectory_msgs::JointTrajectoryPoint p;
@@ -664,9 +667,9 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
         // Add position, velocity, acceleration from each velocity profile
         for (int i = 0; i < GetDOF(); i++)
         {
-            p.positions.push_back(m_velocity_profiles[i].Pos(t));
-            p.velocities.push_back(m_velocity_profiles[i].Vel(t));
-            p.accelerations.push_back(m_velocity_profiles[i].Acc(t));
+            p.positions.push_back(m_velocity_trap_profiles[i].Pos(t));
+            p.velocities.push_back(m_velocity_trap_profiles[i].Vel(t));
+            p.accelerations.push_back(m_velocity_trap_profiles[i].Acc(t));
         }
         // Add trajectory point to goal
         traj.points.push_back(p);
@@ -674,12 +677,12 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
     // Finally, add endpoint to trajectory
     // Add position, velocity, acceleration from each velocity profile
     trajectory_msgs::JointTrajectoryPoint p;
-    p.time_from_start = ros::Duration(m_velocity_profiles[0].Duration());
+    p.time_from_start = ros::Duration(m_velocity_trap_profiles[0].Duration());
     for (int i = 0; i < GetDOF(); i++)
     {
-        p.positions.push_back(m_velocity_profiles[i].Pos(m_velocity_profiles[i].Duration()));
-        p.velocities.push_back(m_velocity_profiles[i].Vel(m_velocity_profiles[i].Duration()));
-        p.accelerations.push_back(m_velocity_profiles[i].Acc(m_velocity_profiles[i].Duration()));
+        p.positions.push_back(m_velocity_trap_profiles[i].Pos(m_velocity_trap_profiles[i].Duration()));
+        p.velocities.push_back(m_velocity_trap_profiles[i].Vel(m_velocity_trap_profiles[i].Duration()));
+        p.accelerations.push_back(m_velocity_trap_profiles[i].Acc(m_velocity_trap_profiles[i].Duration()));
     }
     // Add trajectory point to goal
     traj.points.push_back(p);
@@ -737,7 +740,6 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     return result;
 }
 
-// TODO Fill implementation
 kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kortex_driver::Action& action)
 {
     kortex_driver::KortexError result;
@@ -758,7 +760,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kor
     }
 
     // TODO Handle constraints and warn if some cannot be applied in simulation
-    // TODO Fill implementation to move simulated arm at angular speeds
+    // TODO Fill implementation to move all actuators at given velocities
 
     return result;
 }

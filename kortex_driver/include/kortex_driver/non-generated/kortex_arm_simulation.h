@@ -127,7 +127,7 @@ class KortexArmSimulation
     std::unique_ptr<KDL::ChainFkSolverPos_recursive> m_fk_solver;
     std::unique_ptr<KDL::ChainIkSolverPos_NR> m_ik_pos_solver;
     std::unique_ptr<KDL::ChainIkSolverVel_pinv> m_ik_vel_solver;
-    std::vector<KDL::VelocityProfile_Trap> m_velocity_profiles;
+    std::vector<KDL::VelocityProfile_Trap> m_velocity_trap_profiles;
 
     // Threading
     std::atomic<bool> m_is_action_being_executed;
