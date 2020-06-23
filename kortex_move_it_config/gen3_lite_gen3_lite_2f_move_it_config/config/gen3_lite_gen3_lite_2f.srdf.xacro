@@ -31,10 +31,10 @@
     <group_state name="home" group="arm">
         <joint name="$(arg prefix)joint_1" value="0" />
         <joint name="$(arg prefix)joint_2" value="-0.28" />
-        <joint name="$(arg prefix)joint_3" value="1.33" />
+        <joint name="$(arg prefix)joint_3" value="1.309" />
         <joint name="$(arg prefix)joint_4" value="0" />
         <joint name="$(arg prefix)joint_5" value="-1.047" />
-        <joint name="$(arg prefix)joint_6" value="2.67" />
+        <joint name="$(arg prefix)joint_6" value="0" />
     </group_state>
     <group_state name="retract" group="arm">
         <joint name="$(arg prefix)joint_1" value="-0.0522" />
