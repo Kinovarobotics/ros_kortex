@@ -34,11 +34,6 @@ namespace
     static constexpr unsigned int FIRST_CREATED_ACTION_ID = 10000;
     static const std::set<unsigned int> DEFAULT_ACTIONS_IDENTIFIERS{1,2,3};
     static constexpr double JOINT_TRAJECTORY_TIMESTEP_SECONDS = 0.01;
-    // This is used in Cartesian Path_Line generation to make sure translations and rotations are in sync
-    static constexpr double CARTESIAN_MAX_TRANSLATION_SPEED = 0.5; // m/s
-    static constexpr double CARTESIAN_MAX_TRANSLATION_ACCELERATION = 0.4; // m/s²
-    static constexpr double CARTESIAN_MAX_ROTATION_SPEED = 1.7453; // rad/s
-    static constexpr double DEFAULT_EQ_RADIUS = CARTESIAN_MAX_TRANSLATION_SPEED / CARTESIAN_MAX_ROTATION_SPEED;
 }
 
 KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_handle(node_handle),
@@ -50,17 +45,24 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     ros::param::get("~robot_name", m_robot_name);
     ros::param::get("~prefix", m_prefix);
 
-    // Arm and gripper information
+    // Arm information
     ros::param::get("~dof", m_degrees_of_freedom);
     ros::param::get("~arm", m_arm_name);
     ros::param::get("~joint_names", m_arm_joint_names);
     ros::param::get("~maximum_velocities", m_arm_velocity_max_limits);
     ros::param::get("~maximum_accelerations", m_arm_acceleration_max_limits);
-    
     for (auto s : m_arm_joint_names)
     {
         s.insert(0, m_prefix);
     }
+
+    // Cartesian Twist limits
+    ros::param::get("~maximum_linear_velocity", m_max_cartesian_twist_linear);
+    ros::param::get("~maximum_angular_velocity", m_max_cartesian_twist_angular);
+    ros::param::get("~maximum_linear_acceleration", m_max_cartesian_acceleration_linear);
+    ros::param::get("~maximum_angular_acceleration", m_max_cartesian_acceleration_angular);
+    
+    // Gripper information
     ros::param::get("~gripper", m_gripper_name);
     if (IsGripperPresent())
     {
@@ -786,13 +788,9 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     ROS_DEBUG("end rot = %2.4f", end_rot.GetRotAngle(axis));
     }
 
-    // Create Path_Line object
-    // I know this is ugly but the RotationalInterpolation object is mandatory and needs to be created as such
-    KDL::Path_Line line(start, end, new KDL::RotationalInterpolation_SingleAxis(), DEFAULT_EQ_RADIUS);
-
     // If different speed limits than the default ones are provided, use them instead
-    float translation_speed_limit = CARTESIAN_MAX_TRANSLATION_SPEED;
-    float rotation_speed_limit = CARTESIAN_MAX_ROTATION_SPEED;
+    float translation_speed_limit = m_max_cartesian_twist_linear;
+    float rotation_speed_limit = m_max_cartesian_twist_angular;
     if (!constrained_pose.constraint.oneof_type.speed.empty())
     {
         // If a max velocity is supplied for each joint, we need to find the limiting duration with this velocity constraint
@@ -802,20 +800,27 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
 
     // Calculate norm of translation movement and minimum duration to move this amount given max translation speed
     double delta_pos = (end_pos - start.p).Norm();
-    double minimum_translation_duration = delta_pos / CARTESIAN_MAX_TRANSLATION_SPEED; // in seconds
-    ROS_INFO("delta_pos = %2.4f m and min duration is %2.4f seconds", delta_pos, minimum_translation_duration);
+    double minimum_translation_duration = delta_pos / m_max_cartesian_twist_linear; // in seconds
 
     // Calculate angle variation of rotation movement and minimum duration to move this amount given max rotation speed
     KDL::Vector axis; // we need to create this variable to access the RotAngle for start and end frames'rotation components
     double delta_rot = fabs(end_rot.GetRotAngle(axis) - start.M.GetRotAngle(axis));
-    double minimum_rotation_duration = delta_pos / CARTESIAN_MAX_ROTATION_SPEED; // in seconds
-    ROS_INFO("delta_rot = %2.4f rad and min duration is %2.4f seconds", delta_rot, minimum_rotation_duration);
+    double minimum_rotation_duration = delta_pos / m_max_cartesian_twist_angular; // in seconds
 
     // The default value for the duration will be the longer duration of the two
     double duration = std::max(minimum_translation_duration, minimum_rotation_duration);
 
+    // eq_radius is chosen here to make it so translations and rotations are normalised
+    // Here is a good explanation for it : https://github.com/zakharov/BRICS_RN/blob/master/navigation_trajectory_common/include/navigation_trajectory_common/Conversions.h#L358-L382
+    float eq_radius = translation_speed_limit / rotation_speed_limit;
+
+    // Create Path_Line object
+    // I know this is ugly but the RotationalInterpolation object is mandatory and needs to be created as such
+    KDL::Path_Line line(start, end, new KDL::RotationalInterpolation_SingleAxis(), eq_radius);
+
     // Create a trapezoidal velocity profile for the Cartesian trajectory to parametrize it in time
-    KDL::VelocityProfile_Trap velocity_profile(CARTESIAN_MAX_TRANSLATION_SPEED, CARTESIAN_MAX_TRANSLATION_ACCELERATION);
+    ROS_INFO("Before creating vel profile: trans speed is : %2.4g and angular is %2.4f", translation_speed_limit, rotation_speed_limit);
+    KDL::VelocityProfile_Trap velocity_profile(std::min(translation_speed_limit, rotation_speed_limit), m_max_cartesian_acceleration_linear);
     velocity_profile.SetProfile(0.0, line.PathLength());
     duration = std::max(duration, velocity_profile.Duration());
 
@@ -836,7 +841,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     // Set the velocity profile duration
     velocity_profile.SetProfileDuration(0.0, line.PathLength(), duration);
     KDL::Trajectory_Segment segment(&line, &velocity_profile, false);
-    ROS_INFO("Duration of trajectory will be %2.4f seconds", duration);
+    ROS_DEBUG("Duration of trajectory will be %2.4f seconds", duration);
 
     // Initialize trajectory object
     trajectory_msgs::JointTrajectory traj;
@@ -855,9 +860,10 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     {
         // First get the next Cartesian position and twists
         auto pos = segment.Pos(t);
-        auto vel = segment.Vel(t);
-        auto acc = segment.Acc(t);
-        ROS_INFO("t = %2.4f seconds pos_z = %2.4f vel_z = %2.4f acc_z = %2.4f", t, pos.p.z(), vel.vel.z(), acc.vel.z());
+        
+        // Position is enough to have a smooth trajectory it seems but if eventually vel and acc are useful somehow this is how to get them:
+        // auto vel = segment.Vel(t);
+        // auto acc = segment.Acc(t);
 
         // Create trajectory point
         trajectory_msgs::JointTrajectoryPoint p;
@@ -867,7 +873,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
         int code = m_ik_pos_solver->CartToJnt(previous, pos, current_joints);
         if (code != m_ik_pos_solver->E_NOERROR)
         {
-            ROS_ERROR("CODE = %d", code);
+            ROS_ERROR("IK ERROR CODE = %d", code);
         }
 
         for (int i = 0; i < GetDOF(); i++)
@@ -884,9 +890,6 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     trajectory_msgs::JointTrajectoryPoint p;
     p.time_from_start = ros::Duration(segment.Duration());
     auto pos = segment.Pos(segment.Duration());
-    auto vel = 0.0;
-    auto acc = 0.0;
-    ROS_INFO("i = %2.4f seconds pos_z = %2.4f vel_z = %2.4f acc_z = %2.4f", segment.Duration(), pos.p.z(), vel, acc);
     int code = m_ik_pos_solver->CartToJnt(previous, pos, current_joints);
     for (int i = 0; i < GetDOF(); i++)
     {

@@ -105,11 +105,17 @@ class KortexArmSimulation
     std::string m_prefix;
     std::string m_robot_name;
 
-    // Arm and gripper information
+    // Arm information
     std::string m_arm_name;
     std::vector<std::string> m_arm_joint_names;
     std::vector<float> m_arm_velocity_max_limits;
     std::vector<float> m_arm_acceleration_max_limits;
+    float m_max_cartesian_twist_linear;
+    float m_max_cartesian_twist_angular;
+    float m_max_cartesian_acceleration_linear;
+    float m_max_cartesian_acceleration_angular;
+
+    // Gripper information
     std::string m_gripper_name;
     std::vector<std::string> m_gripper_joint_names;
     std::vector<float> m_gripper_joint_limits_max;
