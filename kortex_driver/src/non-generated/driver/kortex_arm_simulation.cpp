@@ -20,6 +20,9 @@
 #include "trajectory_msgs/JointTrajectory.h"
 
 #include <kdl_parser/kdl_parser.hpp>
+#include <kdl/path_line.hpp>
+#include <kdl/rotational_interpolation_sa.hpp>
+#include <kdl/trajectory_segment.hpp>
 
 #include <set>
 #include <chrono>
@@ -31,6 +34,11 @@ namespace
     static constexpr unsigned int FIRST_CREATED_ACTION_ID = 10000;
     static const std::set<unsigned int> DEFAULT_ACTIONS_IDENTIFIERS{1,2,3};
     static constexpr double JOINT_TRAJECTORY_TIMESTEP_SECONDS = 0.01;
+    // This is used in Cartesian Path_Line generation to make sure translations and rotations are in sync
+    static constexpr double CARTESIAN_MAX_TRANSLATION_SPEED = 0.5; // m/s
+    static constexpr double CARTESIAN_MAX_TRANSLATION_ACCELERATION = 0.4; // m/s²
+    static constexpr double CARTESIAN_MAX_ROTATION_SPEED = 1.7453; // rad/s
+    static constexpr double DEFAULT_EQ_RADIUS = CARTESIAN_MAX_TRANSLATION_SPEED / CARTESIAN_MAX_ROTATION_SPEED;
 }
 
 KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_handle(node_handle),
@@ -735,10 +743,189 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
                                 "Error playing pose action : action is malformed.");
     }
     auto constrained_pose = action.oneof_action_parameters.reach_pose[0];
-    
-    // TODO Handle constraints and warn if some cannot be applied in simulation
-    // TODO Fill implementation to move simulated arm to Cartesian pose
 
+    // Get current position
+    trajectory_msgs::JointTrajectoryPoint current;
+    {
+        const std::lock_guard<std::mutex> lock(m_state_mutex);
+        current = m_current_state.actual;
+    }
+    
+    // Get Start frame
+    // For the Rotation part : ThetaX = gamma, ThetaY = beta, ThetaZ = alpha 
+    auto start = KDL::Frame();
+    Eigen::VectorXd positions_eigen(m_degrees_of_freedom);
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        positions_eigen[i] = current.positions[i];
+    }
+    KDL::JntArray current_kdl(GetDOF());
+    current_kdl.data = positions_eigen;
+    m_fk_solver->JntToCart(current_kdl, start);
+
+    {
+    ROS_DEBUG("START FRAME :");
+    ROS_DEBUG("X=%2.4f Y=%2.4f Z=%2.4f", start.p[0], start.p[1], start.p[2]);
+    double sa, sb, sg; start.M.GetEulerZYX(sa, sb, sg);
+    ROS_DEBUG("ALPHA=%2.4f BETA=%2.4f GAMMA=%2.4f", m_math_util.toDeg(sa), m_math_util.toDeg(sb), m_math_util.toDeg(sg));
+    KDL::Vector axis;
+    ROS_DEBUG("start rot = %2.4f", start.M.GetRotAngle(axis));
+    }
+
+    // Get End frame
+    auto end_pos = KDL::Vector(constrained_pose.target_pose.x, constrained_pose.target_pose.y, constrained_pose.target_pose.z);
+    auto end_rot = KDL::Rotation::EulerZYX(m_math_util.toRad(constrained_pose.target_pose.theta_z), m_math_util.toRad(constrained_pose.target_pose.theta_y), m_math_util.toRad(constrained_pose.target_pose.theta_x));
+    KDL::Frame end(end_rot, end_pos);
+
+    {
+    ROS_DEBUG("END FRAME :");
+    ROS_DEBUG("X=%2.4f Y=%2.4f Z=%2.4f", end_pos[0], end_pos[1], end_pos[2]);
+    double ea, eb, eg; end_rot.GetEulerZYX(ea, eb, eg);
+    ROS_DEBUG("ALPHA=%2.4f BETA=%2.4f GAMMA=%2.4f", m_math_util.toDeg(ea), m_math_util.toDeg(eb), m_math_util.toDeg(eg));
+    KDL::Vector axis;
+    ROS_DEBUG("end rot = %2.4f", end_rot.GetRotAngle(axis));
+    }
+
+    // Create Path_Line object
+    // I know this is ugly but the RotationalInterpolation object is mandatory and needs to be created as such
+    KDL::Path_Line line(start, end, new KDL::RotationalInterpolation_SingleAxis(), DEFAULT_EQ_RADIUS);
+
+    // If different speed limits than the default ones are provided, use them instead
+    float translation_speed_limit = CARTESIAN_MAX_TRANSLATION_SPEED;
+    float rotation_speed_limit = CARTESIAN_MAX_ROTATION_SPEED;
+    if (!constrained_pose.constraint.oneof_type.speed.empty())
+    {
+        // If a max velocity is supplied for each joint, we need to find the limiting duration with this velocity constraint
+        translation_speed_limit = std::min(constrained_pose.constraint.oneof_type.speed[0].translation, translation_speed_limit);
+        rotation_speed_limit = std::min(constrained_pose.constraint.oneof_type.speed[0].orientation, rotation_speed_limit);
+    }
+
+    // Calculate norm of translation movement and minimum duration to move this amount given max translation speed
+    double delta_pos = (end_pos - start.p).Norm();
+    double minimum_translation_duration = delta_pos / CARTESIAN_MAX_TRANSLATION_SPEED; // in seconds
+    ROS_INFO("delta_pos = %2.4f m and min duration is %2.4f seconds", delta_pos, minimum_translation_duration);
+
+    // Calculate angle variation of rotation movement and minimum duration to move this amount given max rotation speed
+    KDL::Vector axis; // we need to create this variable to access the RotAngle for start and end frames'rotation components
+    double delta_rot = fabs(end_rot.GetRotAngle(axis) - start.M.GetRotAngle(axis));
+    double minimum_rotation_duration = delta_pos / CARTESIAN_MAX_ROTATION_SPEED; // in seconds
+    ROS_INFO("delta_rot = %2.4f rad and min duration is %2.4f seconds", delta_rot, minimum_rotation_duration);
+
+    // The default value for the duration will be the longer duration of the two
+    double duration = std::max(minimum_translation_duration, minimum_rotation_duration);
+
+    // Create a trapezoidal velocity profile for the Cartesian trajectory to parametrize it in time
+    KDL::VelocityProfile_Trap velocity_profile(CARTESIAN_MAX_TRANSLATION_SPEED, CARTESIAN_MAX_TRANSLATION_ACCELERATION);
+    velocity_profile.SetProfile(0.0, line.PathLength());
+    duration = std::max(duration, velocity_profile.Duration());
+
+    // If duration is not supplied, use the one we just calculated
+    // If the duration is supplied, simply use it
+    if (!constrained_pose.constraint.oneof_type.duration.empty())
+    {
+        double supplied_duration = constrained_pose.constraint.oneof_type.duration[0];
+        if (duration > supplied_duration)
+        {
+            ROS_WARN("Cannot use supplied duration %2.4f because the minimum duration based on velocity limits is %2.4f",
+                        supplied_duration,
+                        duration);
+        }
+        duration = std::max(duration, supplied_duration);
+    }
+
+    // Set the velocity profile duration
+    velocity_profile.SetProfileDuration(0.0, line.PathLength(), duration);
+    KDL::Trajectory_Segment segment(&line, &velocity_profile, false);
+    ROS_INFO("Duration of trajectory will be %2.4f seconds", duration);
+
+    // Initialize trajectory object
+    trajectory_msgs::JointTrajectory traj;
+    traj.header.frame_id = m_prefix + "base_link";
+    traj.header.stamp = ros::Time::now();
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        const std::string joint_name = m_prefix + "joint_" + std::to_string(i+1); //joint names are 1-based
+        traj.joint_names.push_back(joint_name);
+    }
+
+    // Fill trajectory object
+    KDL::JntArray previous = current_kdl; // Position i - 1, initialise to starting angles
+    KDL::JntArray current_joints(GetDOF()); // Position i
+    for (float t = JOINT_TRAJECTORY_TIMESTEP_SECONDS; t < duration; t += JOINT_TRAJECTORY_TIMESTEP_SECONDS)
+    {
+        // First get the next Cartesian position and twists
+        auto pos = segment.Pos(t);
+        auto vel = segment.Vel(t);
+        auto acc = segment.Acc(t);
+        ROS_INFO("t = %2.4f seconds pos_z = %2.4f vel_z = %2.4f acc_z = %2.4f", t, pos.p.z(), vel.vel.z(), acc.vel.z());
+
+        // Create trajectory point
+        trajectory_msgs::JointTrajectoryPoint p;
+        p.time_from_start = ros::Duration(t);
+
+        // Use inverse IK solver
+        int code = m_ik_pos_solver->CartToJnt(previous, pos, current_joints);
+        if (code != m_ik_pos_solver->E_NOERROR)
+        {
+            ROS_ERROR("CODE = %d", code);
+        }
+
+        for (int i = 0; i < GetDOF(); i++)
+        {
+            p.positions.push_back(current_joints(i));
+        }
+        
+        // Add trajectory point to goal
+        traj.points.push_back(p);
+        previous = current_joints;
+    }
+
+    // Add last point
+    trajectory_msgs::JointTrajectoryPoint p;
+    p.time_from_start = ros::Duration(segment.Duration());
+    auto pos = segment.Pos(segment.Duration());
+    auto vel = 0.0;
+    auto acc = 0.0;
+    ROS_INFO("i = %2.4f seconds pos_z = %2.4f vel_z = %2.4f acc_z = %2.4f", segment.Duration(), pos.p.z(), vel, acc);
+    int code = m_ik_pos_solver->CartToJnt(previous, pos, current_joints);
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        p.positions.push_back(current_joints(i));
+    }
+    
+    // Add trajectory point to goal
+    traj.points.push_back(p);
+
+    // Verify if goal has been cancelled before sending it
+    if (m_action_preempted.load())
+    {
+        return result;
+    }
+    
+    // Send goal
+    control_msgs::FollowJointTrajectoryActionGoal goal;
+    goal.goal.trajectory = traj;
+    m_follow_joint_trajectory_action_client->sendGoal(goal.goal);
+
+    // Wait for goal to be done, or for preempt to be called (check every 10ms)
+    while(!m_action_preempted.load() && !m_follow_joint_trajectory_action_client->waitForResult(ros::Duration(0.01f))) {}
+
+    // If we got out of the loop because we're preempted, cancel the goal before returning
+    if (m_action_preempted.load())
+    {
+        m_follow_joint_trajectory_action_client->cancelAllGoals();
+    }
+    // Fill result depending on action final status if user didn't cancel
+    else
+    {
+        auto status = m_follow_joint_trajectory_action_client->getResult();
+        if (status->error_code != status->SUCCESSFUL)
+        {
+            result = FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                        kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                        status->error_string);
+        }
+    }
     return result;
 }
 
