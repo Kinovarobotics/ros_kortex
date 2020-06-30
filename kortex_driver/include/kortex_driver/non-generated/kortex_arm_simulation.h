@@ -17,6 +17,7 @@
 #include <ros/ros.h>
 #include <control_msgs/JointTrajectoryControllerState.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
+#include <control_msgs/GripperCommandAction.h>
 #include <actionlib/client/simple_action_client.h>
 
 // MoveIt
@@ -104,6 +105,7 @@ class KortexArmSimulation
 
     // Action clients
     std::unique_ptr<actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>> m_follow_joint_trajectory_action_client;
+    std::unique_ptr<actionlib::SimpleActionClient<control_msgs::GripperCommandAction>> m_gripper_action_client;
 
     // Namespacing and prefixing information
     std::string m_prefix;

@@ -16,6 +16,7 @@
 #include "kortex_driver/ActionNotification.h"
 #include "kortex_driver/ActionEvent.h"
 #include "kortex_driver/JointTrajectoryConstraintType.h"
+#include "kortex_driver/GripperMode.h"
 
 #include "trajectory_msgs/JointTrajectory.h"
 
@@ -119,17 +120,22 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     CreateDefaultActions();
 
     // Create publishers and subscribers
-    static const std::string joint_trajectory_controller_topic = "/" + m_robot_name + "/" + m_prefix + m_arm_name + "_joint_trajectory_controller";
     m_pub_action_topic = m_node_handle.advertise<kortex_driver::ActionNotification>("action_topic", 1000);
-    // m_sub_joint_trajectory_controller_state = m_node_handle.subscribe(joint_trajectory_controller_topic + "/state", 1, &KortexArmSimulation::cb_joint_trajectory_controller_state, this);
     m_sub_joint_state = m_node_handle.subscribe("/" + m_robot_name + "/" + "joint_states", 1, &KortexArmSimulation::cb_joint_states, this);
     m_feedback.actuators.resize(GetDOF());
     m_feedback.interconnect.oneof_tool_feedback.gripper_feedback.resize(1);
     m_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor.resize(1);
 
     // Create and connect action clients
-    m_follow_joint_trajectory_action_client.reset(new actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>(joint_trajectory_controller_topic + "/follow_joint_trajectory", true));
+    m_follow_joint_trajectory_action_client.reset(new actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>(
+        "/" + m_robot_name + "/" + m_prefix + m_arm_name + "_joint_trajectory_controller" + "/follow_joint_trajectory", true));
     m_follow_joint_trajectory_action_client->waitForServer();
+    if (IsGripperPresent())
+    {
+        m_gripper_action_client.reset(new actionlib::SimpleActionClient<control_msgs::GripperCommandAction>(
+            "/" + m_robot_name + "/" + m_prefix + m_gripper_name + "_gripper_controller" + "/gripper_cmd", true));
+        m_gripper_action_client->waitForServer();
+    }
 
     // Create usual ROS parameters
     m_node_handle.setParam("degrees_of_freedom", m_degrees_of_freedom);
@@ -361,6 +367,10 @@ kortex_driver::StopAction::Response KortexArmSimulation::StopAction(const kortex
     }
 
     m_follow_joint_trajectory_action_client->cancelAllGoals();
+    if (IsGripperPresent())
+    {
+        m_gripper_action_client->cancelAllGoals();
+    }
     
     return kortex_driver::StopAction::Response();
 }
@@ -443,6 +453,10 @@ kortex_driver::Stop::Response KortexArmSimulation::Stop(const kortex_driver::Sto
         JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     }
     m_follow_joint_trajectory_action_client->cancelAllGoals();
+    if (IsGripperPresent())
+    {
+        m_gripper_action_client->cancelAllGoals();
+    }
     return kortex_driver::Stop::Response();
 }
 
@@ -454,6 +468,10 @@ kortex_driver::ApplyEmergencyStop::Response KortexArmSimulation::ApplyEmergencyS
         JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     }
     m_follow_joint_trajectory_action_client->cancelAllGoals();
+    if (IsGripperPresent())
+    {
+        m_gripper_action_client->cancelAllGoals();
+    }
     return kortex_driver::ApplyEmergencyStop::Response();
 }
 
@@ -1037,7 +1055,6 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendTwist(const kortex_dr
     return result;
 }
 
-// TODO Fill implementation
 kortex_driver::KortexError KortexArmSimulation::ExecuteSendGripperCommand(const kortex_driver::Action& action)
 {
     kortex_driver::KortexError result;
@@ -1051,10 +1068,56 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendGripperCommand(const 
     }
     auto gripper_command = action.oneof_action_parameters.send_gripper_command[0];
 
-    // TODO Handle constraints and warn if some cannot be applied in simulation
-    // TODO Handle velocity mode too?
-    // TODO Fill implementation to move simulated gripper to given position
+    if (gripper_command.gripper.finger.size() != 1)
+    {
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing gripper command action : there must be exactly one finger");
+    }
 
+    if (gripper_command.mode != kortex_driver::GripperMode::GRIPPER_POSITION)
+    {
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                            kortex_driver::SubErrorCodes::UNSUPPORTED_ACTION,
+                            "Error playing gripper command action : gripper mode " + std::to_string(gripper_command.mode) + " is not supported; only position is.");
+    }
+
+    // The incoming command is relative [0,1] and we need to put it in absolute unit [m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0]]:
+    double absolute_gripper_command = m_math_util.absolute_position_from_relative(gripper_command.gripper.finger[0].value, m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0]);
+
+    // Create the goal
+    control_msgs::GripperCommandGoal goal;
+    goal.command.position = absolute_gripper_command;
+
+    // Verify if goal has been cancelled before sending it
+    if (m_action_preempted.load())
+    {
+        return result;
+    }
+
+    // Send goal
+    m_gripper_action_client->sendGoal(goal);
+
+    // Wait for goal to be done, or for preempt to be called (check every 10ms)
+    while(!m_action_preempted.load() && !m_gripper_action_client->waitForResult(ros::Duration(0.01f))) {}
+
+    // If we got out of the loop because we're preempted, cancel the goal before returning
+    if (m_action_preempted.load())
+    {
+        m_gripper_action_client->cancelAllGoals();
+    }
+    // Fill result depending on action final status if user didn't cancel
+    else
+    {
+        auto status = m_gripper_action_client->getResult();
+        
+        if (!status->reached_goal)
+        {
+            result = FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                        kortex_driver::SubErrorCodes::METHOD_FAILED,
+                                        "The gripper command failed during execution.");
+        }
+    }
     return result;
 }
 
