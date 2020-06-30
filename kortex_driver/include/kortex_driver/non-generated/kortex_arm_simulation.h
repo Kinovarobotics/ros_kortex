@@ -39,6 +39,7 @@
 
 #include "kortex_driver/ActionType.h"
 #include "kortex_driver/KortexError.h"
+#include "kortex_driver/BaseCyclic_Feedback.h"
 
 #include "kortex_driver/CreateAction.h"
 #include "kortex_driver/ReadAction.h"
@@ -69,6 +70,8 @@ class KortexArmSimulation
     std::unordered_map<uint32_t, kortex_driver::Action> GetActionsMap() const;
     int GetDOF() const {return m_degrees_of_freedom;}
 
+    kortex_driver::BaseCyclic_Feedback GetFeedback();
+
     // Handlers for simulated Kortex API functions
     // Actions API
     kortex_driver::CreateAction::Response CreateAction(const kortex_driver::CreateAction::Request& req);
@@ -97,6 +100,7 @@ class KortexArmSimulation
 
     // Subscribers
     ros::Subscriber m_sub_joint_trajectory_controller_state;
+    ros::Subscriber m_sub_joint_state;
 
     // Action clients
     std::unique_ptr<actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>> m_follow_joint_trajectory_action_client;
@@ -145,8 +149,11 @@ class KortexArmSimulation
     std::unique_ptr<moveit::planning_interface::MoveGroupInterface> m_moveit_gripper_interface;
 
     // Subscription callbacks and data structures with their mutexes
-    void cb_joint_trajectory_controller_state(const control_msgs::JointTrajectoryControllerState& state);
-    control_msgs::JointTrajectoryControllerState m_current_state;
+    // void cb_joint_trajectory_controller_state(const control_msgs::JointTrajectoryControllerState& state);
+    void cb_joint_states(const sensor_msgs::JointState& state);
+    sensor_msgs::JointState m_current_state;
+    bool m_first_state_received;
+    kortex_driver::BaseCyclic_Feedback m_feedback;
     std::mutex m_state_mutex;
 
     // Helper functions
