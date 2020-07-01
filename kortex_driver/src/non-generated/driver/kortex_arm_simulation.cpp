@@ -69,6 +69,21 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     if (IsGripperPresent())
     {
         ros::param::get("~gripper_joint_names", m_gripper_joint_names);
+
+        // The joint_states feedback uses alphabetical order for the indexes
+        // If the gripper joint is before
+        if (m_gripper_joint_names[0] < m_arm_joint_names[0])
+        {
+            m_gripper_joint_index = 0;
+            m_first_arm_joint_index = 1;
+        }
+        // If the gripper joint is after the arm joints
+        else
+        {
+            m_gripper_joint_index = GetDOF();
+            m_first_arm_joint_index = 0;
+        }
+
         for (auto s : m_gripper_joint_names)
         {
             s.insert(0, m_prefix);
@@ -155,7 +170,6 @@ kortex_driver::BaseCyclic_Feedback KortexArmSimulation::GetFeedback()
     // If the feedback is not yet received, return now
     if (!m_first_state_received)
     {
-        ROS_WARN("Waiting for feedback to arrive");
         return m_feedback;
     }
 
@@ -169,8 +183,8 @@ kortex_driver::BaseCyclic_Feedback KortexArmSimulation::GetFeedback()
     // Fill joint angles feedback
     for (int i = 0; i < GetDOF(); i++)
     {
-        m_feedback.actuators[i].position = m_math_util.wrapDegreesFromZeroTo360(m_math_util.toDeg(current.position[i]));
-        m_feedback.actuators[i].velocity = m_math_util.toDeg(current.velocity[i]);
+        m_feedback.actuators[i].position = m_math_util.wrapDegreesFromZeroTo360(m_math_util.toDeg(current.position[m_first_arm_joint_index + i]));
+        m_feedback.actuators[i].velocity = m_math_util.toDeg(current.velocity[m_first_arm_joint_index + i]);
     }
 
     // Calculate FK to get end effector pose
@@ -178,7 +192,7 @@ kortex_driver::BaseCyclic_Feedback KortexArmSimulation::GetFeedback()
     Eigen::VectorXd positions_eigen(GetDOF());
     for (int i = 0; i < GetDOF(); i++)
     {
-        positions_eigen[i] = current.position[i];
+        positions_eigen[i] = current.position[m_first_arm_joint_index + i];
     }
     KDL::JntArray current_kdl(GetDOF());
     current_kdl.data = positions_eigen;
@@ -193,8 +207,11 @@ kortex_driver::BaseCyclic_Feedback KortexArmSimulation::GetFeedback()
     m_feedback.base.tool_pose_theta_z = m_math_util.toDeg(alpha);
 
     // Fill gripper information
-    // Gripper index is right after last actuator and is expressed in % in the base feedback (not in absolute position like in joint_states)
-    m_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor[0].position = 100.0 * m_math_util.relative_position_from_absolute(current.position[GetDOF()], m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0]);
+    if (IsGripperPresent())
+    {
+        // Gripper index is right after last actuator and is expressed in % in the base feedback (not in absolute position like in joint_states)
+        m_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor[0].position = 100.0 * m_math_util.relative_position_from_absolute(current.position[m_gripper_joint_index], m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0]);
+    }
 
     return m_feedback;
 }
@@ -475,13 +492,6 @@ kortex_driver::ApplyEmergencyStop::Response KortexArmSimulation::ApplyEmergencyS
     return kortex_driver::ApplyEmergencyStop::Response();
 }
 
-// void KortexArmSimulation::cb_joint_trajectory_controller_state(const control_msgs::JointTrajectoryControllerState& state)
-// {
-//     const std::lock_guard<std::mutex> lock(m_state_mutex);
-//     m_first_state_received = true;
-//     m_current_state = state;
-// }
-
 void KortexArmSimulation::cb_joint_states(const sensor_msgs::JointState& state)
 {
     const std::lock_guard<std::mutex> lock(m_state_mutex);
@@ -693,7 +703,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
             // Set the velocity profiles
             for (int i = 0; i < GetDOF(); i++)
             {
-                m_velocity_trap_profiles[i].SetProfileDuration(current.position[i], endpoint.positions[i], constrained_joint_angles.constraint.value);
+                m_velocity_trap_profiles[i].SetProfileDuration(current.position[m_first_arm_joint_index + i], endpoint.positions[i], constrained_joint_angles.constraint.value);
             }
             endpoint.time_from_start = ros::Duration(constrained_joint_angles.constraint.value);
             ROS_DEBUG("Using supplied duration : %2.2f", constrained_joint_angles.constraint.value);
@@ -715,15 +725,15 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
             for (int i = 0; i < GetDOF(); i++)
             {
                 double velocity_ratio = std::min(1.0, double(max_velocity)/m_arm_velocity_max_limits[i]);
-                m_velocity_trap_profiles[i].SetProfileVelocity(current.position[i], endpoint.positions[i], velocity_ratio);
+                m_velocity_trap_profiles[i].SetProfileVelocity(current.position[m_first_arm_joint_index + i], endpoint.positions[i], velocity_ratio);
                 max_duration = std::max(max_duration, m_velocity_trap_profiles[i].Duration());
-                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.position[i], endpoint.positions[i], m_velocity_trap_profiles[i].Duration());
+                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.position[m_first_arm_joint_index + i], endpoint.positions[i], m_velocity_trap_profiles[i].Duration());
             }
             ROS_DEBUG("max_duration is : %2.2f", max_duration);
             // Set the velocity profiles
             for (int i = 0; i < GetDOF(); i++)
             {
-                m_velocity_trap_profiles[i].SetProfileDuration(current.position[i], endpoint.positions[i], max_duration);
+                m_velocity_trap_profiles[i].SetProfileDuration(current.position[m_first_arm_joint_index + i], endpoint.positions[i], max_duration);
             }
             endpoint.time_from_start = ros::Duration(max_duration);
             break;
@@ -734,15 +744,15 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
             double optimal_duration = 0.0;
             for (int i = 0; i < GetDOF(); i++)
             {
-                m_velocity_trap_profiles[i].SetProfile(current.position[i], endpoint.positions[i]);
+                m_velocity_trap_profiles[i].SetProfile(current.position[m_first_arm_joint_index + i], endpoint.positions[i]);
                 optimal_duration = std::max(optimal_duration, m_velocity_trap_profiles[i].Duration());
-                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.position[i], endpoint.positions[i], m_velocity_trap_profiles[i].Duration());
+                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.position[m_first_arm_joint_index + i], endpoint.positions[i], m_velocity_trap_profiles[i].Duration());
             }
             ROS_DEBUG("optimal_duration is : %2.2f", optimal_duration);
             // Set the velocity profiles
             for (int i = 0; i < GetDOF(); i++)
             {
-                m_velocity_trap_profiles[i].SetProfileDuration(current.position[i], endpoint.positions[i], optimal_duration);
+                m_velocity_trap_profiles[i].SetProfileDuration(current.position[m_first_arm_joint_index + i], endpoint.positions[i], optimal_duration);
             }
             endpoint.time_from_start = ros::Duration(optimal_duration);
             break;
@@ -838,7 +848,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     Eigen::VectorXd positions_eigen(m_degrees_of_freedom);
     for (int i = 0; i < GetDOF(); i++)
     {
-        positions_eigen[i] = current.position[i];
+        positions_eigen[i] = current.position[m_first_arm_joint_index + i];
     }
     KDL::JntArray current_kdl(GetDOF());
     current_kdl.data = positions_eigen;

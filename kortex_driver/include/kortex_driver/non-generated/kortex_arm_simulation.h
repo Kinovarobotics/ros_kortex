@@ -128,6 +128,10 @@ class KortexArmSimulation
     std::vector<float> m_gripper_joint_limits_min;
     int m_degrees_of_freedom;
 
+    // The indexes of the first arm joint and of the gripper joint in the "joint_states" feedback
+    int m_first_arm_joint_index;
+    int m_gripper_joint_index;
+
     // Action-related
     std::unordered_map<uint32_t, kortex_driver::Action> m_map_actions;
 
