@@ -104,6 +104,7 @@ class KortexArmSimulation
 
     // Publishers
     ros::Publisher m_pub_action_topic;
+    std::vector<ros::Publisher> m_pub_position_controllers;
 
     // Subscribers
     ros::Subscriber m_sub_joint_trajectory_controller_state;
@@ -114,6 +115,7 @@ class KortexArmSimulation
     ControllerType m_active_controller_type;
     std::vector<std::string> m_trajectory_controllers_list;
     std::vector<std::string> m_position_controllers_list;
+    std::vector<double> m_velocity_commands;
 
     // Action clients
     std::unique_ptr<actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>> m_follow_joint_trajectory_action_client;
@@ -126,6 +128,8 @@ class KortexArmSimulation
     // Arm information
     std::string m_arm_name;
     std::vector<std::string> m_arm_joint_names;
+    std::vector<double> m_arm_joint_limits_min;
+    std::vector<double> m_arm_joint_limits_max;
     std::vector<float> m_arm_velocity_max_limits;
     std::vector<float> m_arm_acceleration_max_limits;
     float m_max_cartesian_twist_linear;
@@ -160,6 +164,7 @@ class KortexArmSimulation
     // Threading
     std::atomic<bool> m_is_action_being_executed;
     std::atomic<bool> m_action_preempted;
+    std::atomic<int> m_current_action_type;
     std::thread m_action_executor_thread;
 
     // MoveIt-related

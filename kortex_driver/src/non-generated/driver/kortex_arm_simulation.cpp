@@ -20,11 +20,14 @@
 
 #include "trajectory_msgs/JointTrajectory.h"
 #include "controller_manager_msgs/SwitchController.h"
+#include "std_msgs/Float64.h"
 
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/path_line.hpp>
 #include <kdl/rotational_interpolation_sa.hpp>
 #include <kdl/trajectory_segment.hpp>
+
+#include <urdf/model.h>
 
 #include <set>
 #include <chrono>
@@ -36,12 +39,14 @@ namespace
     static constexpr unsigned int FIRST_CREATED_ACTION_ID = 10000;
     static const std::set<unsigned int> DEFAULT_ACTIONS_IDENTIFIERS{1,2,3};
     static constexpr double JOINT_TRAJECTORY_TIMESTEP_SECONDS = 0.01;
+    static constexpr double MINIMUM_JOINT_VELOCITY_RAD_PER_SECONDS = 0.001;
 }
 
 KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_handle(node_handle),
                                                                         m_map_actions{},
                                                                         m_is_action_being_executed{false},
                                                                         m_action_preempted{false},
+                                                                        m_current_action_type{0},
                                                                         m_first_state_received{false},
                                                                         m_active_controller_type{ControllerType::kTrajectory}
 {
@@ -50,14 +55,20 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     ros::param::get("~prefix", m_prefix);
 
     // Arm information
+    urdf::Model model;
+    model.initParam("/" + m_robot_name + "/robot_description");
     ros::param::get("~dof", m_degrees_of_freedom);
     ros::param::get("~arm", m_arm_name);
     ros::param::get("~joint_names", m_arm_joint_names);
     ros::param::get("~maximum_velocities", m_arm_velocity_max_limits);
     ros::param::get("~maximum_accelerations", m_arm_acceleration_max_limits);
-    for (auto s : m_arm_joint_names)
+    m_arm_joint_limits_min.resize(GetDOF());
+    m_arm_joint_limits_max.resize(GetDOF());
+    for (int i = 0; i < GetDOF(); i++)
     {
-        s.insert(0, m_prefix);
+        auto joint = model.getJoint(m_arm_joint_names[i]);
+        m_arm_joint_limits_min[i] = joint->limits->lower;
+        m_arm_joint_limits_max[i] = joint->limits->upper;
     }
 
     // Cartesian Twist limits
@@ -137,6 +148,11 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     CreateDefaultActions();
 
     // Create publishers and subscribers
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        m_pub_position_controllers.push_back(m_node_handle.advertise<std_msgs::Float64>(
+            "/" + m_robot_name + "/" + m_prefix + "joint_" + std::to_string(i+1) + "_position_controller/command", 1000));
+    }
     m_pub_action_topic = m_node_handle.advertise<kortex_driver::ActionNotification>("action_topic", 1000);
     m_sub_joint_state = m_node_handle.subscribe("/" + m_robot_name + "/" + "joint_states", 1, &KortexArmSimulation::cb_joint_states, this);
     m_feedback.actuators.resize(GetDOF());
@@ -157,6 +173,10 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
                         static int i = 1;
                         return m_prefix + "joint_" + std::to_string(i++) + "_position_controller";
                     });
+
+    // Initialize the velocity commands to null
+    m_velocity_commands.resize(GetDOF());
+    std::fill(m_velocity_commands.begin(), m_velocity_commands.end(), 0.0);
 
     // Create and connect action clients
     m_follow_joint_trajectory_action_client.reset(new actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>(
@@ -459,8 +479,21 @@ kortex_driver::SendJointSpeedsCommand::Response KortexArmSimulation::SendJointSp
     action.handle.action_type = kortex_driver::ActionType::SEND_JOINT_SPEEDS;
     action.oneof_action_parameters.send_joint_speeds.push_back(joint_speeds);
 
-    JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
-    m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
+    // Fill the velocity commands vector
+    int n = 0;
+    std::generate(m_velocity_commands.begin(),
+        m_velocity_commands.end(), 
+        [this, &action, &n]() -> double
+        {
+            return m_math_util.toRad(action.oneof_action_parameters.send_joint_speeds[0].joint_speeds[n++].value);
+        });
+
+    // If we are already executing joint speed control, don't cancel the thread
+    if (m_current_action_type != kortex_driver::ActionType::SEND_JOINT_SPEEDS)
+    {
+        JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
+        m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
+    }
     
     return kortex_driver::SendJointSpeedsCommand::Response();
 }
@@ -631,11 +664,13 @@ kortex_driver::KortexError KortexArmSimulation::FillKortexError(uint32_t code, u
 
 void KortexArmSimulation::JoinThreadAndCancelAction()
 {
+    // Tell the thread to stop and join it
     m_action_preempted = true;
     if (m_action_executor_thread.joinable())
     {
         m_action_executor_thread.join();
     }
+    m_current_action_type = 0;
     m_action_preempted = false;
 }
 
@@ -649,6 +684,7 @@ void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
     start_notif.action_event = kortex_driver::ActionEvent::ACTION_START;
     m_pub_action_topic.publish(start_notif);
     m_is_action_being_executed = true;
+    m_current_action_type = action.handle.action_type;
     
     // Switch executor on the action type
     switch (action.handle.action_type)
@@ -1129,8 +1165,108 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kor
                                 "Error playing joint speeds action : simulated positions controllers could not be switched to.");
     }
 
-    // TODO Handle constraints and warn if some cannot be applied in simulation
-    // TODO Fill implementation to move all actuators at given velocities
+    // Get current position
+    sensor_msgs::JointState current;
+    {
+        const std::lock_guard<std::mutex> lock(m_state_mutex);
+        current = m_current_state;
+    }
+    
+    // Initialise commands
+    std::vector<double> commands(GetDOF(), 0.0); // in rad
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        commands[i] = current.position[m_first_arm_joint_index + i];
+    }
+    std::vector<double> previous_commands = commands; // in rad
+    std::vector<double> previous_velocity_commands(GetDOF(), 0.0); // in rad/s
+    std::vector<bool> stopped(GetDOF(), false);
+    
+    // While we're not done
+    while (true)
+    {
+        if (m_action_preempted.load())
+        {
+            std::fill(m_velocity_commands.begin(), m_velocity_commands.end(), 0.0);
+        }
+        // For each joint
+        for (int i = 0; i < GetDOF(); i++)
+        {
+            // Calculate real position increment
+            // This helps to know if we hit joint limits or if we stopped
+            {
+            const std::lock_guard<std::mutex> lock(m_state_mutex);
+            current = m_current_state;
+            }
+
+            // Calculate permitted velocity command because we don't have infinite acceleration
+            double vel_delta = m_velocity_commands[i] - previous_velocity_commands[i];
+            double max_delta = std::copysign(m_arm_acceleration_max_limits[i] * JOINT_TRAJECTORY_TIMESTEP_SECONDS, vel_delta);
+            
+            // If the velocity change is within acceleration limits for this timestep
+            double velocity_command;
+            if (fabs(vel_delta) < fabs(max_delta))
+            {
+                velocity_command = m_velocity_commands[i];
+            }
+            // If we cannot instantly accelerate to this velocity
+            else
+            {
+                velocity_command = previous_velocity_commands[i] + max_delta;
+            }
+
+            // Cap to the velocity limit for the joint
+            velocity_command = std::copysign(std::min(fabs(velocity_command), double(fabs(m_arm_velocity_max_limits[i]))), velocity_command);
+
+            // Check if velocity command is in fact too small
+            if (fabs(velocity_command) < MINIMUM_JOINT_VELOCITY_RAD_PER_SECONDS)
+            {
+                velocity_command = 0.0;
+                commands[i] = current.position[m_first_arm_joint_index + i];
+                stopped[i] = true;
+            }
+            // Else calculate the position increment and send it
+            else
+            {
+                commands[i] = previous_commands[i] + velocity_command * JOINT_TRAJECTORY_TIMESTEP_SECONDS;
+                stopped[i] = false;
+
+                // Cap the command to the joint limit
+                if (m_arm_joint_limits_min[i] != 0.0 && commands[i] < 0.0)
+                {
+                    commands[i] = std::max(m_arm_joint_limits_min[i], commands[i]);
+                    velocity_command = 0.0;
+                }
+                else if (m_arm_joint_limits_max[i] != 0.0 && commands[i] > 0.0)
+                {
+                    commands[i] = std::min(m_arm_joint_limits_min[i], commands[i]);
+                    velocity_command = 0.0;
+                }
+
+                // Send the position increments to the controllers
+                std_msgs::Float64 message;
+                message.data = commands[i];
+                m_pub_position_controllers[i].publish(message);
+            }
+
+            // Remember actual command as previous and actual velocity command as previous
+            previous_commands[i] = commands[i];
+            previous_velocity_commands[i] = velocity_command;
+        }
+
+        // Sleep for TIMESTEP
+        std::this_thread::sleep_for(std::chrono::milliseconds(int(1000*JOINT_TRAJECTORY_TIMESTEP_SECONDS)));
+
+        // If the action is preempted and we're back to zero velocity, we're done here
+        if (m_action_preempted.load())
+        {
+            // Check if all joints are stopped and break if yes
+            if (std::all_of(stopped.begin(), stopped.end(), [](bool b){return b;}))
+            {
+                break;
+            }
+        }
+    }
 
     return result;
 }
