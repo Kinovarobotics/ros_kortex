@@ -19,6 +19,7 @@
 #include "kortex_driver/GripperMode.h"
 
 #include "trajectory_msgs/JointTrajectory.h"
+#include "controller_manager_msgs/SwitchController.h"
 
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/path_line.hpp>
@@ -41,7 +42,8 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
                                                                         m_map_actions{},
                                                                         m_is_action_being_executed{false},
                                                                         m_action_preempted{false},
-                                                                        m_first_state_received{false}
+                                                                        m_first_state_received{false},
+                                                                        m_active_controller_type{ControllerType::kTrajectory}
 {
     // Namespacing and prefixing information
     ros::param::get("~robot_name", m_robot_name);
@@ -140,6 +142,21 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     m_feedback.actuators.resize(GetDOF());
     m_feedback.interconnect.oneof_tool_feedback.gripper_feedback.resize(1);
     m_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor.resize(1);
+
+    // Create service clients
+    m_client_switch_controllers = m_node_handle.serviceClient<controller_manager_msgs::SwitchController>
+        ("/" + m_robot_name + "/controller_manager/switch_controller");
+    
+    // Fill controllers'names
+    m_trajectory_controllers_list.push_back(m_prefix + m_arm_name + "_joint_trajectory_controller"); // only one trajectory controller
+    m_position_controllers_list.resize(GetDOF()); // one position controller per 
+    std::generate(m_position_controllers_list.begin(), 
+                    m_position_controllers_list.end(), 
+                    [this]() -> std::string
+                    {
+                        static int i = 1;
+                        return m_prefix + "joint_" + std::to_string(i++) + "_position_controller";
+                    });
 
     // Create and connect action clients
     m_follow_joint_trajectory_action_client.reset(new actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>(
@@ -554,6 +571,55 @@ void KortexArmSimulation::CreateDefaultActions()
     m_map_actions.emplace(std::make_pair(zero.handle.identifier, zero));
 }
 
+bool KortexArmSimulation::SwitchControllerType(ControllerType new_type)
+{
+    bool success = true;
+    controller_manager_msgs::SwitchController service;
+    service.request.strictness = service.request.STRICT;
+    if (m_active_controller_type != new_type)
+    {
+        // Set the controllers we want to switch to
+        switch (new_type)
+        {
+            case ControllerType::kTrajectory:
+                service.request.start_controllers = m_trajectory_controllers_list;
+                service.request.stop_controllers = m_position_controllers_list;
+                break;
+            case ControllerType::kIndividual:
+                service.request.start_controllers = m_position_controllers_list;
+                service.request.stop_controllers = m_trajectory_controllers_list;
+                break;
+            default:
+                ROS_ERROR("Kortex arm simulator : Unsupported controller type %d", int(new_type));
+                return false;
+        }
+
+        // Call the service
+        if (!m_client_switch_controllers.call(service))
+        {
+            ROS_ERROR("Failed to call the service for switching controllers");
+            success = false;
+        }
+        else
+        {
+            success = service.response.ok;
+        }
+
+        // Update active type if the switch was successful
+        if (success)
+        {
+            ROS_INFO("Switch was successful");
+            m_active_controller_type = new_type;
+        }
+    }
+    else
+    {
+        ROS_INFO("Not switching controllers because demanded type is already active");
+    }
+
+    return success;
+}
+
 kortex_driver::KortexError KortexArmSimulation::FillKortexError(uint32_t code, uint32_t subCode, const std::string& description) const
 {
     kortex_driver::KortexError error;
@@ -658,6 +724,14 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
         return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
                                 kortex_driver::SubErrorCodes::INVALID_PARAM,
                                 "Error playing joint angles action : action contains " + std::to_string(constrained_joint_angles.joint_angles.joint_angles.size()) + " joint angles but arm has " + std::to_string(GetDOF()));
+    }
+
+    // Switch to trajectory controller
+    if (!SwitchControllerType(ControllerType::kTrajectory))
+    {
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::METHOD_FAILED,
+                                "Error playing joint angles action : simulated trajectory controller could not be switched to.");
     }
 
     // Initialize trajectory object
@@ -834,6 +908,14 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
                                 "Error playing pose action : action is malformed.");
     }
     auto constrained_pose = action.oneof_action_parameters.reach_pose[0];
+
+    // Switch to trajectory controller
+    if (!SwitchControllerType(ControllerType::kTrajectory))
+    {
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::METHOD_FAILED,
+                                "Error playing pose action : simulated trajectory controller could not be switched to.");
+    }
 
     // Get current position
     sensor_msgs::JointState current;
@@ -1037,6 +1119,14 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kor
         return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
                                 kortex_driver::SubErrorCodes::INVALID_PARAM,
                                 "Error playing joint speeds action : action contains " + std::to_string(joint_speeds.joint_speeds.size()) + " joint speeds but arm has " + std::to_string(GetDOF()));
+    }
+
+    // Switch to trajectory controller
+    if (!SwitchControllerType(ControllerType::kIndividual))
+    {
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::METHOD_FAILED,
+                                "Error playing joint speeds action : simulated positions controllers could not be switched to.");
     }
 
     // TODO Handle constraints and warn if some cannot be applied in simulation

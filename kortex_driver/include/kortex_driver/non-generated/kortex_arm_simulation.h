@@ -62,6 +62,12 @@
 #include "kortex_driver/SendGripperCommand.h"
 #include "kortex_driver/ApplyEmergencyStop.h"
 
+enum class ControllerType
+{
+  kTrajectory, // this is for the JointTrajectoryController
+  kIndividual  // this is for the individual JointPositionController's
+};
+
 class KortexArmSimulation
 {
   public:
@@ -102,6 +108,12 @@ class KortexArmSimulation
     // Subscribers
     ros::Subscriber m_sub_joint_trajectory_controller_state;
     ros::Subscriber m_sub_joint_state;
+
+    // Service clients
+    ros::ServiceClient m_client_switch_controllers;
+    ControllerType m_active_controller_type;
+    std::vector<std::string> m_trajectory_controllers_list;
+    std::vector<std::string> m_position_controllers_list;
 
     // Action clients
     std::unique_ptr<actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>> m_follow_joint_trajectory_action_client;
@@ -165,6 +177,7 @@ class KortexArmSimulation
     // Helper functions
     bool IsGripperPresent() const {return !m_gripper_name.empty();}
     void CreateDefaultActions();
+    bool SwitchControllerType(ControllerType new_type);
     kortex_driver::KortexError FillKortexError(uint32_t code, uint32_t subCode, const std::string& description = "") const;
 
     // Executors
