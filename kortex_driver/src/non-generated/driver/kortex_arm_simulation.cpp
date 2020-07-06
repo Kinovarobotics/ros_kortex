@@ -641,13 +641,8 @@ bool KortexArmSimulation::SwitchControllerType(ControllerType new_type)
         // Update active type if the switch was successful
         if (success)
         {
-            ROS_INFO("Switch was successful");
             m_active_controller_type = new_type;
         }
-    }
-    else
-    {
-        ROS_INFO("Not switching controllers because demanded type is already active");
     }
 
     return success;
@@ -714,8 +709,8 @@ void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
     
     kortex_driver::ActionNotification end_notif;
     end_notif.handle = action.handle;
-    // Action was cancelled by user
-    if (m_action_preempted.load())
+    // Action was cancelled by user and is not a velocity command
+    if (m_action_preempted.load() && action.handle.action_type != kortex_driver::ActionType::SEND_JOINT_SPEEDS)
     {
         // Notify ACTION_ABORT
         end_notif.action_event = kortex_driver::ActionEvent::ACTION_ABORT;
@@ -773,7 +768,6 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
     // Initialize trajectory object
     trajectory_msgs::JointTrajectory traj;
     traj.header.frame_id = m_prefix + "base_link";
-    traj.header.stamp = ros::Time::now();
     for (int i = 0; i < constrained_joint_angles.joint_angles.joint_angles.size(); i++)
     {
         const std::string joint_name = m_prefix + "joint_" + std::to_string(i+1); //joint names are 1-based
@@ -910,11 +904,31 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
     
     // Send goal
     control_msgs::FollowJointTrajectoryActionGoal goal;
+    traj.header.stamp = ros::Time::now();
     goal.goal.trajectory = traj;
     m_follow_joint_trajectory_action_client->sendGoal(goal.goal);
 
-    // Wait for goal to be done, or for preempt to be called (check every 10ms)
-    while(!m_action_preempted.load() && !m_follow_joint_trajectory_action_client->waitForResult(ros::Duration(0.01f))) {}
+    // Wait for goal to be done, or for preempt to be called (check every 100ms)
+    while(!m_action_preempted.load())
+    {
+        if (m_follow_joint_trajectory_action_client->waitForResult(ros::Duration(0.1f)))
+        {
+            // Sometimes an error is thrown related to a bad cast in a ros::time structure inside the SimpleActionClient
+            // See https://answers.ros.org/question/209452/exception-thrown-while-processing-service-call-time-is-out-of-dual-32-bit-range/
+            // If this error happens here we just send the goal again with an updated timestamp
+            auto status = m_follow_joint_trajectory_action_client->getResult();
+            if (status->error_string == "Time is out of dual 32-bit range")
+            {
+                traj.header.stamp = ros::Time::now();
+                goal.goal.trajectory = traj;
+                m_follow_joint_trajectory_action_client->sendGoal(goal.goal);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
 
     // If we got out of the loop because we're preempted, cancel the goal before returning
     if (m_action_preempted.load())

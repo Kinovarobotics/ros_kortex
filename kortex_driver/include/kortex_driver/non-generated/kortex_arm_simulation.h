@@ -18,7 +18,7 @@
 #include <control_msgs/JointTrajectoryControllerState.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <control_msgs/GripperCommandAction.h>
-#include <actionlib/client/simple_action_client.h>
+#include <actionlib/client/action_client.h>
 
 // MoveIt
 #include <moveit/move_group_interface/move_group_interface.h>
