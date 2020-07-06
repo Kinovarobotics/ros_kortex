@@ -791,8 +791,11 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
     trajectory_msgs::JointTrajectoryPoint endpoint;
     for (int i = 0; i < constrained_joint_angles.joint_angles.joint_angles.size(); i++)
     {
+        // If the current actuator has turned on itself many times, we need the endpoint to follow that trend too
+        int n_turns = 0;
+        m_math_util.wrapRadiansFromMinusPiToPi(current.position[m_first_arm_joint_index + i], n_turns);
         const double rad_wrapped_goal = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(constrained_joint_angles.joint_angles.joint_angles[i].value));
-        endpoint.positions.push_back(rad_wrapped_goal);
+        endpoint.positions.push_back(rad_wrapped_goal + double(n_turns) * 2.0 * M_PI);
         endpoint.velocities.push_back(0.0);
         endpoint.accelerations.push_back(0.0);
     }
