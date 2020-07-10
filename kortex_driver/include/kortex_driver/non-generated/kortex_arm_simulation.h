@@ -15,6 +15,7 @@
 
 // ROS
 #include <ros/ros.h>
+#include <std_msgs/Empty.h>
 #include <control_msgs/JointTrajectoryControllerState.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <control_msgs/GripperCommandAction.h>
@@ -109,6 +110,11 @@ class KortexArmSimulation
     // Subscribers
     ros::Subscriber m_sub_joint_trajectory_controller_state;
     ros::Subscriber m_sub_joint_state;
+    ros::Subscriber m_sub_joint_speeds;
+    ros::Subscriber m_sub_twist;
+    ros::Subscriber m_sub_clear_faults;
+    ros::Subscriber m_sub_stop;
+    ros::Subscriber m_sub_emergency_stop;
 
     // Service clients
     ros::ServiceClient m_client_switch_controllers;
@@ -116,6 +122,7 @@ class KortexArmSimulation
     std::vector<std::string> m_trajectory_controllers_list;
     std::vector<std::string> m_position_controllers_list;
     std::vector<double> m_velocity_commands;
+    kortex_driver::Twist m_twist_command;
 
     // Action clients
     std::unique_ptr<actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>> m_follow_joint_trajectory_action_client;
@@ -172,7 +179,6 @@ class KortexArmSimulation
     std::unique_ptr<moveit::planning_interface::MoveGroupInterface> m_moveit_gripper_interface;
 
     // Subscription callbacks and data structures with their mutexes
-    // void cb_joint_trajectory_controller_state(const control_msgs::JointTrajectoryControllerState& state);
     void cb_joint_states(const sensor_msgs::JointState& state);
     sensor_msgs::JointState m_current_state;
     bool m_first_state_received;
@@ -194,6 +200,13 @@ class KortexArmSimulation
     kortex_driver::KortexError ExecuteSendTwist(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteSendGripperCommand(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteTimeDelay(const kortex_driver::Action& action);
+
+    // Callbacks
+    void new_joint_speeds_cb(const kortex_driver::Base_JointSpeeds& joint_speeds);
+    void new_twist_cb(const kortex_driver::TwistCommand& twist);
+    void clear_faults_cb(const std_msgs::Empty& empty);
+    void stop_cb(const std_msgs::Empty& empty);
+    void emergency_stop_cb(const std_msgs::Empty& empty);
 };
 
 #endif //_KORTEX_ARM_SIMULATION_H_

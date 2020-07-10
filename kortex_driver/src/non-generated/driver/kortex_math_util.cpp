@@ -99,3 +99,15 @@ double KortexMathUtil::absolute_position_from_relative(double relative_position,
     double range = max_value - min_value;
     return relative_position * range + min_value;
 }
+
+kortex_driver::Twist KortexMathUtil::substractTwists(const kortex_driver::Twist& a, const kortex_driver::Twist& b)
+{
+    kortex_driver::Twist c;
+    c.linear_x = a.linear_x - b.linear_x;
+    c.linear_y = a.linear_y - b.linear_y;
+    c.linear_z = a.linear_z - b.linear_z;
+    c.angular_x = a.angular_x - b.angular_x;
+    c.angular_y = a.angular_y - b.angular_y;
+    c.angular_z = a.angular_z - b.angular_z;
+    return c;
+}
