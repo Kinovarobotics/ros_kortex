@@ -15,6 +15,15 @@
 #include "kortex_driver/SubErrorCodes.h"
 #include "kortex_driver/ActionNotification.h"
 #include "kortex_driver/ActionEvent.h"
+#include "kortex_driver/JointTrajectoryConstraintType.h"
+#include "kortex_driver/GripperMode.h"
+
+#include "trajectory_msgs/JointTrajectory.h"
+
+#include <kdl_parser/kdl_parser.hpp>
+#include <kdl/path_line.hpp>
+#include <kdl/rotational_interpolation_sa.hpp>
+#include <kdl/trajectory_segment.hpp>
 
 #include <set>
 #include <chrono>
@@ -25,29 +34,56 @@ namespace
     static const std::string GRIPPER_PLANNING_GROUP = "gripper";
     static constexpr unsigned int FIRST_CREATED_ACTION_ID = 10000;
     static const std::set<unsigned int> DEFAULT_ACTIONS_IDENTIFIERS{1,2,3};
+    static constexpr double JOINT_TRAJECTORY_TIMESTEP_SECONDS = 0.01;
 }
 
 KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_handle(node_handle),
                                                                         m_map_actions{},
                                                                         m_is_action_being_executed{false},
-                                                                        m_action_preempted{false}
+                                                                        m_action_preempted{false},
+                                                                        m_first_state_received{false}
 {
     // Namespacing and prefixing information
     ros::param::get("~robot_name", m_robot_name);
     ros::param::get("~prefix", m_prefix);
 
-    // Arm and gripper information
+    // Arm information
     ros::param::get("~dof", m_degrees_of_freedom);
     ros::param::get("~arm", m_arm_name);
     ros::param::get("~joint_names", m_arm_joint_names);
+    ros::param::get("~maximum_velocities", m_arm_velocity_max_limits);
+    ros::param::get("~maximum_accelerations", m_arm_acceleration_max_limits);
     for (auto s : m_arm_joint_names)
     {
         s.insert(0, m_prefix);
     }
+
+    // Cartesian Twist limits
+    ros::param::get("~maximum_linear_velocity", m_max_cartesian_twist_linear);
+    ros::param::get("~maximum_angular_velocity", m_max_cartesian_twist_angular);
+    ros::param::get("~maximum_linear_acceleration", m_max_cartesian_acceleration_linear);
+    ros::param::get("~maximum_angular_acceleration", m_max_cartesian_acceleration_angular);
+    
+    // Gripper information
     ros::param::get("~gripper", m_gripper_name);
     if (IsGripperPresent())
     {
         ros::param::get("~gripper_joint_names", m_gripper_joint_names);
+
+        // The joint_states feedback uses alphabetical order for the indexes
+        // If the gripper joint is before
+        if (m_gripper_joint_names[0] < m_arm_joint_names[0])
+        {
+            m_gripper_joint_index = 0;
+            m_first_arm_joint_index = 1;
+        }
+        // If the gripper joint is after the arm joints
+        else
+        {
+            m_gripper_joint_index = GetDOF();
+            m_first_arm_joint_index = 0;
+        }
+
         for (auto s : m_gripper_joint_names)
         {
             s.insert(0, m_prefix);
@@ -63,6 +99,31 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     ROS_INFO("Arm namespace : %s", m_robot_name.c_str());
     ROS_INFO("URDF prefix : %s", m_prefix.c_str());
 
+    // Building the KDL chain from the robot description
+    // The chain goes from 'base_link' to 'tool_frame'
+    KDL::Tree tree;
+    if (!kdl_parser::treeFromParam("robot_description", tree))
+    {
+        const std::string error_string("Failed to parse robot_description parameter to build the kinematic tree!"); 
+        ROS_ERROR("%s", error_string.c_str());
+        throw(std::runtime_error(error_string));
+    }
+    if (!tree.getChain(m_prefix + "base_link", m_prefix + "tool_frame", m_chain))
+    {
+        const std::string error_string("Failed to extract kinematic chain from parsed tree!"); 
+        ROS_ERROR("%s", error_string.c_str());
+        throw(std::runtime_error(error_string));
+    }
+    m_fk_solver.reset(new KDL::ChainFkSolverPos_recursive(m_chain));
+    m_ik_vel_solver.reset(new KDL::ChainIkSolverVel_pinv(m_chain));
+    m_ik_pos_solver.reset(new KDL::ChainIkSolverPos_NR(m_chain, *m_fk_solver, *m_ik_vel_solver));
+
+    // Build the velocity profile for each joint using the max velocities and max accelerations
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        m_velocity_trap_profiles.push_back(KDL::VelocityProfile_Trap(m_arm_velocity_max_limits[i], m_arm_acceleration_max_limits[i]));
+    }
+
     // Start MoveIt client
     m_moveit_arm_interface.reset(new moveit::planning_interface::MoveGroupInterface(ARM_PLANNING_GROUP));
     if (IsGripperPresent())
@@ -73,18 +134,92 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     // Create default actions
     CreateDefaultActions();
 
-    // Create publishers
+    // Create publishers and subscribers
     m_pub_action_topic = m_node_handle.advertise<kortex_driver::ActionNotification>("action_topic", 1000);
+    m_sub_joint_state = m_node_handle.subscribe("/" + m_robot_name + "/" + "joint_states", 1, &KortexArmSimulation::cb_joint_states, this);
+    m_feedback.actuators.resize(GetDOF());
+    m_feedback.interconnect.oneof_tool_feedback.gripper_feedback.resize(1);
+    m_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor.resize(1);
+
+    // Create and connect action clients
+    m_follow_joint_trajectory_action_client.reset(new actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>(
+        "/" + m_robot_name + "/" + m_prefix + m_arm_name + "_joint_trajectory_controller" + "/follow_joint_trajectory", true));
+    m_follow_joint_trajectory_action_client->waitForServer();
+    if (IsGripperPresent())
+    {
+        m_gripper_action_client.reset(new actionlib::SimpleActionClient<control_msgs::GripperCommandAction>(
+            "/" + m_robot_name + "/" + m_prefix + m_gripper_name + "_gripper_controller" + "/gripper_cmd", true));
+        m_gripper_action_client->waitForServer();
+    }
+
+    // Create usual ROS parameters
+    m_node_handle.setParam("degrees_of_freedom", m_degrees_of_freedom);
+    m_node_handle.setParam("is_gripper_present", IsGripperPresent());
+    m_node_handle.setParam("gripper_joint_names", m_gripper_joint_names);
+	m_node_handle.setParam("has_vision_module", false);
+    m_node_handle.setParam("has_interconnect_module", false);
 }
 
 KortexArmSimulation::~KortexArmSimulation()
 {
-    CancelAction();
+    JoinThreadAndCancelAction();
 }
 
-std::unordered_map<uint32_t, kortex_driver::Action> KortexArmSimulation::GetActionsMap() const
+kortex_driver::BaseCyclic_Feedback KortexArmSimulation::GetFeedback()
 {
-    return m_map_actions;
+    // If the feedback is not yet received, return now
+    if (!m_first_state_received)
+    {
+        return m_feedback;
+    }
+
+    // Make a copy of current state
+    sensor_msgs::JointState current;
+    {
+        const std::lock_guard<std::mutex> lock(m_state_mutex);
+        current = m_current_state;
+    }
+
+    // Fill joint angles feedback
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        m_feedback.actuators[i].position = m_math_util.wrapDegreesFromZeroTo360(m_math_util.toDeg(current.position[m_first_arm_joint_index + i]));
+        m_feedback.actuators[i].velocity = m_math_util.toDeg(current.velocity[m_first_arm_joint_index + i]);
+    }
+
+    // Calculate FK to get end effector pose
+    auto frame = KDL::Frame();
+    Eigen::VectorXd positions_eigen(GetDOF());
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        positions_eigen[i] = current.position[m_first_arm_joint_index + i];
+    }
+    KDL::JntArray current_kdl(GetDOF());
+    current_kdl.data = positions_eigen;
+    m_fk_solver->JntToCart(current_kdl, frame);
+    m_feedback.base.tool_pose_x = frame.p.x();
+    m_feedback.base.commanded_tool_pose_x = frame.p.x();
+    m_feedback.base.tool_pose_y = frame.p.y();
+    m_feedback.base.commanded_tool_pose_y = frame.p.y();
+    m_feedback.base.tool_pose_z = frame.p.z();
+    m_feedback.base.commanded_tool_pose_z = frame.p.z();
+    double alpha, beta, gamma;
+    frame.M.GetEulerZYX(alpha, beta, gamma);
+    m_feedback.base.tool_pose_theta_x = m_math_util.toDeg(gamma);
+    m_feedback.base.commanded_tool_pose_theta_x = m_math_util.toDeg(gamma);
+    m_feedback.base.tool_pose_theta_y = m_math_util.toDeg(beta);
+    m_feedback.base.commanded_tool_pose_theta_y = m_math_util.toDeg(beta);
+    m_feedback.base.tool_pose_theta_z = m_math_util.toDeg(alpha);
+    m_feedback.base.commanded_tool_pose_theta_z = m_math_util.toDeg(alpha);
+
+    // Fill gripper information
+    if (IsGripperPresent())
+    {
+        // Gripper index is right after last actuator and is expressed in % in the base feedback (not in absolute position like in joint_states)
+        m_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor[0].position = 100.0 * m_math_util.relative_position_from_absolute(current.position[m_gripper_joint_index], m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0]);
+    }
+
+    return m_feedback;
 }
 
 kortex_driver::CreateAction::Response KortexArmSimulation::CreateAction(const kortex_driver::CreateAction::Request& req)
@@ -215,11 +350,7 @@ kortex_driver::ExecuteActionFromReference::Response KortexArmSimulation::Execute
     auto it = m_map_actions.find(handle.identifier);
     if (it != m_map_actions.end())
     {
-        // If an action is ongoing, cancel it first
-        if (m_is_action_being_executed.load())
-        {
-            CancelAction(); // this will block until the thread is joined and current action finished
-        }
+        JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
         m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, it->second);
     }
     else
@@ -233,7 +364,6 @@ kortex_driver::ExecuteActionFromReference::Response KortexArmSimulation::Execute
 kortex_driver::ExecuteAction::Response KortexArmSimulation::ExecuteAction(const kortex_driver::ExecuteAction::Request& req)
 {
     auto action = req.input;
-
     // Add Action to map if type is supported
     switch (action.handle.action_type)
     {
@@ -241,11 +371,7 @@ kortex_driver::ExecuteAction::Response KortexArmSimulation::ExecuteAction(const 
         case kortex_driver::ActionType::REACH_POSE:
         case kortex_driver::ActionType::SEND_GRIPPER_COMMAND:
         case kortex_driver::ActionType::TIME_DELAY:
-            // If an action is ongoing, cancel it first
-            if (m_is_action_being_executed.load())
-            {
-                CancelAction(); // this will block until the thread is joined and current action finished
-            }
+            JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
             m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
             break;
         default:
@@ -260,7 +386,13 @@ kortex_driver::StopAction::Response KortexArmSimulation::StopAction(const kortex
 {
     if (m_is_action_being_executed.load())
     {
-        CancelAction(); // this will block until the thread is joined and current action finished
+        JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
+    }
+
+    m_follow_joint_trajectory_action_client->cancelAllGoals();
+    if (IsGripperPresent())
+    {
+        m_gripper_action_client->cancelAllGoals();
     }
     
     return kortex_driver::StopAction::Response();
@@ -274,11 +406,7 @@ kortex_driver::PlayCartesianTrajectory::Response KortexArmSimulation::PlayCartes
     action.handle.action_type = kortex_driver::ActionType::REACH_POSE;
     action.oneof_action_parameters.reach_pose.push_back(constrained_pose);
 
-    // If an action is ongoing, cancel it first
-    if (m_is_action_being_executed.load())
-    {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }
+    JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
     
     return kortex_driver::PlayCartesianTrajectory::Response();
@@ -292,11 +420,7 @@ kortex_driver::SendTwistCommand::Response KortexArmSimulation::SendTwistCommand(
     action.handle.action_type = kortex_driver::ActionType::SEND_TWIST_COMMAND;
     action.oneof_action_parameters.send_twist_command.push_back(twist_command);
 
-    // If an action is ongoing, cancel it first
-    if (m_is_action_being_executed.load())
-    {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }
+    JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
     
     return kortex_driver::SendTwistCommand::Response();
@@ -310,11 +434,7 @@ kortex_driver::PlayJointTrajectory::Response KortexArmSimulation::PlayJointTraje
     action.handle.action_type = kortex_driver::ActionType::REACH_JOINT_ANGLES;
     action.oneof_action_parameters.reach_joint_angles.push_back(constrained_joint_angles);
 
-    // If an action is ongoing, cancel it first
-    if (m_is_action_being_executed.load())
-    {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }
+    JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
     
     return kortex_driver::PlayJointTrajectory::Response();
@@ -328,11 +448,7 @@ kortex_driver::SendJointSpeedsCommand::Response KortexArmSimulation::SendJointSp
     action.handle.action_type = kortex_driver::ActionType::SEND_JOINT_SPEEDS;
     action.oneof_action_parameters.send_joint_speeds.push_back(joint_speeds);
 
-    // If an action is ongoing, cancel it first
-    if (m_is_action_being_executed.load())
-    {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }
+    JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
     
     return kortex_driver::SendJointSpeedsCommand::Response();
@@ -346,11 +462,7 @@ kortex_driver::SendGripperCommand::Response KortexArmSimulation::SendGripperComm
     action.handle.action_type = kortex_driver::ActionType::SEND_GRIPPER_COMMAND;
     action.oneof_action_parameters.send_gripper_command.push_back(gripper_command);
 
-    // If an action is ongoing, cancel it first
-    if (m_is_action_being_executed.load())
-    {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }
+    JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
     m_action_executor_thread = std::thread(&KortexArmSimulation::PlayAction, this, action);
     
     return kortex_driver::SendGripperCommand::Response();
@@ -361,8 +473,13 @@ kortex_driver::Stop::Response KortexArmSimulation::Stop(const kortex_driver::Sto
     // If an action is ongoing, cancel it first
     if (m_is_action_being_executed.load())
     {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }   
+        JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
+    }
+    m_follow_joint_trajectory_action_client->cancelAllGoals();
+    if (IsGripperPresent())
+    {
+        m_gripper_action_client->cancelAllGoals();
+    }
     return kortex_driver::Stop::Response();
 }
 
@@ -371,9 +488,21 @@ kortex_driver::ApplyEmergencyStop::Response KortexArmSimulation::ApplyEmergencyS
     // If an action is ongoing, cancel it first
     if (m_is_action_being_executed.load())
     {
-        CancelAction(); // this will block until the thread is joined and current action finished
-    }   
+        JoinThreadAndCancelAction(); // this will block until the thread is joined and current action finished
+    }
+    m_follow_joint_trajectory_action_client->cancelAllGoals();
+    if (IsGripperPresent())
+    {
+        m_gripper_action_client->cancelAllGoals();
+    }
     return kortex_driver::ApplyEmergencyStop::Response();
+}
+
+void KortexArmSimulation::cb_joint_states(const sensor_msgs::JointState& state)
+{
+    const std::lock_guard<std::mutex> lock(m_state_mutex);
+    m_first_state_received = true;
+    m_current_state = state;
 }
 
 void KortexArmSimulation::CreateDefaultActions()
@@ -431,7 +560,16 @@ void KortexArmSimulation::CreateDefaultActions()
     m_map_actions.emplace(std::make_pair(zero.handle.identifier, zero));
 }
 
-void KortexArmSimulation::CancelAction()
+kortex_driver::KortexError KortexArmSimulation::FillKortexError(uint32_t code, uint32_t subCode, const std::string& description) const
+{
+    kortex_driver::KortexError error;
+    error.code = code;
+    error.subCode = subCode;
+    error.description = description;
+    return error;
+}
+
+void KortexArmSimulation::JoinThreadAndCancelAction()
 {
     m_action_preempted = true;
     if (m_action_executor_thread.joinable())
@@ -443,7 +581,7 @@ void KortexArmSimulation::CancelAction()
 
 void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
 {
-    kortex_driver::KortexError action_result;
+    auto action_result = FillKortexError(kortex_driver::ErrorCodes::ERROR_NONE, kortex_driver::SubErrorCodes::SUB_ERROR_NONE);
 
     // Notify action started
     kortex_driver::ActionNotification start_notif;
@@ -474,8 +612,7 @@ void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
             action_result = ExecuteTimeDelay(action);
             break;
         default:
-            action_result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-            action_result.subCode = kortex_driver::SubErrorCodes::UNSUPPORTED_ACTION;
+            action_result = FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE, kortex_driver::SubErrorCodes::UNSUPPORTED_ACTION);
             break;
     }
     
@@ -514,32 +651,183 @@ void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
 
 kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const kortex_driver::Action& action)
 {
-    kortex_driver::KortexError result;
-    result.code = kortex_driver::ErrorCodes::ERROR_NONE;
-    result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    auto result = FillKortexError(kortex_driver::ErrorCodes::ERROR_NONE, kortex_driver::SubErrorCodes::SUB_ERROR_NONE);
     if (action.oneof_action_parameters.reach_joint_angles.size() != 1)
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing joint angles action : action is malformed.";
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                    kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                    "Error playing joint angles action : action is malformed.");
     }
     auto constrained_joint_angles = action.oneof_action_parameters.reach_joint_angles[0];
     if (constrained_joint_angles.joint_angles.joint_angles.size() != GetDOF())
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing joint angles action : action contains " + std::to_string(constrained_joint_angles.joint_angles.joint_angles.size()) + " joint angles but arm has " + std::to_string(GetDOF());
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing joint angles action : action contains " + std::to_string(constrained_joint_angles.joint_angles.joint_angles.size()) + " joint angles but arm has " + std::to_string(GetDOF()));
     }
 
-    // TODO Handle constraints and warn if some cannot be applied in simulation
-    // TODO Fill implementation to move simulated arm to angular position
+    // Initialize trajectory object
+    trajectory_msgs::JointTrajectory traj;
+    traj.header.frame_id = m_prefix + "base_link";
+    traj.header.stamp = ros::Time::now();
+    for (int i = 0; i < constrained_joint_angles.joint_angles.joint_angles.size(); i++)
+    {
+        const std::string joint_name = m_prefix + "joint_" + std::to_string(i+1); //joint names are 1-based
+        traj.joint_names.push_back(joint_name);
+    }
 
+    // Get current position
+    sensor_msgs::JointState current;
+    {
+        const std::lock_guard<std::mutex> lock(m_state_mutex);
+        current = m_current_state;
+    }
+
+    // Transform kortex structure to trajectory_msgs to fill endpoint structure
+    trajectory_msgs::JointTrajectoryPoint endpoint;
+    for (int i = 0; i < constrained_joint_angles.joint_angles.joint_angles.size(); i++)
+    {
+        const double rad_wrapped_goal = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(constrained_joint_angles.joint_angles.joint_angles[i].value));
+        endpoint.positions.push_back(rad_wrapped_goal);
+        endpoint.velocities.push_back(0.0);
+        endpoint.accelerations.push_back(0.0);
+    }
+
+    // Calculate velocity profiles to know how much time this trajectory must last
+    switch (constrained_joint_angles.constraint.type)
+    {
+        // If the duration is supplied, set the duration of the velocity profiles with that value
+        case kortex_driver::JointTrajectoryConstraintType::JOINT_CONSTRAINT_DURATION:
+        {
+            // Error check on the given duration
+            if (constrained_joint_angles.constraint.value <= 0.0f)
+            {
+                return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Invalid duration constraint : it has to be higher than 0.0!");
+            }
+            // Set the velocity profiles
+            for (int i = 0; i < GetDOF(); i++)
+            {
+                m_velocity_trap_profiles[i].SetProfileDuration(current.position[m_first_arm_joint_index + i], endpoint.positions[i], constrained_joint_angles.constraint.value);
+            }
+            endpoint.time_from_start = ros::Duration(constrained_joint_angles.constraint.value);
+            ROS_DEBUG("Using supplied duration : %2.2f", constrained_joint_angles.constraint.value);
+            break;
+        }
+        // If a max velocity is supplied for each joint, we need to find the limiting duration with this velocity constraint
+        case kortex_driver::JointTrajectoryConstraintType::JOINT_CONSTRAINT_SPEED:
+        {
+            // Error check on the given velocity
+            float max_velocity = m_math_util.toRad(constrained_joint_angles.constraint.value);
+            if (max_velocity <= 0.0f)
+            {
+                return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Invalid velocity constraint : it has to be higher than 0.0!");
+            }
+            // Find the limiting duration with given velocity
+            double max_duration = 0.0;
+            for (int i = 0; i < GetDOF(); i++)
+            {
+                double velocity_ratio = std::min(1.0, double(max_velocity)/m_arm_velocity_max_limits[i]);
+                m_velocity_trap_profiles[i].SetProfileVelocity(current.position[m_first_arm_joint_index + i], endpoint.positions[i], velocity_ratio);
+                max_duration = std::max(max_duration, m_velocity_trap_profiles[i].Duration());
+                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.position[m_first_arm_joint_index + i], endpoint.positions[i], m_velocity_trap_profiles[i].Duration());
+            }
+            ROS_DEBUG("max_duration is : %2.2f", max_duration);
+            // Set the velocity profiles
+            for (int i = 0; i < GetDOF(); i++)
+            {
+                m_velocity_trap_profiles[i].SetProfileDuration(current.position[m_first_arm_joint_index + i], endpoint.positions[i], max_duration);
+            }
+            endpoint.time_from_start = ros::Duration(max_duration);
+            break;
+        }
+        default:
+        {
+            // Find the optimal duration based on actual velocity and acceleration limits
+            double optimal_duration = 0.0;
+            for (int i = 0; i < GetDOF(); i++)
+            {
+                m_velocity_trap_profiles[i].SetProfile(current.position[m_first_arm_joint_index + i], endpoint.positions[i]);
+                optimal_duration = std::max(optimal_duration, m_velocity_trap_profiles[i].Duration());
+                ROS_DEBUG("Joint %d moving from %2.2f to %2.2f gives duration %2.2f", i, current.position[m_first_arm_joint_index + i], endpoint.positions[i], m_velocity_trap_profiles[i].Duration());
+            }
+            ROS_DEBUG("optimal_duration is : %2.2f", optimal_duration);
+            // Set the velocity profiles
+            for (int i = 0; i < GetDOF(); i++)
+            {
+                m_velocity_trap_profiles[i].SetProfileDuration(current.position[m_first_arm_joint_index + i], endpoint.positions[i], optimal_duration);
+            }
+            endpoint.time_from_start = ros::Duration(optimal_duration);
+            break;
+        }
+    }
+
+    // Copy velocity profile data into trajectory using JOINT_TRAJECTORY_TIMESTEP_SECONDS timesteps
+    // For each timestep
+    for (double t = JOINT_TRAJECTORY_TIMESTEP_SECONDS; t < m_velocity_trap_profiles[0].Duration(); t += JOINT_TRAJECTORY_TIMESTEP_SECONDS)
+    {
+        // Create trajectory point
+        trajectory_msgs::JointTrajectoryPoint p;
+        p.time_from_start = ros::Duration(t);
+        // Add position, velocity, acceleration from each velocity profile
+        for (int i = 0; i < GetDOF(); i++)
+        {
+            p.positions.push_back(m_velocity_trap_profiles[i].Pos(t));
+            p.velocities.push_back(m_velocity_trap_profiles[i].Vel(t));
+            p.accelerations.push_back(m_velocity_trap_profiles[i].Acc(t));
+        }
+        // Add trajectory point to goal
+        traj.points.push_back(p);
+    }
+    // Finally, add endpoint to trajectory
+    // Add position, velocity, acceleration from each velocity profile
+    trajectory_msgs::JointTrajectoryPoint p;
+    p.time_from_start = ros::Duration(m_velocity_trap_profiles[0].Duration());
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        p.positions.push_back(m_velocity_trap_profiles[i].Pos(m_velocity_trap_profiles[i].Duration()));
+        p.velocities.push_back(m_velocity_trap_profiles[i].Vel(m_velocity_trap_profiles[i].Duration()));
+        p.accelerations.push_back(m_velocity_trap_profiles[i].Acc(m_velocity_trap_profiles[i].Duration()));
+    }
+    // Add trajectory point to goal
+    traj.points.push_back(p);
+
+    // Verify if goal has been cancelled before sending it
+    if (m_action_preempted.load())
+    {
+        return result;
+    }
+    
+    // Send goal
+    control_msgs::FollowJointTrajectoryActionGoal goal;
+    goal.goal.trajectory = traj;
+    m_follow_joint_trajectory_action_client->sendGoal(goal.goal);
+
+    // Wait for goal to be done, or for preempt to be called (check every 10ms)
+    while(!m_action_preempted.load() && !m_follow_joint_trajectory_action_client->waitForResult(ros::Duration(0.01f))) {}
+
+    // If we got out of the loop because we're preempted, cancel the goal before returning
+    if (m_action_preempted.load())
+    {
+        m_follow_joint_trajectory_action_client->cancelAllGoals();
+    }
+    // Fill result depending on action final status if user didn't cancel
+    else
+    {
+        auto status = m_follow_joint_trajectory_action_client->getResult();
+        if (status->error_code != status->SUCCESSFUL)
+        {
+            result = FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                        kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                        status->error_string);
+        }
+    }
     return result;
 }
 
-// TODO Fill implementation
 kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_driver::Action& action)
 {
     kortex_driver::KortexError result;
@@ -547,20 +835,200 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
     if (action.oneof_action_parameters.reach_pose.size() != 1)
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing pose action : action is malformed.";
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing pose action : action is malformed.");
     }
     auto constrained_pose = action.oneof_action_parameters.reach_pose[0];
-    
-    // TODO Handle constraints and warn if some cannot be applied in simulation
-    // TODO Fill implementation to move simulated arm to Cartesian pose
 
+    // Get current position
+    sensor_msgs::JointState current;
+    {
+        const std::lock_guard<std::mutex> lock(m_state_mutex);
+        current = m_current_state;
+    }
+    
+    // Get Start frame
+    // For the Rotation part : ThetaX = gamma, ThetaY = beta, ThetaZ = alpha 
+    auto start = KDL::Frame();
+    Eigen::VectorXd positions_eigen(m_degrees_of_freedom);
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        positions_eigen[i] = current.position[m_first_arm_joint_index + i];
+    }
+    KDL::JntArray current_kdl(GetDOF());
+    current_kdl.data = positions_eigen;
+    m_fk_solver->JntToCart(current_kdl, start);
+
+    {
+    ROS_INFO("START FRAME :");
+    ROS_INFO("X=%2.4f Y=%2.4f Z=%2.4f", start.p[0], start.p[1], start.p[2]);
+    double sa, sb, sg; start.M.GetEulerZYX(sa, sb, sg);
+    ROS_INFO("ALPHA=%2.4f BETA=%2.4f GAMMA=%2.4f", m_math_util.toDeg(sa), m_math_util.toDeg(sb), m_math_util.toDeg(sg));
+    KDL::Vector axis;
+    ROS_INFO("start rot = %2.4f", start.M.GetRotAngle(axis));
+    }
+
+    // Get End frame
+    auto end_pos = KDL::Vector(constrained_pose.target_pose.x, constrained_pose.target_pose.y, constrained_pose.target_pose.z);
+    auto end_rot = KDL::Rotation::EulerZYX(m_math_util.toRad(constrained_pose.target_pose.theta_z), m_math_util.toRad(constrained_pose.target_pose.theta_y), m_math_util.toRad(constrained_pose.target_pose.theta_x));
+    KDL::Frame end(end_rot, end_pos);
+
+    {
+    ROS_INFO("END FRAME :");
+    ROS_INFO("X=%2.4f Y=%2.4f Z=%2.4f", end_pos[0], end_pos[1], end_pos[2]);
+    double ea, eb, eg; end_rot.GetEulerZYX(ea, eb, eg);
+    ROS_INFO("ALPHA=%2.4f BETA=%2.4f GAMMA=%2.4f", m_math_util.toDeg(ea), m_math_util.toDeg(eb), m_math_util.toDeg(eg));
+    KDL::Vector axis;
+    ROS_INFO("end rot = %2.4f", end_rot.GetRotAngle(axis));
+    }
+
+    // If different speed limits than the default ones are provided, use them instead
+    float translation_speed_limit = m_max_cartesian_twist_linear;
+    float rotation_speed_limit = m_max_cartesian_twist_angular;
+    if (!constrained_pose.constraint.oneof_type.speed.empty())
+    {
+        // If a max velocity is supplied for each joint, we need to find the limiting duration with this velocity constraint
+        translation_speed_limit = std::min(constrained_pose.constraint.oneof_type.speed[0].translation, translation_speed_limit);
+        rotation_speed_limit = std::min(constrained_pose.constraint.oneof_type.speed[0].orientation, rotation_speed_limit);
+    }
+
+    // Calculate norm of translation movement and minimum duration to move this amount given max translation speed
+    double delta_pos = (end_pos - start.p).Norm();
+    double minimum_translation_duration = delta_pos / m_max_cartesian_twist_linear; // in seconds
+
+    // Calculate angle variation of rotation movement and minimum duration to move this amount given max rotation speed
+    KDL::Vector axis; // we need to create this variable to access the RotAngle for start and end frames'rotation components
+    KDL::Rotation dR = end_rot * start.M.Inverse();
+    double delta_rot = dR.GetRotAngle(axis);
+    double minimum_rotation_duration = delta_rot / m_max_cartesian_twist_angular; // in seconds
+
+    ROS_INFO("trans : %2.4f rot : %2.4f", minimum_translation_duration, minimum_rotation_duration);
+
+    // The default value for the duration will be the longer duration of the two
+    double duration = std::max(minimum_translation_duration, minimum_rotation_duration);
+
+    // eq_radius is chosen here to make it so translations and rotations are normalised
+    // Here is a good explanation for it : https://github.com/zakharov/BRICS_RN/blob/master/navigation_trajectory_common/include/navigation_trajectory_common/Conversions.h#L358-L382
+    float eq_radius = translation_speed_limit / rotation_speed_limit;
+
+    // Create Path_Line object
+    // I know this is ugly but the RotationalInterpolation object is mandatory and needs to be created as such
+    KDL::Path_Line line(start, end, new KDL::RotationalInterpolation_SingleAxis(), eq_radius);
+
+    // Create a trapezoidal velocity profile for the Cartesian trajectory to parametrize it in time
+    KDL::VelocityProfile_Trap velocity_profile(std::min(translation_speed_limit, rotation_speed_limit), m_max_cartesian_acceleration_linear);
+    velocity_profile.SetProfile(0.0, line.PathLength());
+    duration = std::max(duration, velocity_profile.Duration());
+
+    // If duration is not supplied, use the one we just calculated
+    // If the duration is supplied, simply use it
+    if (!constrained_pose.constraint.oneof_type.duration.empty())
+    {
+        double supplied_duration = constrained_pose.constraint.oneof_type.duration[0];
+        if (duration > supplied_duration)
+        {
+            ROS_WARN("Cannot use supplied duration %2.4f because the minimum duration based on velocity limits is %2.4f",
+                        supplied_duration,
+                        duration);
+        }
+        duration = std::max(duration, supplied_duration);
+    }
+
+    // Set the velocity profile duration
+    velocity_profile.SetProfileDuration(0.0, line.PathLength(), duration);
+    KDL::Trajectory_Segment segment(&line, &velocity_profile, false);
+    ROS_DEBUG("Duration of trajectory will be %2.4f seconds", duration);
+
+    // Initialize trajectory object
+    trajectory_msgs::JointTrajectory traj;
+    traj.header.frame_id = m_prefix + "base_link";
+    traj.header.stamp = ros::Time::now();
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        const std::string joint_name = m_prefix + "joint_" + std::to_string(i+1); //joint names are 1-based
+        traj.joint_names.push_back(joint_name);
+    }
+
+    // Fill trajectory object
+    KDL::JntArray previous = current_kdl; // Position i - 1, initialise to starting angles
+    KDL::JntArray current_joints(GetDOF()); // Position i
+    for (float t = JOINT_TRAJECTORY_TIMESTEP_SECONDS; t < duration; t += JOINT_TRAJECTORY_TIMESTEP_SECONDS)
+    {
+        // First get the next Cartesian position and twists
+        auto pos = segment.Pos(t);
+        
+        // Position is enough to have a smooth trajectory it seems but if eventually vel and acc are useful somehow this is how to get them:
+        // auto vel = segment.Vel(t);
+        // auto acc = segment.Acc(t);
+
+        // Create trajectory point
+        trajectory_msgs::JointTrajectoryPoint p;
+        p.time_from_start = ros::Duration(t);
+
+        // Use inverse IK solver
+        int code = m_ik_pos_solver->CartToJnt(previous, pos, current_joints);
+        if (code != m_ik_pos_solver->E_NOERROR)
+        {
+            ROS_ERROR("IK ERROR CODE = %d", code);
+        }
+
+        for (int i = 0; i < GetDOF(); i++)
+        {
+            p.positions.push_back(current_joints(i));
+        }
+        
+        // Add trajectory point to goal
+        traj.points.push_back(p);
+        previous = current_joints;
+    }
+
+    // Add last point
+    trajectory_msgs::JointTrajectoryPoint p;
+    p.time_from_start = ros::Duration(segment.Duration());
+    auto pos = segment.Pos(segment.Duration());
+    int code = m_ik_pos_solver->CartToJnt(previous, pos, current_joints);
+    for (int i = 0; i < GetDOF(); i++)
+    {
+        p.positions.push_back(current_joints(i));
+    }
+    
+    // Add trajectory point to goal
+    traj.points.push_back(p);
+
+    // Verify if goal has been cancelled before sending it
+    if (m_action_preempted.load())
+    {
+        return result;
+    }
+    
+    // Send goal
+    control_msgs::FollowJointTrajectoryActionGoal goal;
+    goal.goal.trajectory = traj;
+    m_follow_joint_trajectory_action_client->sendGoal(goal.goal);
+
+    // Wait for goal to be done, or for preempt to be called (check every 10ms)
+    while(!m_action_preempted.load() && !m_follow_joint_trajectory_action_client->waitForResult(ros::Duration(0.01f))) {}
+
+    // If we got out of the loop because we're preempted, cancel the goal before returning
+    if (m_action_preempted.load())
+    {
+        m_follow_joint_trajectory_action_client->cancelAllGoals();
+    }
+    // Fill result depending on action final status if user didn't cancel
+    else
+    {
+        auto status = m_follow_joint_trajectory_action_client->getResult();
+        if (status->error_code != status->SUCCESSFUL)
+        {
+            result = FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                        kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                        status->error_string);
+        }
+    }
     return result;
 }
 
-// TODO Fill implementation
 kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kortex_driver::Action& action)
 {
     kortex_driver::KortexError result;
@@ -568,22 +1036,20 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kor
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
     if (action.oneof_action_parameters.send_joint_speeds.size() != 1)
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing joints speeds : action is malformed.";
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing joints speeds : action is malformed.");
     }
     auto joint_speeds = action.oneof_action_parameters.send_joint_speeds[0];
     if (joint_speeds.joint_speeds.size() != GetDOF())
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing joint speeds action : action contains " + std::to_string(joint_speeds.joint_speeds.size()) + " joint speeds but arm has " + std::to_string(GetDOF());
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing joint speeds action : action contains " + std::to_string(joint_speeds.joint_speeds.size()) + " joint speeds but arm has " + std::to_string(GetDOF()));
     }
 
     // TODO Handle constraints and warn if some cannot be applied in simulation
-    // TODO Fill implementation to move simulated arm at angular speeds
+    // TODO Fill implementation to move all actuators at given velocities
 
     return result;
 }
@@ -596,10 +1062,9 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendTwist(const kortex_dr
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
     if (action.oneof_action_parameters.send_twist_command.size() != 1)
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing twist action : action is malformed.";
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing twist action : action is malformed.");
     }
     auto twist = action.oneof_action_parameters.send_twist_command[0];
 
@@ -609,7 +1074,6 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendTwist(const kortex_dr
     return result;
 }
 
-// TODO Fill implementation
 kortex_driver::KortexError KortexArmSimulation::ExecuteSendGripperCommand(const kortex_driver::Action& action)
 {
     kortex_driver::KortexError result;
@@ -617,25 +1081,69 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendGripperCommand(const 
     result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
     if (action.oneof_action_parameters.send_gripper_command.size() != 1)
     {
-        result.code = kortex_driver::ErrorCodes::ERROR_DEVICE;
-        result.subCode = kortex_driver::SubErrorCodes::INVALID_PARAM;
-        result.description = "Error playing gripper command action : action is malformed.";
-        return result;
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing gripper command action : action is malformed.");
     }
     auto gripper_command = action.oneof_action_parameters.send_gripper_command[0];
 
-    // TODO Handle constraints and warn if some cannot be applied in simulation
-    // TODO Handle velocity mode too?
-    // TODO Fill implementation to move simulated gripper to given position
+    if (gripper_command.gripper.finger.size() != 1)
+    {
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Error playing gripper command action : there must be exactly one finger");
+    }
 
+    if (gripper_command.mode != kortex_driver::GripperMode::GRIPPER_POSITION)
+    {
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                            kortex_driver::SubErrorCodes::UNSUPPORTED_ACTION,
+                            "Error playing gripper command action : gripper mode " + std::to_string(gripper_command.mode) + " is not supported; only position is.");
+    }
+
+    // The incoming command is relative [0,1] and we need to put it in absolute unit [m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0]]:
+    double absolute_gripper_command = m_math_util.absolute_position_from_relative(gripper_command.gripper.finger[0].value, m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0]);
+
+    // Create the goal
+    control_msgs::GripperCommandGoal goal;
+    goal.command.position = absolute_gripper_command;
+
+    // Verify if goal has been cancelled before sending it
+    if (m_action_preempted.load())
+    {
+        return result;
+    }
+
+    // Send goal
+    m_gripper_action_client->sendGoal(goal);
+
+    // Wait for goal to be done, or for preempt to be called (check every 10ms)
+    while(!m_action_preempted.load() && !m_gripper_action_client->waitForResult(ros::Duration(0.01f))) {}
+
+    // If we got out of the loop because we're preempted, cancel the goal before returning
+    if (m_action_preempted.load())
+    {
+        m_gripper_action_client->cancelAllGoals();
+    }
+    // Fill result depending on action final status if user didn't cancel
+    else
+    {
+        auto status = m_gripper_action_client->getResult();
+        
+        if (!status->reached_goal)
+        {
+            result = FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                        kortex_driver::SubErrorCodes::METHOD_FAILED,
+                                        "The gripper command failed during execution.");
+        }
+    }
     return result;
 }
 
 kortex_driver::KortexError KortexArmSimulation::ExecuteTimeDelay(const kortex_driver::Action& action)
 {
-    kortex_driver::KortexError result;
-    result.code = kortex_driver::ErrorCodes::ERROR_NONE;
-    result.subCode = kortex_driver::SubErrorCodes::SUB_ERROR_NONE;
+    auto result = FillKortexError(kortex_driver::ErrorCodes::ERROR_NONE,
+                                kortex_driver::SubErrorCodes::SUB_ERROR_NONE);
     if (!action.oneof_action_parameters.delay.empty())
     {
         auto start = std::chrono::system_clock::now();

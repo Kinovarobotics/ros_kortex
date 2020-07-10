@@ -13,15 +13,34 @@
 *
 */
 
+// ROS
 #include <ros/ros.h>
+#include <control_msgs/JointTrajectoryControllerState.h>
+#include <control_msgs/FollowJointTrajectoryAction.h>
+#include <control_msgs/GripperCommandAction.h>
+#include <actionlib/client/simple_action_client.h>
 
+// MoveIt
+#include <moveit/move_group_interface/move_group_interface.h>
+
+// KDL
+#include <kdl/chain.hpp>
+#include <kdl/chainfksolverpos_recursive.hpp>
+#include <kdl/chainiksolverpos_nr.hpp>
+#include <kdl/chainiksolvervel_pinv.hpp>
+#include <kdl/velocityprofile_trap.hpp>
+
+// Standard
 #include <unordered_map>
 #include <thread>
+#include <mutex>
 
+// Kortex
 #include "kortex_driver/non-generated/kortex_math_util.h"
 
 #include "kortex_driver/ActionType.h"
 #include "kortex_driver/KortexError.h"
+#include "kortex_driver/BaseCyclic_Feedback.h"
 
 #include "kortex_driver/CreateAction.h"
 #include "kortex_driver/ReadAction.h"
@@ -43,8 +62,6 @@
 #include "kortex_driver/SendGripperCommand.h"
 #include "kortex_driver/ApplyEmergencyStop.h"
 
-#include <moveit/move_group_interface/move_group_interface.h>
-
 class KortexArmSimulation
 {
   public:
@@ -53,6 +70,8 @@ class KortexArmSimulation
     ~KortexArmSimulation();
     std::unordered_map<uint32_t, kortex_driver::Action> GetActionsMap() const;
     int GetDOF() const {return m_degrees_of_freedom;}
+
+    kortex_driver::BaseCyclic_Feedback GetFeedback();
 
     // Handlers for simulated Kortex API functions
     // Actions API
@@ -74,30 +93,57 @@ class KortexArmSimulation
     kortex_driver::ApplyEmergencyStop::Response ApplyEmergencyStop(const kortex_driver::ApplyEmergencyStop::Request& req);
 
   private:
-
+    // ROS
     ros::NodeHandle m_node_handle;
 
     // Publishers
     ros::Publisher m_pub_action_topic;
 
+    // Subscribers
+    ros::Subscriber m_sub_joint_trajectory_controller_state;
+    ros::Subscriber m_sub_joint_state;
+
+    // Action clients
+    std::unique_ptr<actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>> m_follow_joint_trajectory_action_client;
+    std::unique_ptr<actionlib::SimpleActionClient<control_msgs::GripperCommandAction>> m_gripper_action_client;
+
     // Namespacing and prefixing information
     std::string m_prefix;
     std::string m_robot_name;
 
-    // Arm and gripper information
+    // Arm information
     std::string m_arm_name;
     std::vector<std::string> m_arm_joint_names;
+    std::vector<float> m_arm_velocity_max_limits;
+    std::vector<float> m_arm_acceleration_max_limits;
+    float m_max_cartesian_twist_linear;
+    float m_max_cartesian_twist_angular;
+    float m_max_cartesian_acceleration_linear;
+    float m_max_cartesian_acceleration_angular;
+
+    // Gripper information
     std::string m_gripper_name;
     std::vector<std::string> m_gripper_joint_names;
     std::vector<float> m_gripper_joint_limits_max;
     std::vector<float> m_gripper_joint_limits_min;
     int m_degrees_of_freedom;
 
+    // The indexes of the first arm joint and of the gripper joint in the "joint_states" feedback
+    int m_first_arm_joint_index;
+    int m_gripper_joint_index;
+
     // Action-related
     std::unordered_map<uint32_t, kortex_driver::Action> m_map_actions;
 
     // Math utility
     KortexMathUtil m_math_util;
+
+    // KDL chain, solvers and motions
+    KDL::Chain m_chain;
+    std::unique_ptr<KDL::ChainFkSolverPos_recursive> m_fk_solver;
+    std::unique_ptr<KDL::ChainIkSolverPos_NR> m_ik_pos_solver;
+    std::unique_ptr<KDL::ChainIkSolverVel_pinv> m_ik_vel_solver;
+    std::vector<KDL::VelocityProfile_Trap> m_velocity_trap_profiles;
 
     // Threading
     std::atomic<bool> m_is_action_being_executed;
@@ -108,12 +154,21 @@ class KortexArmSimulation
     std::unique_ptr<moveit::planning_interface::MoveGroupInterface> m_moveit_arm_interface;
     std::unique_ptr<moveit::planning_interface::MoveGroupInterface> m_moveit_gripper_interface;
 
+    // Subscription callbacks and data structures with their mutexes
+    // void cb_joint_trajectory_controller_state(const control_msgs::JointTrajectoryControllerState& state);
+    void cb_joint_states(const sensor_msgs::JointState& state);
+    sensor_msgs::JointState m_current_state;
+    bool m_first_state_received;
+    kortex_driver::BaseCyclic_Feedback m_feedback;
+    std::mutex m_state_mutex;
+
     // Helper functions
     bool IsGripperPresent() const {return !m_gripper_name.empty();}
     void CreateDefaultActions();
+    kortex_driver::KortexError FillKortexError(uint32_t code, uint32_t subCode, const std::string& description = "") const;
 
     // Executors
-    void CancelAction();
+    void JoinThreadAndCancelAction();
     void PlayAction(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteReachJointAngles(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteReachPose(const kortex_driver::Action& action);

@@ -50,6 +50,10 @@ KortexArmDriver::KortexArmDriver(ros::NodeHandle nh):   m_node_handle(nh),
     {
         m_publish_feedback_thread = std::thread(&KortexArmDriver::publishRobotFeedback, this);
     }
+    else
+    {
+        m_publish_feedback_thread = std::thread(&KortexArmDriver::publishSimulationFeedback, this);
+    }
 
     // If we get here and no error was thrown we started the node correctly
     ROS_INFO("%sThe Kortex driver has been initialized correctly!%s", GREEN_COLOR_CONSOLE, RESET_COLOR_CONSOLE);
@@ -635,6 +639,16 @@ void KortexArmDriver::publishRobotFeedback()
         m_pub_base_feedback.publish(base_feedback);
         m_pub_joint_state.publish(joint_state);
 
+        rate.sleep();
+    }
+}
+
+void KortexArmDriver::publishSimulationFeedback()
+{
+    ros::Rate rate(m_cyclic_data_publish_rate);
+    while (m_node_is_running)
+    {
+        m_pub_base_feedback.publish(m_simulator->GetFeedback());
         rate.sleep();
     }
 }
