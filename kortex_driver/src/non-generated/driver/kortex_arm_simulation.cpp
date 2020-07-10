@@ -198,13 +198,19 @@ kortex_driver::BaseCyclic_Feedback KortexArmSimulation::GetFeedback()
     current_kdl.data = positions_eigen;
     m_fk_solver->JntToCart(current_kdl, frame);
     m_feedback.base.tool_pose_x = frame.p.x();
+    m_feedback.base.commanded_tool_pose_x = frame.p.x();
     m_feedback.base.tool_pose_y = frame.p.y();
+    m_feedback.base.commanded_tool_pose_y = frame.p.y();
     m_feedback.base.tool_pose_z = frame.p.z();
+    m_feedback.base.commanded_tool_pose_z = frame.p.z();
     double alpha, beta, gamma;
     frame.M.GetEulerZYX(alpha, beta, gamma);
     m_feedback.base.tool_pose_theta_x = m_math_util.toDeg(gamma);
+    m_feedback.base.commanded_tool_pose_theta_x = m_math_util.toDeg(gamma);
     m_feedback.base.tool_pose_theta_y = m_math_util.toDeg(beta);
+    m_feedback.base.commanded_tool_pose_theta_y = m_math_util.toDeg(beta);
     m_feedback.base.tool_pose_theta_z = m_math_util.toDeg(alpha);
+    m_feedback.base.commanded_tool_pose_theta_z = m_math_util.toDeg(alpha);
 
     // Fill gripper information
     if (IsGripperPresent())
@@ -855,12 +861,12 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     m_fk_solver->JntToCart(current_kdl, start);
 
     {
-    ROS_DEBUG("START FRAME :");
-    ROS_DEBUG("X=%2.4f Y=%2.4f Z=%2.4f", start.p[0], start.p[1], start.p[2]);
+    ROS_INFO("START FRAME :");
+    ROS_INFO("X=%2.4f Y=%2.4f Z=%2.4f", start.p[0], start.p[1], start.p[2]);
     double sa, sb, sg; start.M.GetEulerZYX(sa, sb, sg);
-    ROS_DEBUG("ALPHA=%2.4f BETA=%2.4f GAMMA=%2.4f", m_math_util.toDeg(sa), m_math_util.toDeg(sb), m_math_util.toDeg(sg));
+    ROS_INFO("ALPHA=%2.4f BETA=%2.4f GAMMA=%2.4f", m_math_util.toDeg(sa), m_math_util.toDeg(sb), m_math_util.toDeg(sg));
     KDL::Vector axis;
-    ROS_DEBUG("start rot = %2.4f", start.M.GetRotAngle(axis));
+    ROS_INFO("start rot = %2.4f", start.M.GetRotAngle(axis));
     }
 
     // Get End frame
@@ -869,12 +875,12 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
     KDL::Frame end(end_rot, end_pos);
 
     {
-    ROS_DEBUG("END FRAME :");
-    ROS_DEBUG("X=%2.4f Y=%2.4f Z=%2.4f", end_pos[0], end_pos[1], end_pos[2]);
+    ROS_INFO("END FRAME :");
+    ROS_INFO("X=%2.4f Y=%2.4f Z=%2.4f", end_pos[0], end_pos[1], end_pos[2]);
     double ea, eb, eg; end_rot.GetEulerZYX(ea, eb, eg);
-    ROS_DEBUG("ALPHA=%2.4f BETA=%2.4f GAMMA=%2.4f", m_math_util.toDeg(ea), m_math_util.toDeg(eb), m_math_util.toDeg(eg));
+    ROS_INFO("ALPHA=%2.4f BETA=%2.4f GAMMA=%2.4f", m_math_util.toDeg(ea), m_math_util.toDeg(eb), m_math_util.toDeg(eg));
     KDL::Vector axis;
-    ROS_DEBUG("end rot = %2.4f", end_rot.GetRotAngle(axis));
+    ROS_INFO("end rot = %2.4f", end_rot.GetRotAngle(axis));
     }
 
     // If different speed limits than the default ones are provided, use them instead
@@ -893,8 +899,11 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
 
     // Calculate angle variation of rotation movement and minimum duration to move this amount given max rotation speed
     KDL::Vector axis; // we need to create this variable to access the RotAngle for start and end frames'rotation components
-    double delta_rot = fabs(end_rot.GetRotAngle(axis) - start.M.GetRotAngle(axis));
-    double minimum_rotation_duration = delta_pos / m_max_cartesian_twist_angular; // in seconds
+    KDL::Rotation dR = end_rot * start.M.Inverse();
+    double delta_rot = dR.GetRotAngle(axis);
+    double minimum_rotation_duration = delta_rot / m_max_cartesian_twist_angular; // in seconds
+
+    ROS_INFO("trans : %2.4f rot : %2.4f", minimum_translation_duration, minimum_rotation_duration);
 
     // The default value for the duration will be the longer duration of the two
     double duration = std::max(minimum_translation_duration, minimum_rotation_duration);
