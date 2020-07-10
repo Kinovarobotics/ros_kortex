@@ -189,11 +189,9 @@ class KortexArmSimulation
     bool IsGripperPresent() const {return !m_gripper_name.empty();}
     void CreateDefaultActions();
     bool SwitchControllerType(ControllerType new_type);
-    kortex_driver::KortexError FillKortexError(uint32_t code, uint32_t subCode, const std::string& description = "") const;
-
-    // Executors
-    void JoinThreadAndCancelAction();
     void PlayAction(const kortex_driver::Action& action);
+    void JoinThreadAndCancelAction();
+    kortex_driver::KortexError FillKortexError(uint32_t code, uint32_t subCode, const std::string& description = std::string()) const;
     kortex_driver::KortexError ExecuteReachJointAngles(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteReachPose(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteSendJointSpeeds(const kortex_driver::Action& action);

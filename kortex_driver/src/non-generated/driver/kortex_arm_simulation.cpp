@@ -242,13 +242,19 @@ kortex_driver::BaseCyclic_Feedback KortexArmSimulation::GetFeedback()
     current_kdl.data = positions_eigen;
     m_fk_solver->JntToCart(current_kdl, frame);
     m_feedback.base.tool_pose_x = frame.p.x();
+    m_feedback.base.commanded_tool_pose_x = frame.p.x();
     m_feedback.base.tool_pose_y = frame.p.y();
+    m_feedback.base.commanded_tool_pose_y = frame.p.y();
     m_feedback.base.tool_pose_z = frame.p.z();
+    m_feedback.base.commanded_tool_pose_z = frame.p.z();
     double alpha, beta, gamma;
     frame.M.GetEulerZYX(alpha, beta, gamma);
     m_feedback.base.tool_pose_theta_x = m_math_util.toDeg(gamma);
+    m_feedback.base.commanded_tool_pose_theta_x = m_math_util.toDeg(gamma);
     m_feedback.base.tool_pose_theta_y = m_math_util.toDeg(beta);
+    m_feedback.base.commanded_tool_pose_theta_y = m_math_util.toDeg(beta);
     m_feedback.base.tool_pose_theta_z = m_math_util.toDeg(alpha);
+    m_feedback.base.commanded_tool_pose_theta_z = m_math_util.toDeg(alpha);
 
     // Fill gripper information
     if (IsGripperPresent())
@@ -1047,8 +1053,11 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachPose(const kortex_dr
 
     // Calculate angle variation of rotation movement and minimum duration to move this amount given max rotation speed
     KDL::Vector axis; // we need to create this variable to access the RotAngle for start and end frames'rotation components
-    double delta_rot = fabs(end_rot.GetRotAngle(axis) - start.M.GetRotAngle(axis));
-    double minimum_rotation_duration = delta_pos / m_max_cartesian_twist_angular; // in seconds
+    KDL::Rotation dR = end_rot * start.M.Inverse();
+    double delta_rot = dR.GetRotAngle(axis);
+    double minimum_rotation_duration = delta_rot / m_max_cartesian_twist_angular; // in seconds
+
+    ROS_INFO("trans : %2.4f rot : %2.4f", minimum_translation_duration, minimum_rotation_duration);
 
     // The default value for the duration will be the longer duration of the two
     double duration = std::max(minimum_translation_duration, minimum_rotation_duration);
