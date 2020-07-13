@@ -10,6 +10,7 @@
  *
  */
 #include <thread>
+#include <atomic>
 
 #include "ros/ros.h"
 #include <kortex_driver/Base_ClearFaults.h>
@@ -23,8 +24,38 @@
 #include <kortex_driver/CartesianReferenceFrame.h>
 #include <kortex_driver/SendGripperCommand.h>
 #include <kortex_driver/GripperMode.h>
+#include <kortex_driver/ActionNotification.h>
+#include <kortex_driver/ActionEvent.h>
+#include <kortex_driver/OnNotificationActionTopic.h>
 
 #define HOME_ACTION_IDENTIFIER 2
+
+std::atomic<int> last_action_notification_event{0};
+
+void notification_callback(const kortex_driver::ActionNotification& notif)
+{
+  last_action_notification_event = notif.action_event;
+}
+
+bool wait_for_action_end_or_abort()
+{
+  while (ros::ok())
+  {
+    if (last_action_notification_event.load() == kortex_driver::ActionEvent::ACTION_END)
+    {
+      ROS_INFO("Received ACTION_END notification");
+      return true;
+    }
+    else if (last_action_notification_event.load() == kortex_driver::ActionEvent::ACTION_ABORT)
+    {
+      ROS_INFO("Received ACTION_ABORT notification");
+      return false;
+    }
+    ros::spinOnce();
+  }
+}
+
+
 
 bool example_clear_faults(ros::NodeHandle n, std::string robot_name)
 {
@@ -48,6 +79,7 @@ bool example_home_the_robot(ros::NodeHandle n, std::string robot_name)
 {
   ros::ServiceClient service_client_read_action = n.serviceClient<kortex_driver::ReadAction>("/" + robot_name + "/base/read_action");
   kortex_driver::ReadAction service_read_action;
+  last_action_notification_event = 0;
 
   // The Home Action is used to home the robot. It cannot be deleted and is always ID #2:
   service_read_action.request.input.identifier = HOME_ACTION_IDENTIFIER;
@@ -76,7 +108,7 @@ bool example_home_the_robot(ros::NodeHandle n, std::string robot_name)
     return false;
   }
 
-  return true;
+  return wait_for_action_end_or_abort();
 }
 
 bool example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_name)
@@ -101,6 +133,7 @@ bool example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_
 
 bool example_send_cartesian_pose(ros::NodeHandle n, std::string robot_name)
 {
+  last_action_notification_event = 0;
   // Get the actual cartesian pose to increment it
   // You can create a subscriber to listen to the base_feedback
   // Here we only need the latest message in the topic though
@@ -121,10 +154,10 @@ bool example_send_cartesian_pose(ros::NodeHandle n, std::string robot_name)
   // Creating the target pose
   service_play_cartesian_trajectory.request.input.target_pose.x = current_x;
   service_play_cartesian_trajectory.request.input.target_pose.y = current_y;
-  service_play_cartesian_trajectory.request.input.target_pose.z = current_z + 0.15;
+  service_play_cartesian_trajectory.request.input.target_pose.z = current_z + 0.10;
   service_play_cartesian_trajectory.request.input.target_pose.theta_x = current_theta_x;
   service_play_cartesian_trajectory.request.input.target_pose.theta_y = current_theta_y;
-  service_play_cartesian_trajectory.request.input.target_pose.theta_z = current_theta_z + 35;
+  service_play_cartesian_trajectory.request.input.target_pose.theta_z = current_theta_z;
 
   kortex_driver::CartesianSpeed poseSpeed;
   poseSpeed.translation = 0.1;
@@ -145,11 +178,12 @@ bool example_send_cartesian_pose(ros::NodeHandle n, std::string robot_name)
     return false;
   }
 
-  return true;
+  return wait_for_action_end_or_abort();
 }
 
 bool example_send_joint_angles(ros::NodeHandle n, std::string robot_name, int degrees_of_freedom)
 {
+  last_action_notification_event = 0;
   // Initialize the ServiceClient
   ros::ServiceClient service_client_play_joint_trajectory = n.serviceClient<kortex_driver::PlayJointTrajectory>("/" + robot_name + "/base/play_joint_trajectory");
   kortex_driver::PlayJointTrajectory service_play_joint_trajectory;
@@ -179,7 +213,7 @@ bool example_send_joint_angles(ros::NodeHandle n, std::string robot_name, int de
     return false;
   }
 
-  return true;
+  return wait_for_action_end_or_abort();
 }
 
 bool example_send_gripper_command(ros::NodeHandle n, std::string robot_name, double value)
@@ -205,7 +239,7 @@ bool example_send_gripper_command(ros::NodeHandle n, std::string robot_name, dou
     ROS_ERROR("%s", error_string.c_str());
     return false;
   }
-
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   return true;
 }
 
@@ -262,6 +296,23 @@ int main(int argc, char **argv)
   }
   //*******************************************************************************
 
+  // Subscribe to the Action Topic
+  ros::Subscriber sub = n.subscribe("/" + robot_name  + "/action_topic", 1000, notification_callback);
+
+  // We need to call this service to activate the Action Notification on the kortex_driver node.
+  ros::ServiceClient service_client_activate_notif = n.serviceClient<kortex_driver::OnNotificationActionTopic>("/" + robot_name + "/base/activate_publishing_of_action_topic");
+  kortex_driver::OnNotificationActionTopic service_activate_notif;
+  if (service_client_activate_notif.call(service_activate_notif))
+  {
+    ROS_INFO("Action notification activated!");
+  }
+  else 
+  {
+    std::string error_string = "Action notification publication failed";
+    ROS_ERROR("%s", error_string.c_str());
+    success = false;
+  }
+
   //*******************************************************************************
   // Make sure to clear the robot's faults else it won't move if it's already in fault
   success &= example_clear_faults(n, robot_name);
@@ -270,7 +321,6 @@ int main(int argc, char **argv)
   //*******************************************************************************
   // Move the robot to the Home position with an Action
   success &= example_home_the_robot(n, robot_name);
-  std::this_thread::sleep_for(std::chrono::milliseconds(10000));
   //*******************************************************************************
 
   //*******************************************************************************
@@ -279,7 +329,6 @@ int main(int argc, char **argv)
   if (is_gripper_present)
   {
     success &= example_send_gripper_command(n, robot_name, 0.0);
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));  
   }
   //*******************************************************************************
 
@@ -290,14 +339,12 @@ int main(int argc, char **argv)
   // Example of cartesian pose
   // Let's make it move in Z
   success &= example_send_cartesian_pose(n, robot_name);
-  std::this_thread::sleep_for(std::chrono::milliseconds(10000));
   //*******************************************************************************
 
   //*******************************************************************************
   // Example of angular position
   // Let's send the arm to vertical position
   success &= example_send_joint_angles(n, robot_name, degrees_of_freedom);
-  std::this_thread::sleep_for(std::chrono::milliseconds(10000));
   //*******************************************************************************
 
   //*******************************************************************************
@@ -306,7 +353,6 @@ int main(int argc, char **argv)
   if (is_gripper_present)
   {
     success &= example_send_gripper_command(n, robot_name, 0.5);
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));  
   }
   //*******************************************************************************
 
