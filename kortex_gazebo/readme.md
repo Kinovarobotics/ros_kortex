@@ -10,7 +10,7 @@
 *
 * -->
 
-# Kortex Gazebo (**EXPERIMENTAL**)
+# Kortex Gazebo
 
 ## Overview
 This package contains files to simulate the Kinova Gen3 and Gen3 lite robots in Gazebo.
@@ -25,18 +25,18 @@ Maintainer: Kinova inc. support@kinovarobotics.com**
 
 This package has been tested under ROS Kinetic, Gazebo 7 and Ubuntu 16.04 and under ROS Melodic, Gazebo 9 and Ubuntu 18.04.
 
-## Why **"EXPERIMENTAL"**?
+## A word on stability of the models
  
-The simulated arm has been tested and is stable in mid and high-inertia configurations and in most of its workspace, but the PID gains specified in the [configuration file](../kortex_control/arms/gen3/config/joint_position_controllers.yaml) do not work well in very low-inertia configurations (when the arm is vertical, or almost vertical). Hence, since some tuning still needs to be done on the gains, the package is tagged as **experimental**.
+The arms's controllers are simulated with the `gazebo_ros_control` package, which provides PID effort controllers for every joint. It is not an exact simulation of the real arms's behaviour. The simulated arms are stable in most of their workspace, although we have seen the Gen3 be a bit less stable in a very low inertia position (vertical). The gains are set in .yaml files in the `kortex_control` package, so they can be modified by end users.
 
 Other disclaimers :
  - The simulation has not been tested with simulated payload.
- - No characterization was done to compare and quantify the performance of the simulated controllers and the real arm's controllers. The simulation only offers a **visually comparable experience** to the real arm. 
+ - No characterization was done to compare and quantify the performance of the simulated controllers and the real arm's controllers. The simulation only offers a **visually comparable experience** to the real arms. 
  - Very rarely, the base (fixed to the world frame) seems to lose its fixation and the arm goes unstable. We are currently looking for the root cause of this behavior, but we found that clicking **Edit ---> Reset Model Poses** (Shift + Ctrl + R) in Gazebo is a workaround.
 
 ## Usage
 
-The [spawn_kortex_robot.launch file](launch/spawn_kortex_robot.launch) launches the arm simulation in [Gazebo](http://gazebosim.org), with [ros_control](http://wiki.ros.org/ros_control) controllers and optionally [MoveIt!](https://moveit.ros.org/).
+The [spawn_kortex_robot.launch file](launch/spawn_kortex_robot.launch) launches the arm simulation in [Gazebo](http://gazebosim.org), with [ros_control](http://wiki.ros.org/ros_control) controllers and [MoveIt!](https://moveit.ros.org/).
 The launch can be parametrized with arguments : 
 
 **Arguments**:
@@ -70,24 +70,19 @@ Gazebo loads an empty world an first, then the `spawn_model` node from the [gaze
 
 ## Controllers
 
-### JointTrajectoryController with MoveIt! support
-
 The simulated arm is controlled with a `effort_controllers/JointTrajectoryController` from [ros_controllers](http://wiki.ros.org/ros_controllers).
 This controller offers a [FollowJointTrajectory](http://wiki.ros.org/joint_trajectory_controller) interface to control the simulated arm, which is configured with [MoveIt!](http://docs.ros.org/kinetic/api/moveit_tutorials/html/index.html) so the trajectories outputed by the `move_group` node are sent to the robot in Gazebo and executed.
-The RViz Motion Planning plugin offers simple motion planning support for the simulated robot. See the [kortex_move_it_config documentation](../kortex_move_it_config/readme.md) for more details. 
+The RViz Motion Planning plugin offers simple motion planning support for the simulated robot. See the [kortex_move_it_config documentation](../kortex_move_it_config/readme.md) for more details.
 
-See the [kortex_control package documentation](../kortex_control/readme.md) for more details. 
+There are also individual JointPositionController's for every joint, stopped by default. These are used by the kortex_arm_driver node to do velocity control. 
 
-### Individual JointPositionController's for each joint
-
-The simulated arm is controlled with one `effort_controllers/JointPositionController` per joint.
-These controllers offer a simpler topic interface to control the simulated arm joint by joint. These controllers cannot be used with MoveIt!, which needs a `FollowJointTrajectory` interface.
+See the [kortex_driver package documentation](../kortex_driver/readme.md) for more details on how to use the simulated arm. 
 
 ## Initialization script
 
 The package also uses a [Python script](./scripts/home_robot.py) to home the robot after the robot has been spawned. 
-Gazebo is **launched with paused physics** when using the trajectory controller. Otherwise, the arm would fall to the ground because the controllers are not fully loaded when the robot is spawned in the simulator. 
-When everything is well loaded, the script unpauses Gazebo's physics and uses MoveIt! to home the robot.
+Gazebo is **launched with paused physics**. Otherwise, the arm would fall to the ground because the controllers are not fully loaded when the robot is spawned in the simulator. 
+When everything is well loaded, the script unpauses Gazebo's physics and executes the robot's Home action.
 
 ## Plugins
 
