@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>kortex_examples</name>
-  <version>2.2.0</version>
-  <description>THe kortex package that act as a robot's driver.</description>
+  <version>2.2.2</version>
+  <description>Examples to show usage of core kortex_arm_driver services and topics.</description>
 
-  <maintainer email="support@kinova.ca" />
+  <author email="hlamontagne@kinova.ca">Hugo Lamontagne</author>
+  <author email="avannobel@kinova.ca">Alexandre Vannobel</author>
+  <maintainer email="avannobel@kinova.ca" />
 
   <license>BSD</license>
 

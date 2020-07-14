@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>kortex_driver</name>
-  <version>2.2.1</version>
-  <description>THe kortex package that act as a robot's driver.</description>
+  <version>2.2.2</version>
+  <description>The package that acts as a robot's driver. Supports simulated and real Kortex robots.</description>
 
-  <maintainer email="support@kinova.ca" />
+  <author email="hlamontagne@kinova.ca">Hugo Lamontagne</author>
+  <author email="avannobel@kinova.ca">Alexandre Vannobel</author>
+  <maintainer email="avannobel@kinova.ca" />
 
   <license>BSD</license>
 
