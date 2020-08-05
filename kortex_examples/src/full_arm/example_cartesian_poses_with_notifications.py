@@ -13,7 +13,7 @@
 
 import sys
 import rospy
-import threading
+import time
 from kortex_driver.srv import *
 from kortex_driver.msg import *
 
@@ -24,16 +24,17 @@ class ExampleCartesianActionsWithNotifications:
 
             self.HOME_ACTION_IDENTIFIER = 2
 
-            self.pose_1_done = threading.Event()
-            self.pose_2_done = threading.Event()
-            self.pose_3_done = threading.Event()
-
+            self.action_topic_sub = None
             self.all_notifs_succeeded = True
 
             # Get node params
             self.robot_name = rospy.get_param('~robot_name', "my_gen3")
 
             rospy.loginfo("Using robot_name " + self.robot_name)
+
+            # Init the action topic subscriber
+            self.action_topic_sub = rospy.Subscriber("/" + self.robot_name + "/action_topic", ActionNotification, self.cb_action_topic)
+            self.last_action_notif_type = None
 
             # Init the services
             clear_faults_full_name = '/' + self.robot_name + '/base/clear_faults'
@@ -60,6 +61,21 @@ class ExampleCartesianActionsWithNotifications:
         else:
             self.is_init_success = True
 
+    def cb_action_topic(self, notif):
+        self.last_action_notif_type = notif.action_event
+
+    def wait_for_action_end_or_abort(self):
+        while not rospy.is_shutdown():
+            if (self.last_action_notif_type == ActionEvent.ACTION_END):
+                rospy.loginfo("Received ACTION_END notification")
+                return True
+            elif (self.last_action_notif_type == ActionEvent.ACTION_ABORT):
+                rospy.loginfo("Received ACTION_ABORT notification")
+                self.all_notifs_succeeded = False
+                return False
+            else:
+                time.sleep(0.01)
+
     def example_clear_faults(self):
         try:
             self.clear_faults()
@@ -75,6 +91,7 @@ class ExampleCartesianActionsWithNotifications:
         # The Home Action is used to home the robot. It cannot be deleted and is always ID #2:
         req = ReadActionRequest()
         req.input.identifier = self.HOME_ACTION_IDENTIFIER
+        self.last_action_notif_type = None
         try:
             res = self.read_action(req)
         except rospy.ServiceException:
@@ -92,7 +109,7 @@ class ExampleCartesianActionsWithNotifications:
                 rospy.logerr("Failed to call ExecuteAction")
                 return False
             else:
-                return True
+                return self.wait_for_action_end_or_abort()
 
     def example_set_cartesian_reference_frame(self):
         # Prepare the request with the frame we want to set
@@ -112,24 +129,6 @@ class ExampleCartesianActionsWithNotifications:
         # Wait a bit
         rospy.sleep(0.25)
 
-    def notification_callback(self, notif):
-        if notif.action_event == ActionEvent.ACTION_END:
-            if notif.handle.identifier == 1001:
-                self.pose_1_done.set()
-            if notif.handle.identifier == 1002:
-                self.pose_2_done.set()
-            if notif.handle.identifier == 1003:
-                self.pose_3_done.set()
-        if notif.action_event == ActionEvent.ACTION_ABORT:
-            rospy.logerr("Action was aborted!")
-            self.all_notifs_succeeded = False
-            if notif.handle.identifier == 1001:
-                self.pose_1_done.set()
-            if notif.handle.identifier == 1002:
-                self.pose_2_done.set()
-            if notif.handle.identifier == 1003:
-                self.pose_3_done.set()
-
     def example_subscribe_to_a_robot_notification(self):
         # Activate the publishing of the ActionNotification
         req = OnNotificationActionTopicRequest()
@@ -141,9 +140,6 @@ class ExampleCartesianActionsWithNotifications:
             return False
         else:
             rospy.loginfo("Successfully activated the Action Notifications!")
-
-        # Subscribe to the ActionNotification with the given callback
-        rospy.Subscriber("/" + self.robot_name + "/action_topic", ActionNotification, self.notification_callback)
 
         rospy.sleep(1.0)
 
@@ -167,7 +163,6 @@ class ExampleCartesianActionsWithNotifications:
             #*******************************************************************************
             # Start the example from the Home position
             success &= self.example_home_the_robot()
-            rospy.sleep(7)
             #*******************************************************************************
 
             #*******************************************************************************
@@ -201,6 +196,7 @@ class ExampleCartesianActionsWithNotifications:
             req.input.handle.identifier = 1001
 
             rospy.loginfo("Sending pose 1...")
+            self.last_action_notif_type = None
             try:
                 self.execute_action(req)
             except rospy.ServiceException:
@@ -209,7 +205,7 @@ class ExampleCartesianActionsWithNotifications:
             else:
                 rospy.loginfo("Waiting for pose 1 to finish...")
 
-            self.pose_1_done.wait()
+            self.wait_for_action_end_or_abort()
 
             # Prepare and send pose 2
             req.input.handle.identifier = 1002
@@ -220,6 +216,7 @@ class ExampleCartesianActionsWithNotifications:
             req.input.oneof_action_parameters.reach_pose[0] = my_constrained_pose
 
             rospy.loginfo("Sending pose 2...")
+            self.last_action_notif_type = None
             try:
                 self.execute_action(req)
             except rospy.ServiceException:
@@ -228,7 +225,7 @@ class ExampleCartesianActionsWithNotifications:
             else:
                 rospy.loginfo("Waiting for pose 2 to finish...")
 
-            self.pose_2_done.wait()
+            self.wait_for_action_end_or_abort()
 
             # Prepare and send pose 3
             req.input.handle.identifier = 1003
@@ -239,6 +236,7 @@ class ExampleCartesianActionsWithNotifications:
             req.input.oneof_action_parameters.reach_pose[0] = my_constrained_pose
 
             rospy.loginfo("Sending pose 3...")
+            self.last_action_notif_type = None
             try:
                 self.execute_action(req)
             except rospy.ServiceException:
@@ -247,7 +245,7 @@ class ExampleCartesianActionsWithNotifications:
             else:
                 rospy.loginfo("Waiting for pose 3 to finish...")
 
-            self.pose_3_done.wait()
+            self.wait_for_action_end_or_abort()
 
             success &= self.all_notifs_succeeded
 

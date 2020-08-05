@@ -732,35 +732,39 @@ void KortexArmSimulation::PlayAction(const kortex_driver::Action& action)
             break;
     }
     
-    kortex_driver::ActionNotification end_notif;
-    end_notif.handle = action.handle;
-    // Action was cancelled by user and is not a velocity command
-    if (m_action_preempted.load() && action.handle.action_type != kortex_driver::ActionType::SEND_JOINT_SPEEDS)
+    // Oddly enough, gripper actions don't send notifications through Kortex API when they end
+    if (action.handle.action_type != kortex_driver::ActionType::SEND_GRIPPER_COMMAND)
     {
-        // Notify ACTION_ABORT
-        end_notif.action_event = kortex_driver::ActionEvent::ACTION_ABORT;
-        ROS_WARN("Action was aborted by user.");
-    }
-    // Action ended on its own
-    else
-    {
-        if (action_result.code != kortex_driver::ErrorCodes::ERROR_NONE)
+        kortex_driver::ActionNotification end_notif;
+        end_notif.handle = action.handle;
+        // Action was cancelled by user and is not a velocity command
+        if (m_action_preempted.load() && action.handle.action_type != kortex_driver::ActionType::SEND_JOINT_SPEEDS)
         {
             // Notify ACTION_ABORT
             end_notif.action_event = kortex_driver::ActionEvent::ACTION_ABORT;
-            end_notif.abort_details = action_result.subCode;
-            ROS_WARN("Action was failed : \nError code is %d\nSub-error code is %d\nError description is : %s", 
-                        action_result.code,
-                        action_result.subCode,
-                        action_result.description.c_str());
+            ROS_WARN("Action was aborted by user.");
         }
+        // Action ended on its own
         else
         {
-            // Notify ACTION_END
-            end_notif.action_event = kortex_driver::ActionEvent::ACTION_END;
+            if (action_result.code != kortex_driver::ErrorCodes::ERROR_NONE)
+            {
+                // Notify ACTION_ABORT
+                end_notif.action_event = kortex_driver::ActionEvent::ACTION_ABORT;
+                end_notif.abort_details = action_result.subCode;
+                ROS_WARN("Action was failed : \nError code is %d\nSub-error code is %d\nError description is : %s", 
+                            action_result.code,
+                            action_result.subCode,
+                            action_result.description.c_str());
+            }
+            else
+            {
+                // Notify ACTION_END
+                end_notif.action_event = kortex_driver::ActionEvent::ACTION_END;
+            }
         }
+        m_pub_action_topic.publish(end_notif);
     }
-    m_pub_action_topic.publish(end_notif);
     
     m_is_action_being_executed = false;
 }
