@@ -12,23 +12,48 @@
 
 #include "kortex_driver/non-generated/kortex_arm_driver.h"
 
-KortexArmDriver::KortexArmDriver(ros::NodeHandle nh): m_node_handle(nh), m_node_is_running(true), m_consecutive_base_cyclic_timeouts(0)
+KortexArmDriver::KortexArmDriver(ros::NodeHandle nh):   m_node_handle(nh), 
+                                                        m_node_is_running(true), 
+                                                        m_consecutive_base_cyclic_timeouts(0),
+                                                        m_is_interconnect_module_present(false),
+                                                        m_is_vision_module_present(false),
+                                                        m_simulator{}
 {
     // Parameter to let the other nodes know this node is up
     ros::param::set("is_initialized", false);
 
-    // Start the node in the different initialization functions
     parseRosArguments();
-    initApi();
-    verifyProductConfiguration();
-    initSubscribers();
+    
+    // If with a real robot, start the robot-specific stuff
+    if (m_is_real_robot)
+    {
+        initApi();
+        verifyProductConfiguration();
+        initSubscribers();
+        startActionServers();
+    }    
+
+    // ROS Services are always started
     initRosServices();
-    startActionServers();
+
+    // Enable ROS Service simulation if not with a real robot
+    if (!m_is_real_robot)
+    {
+        m_simulator.reset(new KortexArmSimulation(nh));
+        registerSimulationHandlers();
+    }
 
     // Start the thread to publish the feedback and joint states
     m_pub_base_feedback = m_node_handle.advertise<kortex_driver::BaseCyclic_Feedback>("base_feedback", 1000);
     m_pub_joint_state = m_node_handle.advertise<sensor_msgs::JointState>("base_feedback/joint_state", 1000);
-    m_publish_feedback_thread = std::thread(&KortexArmDriver::publishFeedback, this);
+    if (m_is_real_robot)
+    {
+        m_publish_feedback_thread = std::thread(&KortexArmDriver::publishRobotFeedback, this);
+    }
+    else
+    {
+        m_publish_feedback_thread = std::thread(&KortexArmDriver::publishSimulationFeedback, this);
+    }
 
     // If we get here and no error was thrown we started the node correctly
     ROS_INFO("%sThe Kortex driver has been initialized correctly!%s", GREEN_COLOR_CONSOLE, RESET_COLOR_CONSOLE);
@@ -44,14 +69,6 @@ KortexArmDriver::~KortexArmDriver()
         m_publish_feedback_thread.join();
     }
 
-    delete m_action_server_follow_joint_trajectory;
-    if (m_action_server_gripper_command)
-    {
-        delete m_action_server_gripper_command;
-    }
-
-    delete m_topic_subscribers;
-
     delete m_actuator_config_ros_services;
     delete m_base_ros_services;
     delete m_control_config_ros_services;
@@ -65,71 +82,118 @@ KortexArmDriver::~KortexArmDriver()
     {
         delete m_vision_config_ros_services;
     }
-    
-    m_tcp_session_manager->CloseSession();
-    m_udp_session_manager->CloseSession();
-    m_tcp_router->SetActivationStatus(false);
-    m_udp_router->SetActivationStatus(false);
-    m_tcp_transport->disconnect();
-    m_udp_transport->disconnect();
-    
-    delete m_actuator_config;
-    delete m_base;
-    delete m_control_config;
-    delete m_device_config;
-    delete m_device_manager;
-    delete m_interconnect_config;
-    delete m_vision_config;
-    delete m_base_cyclic;
-    
-    delete m_tcp_session_manager;
-	delete m_udp_session_manager;
+
+    if (!m_is_real_robot)
+    {
+
+        delete m_action_server_follow_joint_trajectory;
+        if (m_action_server_gripper_command)
+        {
+            delete m_action_server_gripper_command;
+        }
+
+        delete m_topic_subscribers;
+
+        m_tcp_session_manager->CloseSession();
+        m_udp_session_manager->CloseSession();
+        m_tcp_router->SetActivationStatus(false);
+        m_udp_router->SetActivationStatus(false);
+        m_tcp_transport->disconnect();
+        m_udp_transport->disconnect();
         
-    delete m_tcp_router;
-    delete m_udp_router;
-    delete m_tcp_transport;
-    delete m_udp_transport;
+        delete m_actuator_config;
+        delete m_base;
+        delete m_control_config;
+        delete m_device_config;
+        delete m_device_manager;
+        delete m_interconnect_config;
+        delete m_vision_config;
+        delete m_base_cyclic;
+        
+        delete m_tcp_session_manager;
+        delete m_udp_session_manager;
+            
+        delete m_tcp_router;
+        delete m_udp_router;
+        delete m_tcp_transport;
+        delete m_udp_transport;
+    }
 }
 
 void KortexArmDriver::parseRosArguments()
 {
-    bool use_sim_time = false;
-    if (ros::param::get("/use_sim_time", use_sim_time))
+    bool sim;
+    if (!ros::param::get("~sim", sim))
     {
-        if (use_sim_time)
+        std::string error_string = "Simulation was not specified in the launch file, shutting down the node...";
+        ROS_ERROR("%s", error_string.c_str());
+        throw new std::runtime_error(error_string);
+    }
+    m_is_real_robot = !sim;
+
+    // Some parameters are only necessary with a real robot
+    if (m_is_real_robot)
+    {
+        bool use_sim_time = false;
+        if (ros::param::get("/use_sim_time", use_sim_time))
         {
-            std::string error_string = "ROS parameter /use_sim_time is true : you may experience problems and you should set it to false and restart the driver.";
-            ROS_WARN("%s", error_string.c_str());
+            if (use_sim_time)
+            {
+                std::string error_string = "ROS parameter /use_sim_time is true : you may experience problems and you should set it to false and restart the driver.";
+                ROS_WARN("%s", error_string.c_str());
+            }
+        }
+
+        if (!ros::param::get("~ip_address", m_ip_address))
+        {
+            std::string error_string = "IP address of the robot was not specified in the launch file, shutting down the node...";
+            ROS_ERROR("%s", error_string.c_str());
+            throw new std::runtime_error(error_string);
+        }
+
+        if (!ros::param::get("~username", m_username))
+        {
+            std::string error_string = "Username for the robot session was not specified in the launch file, shutting down the node...";
+            ROS_ERROR("%s", error_string.c_str());
+            throw new std::runtime_error(error_string);
+        }
+
+        if (!ros::param::get("~password", m_password))
+        {
+            std::string error_string = "Password for the robot session was not specified in the launch file, shutting down the node...";
+            ROS_ERROR("%s", error_string.c_str());
+            throw new std::runtime_error(error_string);
+        }
+
+        if (!ros::param::get("~use_hard_limits", m_use_hard_limits))
+        {
+            std::string error_string = "Usage of hard limits as soft was not specified in the launch file, shutting down the node...";
+            ROS_ERROR("%s", error_string.c_str());
+            throw new std::runtime_error(error_string);
+        }
+
+        if (!ros::param::get("~api_rpc_timeout_ms", m_api_rpc_timeout_ms))
+        {
+            std::string error_string = "API RPC timeout duration was not specified in the launch file, shutting down the node...";
+            ROS_ERROR("%s", error_string.c_str());
+            throw new std::runtime_error(error_string);
+        }
+
+        if (!ros::param::get("~api_session_inactivity_timeout_ms", m_api_session_inactivity_timeout_ms))
+        {
+            std::string error_string = "API session inactivity timeout duration was not specified in the launch file, shutting down the node...";
+            ROS_ERROR("%s", error_string.c_str());
+            throw new std::runtime_error(error_string);
+        }
+        
+        if (!ros::param::get("~api_connection_inactivity_timeout_ms", m_api_connection_inactivity_timeout_ms))
+        {
+            std::string error_string = "API connection inactivity timeout duration was not specified in the launch file, shutting down the node...";
+            ROS_ERROR("%s", error_string.c_str());
+            throw new std::runtime_error(error_string);
         }
     }
-
-    if (!ros::param::get("~ip_address", m_ip_address))
-    {
-        std::string error_string = "IP address of the robot was not specified in the launch file, shutting down the node...";
-        ROS_ERROR("%s", error_string.c_str());
-        throw new std::runtime_error(error_string);
-    }
-
-    if (!ros::param::get("~username", m_username))
-    {
-        std::string error_string = "Username for the robot session was not specified in the launch file, shutting down the node...";
-        ROS_ERROR("%s", error_string.c_str());
-        throw new std::runtime_error(error_string);
-    }
-
-    if (!ros::param::get("~password", m_password))
-    {
-        std::string error_string = "Password for the robot session was not specified in the launch file, shutting down the node...";
-        ROS_ERROR("%s", error_string.c_str());
-        throw new std::runtime_error(error_string);
-    }
-
-    if (!ros::param::get("~use_hard_limits", m_use_hard_limits))
-    {
-        std::string error_string = "Usage of hard limits as soft was not specified in the launch file, shutting down the node...";
-        ROS_ERROR("%s", error_string.c_str());
-        throw new std::runtime_error(error_string);
-    }
+    
 
     if (!ros::param::get("~cyclic_data_publish_rate", m_cyclic_data_publish_rate))
     {
@@ -138,27 +202,6 @@ void KortexArmDriver::parseRosArguments()
         throw new std::runtime_error(error_string);
     }
 
-    if (!ros::param::get("~api_rpc_timeout_ms", m_api_rpc_timeout_ms))
-    {
-        std::string error_string = "API RPC timeout duration was not specified in the launch file, shutting down the node...";
-        ROS_ERROR("%s", error_string.c_str());
-        throw new std::runtime_error(error_string);
-    }
-
-    if (!ros::param::get("~api_session_inactivity_timeout_ms", m_api_session_inactivity_timeout_ms))
-    {
-        std::string error_string = "API session inactivity timeout duration was not specified in the launch file, shutting down the node...";
-        ROS_ERROR("%s", error_string.c_str());
-        throw new std::runtime_error(error_string);
-    }
-    
-    if (!ros::param::get("~api_connection_inactivity_timeout_ms", m_api_connection_inactivity_timeout_ms))
-    {
-        std::string error_string = "API connection inactivity timeout duration was not specified in the launch file, shutting down the node...";
-        ROS_ERROR("%s", error_string.c_str());
-        throw new std::runtime_error(error_string);
-    }
-    
     if (!ros::param::get("~arm", m_arm_name))
     {
         std::string error_string = "Arm name was not specified in the launch file, shutting down the node...";
@@ -183,6 +226,13 @@ void KortexArmDriver::parseRosArguments()
     if (!ros::param::get("~gripper", m_gripper_name))
     {
         std::string error_string = "Gripper name was not specified in the launch file, shutting down the node...";
+        ROS_ERROR("%s", error_string.c_str());
+        throw new std::runtime_error(error_string);
+    }
+    std::string robot_name;
+    if (!ros::param::get("~robot_name", robot_name))
+    {
+        std::string error_string = "Robot name was not specified in the launch file, shutting down the node...";
         ROS_ERROR("%s", error_string.c_str());
         throw new std::runtime_error(error_string);
     }
@@ -364,11 +414,7 @@ void KortexArmDriver::verifyProductConfiguration()
     ROS_INFO("-------------------------------------------------");
     ROS_INFO("Scanning all devices in robot... ");
 
-    // We suppose we don't have an interconnect or a vision module until we find it
-    m_is_interconnect_module_present = false;
-    m_is_vision_module_present = false;
-
-    // Loop through the devices to find the device ID's
+// Loop through the devices to find the device ID's
     auto devices = m_device_manager->ReadAllDevices();
     for (auto device : devices.device_handle())
     {
@@ -415,26 +461,53 @@ void KortexArmDriver::initRosServices()
 {
     ROS_INFO("-------------------------------------------------");
     ROS_INFO("Initializing Kortex Driver's services...");
-    m_actuator_config_ros_services = new ActuatorConfigServices(m_node_handle, m_actuator_config, 0, m_api_rpc_timeout_ms);
-    m_base_ros_services = new BaseServices(m_node_handle, m_base, 0, m_api_rpc_timeout_ms);
-    m_control_config_ros_services = new ControlConfigServices(m_node_handle, m_control_config, 0, m_api_rpc_timeout_ms);
-    m_device_config_ros_services = new DeviceConfigServices(m_node_handle, m_device_config, 0, m_api_rpc_timeout_ms);
-    m_device_manager_ros_services = new DeviceManagerServices(m_node_handle, m_device_manager, 0, m_api_rpc_timeout_ms);
-    if (m_is_interconnect_module_present)
+    if (m_is_real_robot)
     {
-        m_interconnect_config_ros_services = new InterconnectConfigServices(m_node_handle, m_interconnect_config, m_interconnect_device_id, m_api_rpc_timeout_ms);
-    }
-    else 
-    {
-        m_interconnect_config_ros_services = nullptr;
-    }
-    if (m_is_vision_module_present)
-    {
-        m_vision_config_ros_services = new VisionConfigServices(m_node_handle, m_vision_config, m_vision_device_id, m_api_rpc_timeout_ms);
+        m_actuator_config_ros_services = new ActuatorConfigRobotServices(m_node_handle, m_actuator_config, 0, m_api_rpc_timeout_ms);
+        m_base_ros_services = new BaseRobotServices(m_node_handle, m_base, 0, m_api_rpc_timeout_ms);
+        m_control_config_ros_services = new ControlConfigRobotServices(m_node_handle, m_control_config, 0, m_api_rpc_timeout_ms);
+        m_device_config_ros_services = new DeviceConfigRobotServices(m_node_handle, m_device_config, 0, m_api_rpc_timeout_ms);
+        m_device_manager_ros_services = new DeviceManagerRobotServices(m_node_handle, m_device_manager, 0, m_api_rpc_timeout_ms);
+        if (m_is_interconnect_module_present)
+        {
+            m_interconnect_config_ros_services = new InterconnectConfigRobotServices(m_node_handle, m_interconnect_config, m_interconnect_device_id, m_api_rpc_timeout_ms);
+        }
+        else 
+        {
+            m_interconnect_config_ros_services = nullptr;
+        }
+        if (m_is_vision_module_present)
+        {
+            m_vision_config_ros_services = new VisionConfigRobotServices(m_node_handle, m_vision_config, m_vision_device_id, m_api_rpc_timeout_ms);
+        }
+        else
+        {
+            m_vision_config_ros_services = nullptr;
+        }
     }
     else
     {
-        m_vision_config_ros_services = nullptr;
+        m_actuator_config_ros_services = new ActuatorConfigSimulationServices(m_node_handle);
+        m_base_ros_services = new BaseSimulationServices(m_node_handle);
+        m_control_config_ros_services = new ControlConfigSimulationServices(m_node_handle);
+        m_device_config_ros_services = new DeviceConfigSimulationServices(m_node_handle);
+        m_device_manager_ros_services = new DeviceManagerSimulationServices(m_node_handle);
+        if (m_is_interconnect_module_present)
+        {
+            m_interconnect_config_ros_services = new InterconnectConfigSimulationServices(m_node_handle);
+        }
+        else 
+        {
+            m_interconnect_config_ros_services = nullptr;
+        }
+        if (m_is_vision_module_present)
+        {
+            m_vision_config_ros_services = new VisionConfigSimulationServices(m_node_handle);
+        }
+        else
+        {
+            m_vision_config_ros_services = nullptr;
+        }
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     ROS_INFO("Kortex Driver's services initialized correctly.");
@@ -492,7 +565,7 @@ void KortexArmDriver::setAngularTrajectorySoftLimitsToMax()
     }
 }
 
-void KortexArmDriver::publishFeedback()
+void KortexArmDriver::publishRobotFeedback()
 {
 
     Kinova::Api::BaseCyclic::Feedback feedback_from_api;
@@ -568,4 +641,45 @@ void KortexArmDriver::publishFeedback()
 
         rate.sleep();
     }
+}
+
+void KortexArmDriver::publishSimulationFeedback()
+{
+    ros::Rate rate(m_cyclic_data_publish_rate);
+    while (m_node_is_running)
+    {
+        m_pub_base_feedback.publish(m_simulator->GetFeedback());
+        rate.sleep();
+    }
+}
+
+void KortexArmDriver::registerSimulationHandlers()
+{
+    BaseSimulationServices* base_services_simulation = dynamic_cast<BaseSimulationServices*>(m_base_ros_services);
+    // Link the m_simulator handlers to the ROS services callbacks
+    // Action services
+    base_services_simulation->CreateActionHandler = std::bind(&KortexArmSimulation::CreateAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ReadActionHandler = std::bind(&KortexArmSimulation::ReadAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ReadAllActionsHandler = std::bind(&KortexArmSimulation::ReadAllActions, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->DeleteActionHandler = std::bind(&KortexArmSimulation::DeleteAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->UpdateActionHandler = std::bind(&KortexArmSimulation::UpdateAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ExecuteActionFromReferenceHandler = std::bind(&KortexArmSimulation::ExecuteActionFromReference, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ExecuteActionHandler = std::bind(&KortexArmSimulation::ExecuteAction, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->StopActionHandler = std::bind(&KortexArmSimulation::StopAction, m_simulator.get(), std::placeholders::_1);
+    // Other services
+    base_services_simulation->PlayCartesianTrajectoryHandler = std::bind(&KortexArmSimulation::PlayCartesianTrajectory, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->PlayJointTrajectoryHandler = std::bind(&KortexArmSimulation::PlayJointTrajectory, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->SendJointSpeedsCommandHandler = std::bind(&KortexArmSimulation::SendJointSpeedsCommand, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->SendGripperCommandHandler = std::bind(&KortexArmSimulation::SendGripperCommand, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->StopHandler = std::bind(&KortexArmSimulation::Stop, m_simulator.get(), std::placeholders::_1);
+    base_services_simulation->ApplyEmergencyStopHandler = std::bind(&KortexArmSimulation::ApplyEmergencyStop, m_simulator.get(), std::placeholders::_1);
+
+    // Uncomment this SendTwistCommand handler to use the twist command simulation - not stable
+    // base_services_simulation->SendTwistCommandHandler = std::bind(&KortexArmSimulation::SendTwistCommand, m_simulator.get(), std::placeholders::_1);
+
+    // Prospects
+    //SendSelectedJointSpeedCommand
+    //PlaySelectedJointTrajectory
+    //PlayCartesianTrajectoryPosition
+    //PlayCartesianTrajectoryOrientation
 }

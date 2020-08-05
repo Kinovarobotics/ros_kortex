@@ -60,7 +60,7 @@
     <!-- Load arms descriptions -->
    <param 
         name="robot_description" 
-        command="$(find xacro)/xacro --inorder $(find kortex_description)/multiple_robots/kortex_dual_robots.xacro 
+        command="$(find xacro)/xacro $(find kortex_description)/multiple_robots/kortex_dual_robots.xacro 
             left_arm:=$(arg left_arm) 
             left_gripper:=$(arg left_gripper)
             left_dof:=$(arg left_dof)
@@ -90,9 +90,10 @@
         <param name="gripper" value="$(arg left_gripper)"/>
         <param name="dof" value="$(arg left_dof)"/>
         <param name="prefix" value="$(arg left_prefix)"/>
-        <rosparam command="load" file="$(find kortex_description)/arms/$(arg left_arm)/$(arg left_dof)dof/config/joint_limits.yaml"/>
+        <param name="robot_name" value="$(arg left_robot_name)"/>
+        <rosparam command="load" file="$(find kortex_description)/arms/$(arg left_arm)/$(arg left_dof)dof/config/joint_limits.yaml" subst_value="true"/>
         <!-- If there is a gripper, load the active joint names for it -->
-        <rosparam command="load" file="$(find kortex_description)/grippers/$(arg left_gripper)/config/joint_limits.yaml" unless="$(eval not arg('left_gripper'))"/>
+        <rosparam command="load" file="$(find kortex_description)/grippers/$(arg left_gripper)/config/joint_limits.yaml" unless="$(eval not arg('left_gripper'))" subst_value="true"/>
     </node>
     <!-- Start the right arm kortex_driver node -->
     <node name="$(arg right_robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver" output="screen" ns="$(arg right_robot_name)"> launch-prefix="gdb -ex run args"
@@ -109,9 +110,10 @@
         <param name="gripper" value="$(arg right_gripper)"/>
         <param name="dof" value="$(arg right_dof)"/>
         <param name="prefix" value="$(arg right_prefix)"/>
-        <rosparam command="load" file="$(find kortex_description)/arms/$(arg right_arm)/$(arg right_dof)dof/config/joint_limits.yaml"/>
+        <param name="robot_name" value="$(arg right_robot_name)"/>
+        <rosparam command="load" file="$(find kortex_description)/arms/$(arg right_arm)/$(arg right_dof)dof/config/joint_limits.yaml" subst_value="true"/>
         <!-- If there is a gripper, load the active joint names for it -->
-        <rosparam command="load" file="$(find kortex_description)/grippers/$(arg right_gripper)/config/joint_limits.yaml" unless="$(eval not arg('right_gripper'))"/>
+        <rosparam command="load" file="$(find kortex_description)/grippers/$(arg right_gripper)/config/joint_limits.yaml" unless="$(eval not arg('right_gripper'))" subst_value="true"/>
     </node>
 
     <!-- Start joint and robot state publisher -->

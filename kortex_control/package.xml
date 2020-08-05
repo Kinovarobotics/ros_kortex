@@ -1,12 +1,12 @@
 <package>
   <name>kortex_control</name>
-  <version>2.2.0</version>
+  <version>2.2.2</version>
   <description>
-    <p>Gazebo Ros Control package for Kortex robots</p>
-    <p>This package contains launch and configuration files for the ros_control controllers for simulation</p>
+    <p>Gazebo ROS Control package for simulated Kortex robots</p>
+    <p>This package contains configuration files for the gazebo_ros_control controllers for simulation of Kortex arms</p>
   </description>
   <author email="avannobel@kinova.ca">Alexandre Vannobel</author>
-  <maintainer email="support@kinova.ca" />
+  <maintainer email="avannobel@kinova.ca" />
   <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roslaunch</build_depend>

@@ -35,19 +35,28 @@
 #include "kortex_driver/non-generated/kortex_math_util.h"
 
 #include "kortex_driver/BaseCyclic_Feedback.h"
-#include "kortex_driver/generated/basecyclic_ros_converter.h"
+#include "kortex_driver/generated/robot/basecyclic_ros_converter.h"
 
-#include "kortex_driver/generated/actuatorconfig_services.h"
-#include "kortex_driver/generated/base_services.h"
-#include "kortex_driver/generated/deviceconfig_services.h"
-#include "kortex_driver/generated/devicemanager_services.h"
-#include "kortex_driver/generated/interconnectconfig_services.h"
-#include "kortex_driver/generated/visionconfig_services.h"
-#include "kortex_driver/generated/controlconfig_services.h"
+#include "kortex_driver/generated/robot/actuatorconfig_services.h"
+#include "kortex_driver/generated/robot/base_services.h"
+#include "kortex_driver/generated/robot/deviceconfig_services.h"
+#include "kortex_driver/generated/robot/devicemanager_services.h"
+#include "kortex_driver/generated/robot/interconnectconfig_services.h"
+#include "kortex_driver/generated/robot/visionconfig_services.h"
+#include "kortex_driver/generated/robot/controlconfig_services.h"
+
+#include "kortex_driver/generated/simulation/actuatorconfig_services.h"
+#include "kortex_driver/generated/simulation/base_services.h"
+#include "kortex_driver/generated/simulation/deviceconfig_services.h"
+#include "kortex_driver/generated/simulation/devicemanager_services.h"
+#include "kortex_driver/generated/simulation/interconnectconfig_services.h"
+#include "kortex_driver/generated/simulation/visionconfig_services.h"
+#include "kortex_driver/generated/simulation/controlconfig_services.h"
 
 #include "kortex_driver/non-generated/pre_computed_joint_trajectory_action_server.h"
 #include "kortex_driver/non-generated/robotiq_gripper_command_action_server.h"
 #include "kortex_driver/non-generated/kortex_subscribers.h"
+#include "kortex_driver/non-generated/kortex_arm_simulation.h"
 
 #define TCP_PORT 10000
 #define UDP_PORT 10001
@@ -74,6 +83,10 @@ class KortexArmDriver
   private:
 
     ros::NodeHandle m_node_handle;
+
+    // False if in simulation
+    bool m_is_real_robot;
+    std::unique_ptr<KortexArmSimulation> m_simulator;
 
     // Api options
     std::string m_ip_address;
@@ -122,13 +135,13 @@ class KortexArmDriver
     Kinova::Api::SessionManager*                                m_udp_session_manager;
 
     // ROS ServiceProxy's
-    ActuatorConfigServices*     m_actuator_config_ros_services;
-    BaseServices*               m_base_ros_services;
-    ControlConfigServices*      m_control_config_ros_services;
-    DeviceConfigServices*       m_device_config_ros_services;
-    DeviceManagerServices*      m_device_manager_ros_services;
-    InterconnectConfigServices* m_interconnect_config_ros_services;
-    VisionConfigServices*       m_vision_config_ros_services;
+    IActuatorConfigServices*     m_actuator_config_ros_services;
+    IBaseServices*               m_base_ros_services;
+    IControlConfigServices*      m_control_config_ros_services;
+    IDeviceConfigServices*       m_device_config_ros_services;
+    IDeviceManagerServices*      m_device_manager_ros_services;
+    IInterconnectConfigServices* m_interconnect_config_ros_services;
+    IVisionConfigServices*       m_vision_config_ros_services;
 
     // Action servers
     PreComputedJointTrajectoryActionServer* m_action_server_follow_joint_trajectory;
@@ -149,7 +162,9 @@ class KortexArmDriver
     // Private methods
     bool isGripperPresent();
     void setAngularTrajectorySoftLimitsToMax();
-    void publishFeedback();
+    void publishRobotFeedback();
+    void publishSimulationFeedback();
+    void registerSimulationHandlers();
 };
 
 #endif

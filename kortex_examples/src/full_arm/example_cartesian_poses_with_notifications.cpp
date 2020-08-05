@@ -25,65 +25,40 @@
 #include <kortex_driver/GripperMode.h>
 #include <kortex_driver/ActionNotification.h>
 #include <kortex_driver/ActionEvent.h>
+#include <kortex_driver/ActionType.h>
 #include <kortex_driver/GetMeasuredCartesianPose.h>
 #include <kortex_driver/OnNotificationActionTopic.h>
 
 #define HOME_ACTION_IDENTIFIER 2
 
-bool Pose1Done = false;
-bool Pose2Done = false;
-bool Pose3Done = false;
-
 bool all_notifs_succeeded = true;
 
-//Callback that is called when the robot publish a ActionNotification
-void notification_callback(const kortex_driver::ActionNotification::ConstPtr& notif)
+std::atomic<int> last_action_notification_event{0};
+std::atomic<int> last_action_notification_id{0};
+
+void notification_callback(const kortex_driver::ActionNotification& notif)
 {
-  switch(notif->action_event)
+  last_action_notification_event = notif.action_event;
+  last_action_notification_id = notif.handle.identifier;
+}
+
+bool wait_for_action_end_or_abort()
+{
+  while (ros::ok())
   {
-    //This event is published when an action has ended or was aborted
-    case kortex_driver::ActionEvent::ACTION_END:
+    if (last_action_notification_event.load() == kortex_driver::ActionEvent::ACTION_END)
     {
-      if(notif->handle.identifier == 1001)
-      {
-        Pose1Done = true;
-      }
-
-      if(notif->handle.identifier == 1002)
-      {
-        Pose2Done = true;
-      }
-
-      if(notif->handle.identifier == 1003)
-      {
-        Pose3Done = true;
-      }
-      break;
+      ROS_INFO("Received ACTION_END notification for action %d", last_action_notification_id.load());
+      return true;
     }
-    case kortex_driver::ActionEvent::ACTION_ABORT:
+    else if (last_action_notification_event.load() == kortex_driver::ActionEvent::ACTION_ABORT)
     {
-      ROS_ERROR("Action was aborted!");
+      ROS_INFO("Received ACTION_ABORT notification for action %d", last_action_notification_id.load());
       all_notifs_succeeded = false;
-      if(notif->handle.identifier == 1001)
-      {
-        Pose1Done = true;
-      }
-
-      if(notif->handle.identifier == 1002)
-      {
-        Pose2Done = true;
-      }
-
-      if(notif->handle.identifier == 1003)
-      {
-        Pose3Done = true;
-      }
-      break;
+      return false;
     }
-    default:
-      break;
+    ros::spinOnce();
   }
-  
 }
 
 bool example_home_the_robot(ros::NodeHandle n, std::string robot_name)
@@ -118,7 +93,7 @@ bool example_home_the_robot(ros::NodeHandle n, std::string robot_name)
     return false;
   }
 
-  return true;
+  return wait_for_action_end_or_abort();
 }
 
 bool example_cartesian_action(ros::NodeHandle n, std::string robot_name)
@@ -126,7 +101,7 @@ bool example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   ros::ServiceClient service_client_activate_notif = n.serviceClient<kortex_driver::OnNotificationActionTopic>("/" + robot_name + "/base/activate_publishing_of_action_topic");
   kortex_driver::OnNotificationActionTopic service_activate_notif;
 
-  //We need to call this service to activate the Action Notification on the kortex_driver node.
+  // We need to call this service to activate the Action Notification on the kortex_driver node.
   if (service_client_activate_notif.call(service_activate_notif))
   {
     ROS_INFO("Action notification activated!");
@@ -161,7 +136,9 @@ bool example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   service_execute_action.request.input.oneof_action_parameters.reach_pose.push_back(my_constrained_pose);
   service_execute_action.request.input.name = "pose1";
   service_execute_action.request.input.handle.identifier = 1001;
+  service_execute_action.request.input.handle.action_type = kortex_driver::ActionType::REACH_POSE;
   
+  last_action_notification_event = 0;
   if (service_client_execute_action.call(service_execute_action))
   {
     ROS_INFO("Pose 1 was sent to the robot.");
@@ -174,10 +151,7 @@ bool example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   }
 
   // Waiting for the pose 1 to end
-  while(!Pose1Done)
-  {
-    ros::spinOnce();
-  }
+  wait_for_action_end_or_abort();
 
   // Change the pose and give it a new identifier
   service_execute_action.request.input.handle.identifier = 1002;
@@ -188,6 +162,7 @@ bool example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   service_execute_action.request.input.oneof_action_parameters.reach_pose.clear();
   service_execute_action.request.input.oneof_action_parameters.reach_pose.push_back(my_constrained_pose);
 
+  last_action_notification_event = 0;
   if (service_client_execute_action.call(service_execute_action))
   {
     ROS_INFO("Pose 2 was sent to the robot.");
@@ -199,11 +174,8 @@ bool example_cartesian_action(ros::NodeHandle n, std::string robot_name)
     return false;
   }
 
-  //Waiting for the pose 2 to end.
-  while(!Pose2Done)
-  {
-    ros::spinOnce();
-  }
+  // Waiting for the pose 2 to end.
+  wait_for_action_end_or_abort();
 
   // Change the pose and give it a new identifier
   service_execute_action.request.input.handle.identifier = 1003;
@@ -214,6 +186,7 @@ bool example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   service_execute_action.request.input.oneof_action_parameters.reach_pose.clear();
   service_execute_action.request.input.oneof_action_parameters.reach_pose.push_back(my_constrained_pose);
 
+  last_action_notification_event = 0;
   if (service_client_execute_action.call(service_execute_action))
   {
     ROS_INFO("Pose 3 was sent to the robot.");
@@ -226,10 +199,7 @@ bool example_cartesian_action(ros::NodeHandle n, std::string robot_name)
   }
 
   // Waiting for the pose 3 to end
-  while(!Pose3Done)
-  {
-    ros::spinOnce();
-  }
+  wait_for_action_end_or_abort();
 
   return true;
 }
@@ -289,7 +259,6 @@ int main(int argc, char **argv)
   success &= example_set_cartesian_reference_frame(n, robot_name);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   success &= example_home_the_robot(n, robot_name);
-  std::this_thread::sleep_for(std::chrono::milliseconds(10000));
   success &= example_cartesian_action(n, robot_name);
   success &= all_notifs_succeeded;
 
@@ -297,6 +266,4 @@ int main(int argc, char **argv)
   ros::param::set("/kortex_examples_test_results/cartesian_poses_with_notifications_cpp", success);
   
   return success ? 0 : 1;
-
-  return 0;
 }

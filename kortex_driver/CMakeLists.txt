@@ -17,10 +17,10 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 ## find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation actionlib control_msgs urdf)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs controller_manager_msgs message_generation actionlib control_msgs urdf moveit_ros_planning_interface)
 find_package(Boost REQUIRED COMPONENTS system)
 
-file(GLOB_RECURSE generated_files RELATIVE ${PROJECT_SOURCE_DIR} "src/generated/*.cpp")
+file(GLOB_RECURSE generated_files RELATIVE ${PROJECT_SOURCE_DIR} "src/generated/robot/*.cpp" "src/generated/simulation/*.cpp")
 file(GLOB_RECURSE non_generated_files RELATIVE ${PROJECT_SOURCE_DIR} "src/non-generated/driver/*.cpp")
 file(GLOB_RECURSE test_files RELATIVE ${PROJECT_SOURCE_DIR} "src/non-generated/tests/*.cc")
 

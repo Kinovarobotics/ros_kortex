@@ -2,6 +2,7 @@
 
   <!-- OMPL Plugin for MoveIt! -->
   <arg name="planning_plugin" value="ompl_interface/OMPLPlanner" />
+  <arg name="prefix" default=""/>
 
   <!-- The request adapters (plugins) used when planning with OMPL.
        ORDER MATTERS -->
@@ -21,6 +22,6 @@
   <!-- PreComputedJointTrajectory Action Server needs 1msec timesteps between waypoints  -->
   <param name="sample_duration" value="0.001"/>
 
-  <rosparam command="load" file="$(find gen3_move_it_config)/config/ompl_planning.yaml"/>
+  <rosparam command="load" file="$(find gen3_move_it_config)/config/ompl_planning.yaml" subst_value="true"/>
 
 </launch>

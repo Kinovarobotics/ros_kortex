@@ -14,10 +14,10 @@
 
     <!-- Load the description for the robot -->
     <!-- Without gripper -->
-    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true"
+    <param name="robot_description" command="$(find xacro)/xacro $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true"
         if="$(eval not arg('gripper'))"/>
     <!-- With gripper -->
-    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true"
+    <param name="robot_description" command="$(find xacro)/xacro $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true"
         unless="$(eval not arg('gripper'))"/>
 
     <!-- Joint state publisher and robot state publisher -->

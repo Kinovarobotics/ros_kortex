@@ -228,11 +228,11 @@
       <axis xyz="0 0 1" />
       <limit effort="9" velocity="1.2218" />
     </joint>
-    <link name="end_effector_link" />
+    <link name="${prefix}end_effector_link" />
     <joint
       name="${prefix}end_effector"
       type="fixed">
-      <origin xyz="0 0 -0.0615250000000001" rpy="3.14159265358979 1.09937075168372E-32 0" />
+      <origin xyz="0 0 -0.0615250000000001" rpy="3.14159265358979 1.09937075168372E-32 3.14159265358979" />
       <parent
         link="${prefix}bracelet_link" />
       <child

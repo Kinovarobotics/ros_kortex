@@ -4,9 +4,13 @@
   <arg name="dof" default="7"/>
   <arg name="use_hard_limits" default="false"/>
 
+  <!-- The joint and link names prefix used in kortex_description -->
+  <arg name="prefix" default=""/>
+
   <include file="$(find gen3_robotiq_2f_85_move_it_config)/launch/planning_context.launch">
     <arg name="dof" value="$(arg dof)"/>
     <arg name="use_hard_limits" value="$(arg use_hard_limits)"/>
+    <arg name="prefix" value="$(arg prefix)"/>
   </include>
 
   <!-- GDB Debug Option -->
@@ -48,6 +52,7 @@
   <!-- Planning Functionality -->
   <include ns="move_group" file="$(find gen3_robotiq_2f_85_move_it_config)/launch/planning_pipeline.launch.xml">
     <arg name="pipeline" value="ompl" />
+    <arg name="prefix" value="$(arg prefix)"/>
   </include>
 
   <!-- Trajectory Execution Functionality -->
@@ -56,6 +61,7 @@
     <arg name="moveit_manage_controllers" value="true" />
     <arg name="moveit_controller_manager" value="gen3_robotiq_2f_85" unless="$(arg fake_execution)"/>
     <arg name="moveit_controller_manager" value="fake" if="$(arg fake_execution)"/>
+    <arg name="prefix" value="$(arg prefix)"/>
   </include>
 
   <!-- Sensors Functionality -->
