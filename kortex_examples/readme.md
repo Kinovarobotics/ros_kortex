@@ -56,6 +56,8 @@ There are a couple ways to use a Kortex arm with ROS, may it be in simulation or
     - ApplyEmergencyStop and Stop (to stop the robot)
     - The Actions interface (ExecuteAction, ExecuteActionFromReference, CreateAction, DeleteAction, UpdateAction, StopAction).
 
+    It is also important to note that IK solutions for real arms and simulated arms may vary, as KDL is used in simulation and our own kinematics library is used in the arm's firmware.  
+
     The simulated SendTwistCommand service has a POC implementation, we decided it is not stable enough to be activated by default. You can uncomment the kortex_arm_driver.cpp simulation handler to re-enable it and try it yourself. The same goes for the Cartesian velocity topic.
 
     There is no plan to add more simulated services for now, but any user can write his own implementation of a Kortex ROS Service and enable the handler for it (let's say you want to simulate an Interconnect Expansion GPIO device, or a Vision device). The kortex_arm_driver.cpp file should provide all guidelines as to how to define your handler, and you are welcome to open an issue if you want more information on simulation handlers.
@@ -83,13 +85,13 @@ There are a couple ways to use a Kortex arm with ROS, may it be in simulation or
 
 The examples look for advertised services in the **my_gen3** namespace by default and configures the first actuator.
 
-To run the C++ example: `rosrun kortex_examples example_actuator_configuration_cpp`
+To run the C++ example: `roslaunch kortex_examples actuator_config_cpp.launch`
 
-To run the Python example: `rosrun kortex_examples example_actuator_configuration.py`
+To run the Python example: `roslaunch kortex_examples actuator_config_python.launch`
 
 If you started the `kortex_driver` node in another namespace (not **my_gen3**) or if you want to test the example on another actuator than the first one, you will have to supply node parameters in the command line (the syntax doesn't change if you run the C++ or Python example): 
 
-`rosrun kortex_examples example_actuator_configuration_cpp _robot_name:=<your_robot_name> _device_id:=<your_device_id>`
+`roslaunch kortex_examples actuator_config_cpp.launch robot_name:=<your_robot_name> device_id:=<your_device_id>`
 
 <a id="full_arm"></a>
 ## Full arm examples
@@ -99,21 +101,21 @@ The examples look for advertised services in the **my_gen3** namespace by defaul
 
 - **Simple movement example**:
 
-    - To run the C++ example: `rosrun kortex_examples example_full_arm_movement_cpp`
-    - To run the Python example: `rosrun kortex_examples example_full_arm_movement.py`
+    - To run the C++ example: `roslaunch kortex_examples full_arm_movement_cpp.launch`
+    - To run the Python example: `roslaunch kortex_examples full_arm_movement_python.launch`
     
     If you started the `kortex_driver` node in another namespace (not **my_gen3**), you will have to supply the node a parameter in the command line (the syntax doesn't change if you run the C++ or Python example) : 
     
-    `rosrun kortex_examples example_full_arm_movement_cpp _robot_name:=<your_robot_name>`
+    `roslaunch kortex_examples full_arm_movement_cpp.launch robot_name:=<your_robot_name>`
 
 - **Cartesian poses with notifications**:
 
-    - To run the C++ example: `rosrun kortex_examples example_cartesian_poses_with_notifications_cpp`
-    - To run the Python example: `rosrun kortex_examples example_cartesian_poses_with_notifications.py`
+    - To run the C++ example: `roslaunch kortex_examples cartesian_poses_with_notifications_cpp.launch`
+    - To run the Python example: `roslaunch kortex_examples cartesian_poses_with_notifications_python.launch`
     
     If you started the `kortex_driver` node in another namespace (not **my_gen3**), you will have to supply the node a parameter in the command line (the syntax doesn't change if you run the C++ or Python example) : 
     
-    `rosrun kortex_examples example_cartesian_poses_with_notifications_cpp _robot_name:=<your_robot_name>`
+    `roslaunch kortex_examples cartesian_poses_with_notifications_cpp.launch robot_name:=<your_robot_name>`
 
 <a id="vision_config"></a>
 ## Vision module configuration examples
@@ -121,13 +123,13 @@ The examples look for advertised services in the **my_gen3** namespace by defaul
 
 The examples look for advertised services in the **my_gen3** namespace by default.
 
-To run the C++ example: `rosrun kortex_examples example_vision_configuration_cpp`
+To run the C++ example: `roslaunch kortex_examples vision_configuration_cpp.launch`
 
-To run the Python example: `rosrun kortex_examples example_vision_configuration.py`
+To run the Python example: `roslaunch kortex_examples vision_configuration_python.launch`
 
 If you started the `kortex_driver` node in another namespace (not **my_gen3**), you will have to supply the node a parameter in the command line (the syntax doesn't change if you run the C++ or Python example) : 
 
-`rosrun kortex_examples example_vision_configuration_cpp _robot_name:=<your_robot_name>`
+`roslaunch kortex_examples vision_configuration_cpp.launch robot_name:=<your_robot_name>`
 
 <a id="move_it"></a>
 ## MoveIt! example

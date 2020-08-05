@@ -80,6 +80,8 @@ You can also have a look at the [roslaunch documentation](http://wiki.ros.org/ro
 
 If everything goes well, you will see a "**The Kortex driver has been initialized correctly!**" message. If you also start MoveIt!, the `kortex_driver` output may be flooded in the `move_group` output, so pay attention to the warning and error messages! If the node fails to start for any reason, you will get an error message followed by a "**process has died**" message.
 
+You will read below about the topics and services the driver offers. To read more about how to use those tools, [go to the kortex_examples documentation](../kortex_examples/readme.md). 
+
 <a id="topics"></a>
 ## Topics
 
