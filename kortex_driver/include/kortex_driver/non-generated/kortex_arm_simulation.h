@@ -15,10 +15,11 @@
 
 // ROS
 #include <ros/ros.h>
+#include <std_msgs/Empty.h>
 #include <control_msgs/JointTrajectoryControllerState.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <control_msgs/GripperCommandAction.h>
-#include <actionlib/client/simple_action_client.h>
+#include <actionlib/client/action_client.h>
 
 // MoveIt
 #include <moveit/move_group_interface/move_group_interface.h>
@@ -62,6 +63,12 @@
 #include "kortex_driver/SendGripperCommand.h"
 #include "kortex_driver/ApplyEmergencyStop.h"
 
+enum class ControllerType
+{
+  kTrajectory, // this is for the JointTrajectoryController
+  kIndividual  // this is for the individual JointPositionController's
+};
+
 class KortexArmSimulation
 {
   public:
@@ -98,10 +105,24 @@ class KortexArmSimulation
 
     // Publishers
     ros::Publisher m_pub_action_topic;
+    std::vector<ros::Publisher> m_pub_position_controllers;
 
     // Subscribers
     ros::Subscriber m_sub_joint_trajectory_controller_state;
     ros::Subscriber m_sub_joint_state;
+    ros::Subscriber m_sub_joint_speeds;
+    ros::Subscriber m_sub_twist;
+    ros::Subscriber m_sub_clear_faults;
+    ros::Subscriber m_sub_stop;
+    ros::Subscriber m_sub_emergency_stop;
+
+    // Service clients
+    ros::ServiceClient m_client_switch_controllers;
+    ControllerType m_active_controller_type;
+    std::vector<std::string> m_trajectory_controllers_list;
+    std::vector<std::string> m_position_controllers_list;
+    std::vector<double> m_velocity_commands;
+    kortex_driver::Twist m_twist_command;
 
     // Action clients
     std::unique_ptr<actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>> m_follow_joint_trajectory_action_client;
@@ -114,6 +135,8 @@ class KortexArmSimulation
     // Arm information
     std::string m_arm_name;
     std::vector<std::string> m_arm_joint_names;
+    std::vector<double> m_arm_joint_limits_min;
+    std::vector<double> m_arm_joint_limits_max;
     std::vector<float> m_arm_velocity_max_limits;
     std::vector<float> m_arm_acceleration_max_limits;
     float m_max_cartesian_twist_linear;
@@ -148,6 +171,7 @@ class KortexArmSimulation
     // Threading
     std::atomic<bool> m_is_action_being_executed;
     std::atomic<bool> m_action_preempted;
+    std::atomic<int> m_current_action_type;
     std::thread m_action_executor_thread;
 
     // MoveIt-related
@@ -155,7 +179,6 @@ class KortexArmSimulation
     std::unique_ptr<moveit::planning_interface::MoveGroupInterface> m_moveit_gripper_interface;
 
     // Subscription callbacks and data structures with their mutexes
-    // void cb_joint_trajectory_controller_state(const control_msgs::JointTrajectoryControllerState& state);
     void cb_joint_states(const sensor_msgs::JointState& state);
     sensor_msgs::JointState m_current_state;
     bool m_first_state_received;
@@ -165,17 +188,23 @@ class KortexArmSimulation
     // Helper functions
     bool IsGripperPresent() const {return !m_gripper_name.empty();}
     void CreateDefaultActions();
-    kortex_driver::KortexError FillKortexError(uint32_t code, uint32_t subCode, const std::string& description = "") const;
-
-    // Executors
-    void JoinThreadAndCancelAction();
+    bool SwitchControllerType(ControllerType new_type);
     void PlayAction(const kortex_driver::Action& action);
+    void JoinThreadAndCancelAction();
+    kortex_driver::KortexError FillKortexError(uint32_t code, uint32_t subCode, const std::string& description = std::string()) const;
     kortex_driver::KortexError ExecuteReachJointAngles(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteReachPose(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteSendJointSpeeds(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteSendTwist(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteSendGripperCommand(const kortex_driver::Action& action);
     kortex_driver::KortexError ExecuteTimeDelay(const kortex_driver::Action& action);
+
+    // Callbacks
+    void new_joint_speeds_cb(const kortex_driver::Base_JointSpeeds& joint_speeds);
+    void new_twist_cb(const kortex_driver::TwistCommand& twist);
+    void clear_faults_cb(const std_msgs::Empty& empty);
+    void stop_cb(const std_msgs::Empty& empty);
+    void emergency_stop_cb(const std_msgs::Empty& empty);
 };
 
 #endif //_KORTEX_ARM_SIMULATION_H_

@@ -197,6 +197,7 @@ class ExampleCartesianActionsWithNotifications:
             req = ExecuteActionRequest()
             req.input.oneof_action_parameters.reach_pose.append(my_constrained_pose)
             req.input.name = "pose1"
+            req.input.handle.action_type = ActionType.REACH_POSE
             req.input.handle.identifier = 1001
 
             rospy.loginfo("Sending pose 1...")

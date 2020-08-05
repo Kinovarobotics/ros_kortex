@@ -15,10 +15,11 @@
 <!-- MarkdownTOC -->
 
 1. [Before running an example](#first_of_all)
-2. [Actuator configuration examples](#actuator_config)
-3. [Full arm movement examples](#full_arm)
-4. [Vision module configuration examples](#vision_config)
-5. [MoveIt! examples](#move_it)
+2. [Understanding the ways to use a Kortex arm with ROS](#the_ways)
+3. [Actuator configuration examples](#actuator_config)
+4. [Full arm movement examples](#full_arm)
+5. [Vision module configuration examples](#vision_config)
+6. [MoveIt! examples](#move_it)
 
 <!-- /MarkdownTOC -->
 
@@ -27,9 +28,53 @@
 
 Before you run any example, make sure :
 - You have already built the packages using `catkin_make`.
-- You are physically connected to an arm (or you are connected over Wi-Fi).
-- You have started the `kortex_driver` node by following the [instructions](../kortex_driver/readme.md). 
+- You are physically connected to an arm (or you are connected over Wi-Fi) and you have started the `kortex_driver` node by following the [instructions](../kortex_driver/readme.md), or you have started the arm in simulation following the [instructions](../kortex_gazebo/readme.md).
 - The node started correctly and without errors.
+
+<a id="the_ways"></a>
+## The ways to use a Kortex arm with ROS
+
+There are a couple ways to use a Kortex arm with ROS, may it be in simulation or with a real arm.
+
+1. Using the auto-generated services and topics
+
+    The driver auto-generates ROS services based on the C++ Kortex API, so every API call has its ROS equivalent. Some topics (not  auto-generated) are also offered for convenience. You can read more about services, topics and notifications [here](../kortex_driver/readme.md#services).
+
+    **With a real arm**, the auto-generated wrapper translates ROS requests to Kortex API requests (Protobuf), and translated responses back to ROS structures.
+
+    ![](./img/services_real_arm.png)
+
+    **In simulation**, the same services and topics are advertised by the kortex_driver node, but instead of translating to Kortex API and forwarding to an arm, the message either goes through on our own simulator (if the handler for the given service is implemented) or a default response is sent back and a warning printed.
+
+    ![](./img/services_sim.png)
+
+    Only a couple "core" services handlers have been implemented in simulation (mostly the ones that make the robot move and stop), namely:
+    - PlayJointTrajectory and the REACH_JOINT_ANGLES action type (to reach an angular goal)
+    - PlayCartesianTrajectory and the REACH_POSE action type (to reach a Cartesian goal)
+    - SendGripperCommand and the SEND_GRIPPER_COMMAND action type (to actuate the gripper)
+    - SendJointSpeedsCommand (for joint velocity control)
+    - ApplyEmergencyStop and Stop (to stop the robot)
+    - The Actions interface (ExecuteAction, ExecuteActionFromReference, CreateAction, DeleteAction, UpdateAction, StopAction).
+
+    The simulated SendTwistCommand service has a POC implementation, we decided it is not stable enough to be activated by default. You can uncomment the kortex_arm_driver.cpp simulation handler to re-enable it and try it yourself. The same goes for the Cartesian velocity topic.
+
+    There is no plan to add more simulated services for now, but any user can write his own implementation of a Kortex ROS Service and enable the handler for it (let's say you want to simulate an Interconnect Expansion GPIO device, or a Vision device). The kortex_arm_driver.cpp file should provide all guidelines as to how to define your handler, and you are welcome to open an issue if you want more information on simulation handlers.
+
+2. Using MoveIt
+
+    The kortex_driver offers a FollowJointTrajectory Action Server and a GripperCommand Action Server (when a gripper is used) and the MoveIt configuration files are stored for all configurations in kortex_move_it_config. This enables users to use the MoveIt Commander, or the MoveIt Python or C++ interfaces to control the arm with the motion planning framework.
+
+    ![](./img/moveit.png)
+
+    **With a real arm**, the FollowJointTrajectory Action Server uses the Kortex API `PlayPreComputedJointTrajectory`. This call expects a full joint trajectory interpolated at a 1ms timestep, because the arm takes the trajectory as is, verifies it respects all velocity and acceleration constraints and then executes it as a low-level trajectory. Because of this timestep constraint, the MoveIt OMPL planning pipeline has an additional step which uses the `industrial_trajectory_filters/UniformSampleFilter` to interpolate the MoveIt output with a 1ms-timestep. Any timestep that provides a wrong velocity or acceleration causes the whole trajectory to be rejected. The velocity and acceleration limits in the configuration files have been tuned so no trajectory should yield such values, but if you experience trajectory rejection problems, you can tune down those parameters.
+
+    **In simulation**, the FollowJointTrajectory and GripperCommand Action Servers are the ones spawned by the ros_controllers used with Gazebo. They don't need 1ms-timestep, but no option was added in MoveIt to switch between simulated or real action servers, so the same interpolator is used in simulation although it is not required. The Gen3 Intel Realsense camera is not simulated.
+
+3. Low-level control
+
+    **With a real arm**, the low-level control functions have not been added to the Kortex API wrapper because the arm absolutely needs 1kHz control, otherwise it jerks. As ROS is not really real-time friendly, we chose not to offer those functions.
+
+    **In simulation**, the ros_controllers used with Gazebo can be directly controlled with their associated topics if you prefer controlling the joints directly without using the simulation handlers, but be aware that this interface is not accessible with the real arm! The code you write that way will need to be changed significantly to be used with a real arm.
 
 
 <a id="actuator_config"></a>

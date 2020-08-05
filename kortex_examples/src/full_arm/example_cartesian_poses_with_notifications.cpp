@@ -297,6 +297,4 @@ int main(int argc, char **argv)
   ros::param::set("/kortex_examples_test_results/cartesian_poses_with_notifications_cpp", success);
   
   return success ? 0 : 1;
-
-  return 0;
 }
