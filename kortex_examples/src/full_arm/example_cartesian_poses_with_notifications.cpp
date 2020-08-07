@@ -10,6 +10,7 @@
  *
  */
 #include <thread>
+#include <atomic>
 
 #include "ros/ros.h"
 #include <kortex_driver/Base_ClearFaults.h>
