@@ -65,6 +65,8 @@ There are a couple ways to use a Kortex arm with ROS, may it be in simulation or
 2. Using MoveIt
 
     The kortex_driver offers a FollowJointTrajectory Action Server and a GripperCommand Action Server (when a gripper is used) and the MoveIt configuration files are stored for all configurations in kortex_move_it_config. This enables users to use the MoveIt Commander, or the MoveIt Python or C++ interfaces to control the arm with the motion planning framework.
+    
+    The FollowJointTrajectory Action Server pipeline is illustrated below:
 
     ![](./img/moveit.png)
 
