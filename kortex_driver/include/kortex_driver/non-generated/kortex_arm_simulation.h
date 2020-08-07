@@ -35,6 +35,7 @@
 #include <unordered_map>
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 // Kortex
 #include "kortex_driver/non-generated/kortex_math_util.h"
