@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<camera xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="gazebo_depth_camera" params="prefix">
+
+    <!-- LEFT CAMERA -->
+    <gazebo reference="${prefix}sim_camera_depth_frame">
+      <sensor type="depth" name="camera">
+        <update_rate>30.0</update_rate>
+        <camera>
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <horizontal_fov>1.50098</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
+	  <robotNamespace></robotNamespace>
+          <baseline>0.2</baseline>
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0.0</updateRate>
+          <cameraName>camera</cameraName>
+          <imageTopicName>/camera/color/image_raw</imageTopicName>
+          <cameraInfoTopicName>/camera/color/camera_info</cameraInfoTopicName>
+          <depthImageTopicName>/camera/depth/image_raw</depthImageTopicName>
+          <depthImageCameraInfoTopicName>/camera/depth/camera_info</depthImageCameraInfoTopicName>
+          <pointCloudTopicName>/camera/depth/points</pointCloudTopicName>
+          <frameName>${prefix}camera_depth_optical_frame</frameName>
+          <pointCloudCutoff>0.1</pointCloudCutoff>
+          <pointCloudCutoffMax>10</pointCloudCutoffMax>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+  </xacro:macro>
+</camera>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!-- j2s7s300 refers to jaco v2 7DOF spherical 3fingers -->
+
+
+<camera xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:arg name="prefix" default="" />
+
+  <xacro:include filename="$(find kortex_description)/robots/gazebo_depth_camera.xacro" />
+  <xacro:gazebo_depth_camera prefix="${prefix}"/>
+  
+</camera>

@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-    <xacro:macro name="load_robot" params="arm gripper dof vision sim prefix">
+    <xacro:macro name="load_robot" params="arm gripper dof vision sim prefix namespace">
             
         <!-- Files to include -->
         <xacro:include filename="$(find kortex_description)/arms/${arm}/${dof}dof/urdf/${arm}_macro.xacro" />
@@ -13,6 +13,7 @@
         <xacro:if value="${sim}">
             <!-- Arm transmission elements-->
             <xacro:include filename="$(find kortex_description)/arms/${arm}/${dof}dof/urdf/${arm}_transmission_macro.xacro" />
+            <xacro:include filename="$(find kortex_description)/robots/gazebo_depth_camera.xacro" />
             <!-- Gripper transmission elements if there is a gripper-->
             <xacro:unless value="${not gripper}">
                 <xacro:include filename="$(find kortex_description)/grippers/${gripper}/urdf/${gripper}_transmission_macro.xacro" />
@@ -32,7 +33,7 @@
         </xacro:if>
         
         <!-- Load the arm -->
-        <xacro:load_arm parent="" dof="${dof}" vision="${vision}" prefix="${prefix}">
+        <xacro:load_arm parent="" dof="${dof}" vision="${vision}" prefix="${prefix}" namespace="${namespace}">
             <origin xyz="0 0 0" rpy="0 0 0"/> 
         </xacro:load_arm>
 
@@ -56,6 +57,8 @@
         <xacro:if value="${sim}">
 
             <xacro:load_gazebo_arm_transmissions prefix="${prefix}"/>
+
+            <xacro:gazebo_depth_camera prefix="${prefix}"/>
 
             <xacro:unless value="${not gripper}">
                 <xacro:load_gazebo_gripper_transmissions prefix="${prefix}"/>

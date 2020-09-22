@@ -5,7 +5,7 @@
   <!-- Propagate last link name information because it is the gripper's parent link -->
   <xacro:property name="last_arm_link" value="end_effector_link"/>
 
-  <xacro:macro name="load_arm" params="parent:='' dof vision prefix *origin">
+  <xacro:macro name="load_arm" params="parent:='' dof vision prefix *origin namespace">
       <link name="${prefix}base_link">
         <inertial>
           <origin xyz="-0.000648 -0.000166 0.084487" rpy="0 0 0" />
@@ -331,6 +331,20 @@
         <parent link="${prefix}end_effector_link" />
         <child  link="${prefix}camera_color_frame" />
       </joint>
+      <xacro:if value="${sim}">
+        <link name="${prefix}sim_camera_depth_frame" />
+        <joint name="${prefix}sim_depth_module" type="fixed">
+          <origin xyz="0.0275 0.066 -0.00305" rpy="${pi/2} ${-pi/2} ${-pi/2}" />
+          <parent link="${prefix}end_effector_link" />
+          <child  link="${prefix}sim_camera_depth_frame" />
+        </joint>
+        <link name="${namespace}/${prefix}camera_depth_optical_frame" />
+        <joint name="${prefix}optical_module" type="fixed">
+          <origin xyz="0.0 0.0 0.0" rpy="${-pi/2} 0.0 ${-pi/2}" />
+          <parent link="${prefix}sim_camera_depth_frame" />
+          <child  link="${namespace}/${prefix}camera_depth_optical_frame" />
+        </joint>
+      </xacro:if>
     </xacro:if>
   </xacro:macro>
 </robot>
