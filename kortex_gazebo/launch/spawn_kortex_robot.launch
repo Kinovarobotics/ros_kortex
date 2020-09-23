@@ -24,14 +24,16 @@
     
     <arg name="robot_name" default="my_$(arg arm)"/>
     <arg name="prefix" default=""/>
-    <arg name="namespace" default="$(arg robot_name)" />
+    <arg name="namespace" default="$(arg robot_name)"/>
     <arg name="cyclic_data_publish_rate" default="40"/> <!--Hz-->
+
+    <!-- Argument for simulating ARMada workstation in Gazebo -->
+    <arg name="sim_workstation" default="false"/>
 
     <!-- Gazebo parameters -->
     <arg name="use_sim_time" default="true" />
     <arg name="debug" default="false" />
     <arg name="paused" default="true" />
-    <arg name="tf_prefix_" default="" />
     
     <!-- Start Gazebo -->
     <include file="$(find kortex_gazebo)/launch/start_gazebo.launch" if="$(arg start_gazebo)">
@@ -48,10 +50,10 @@
 
         <!-- Load the description for the robot -->
         <!-- Without gripper -->
-        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix) namespace:=$(arg robot_name)"
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix) namespace:=$(arg robot_name) workstation:=$(arg workstation)"
             if="$(eval not arg('gripper'))"/>
         <!-- With gripper -->
-        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix) namespace:=$(arg robot_name)"
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix) namespace:=$(arg robot_name) workstation:=$(arg workstation)"
             unless="$(eval not arg('gripper'))"/>
 
         <!-- Spawn the robot in Gazebo -->

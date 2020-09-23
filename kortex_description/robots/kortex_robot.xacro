@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-    <xacro:macro name="load_robot" params="arm gripper dof vision sim prefix namespace">
+    <xacro:macro name="load_robot" params="arm gripper dof vision sim prefix namespace workstation">
             
         <!-- Files to include -->
         <xacro:include filename="$(find kortex_description)/arms/${arm}/${dof}dof/urdf/${arm}_macro.xacro" />
@@ -18,18 +18,36 @@
             <xacro:unless value="${not gripper}">
                 <xacro:include filename="$(find kortex_description)/grippers/${gripper}/urdf/${gripper}_transmission_macro.xacro" />
             </xacro:unless>
+            <xacro:if value="${workstation}">
+		  <xacro:include filename="$(find uml_hri_nerve_armada_workstation)/workstation_description/workstation_model.urdf.xacro" />
+            </xacro:if>
         </xacro:if>
 
         <!-- Run the macros -->
 
         <!-- For gazebo-->
         <xacro:if value="${sim}">
-            <link name="world" />
-            <joint name="world_to_root" type="fixed">
-                <child link="${prefix}base_link" />
-                <parent link="world" />
-                <origin xyz="0 0 0" rpy="0 0 0" />    
-            </joint> 
+            <xacro:unless value="${workstation}">
+		<link name="world" />
+            	<joint name="world_to_root" type="fixed">
+                    <child link="${prefix}base_link" />
+                    <parent link="world" />
+                    <origin xyz="0 0 0" rpy="0 0 0" />    
+                </joint>
+            </xacro:unless>
+            <xacro:if value="${workstation}">
+		<link name="world"/>
+  		<joint name="world_to_table" type="fixed">
+    		    <child link="table_base_link" />
+    		    <parent link="world" />
+    		    <origin xyz="0.0 0.0 0.41" rpy="0.0 0.0 0.0" />    
+  		</joint> 
+  		<joint name="table_to_root" type="fixed">
+    		    <child link="${prefix}base_link" />
+    		    <parent link="table_mounting_plate_link" />
+    		    <origin xyz="0.0 0.0 0.03625" rpy="0.0 0.0 0.0" />    
+  		</joint>
+            </xacro:if>
         </xacro:if>
         
         <!-- Load the arm -->
@@ -69,6 +87,10 @@
                     <legacyModeNS>true</legacyModeNS>
                 </plugin>
             </gazebo>
+
+            <xacro:if value="${workstation}">
+		<xacro:workstation prefix="${prefix}table_" namespace="${namespace}"/>
+            </xacro:if>
 
         </xacro:if>
     </xacro:macro>
