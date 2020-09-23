@@ -50,10 +50,10 @@
 
         <!-- Load the description for the robot -->
         <!-- Without gripper -->
-        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix) namespace:=$(arg robot_name) workstation:=$(arg workstation)"
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix) namespace:=$(arg robot_name) workstation:=$(arg sim_workstation)"
             if="$(eval not arg('gripper'))"/>
         <!-- With gripper -->
-        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix) namespace:=$(arg robot_name) workstation:=$(arg workstation)"
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix) namespace:=$(arg robot_name) workstation:=$(arg sim_workstation)"
             unless="$(eval not arg('gripper'))"/>
 
         <!-- Spawn the robot in Gazebo -->
