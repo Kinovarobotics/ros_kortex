@@ -45,7 +45,7 @@
   		<joint name="table_to_root" type="fixed">
     		    <child link="${prefix}base_link" />
     		    <parent link="table_mounting_plate_link" />
-    		    <origin xyz="0.0 0.0 0.03625" rpy="0.0 0.0 ${pi}" />    
+    		    <origin xyz="0.0 0.0 0.03625" rpy="0.0 0.0 ${pi/2}" />    
   		</joint>
             </xacro:if>
         </xacro:if>
