@@ -396,13 +396,12 @@ void KortexArmDriver::verifyProductConfiguration()
     }
     else if (m_gripper_name == "gen3_lite_2f")
     {
-        std::cout << "gripper type in the arm : " << Kinova::Api::ProductConfiguration::EndEffectorType_Name(product_config.end_effector_type()) << std::endl;
-        // if (product_config.end_effector_type() != Kinova::Api::ProductConfiguration::EndEffectorType::END_EFFECTOR_TYPE_L31_GRIPPER_2F)
-        // {
-        //     std::string error_string = "The gripper model specified in the launch file doesn't match the detected arm's gripper model, shutting down the node...";
-        //     ROS_ERROR("%s", error_string.c_str());
-        //     throw new std::runtime_error(error_string);
-        // }
+        if (product_config.end_effector_type() != Kinova::Api::ProductConfiguration::EndEffectorType::END_EFFECTOR_TYPE_L31_GRIPPER_2F)
+        {
+            std::string error_string = "The gripper model specified in the launch file doesn't match the detected arm's gripper model, shutting down the node...";
+            ROS_ERROR("%s", error_string.c_str());
+            throw new std::runtime_error(error_string);
+        }
     }
     else 
     {
