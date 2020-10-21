@@ -396,12 +396,13 @@ void KortexArmDriver::verifyProductConfiguration()
     }
     else if (m_gripper_name == "gen3_lite_2f")
     {
-        if (product_config.end_effector_type() != Kinova::Api::ProductConfiguration::EndEffectorType::END_EFFECTOR_TYPE_L31_GRIPPER_2F)
-        {
-            std::string error_string = "The gripper model specified in the launch file doesn't match the detected arm's gripper model, shutting down the node...";
-            ROS_ERROR("%s", error_string.c_str());
-            throw new std::runtime_error(error_string);
-        }
+        std::cout << "gripper type in the arm : " << Kinova::Api::ProductConfiguration::EndEffectorType_Name(product_config.end_effector_type()) << std::endl;
+        // if (product_config.end_effector_type() != Kinova::Api::ProductConfiguration::EndEffectorType::END_EFFECTOR_TYPE_L31_GRIPPER_2F)
+        // {
+        //     std::string error_string = "The gripper model specified in the launch file doesn't match the detected arm's gripper model, shutting down the node...";
+        //     ROS_ERROR("%s", error_string.c_str());
+        //     throw new std::runtime_error(error_string);
+        // }
     }
     else 
     {
@@ -616,7 +617,7 @@ void KortexArmDriver::publishRobotFeedback()
 
         for (int i = 0; i < base_feedback.actuators.size(); i++)
         {
-            joint_state.name[i] = m_prefix + m_arm_joint_names[i];
+            joint_state.name[i] = m_arm_joint_names[i];
             joint_state.position[i] = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(base_feedback.actuators[i].position));
             joint_state.velocity[i] = m_math_util.toRad(base_feedback.actuators[i].velocity);
             joint_state.effort[i] = base_feedback.actuators[i].torque;
@@ -627,7 +628,7 @@ void KortexArmDriver::publishRobotFeedback()
             for (int i = 0; i < base_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor.size(); i++)
             {
                 int joint_state_index = base_feedback.actuators.size() + i;
-                joint_state.name[joint_state_index] = m_prefix + m_gripper_joint_names[i];
+                joint_state.name[joint_state_index] = m_gripper_joint_names[i];
                 // Arm feedback is between 0 and 100, and limits in URDF are specified in gripper_joint_limits_min[i] and gripper_joint_limits_max[i] parameters
                 joint_state.position[joint_state_index] = m_math_util.absolute_position_from_relative(base_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor[i].position / 100.0, m_gripper_joint_limits_min[i], m_gripper_joint_limits_max[i]);
                 joint_state.velocity[joint_state_index] = base_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor[i].velocity;
