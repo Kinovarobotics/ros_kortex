@@ -45,13 +45,7 @@ PreComputedJointTrajectoryActionServer::PreComputedJointTrajectoryActionServer(c
         ROS_ERROR("%s", error_string.c_str());
         throw new std::runtime_error(error_string);
     }
-    else
-    {
-      for (int i = 0; i < m_joint_names.size(); i++)
-      {
-        m_joint_names[i] = m_prefix + m_joint_names[i];
-      }
-    }
+    
     // Subscribe to the arm's Action Notifications
     m_sub_action_notif_handle = m_base->OnNotificationActionTopic(std::bind(&PreComputedJointTrajectoryActionServer::action_notif_callback, this, std::placeholders::_1), Kinova::Api::Common::NotificationOptions());
 
