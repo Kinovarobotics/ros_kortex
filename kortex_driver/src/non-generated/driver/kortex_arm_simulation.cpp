@@ -1283,15 +1283,15 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteSendJointSpeeds(const kor
                 stopped[i] = false;
 
                 // Cap the command to the joint limit
-                if (m_arm_joint_limits_min[i] != 0.0 && commands[i] < 0.0)
+                if (m_arm_joint_limits_min[i] != 0.0 && commands[i] < m_arm_joint_limits_min[i])
                 {
-                    commands[i] = std::max(m_arm_joint_limits_min[i], commands[i]);
-                    velocity_command = 0.0;
+                    commands[i] = m_arm_joint_limits_min[i];
+                    velocity_command = std::max(velocity_command, 0.0);
                 }
-                else if (m_arm_joint_limits_max[i] != 0.0 && commands[i] > 0.0)
+                else if (m_arm_joint_limits_max[i] != 0.0 && commands[i] > m_arm_joint_limits_max[i])
                 {
-                    commands[i] = std::min(m_arm_joint_limits_max[i], commands[i]);
-                    velocity_command = 0.0;
+                    commands[i] = m_arm_joint_limits_max[i];
+                    velocity_command = std::min(velocity_command, 0.0);
                 }
 
                 // Send the position increments to the controllers
