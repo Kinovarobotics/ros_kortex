@@ -29,7 +29,9 @@
     <arg name="use_sim_time" default="true"/>
     <arg name="debug" default="false" />
     <arg name="paused" default="true"/>
-    
+
+    <arg name="enable_test" default="true"/>
+
     <!-- Start Gazebo -->
     <include file="$(find kortex_gazebo)/launch/start_gazebo.launch" if="$(arg start_gazebo)">
             <arg name="gui" value="$(arg gazebo_gui)"/>
@@ -156,7 +158,7 @@
         </node>
 
         <!-- Test if homing the robot with MoveIt ended correctly -->
-        <test test-name="paramtest_gazebo_initialization" pkg="rostest" type="paramtest">
+        <test if="$(arg enable_test)" test-name="paramtest_gazebo_initialization" pkg="rostest" type="paramtest">
             <param name="param_name_target" value="is_initialized" />
             <param name="param_value_expected" value="true" />
             <param name="wait_time" value="60" />
