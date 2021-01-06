@@ -27,7 +27,13 @@
   <exec_depend>std_msgs</exec_depend>
   <build_depend>message_generation</build_depend>
   <exec_depend>message_runtime</exec_depend>
-
+  <exec_depend>gen3_move_it_config</exec_depend>
+  <exec_depend>gen3_robotiq_2f_85_move_it_config</exec_depend>
+  <exec_depend>gen3_robotiq_2f_140_move_it_config</exec_depend>
+  <exec_depend>gen3_lite_gen3_lite_2f_move_it_config</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>rostest</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
