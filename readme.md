@@ -35,7 +35,6 @@ These are the instructions to run in a terminal to create the workspace, clone t
         rosdep install --from-paths src --ignore-src -y
 
 Then, to build and source the workspace:
-
         catkin_make
         source devel/setup.bash
 
