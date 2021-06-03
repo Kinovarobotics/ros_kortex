@@ -44,12 +44,22 @@
         <arg name="start_delay_seconds" value="160"/>
     </include>
 
-    <include file="$(find kortex_examples)/launch/moveit_example.launch"> 
+    <include file="$(find kortex_examples)/launch/waypoint_action_client_cpp.launch"> 
         <arg name="robot_name" value="$(arg robot_name)"/>
-        <arg name="start_delay_seconds" value="220"/>
+        <arg name="start_delay_seconds" value="240"/>
     </include>
 
-    <test test-name="test_all_examples_success" pkg="kortex_examples" type="kortex_examples_tests" time-limit="340.0">
+    <include file="$(find kortex_examples)/launch/waypoint_action_client_python.launch"> 
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="start_delay_seconds" value="300"/>
+    </include>
+
+    <include file="$(find kortex_examples)/launch/moveit_example.launch"> 
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="start_delay_seconds" value="340"/>
+    </include>
+
+    <test test-name="test_all_examples_success" pkg="kortex_examples" type="kortex_examples_tests" time-limit="470.0">
         <param name="robot_name" value="$(arg robot_name)"/>
     </test>
 

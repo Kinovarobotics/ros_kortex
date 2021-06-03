@@ -44,6 +44,8 @@ class KortexDriverTest : public ::testing::Test {
       {"full_arm_movement_cpp", true},
       {"full_arm_movement_python", true},
       {"actuator_configuration_cpp", true},
+      {"waypoint_action_cpp", true},
+      {"waypoint_action_python", true},
       {"moveit_general_python", true}
   };
 

@@ -27,6 +27,8 @@ class ExampleCartesianActionsWithNotifications:
             self.action_topic_sub = None
             self.all_notifs_succeeded = True
 
+            self.all_notifs_succeeded = True
+
             # Get node params
             self.robot_name = rospy.get_param('~robot_name', "my_gen3")
 
@@ -159,11 +161,6 @@ class ExampleCartesianActionsWithNotifications:
             # Make sure to clear the robot's faults else it won't move if it's already in fault
             success &= self.example_clear_faults()
             #*******************************************************************************
-
-            #*******************************************************************************
-            # Subscribe to ActionNotification's from the robot to know when a cartesian pose is finished
-            success &= self.example_subscribe_to_a_robot_notification()
-            #*******************************************************************************
             
             #*******************************************************************************
             # Start the example from the Home position
@@ -173,6 +170,10 @@ class ExampleCartesianActionsWithNotifications:
             #*******************************************************************************
             # Set the reference frame to "Mixed"
             success &= self.example_set_cartesian_reference_frame()
+
+            #*******************************************************************************
+            # Subscribe to ActionNotification's from the robot to know when a cartesian pose is finished
+            success &= self.example_subscribe_to_a_robot_notification()
 
             #*******************************************************************************
             # Prepare and send pose 1
@@ -247,6 +248,8 @@ class ExampleCartesianActionsWithNotifications:
                 rospy.loginfo("Waiting for pose 3 to finish...")
 
             self.wait_for_action_end_or_abort()
+
+            success &= self.all_notifs_succeeded
 
             success &= self.all_notifs_succeeded
 

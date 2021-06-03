@@ -60,9 +60,10 @@ bool wait_for_action_end_or_abort()
     }
     ros::spinOnce();
   }
+  return false;
 }
 
-bool example_home_the_robot(ros::NodeHandle n, std::string robot_name)
+bool example_home_the_robot(ros::NodeHandle n, const std::string &robot_name)
 {
   ros::ServiceClient service_client_read_action = n.serviceClient<kortex_driver::ReadAction>("/" + robot_name + "/base/read_action");
   kortex_driver::ReadAction service_read_action;
@@ -97,25 +98,8 @@ bool example_home_the_robot(ros::NodeHandle n, std::string robot_name)
   return wait_for_action_end_or_abort();
 }
 
-bool example_cartesian_action(ros::NodeHandle n, std::string robot_name)
+bool example_cartesian_action(ros::NodeHandle n, const std::string &robot_name)
 {
-  ros::ServiceClient service_client_activate_notif = n.serviceClient<kortex_driver::OnNotificationActionTopic>("/" + robot_name + "/base/activate_publishing_of_action_topic");
-  kortex_driver::OnNotificationActionTopic service_activate_notif;
-
-  // We need to call this service to activate the Action Notification on the kortex_driver node.
-  if (service_client_activate_notif.call(service_activate_notif))
-  {
-    ROS_INFO("Action notification activated!");
-  }
-  else 
-  {
-    std::string error_string = "Action notification publication failed";
-    ROS_ERROR("%s", error_string.c_str());
-    return false;
-  }
-
-  ros::Duration(1.00).sleep();
-
   kortex_driver::ConstrainedPose my_constrained_pose;
   kortex_driver::CartesianSpeed my_cartesian_speed;
 
@@ -206,7 +190,7 @@ bool example_cartesian_action(ros::NodeHandle n, std::string robot_name)
 }
 
 // This function sets the reference frame to the robot's base
-bool example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_name)
+bool example_set_cartesian_reference_frame(ros::NodeHandle n, const std::string &robot_name)
 {
   // Initialize the ServiceClient
   ros::ServiceClient service_client_set_cartesian_reference_frame = n.serviceClient<kortex_driver::SetCartesianReferenceFrame>("/" + robot_name + "/control_config/set_cartesian_reference_frame");
@@ -256,7 +240,23 @@ int main(int argc, char **argv)
     ROS_INFO("%s", error_string.c_str());
   }
 
+  // We need to call this service to activate the Action Notification on the kortex_driver node.
+  ros::ServiceClient service_client_activate_notif = n.serviceClient<kortex_driver::OnNotificationActionTopic>("/" + robot_name + "/base/activate_publishing_of_action_topic");
+  kortex_driver::OnNotificationActionTopic service_activate_notif;
+  if (service_client_activate_notif.call(service_activate_notif))
+  {
+    ROS_INFO("Action notification activated!");
+  }
+  else 
+  {
+    std::string error_string = "Action notification publication failed";
+    ROS_ERROR("%s", error_string.c_str());
+    return false;
+  }
+  ros::Duration(1.00).sleep();
   ros::Subscriber sub = n.subscribe("/" + robot_name  + "/action_topic", 1000, notification_callback);
+
+  // Run the example
   success &= example_set_cartesian_reference_frame(n, robot_name);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   success &= example_home_the_robot(n, robot_name);
