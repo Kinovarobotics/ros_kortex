@@ -39,7 +39,7 @@
     <group_state name="retract" group="arm">
         <joint name="$(arg prefix)joint_1" value="-0.0522" />
         <joint name="$(arg prefix)joint_2" value="0.3664" />
-        <joint name="$(arg prefix)joint_3" value="2.6199" />
+        <joint name="$(arg prefix)joint_3" value="2.53" />
         <joint name="$(arg prefix)joint_4" value="-1.536" />
         <joint name="$(arg prefix)joint_5" value="-0.6981" />
         <joint name="$(arg prefix)joint_6" value="-1.5184" />

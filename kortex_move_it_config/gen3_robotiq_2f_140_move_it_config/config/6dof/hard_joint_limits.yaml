@@ -4,34 +4,34 @@
 joint_limits:
   $(arg prefix)joint_1:
     has_velocity_limits: true
-    max_velocity: 1.37
+    max_velocity: 1.33
     has_acceleration_limits: true
-    max_acceleration: 1.56
+    max_acceleration: 4.94
   $(arg prefix)joint_2:
     has_velocity_limits: true
-    max_velocity: 1.37
+    max_velocity: 1.33
     has_acceleration_limits: true
-    max_acceleration: 1.56
+    max_acceleration: 4.94
   $(arg prefix)joint_3:
     has_velocity_limits: true
-    max_velocity: 1.37
+    max_velocity: 1.33
     has_acceleration_limits: true
-    max_acceleration: 1.56
+    max_acceleration: 4.94
   $(arg prefix)joint_4:
     has_velocity_limits: true
-    max_velocity: 1.15
+    max_velocity: 1.16
     has_acceleration_limits: true
-    max_acceleration: 3.0
+    max_acceleration: 9.5
   $(arg prefix)joint_5:
     has_velocity_limits: true
-    max_velocity: 1.15
+    max_velocity: 1.16
     has_acceleration_limits: true
-    max_acceleration: 3.0
+    max_acceleration: 9.5
   $(arg prefix)joint_6:
     has_velocity_limits: true
-    max_velocity: 1.15
+    max_velocity: 1.16
     has_acceleration_limits: true
-    max_acceleration: 3.0
+    max_acceleration: 9.5
   $(arg prefix)left_inner_finger_joint:
     has_velocity_limits: true
     max_velocity: 2
