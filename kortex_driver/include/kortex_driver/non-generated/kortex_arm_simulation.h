@@ -76,7 +76,7 @@ class KortexArmSimulation
     KortexArmSimulation() = delete;
     KortexArmSimulation(ros::NodeHandle& nh);
     ~KortexArmSimulation();
-    std::unordered_map<uint32_t, kortex_driver::Action> GetActionsMap() const;
+    std::unordered_map<uint32_t, kortex_driver::Action> GetActionsMap() const {return m_map_actions;}
     int GetDOF() const {return m_degrees_of_freedom;}
 
     kortex_driver::BaseCyclic_Feedback GetFeedback();

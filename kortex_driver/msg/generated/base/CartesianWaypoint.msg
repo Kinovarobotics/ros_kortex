@@ -1,0 +1,6 @@
+
+Pose pose
+uint32 reference_frame
+float32 maximum_linear_velocity
+float32 maximum_angular_velocity
+float32 blending_radius

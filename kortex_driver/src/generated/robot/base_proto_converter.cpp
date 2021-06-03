@@ -16,6 +16,39 @@
  
 #include "kortex_driver/generated/robot/base_proto_converter.h"
 
+int ToProtoData(kortex_driver::GpioConfigurationList input, Kinova::Api::Base::GpioConfigurationList *output)
+{
+	 
+	output->clear_port_configurations();
+	for(int i = 0; i < input.port_configurations.size(); i++)
+	{
+		ToProtoData(input.port_configurations[i], output->add_port_configurations());
+	}
+	
+	return 0;
+}
+int ToProtoData(kortex_driver::Base_GpioConfiguration input, Kinova::Api::Base::GpioConfiguration *output)
+{
+	
+	output->set_port_number(input.port_number); 
+	output->clear_pin_configurations();
+	for(int i = 0; i < input.pin_configurations.size(); i++)
+	{
+		ToProtoData(input.pin_configurations[i], output->add_pin_configurations());
+	}
+	
+	return 0;
+}
+int ToProtoData(kortex_driver::GpioPinConfiguration input, Kinova::Api::Base::GpioPinConfiguration *output)
+{
+	
+	output->set_pin_id(input.pin_id);
+	output->set_pin_property((Kinova::Api::Base::GpioPinPropertyFlags)input.pin_property);
+	output->set_output_enable(input.output_enable);
+	output->set_default_output_value(input.default_output_value);
+	
+	return 0;
+}
 int ToProtoData(kortex_driver::FullUserProfile input, Kinova::Api::Base::FullUserProfile *output)
 {
 	 
@@ -274,6 +307,10 @@ int ToProtoData(kortex_driver::Action input, Kinova::Api::Base::Action *output)
 	{
 		ToProtoData(input.oneof_action_parameters.send_gripper_command[0], output->mutable_send_gripper_command());
 	}
+	if(input.oneof_action_parameters.send_gpio_command.size() > 0)
+	{
+		ToProtoData(input.oneof_action_parameters.send_gpio_command[0], output->mutable_send_gpio_command());
+	}
 	if(input.oneof_action_parameters.stop_action.size() > 0)
 	{
 		ToProtoData(input.oneof_action_parameters.stop_action[0], output->mutable_stop_action());
@@ -281,6 +318,14 @@ int ToProtoData(kortex_driver::Action input, Kinova::Api::Base::Action *output)
 	if(input.oneof_action_parameters.play_pre_computed_trajectory.size() > 0)
 	{
 		ToProtoData(input.oneof_action_parameters.play_pre_computed_trajectory[0], output->mutable_play_pre_computed_trajectory());
+	}
+	if(input.oneof_action_parameters.execute_sequence.size() > 0)
+	{
+		ToProtoData(input.oneof_action_parameters.execute_sequence[0], output->mutable_execute_sequence());
+	}
+	if(input.oneof_action_parameters.execute_waypoint_list.size() > 0)
+	{
+		ToProtoData(input.oneof_action_parameters.execute_waypoint_list[0], output->mutable_execute_waypoint_list());
 	}
 	
 	return 0;
@@ -680,7 +725,7 @@ int ToProtoData(kortex_driver::Base_ControlModeInformation input, Kinova::Api::B
 	
 	return 0;
 }
-int ToProtoData(kortex_driver::ControlModeNotification input, Kinova::Api::Base::ControlModeNotification *output)
+int ToProtoData(kortex_driver::Base_ControlModeNotification input, Kinova::Api::Base::ControlModeNotification *output)
 {
 	
 	output->set_control_mode((Kinova::Api::Base::ControlMode)input.control_mode); 
@@ -854,7 +899,21 @@ int ToProtoData(kortex_driver::ActionNotification input, Kinova::Api::Base::Acti
 	ToProtoData(input.timestamp, output->mutable_timestamp()); 
 	ToProtoData(input.user_handle, output->mutable_user_handle());
 	output->set_abort_details((Kinova::Api::SubErrorCodes)input.abort_details); 
-	ToProtoData(input.connection, output->mutable_connection());
+	ToProtoData(input.connection, output->mutable_connection()); 
+	output->clear_trajectory_info();
+	for(int i = 0; i < input.trajectory_info.size(); i++)
+	{
+		ToProtoData(input.trajectory_info[i], output->add_trajectory_info());
+	}
+	
+	return 0;
+}
+int ToProtoData(kortex_driver::TrajectoryInfo input, Kinova::Api::Base::TrajectoryInfo *output)
+{
+	
+	output->set_trajectory_info_type((Kinova::Api::Base::TrajectoryInfoType)input.trajectory_info_type);
+	output->set_waypoint_index(input.waypoint_index);
+	output->set_joint_index(input.joint_index);
 	
 	return 0;
 }
@@ -1482,6 +1541,16 @@ int ToProtoData(kortex_driver::Finger input, Kinova::Api::Base::Finger *output)
 	
 	return 0;
 }
+int ToProtoData(kortex_driver::GpioCommand input, Kinova::Api::Base::GpioCommand *output)
+{
+	
+	output->set_port_identifier(input.port_identifier);
+	output->set_pin_identifier(input.pin_identifier);
+	output->set_action((Kinova::Api::Base::GpioAction)input.action);
+	output->set_period(input.period);
+	
+	return 0;
+}
 int ToProtoData(kortex_driver::SystemTime input, Kinova::Api::Base::SystemTime *output)
 {
 	
@@ -1647,6 +1716,7 @@ int ToProtoData(kortex_driver::TrajectoryErrorElement input, Kinova::Api::Base::
 	output->set_max_value(input.max_value);
 	output->set_index(input.index);
 	output->set_message(input.message);
+	output->set_waypoint_index(input.waypoint_index);
 	
 	return 0;
 }
@@ -1658,6 +1728,83 @@ int ToProtoData(kortex_driver::TrajectoryErrorReport input, Kinova::Api::Base::T
 	{
 		ToProtoData(input.trajectory_error_elements[i], output->add_trajectory_error_elements());
 	}
+	
+	return 0;
+}
+int ToProtoData(kortex_driver::WaypointValidationReport input, Kinova::Api::Base::WaypointValidationReport *output)
+{
+	 
+	ToProtoData(input.trajectory_error_report, output->mutable_trajectory_error_report()); 
+	ToProtoData(input.optimal_waypoint_list, output->mutable_optimal_waypoint_list());
+	
+	return 0;
+}
+int ToProtoData(kortex_driver::Waypoint input, Kinova::Api::Base::Waypoint *output)
+{
+	
+	output->set_name(input.name);
+	if(input.oneof_type_of_waypoint.angular_waypoint.size() > 0)
+	{
+		ToProtoData(input.oneof_type_of_waypoint.angular_waypoint[0], output->mutable_angular_waypoint());
+	}
+	if(input.oneof_type_of_waypoint.cartesian_waypoint.size() > 0)
+	{
+		ToProtoData(input.oneof_type_of_waypoint.cartesian_waypoint[0], output->mutable_cartesian_waypoint());
+	}
+	
+	return 0;
+}
+int ToProtoData(kortex_driver::AngularWaypoint input, Kinova::Api::Base::AngularWaypoint *output)
+{
+	
+	output->clear_angles();
+	for(int i = 0; i < input.angles.size(); i++)
+	{
+		output->add_angles(input.angles[i]);
+	}
+	output->clear_maximum_velocities();
+	for(int i = 0; i < input.maximum_velocities.size(); i++)
+	{
+		output->add_maximum_velocities(input.maximum_velocities[i]);
+	}
+	output->set_duration(input.duration);
+	
+	return 0;
+}
+int ToProtoData(kortex_driver::CartesianWaypoint input, Kinova::Api::Base::CartesianWaypoint *output)
+{
+	 
+	ToProtoData(input.pose, output->mutable_pose());
+	output->set_reference_frame((Kinova::Api::Common::CartesianReferenceFrame)input.reference_frame);
+	output->set_maximum_linear_velocity(input.maximum_linear_velocity);
+	output->set_maximum_angular_velocity(input.maximum_angular_velocity);
+	output->set_blending_radius(input.blending_radius);
+	
+	return 0;
+}
+int ToProtoData(kortex_driver::WaypointList input, Kinova::Api::Base::WaypointList *output)
+{
+	 
+	output->clear_waypoints();
+	for(int i = 0; i < input.waypoints.size(); i++)
+	{
+		ToProtoData(input.waypoints[i], output->add_waypoints());
+	}
+	output->set_duration(input.duration);
+	output->set_use_optimal_blending(input.use_optimal_blending);
+	
+	return 0;
+}
+int ToProtoData(kortex_driver::KinematicTrajectoryConstraints input, Kinova::Api::Base::KinematicTrajectoryConstraints *output)
+{
+	
+	output->clear_angular_velocities();
+	for(int i = 0; i < input.angular_velocities.size(); i++)
+	{
+		output->add_angular_velocities(input.angular_velocities[i]);
+	}
+	output->set_linear_velocity(input.linear_velocity);
+	output->set_angular_velocity(input.angular_velocity);
 	
 	return 0;
 }
@@ -1679,6 +1826,14 @@ int ToProtoData(kortex_driver::FirmwareComponentVersion input, Kinova::Api::Base
 	output->set_name(input.name);
 	output->set_version(input.version);
 	output->set_device_id(input.device_id);
+	
+	return 0;
+}
+int ToProtoData(kortex_driver::IKData input, Kinova::Api::Base::IKData *output)
+{
+	 
+	ToProtoData(input.cartesian_pose, output->mutable_cartesian_pose()); 
+	ToProtoData(input.guess, output->mutable_guess());
 	
 	return 0;
 }

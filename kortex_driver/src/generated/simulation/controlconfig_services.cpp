@@ -48,6 +48,8 @@ ControlConfigSimulationServices::ControlConfigSimulationServices(ros::NodeHandle
 	m_pub_Error = m_node_handle.advertise<kortex_driver::KortexError>("kortex_error", 1000);
 	m_pub_ControlConfigurationTopic = m_node_handle.advertise<kortex_driver::ControlConfigurationNotification>("control_configuration_topic", 1000);
 	m_is_activated_ControlConfigurationTopic = false;
+	m_pub_ControlModeTopic = m_node_handle.advertise<kortex_driver::ControlConfig_ControlModeNotification>("control_mode_topic", 1000);
+	m_is_activated_ControlModeTopic = false;
 
 	m_serviceSetDeviceID = m_node_handle.advertiseService("control_config/set_device_id", &ControlConfigSimulationServices::SetDeviceID, this);
 	m_serviceSetApiOptions = m_node_handle.advertiseService("control_config/set_api_options", &ControlConfigSimulationServices::SetApiOptions, this);
@@ -81,6 +83,7 @@ ControlConfigSimulationServices::ControlConfigSimulationServices(ros::NodeHandle
 	m_serviceResetTwistLinearSoftLimit = m_node_handle.advertiseService("control_config/reset_twist_linear_soft_limit", &ControlConfigSimulationServices::ResetTwistLinearSoftLimit, this);
 	m_serviceResetTwistAngularSoftLimit = m_node_handle.advertiseService("control_config/reset_twist_angular_soft_limit", &ControlConfigSimulationServices::ResetTwistAngularSoftLimit, this);
 	m_serviceResetJointAccelerationSoftLimits = m_node_handle.advertiseService("control_config/reset_joint_acceleration_soft_limits", &ControlConfigSimulationServices::ResetJointAccelerationSoftLimits, this);
+	m_serviceControlConfig_OnNotificationControlModeTopic = m_node_handle.advertiseService("control_config/activate_publishing_of_control_mode_topic", &ControlConfigSimulationServices::ControlConfig_OnNotificationControlModeTopic, this);
 }
 
 bool ControlConfigSimulationServices::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
@@ -536,4 +539,26 @@ bool ControlConfigSimulationServices::ResetJointAccelerationSoftLimits(kortex_dr
 		ROS_WARN_ONCE("The simulation handler for control_config/reset_joint_acceleration_soft_limits is not implemented, so the service calls will return the default response.");
 	}
 	return true;
+}
+
+bool ControlConfigSimulationServices::ControlConfig_OnNotificationControlModeTopic(kortex_driver::ControlConfig_OnNotificationControlModeTopic::Request  &req, kortex_driver::ControlConfig_OnNotificationControlModeTopic::Response &res)
+{
+	
+	m_is_activated_ControlModeTopic = true;
+	
+	if (ControlConfig_OnNotificationControlModeTopicHandler)
+	{
+		res = ControlConfig_OnNotificationControlModeTopicHandler(req);
+	}
+	else
+	{
+		ROS_WARN_ONCE("The simulation handler for control_config/activate_publishing_of_control_mode_topic is not implemented, so the service calls will return the default response.");
+	}
+	return true;
+}
+void ControlConfigSimulationServices::cb_ControlModeTopic(Kinova::Api::ControlConfig::ControlModeNotification notif)
+{
+	kortex_driver::ControlConfig_ControlModeNotification ros_msg;
+	ToRosData(notif, ros_msg);
+	m_pub_ControlModeTopic.publish(ros_msg);
 }

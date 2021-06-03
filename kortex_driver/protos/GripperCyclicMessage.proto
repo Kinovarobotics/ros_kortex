@@ -23,10 +23,10 @@ message MessageId {
 
 // Command to a single gripper motor
 message MotorCommand {
-    fixed32   motor_id      = 1;       // Motor ID (1, nb_motor)
-    float     position      = 3;       // Desired position of the gripper fingers in percentage (0-100%)
-    float     velocity      = 4;       // Desired velocity in percentage (0-100%) with which position will be set
-    float     force         = 5;       // Desired force limit of the gripper fingers in percentage (0-100%)
+    fixed32   motor_id      = 1;                     // Motor ID (1, nb_motor)
+    float     position      = 3;                     // Desired position of the gripper fingers in percentage (0-100%)
+    float     velocity      = 4;                     // Desired velocity in percentage (0-100%) with which position will be set
+    float     force         = 5 [deprecated = true]; // This field is deprecated and unused. It will be removed in a future release.
 }
 
 // Command sent to a gripper

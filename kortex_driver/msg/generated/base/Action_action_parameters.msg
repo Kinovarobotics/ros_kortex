@@ -17,5 +17,8 @@ Faults[] clear_faults
 Delay[] delay
 ActionHandle[] execute_action
 GripperCommand[] send_gripper_command
+GpioCommand[] send_gpio_command
 Base_Stop[] stop_action
 PreComputedJointTrajectory[] play_pre_computed_trajectory
+SequenceHandle[] execute_sequence
+WaypointList[] execute_waypoint_list

@@ -54,7 +54,7 @@ BaseRobotServices::BaseRobotServices(ros::NodeHandle& node_handle, Kinova::Api::
 	m_is_activated_ConfigurationChangeTopic = false;
 	m_pub_MappingInfoTopic = m_node_handle.advertise<kortex_driver::MappingInfoNotification>("mapping_info_topic", 1000);
 	m_is_activated_MappingInfoTopic = false;
-	m_pub_ControlModeTopic = m_node_handle.advertise<kortex_driver::ControlModeNotification>("control_mode_topic", 1000);
+	m_pub_ControlModeTopic = m_node_handle.advertise<kortex_driver::Base_ControlModeNotification>("control_mode_topic", 1000);
 	m_is_activated_ControlModeTopic = false;
 	m_pub_OperatingModeTopic = m_node_handle.advertise<kortex_driver::OperatingModeNotification>("operating_mode_topic", 1000);
 	m_is_activated_OperatingModeTopic = false;
@@ -140,7 +140,7 @@ BaseRobotServices::BaseRobotServices(ros::NodeHandle& node_handle, Kinova::Api::
 	m_serviceBase_Unsubscribe = m_node_handle.advertiseService("base/unsubscribe", &BaseRobotServices::Base_Unsubscribe, this);
 	m_serviceOnNotificationConfigurationChangeTopic = m_node_handle.advertiseService("base/activate_publishing_of_configuration_change_topic", &BaseRobotServices::OnNotificationConfigurationChangeTopic, this);
 	m_serviceOnNotificationMappingInfoTopic = m_node_handle.advertiseService("base/activate_publishing_of_mapping_info_topic", &BaseRobotServices::OnNotificationMappingInfoTopic, this);
-	m_serviceOnNotificationControlModeTopic = m_node_handle.advertiseService("base/activate_publishing_of_control_mode_topic", &BaseRobotServices::OnNotificationControlModeTopic, this);
+	m_serviceBase_OnNotificationControlModeTopic = m_node_handle.advertiseService("base/activate_publishing_of_control_mode_topic", &BaseRobotServices::Base_OnNotificationControlModeTopic, this);
 	m_serviceOnNotificationOperatingModeTopic = m_node_handle.advertiseService("base/activate_publishing_of_operating_mode_topic", &BaseRobotServices::OnNotificationOperatingModeTopic, this);
 	m_serviceOnNotificationSequenceInfoTopic = m_node_handle.advertiseService("base/activate_publishing_of_sequence_info_topic", &BaseRobotServices::OnNotificationSequenceInfoTopic, this);
 	m_serviceOnNotificationProtectionZoneTopic = m_node_handle.advertiseService("base/activate_publishing_of_protection_zone_topic", &BaseRobotServices::OnNotificationProtectionZoneTopic, this);
@@ -220,12 +220,16 @@ BaseRobotServices::BaseRobotServices(ros::NodeHandle& node_handle, Kinova::Api::
 	m_serviceDeleteAllSequenceTasks = m_node_handle.advertiseService("base/delete_all_sequence_tasks", &BaseRobotServices::DeleteAllSequenceTasks, this);
 	m_serviceTakeSnapshot = m_node_handle.advertiseService("base/take_snapshot", &BaseRobotServices::TakeSnapshot, this);
 	m_serviceGetFirmwareBundleVersions = m_node_handle.advertiseService("base/get_firmware_bundle_versions", &BaseRobotServices::GetFirmwareBundleVersions, this);
+	m_serviceExecuteWaypointTrajectory = m_node_handle.advertiseService("base/execute_waypoint_trajectory", &BaseRobotServices::ExecuteWaypointTrajectory, this);
 	m_serviceMoveSequenceTask = m_node_handle.advertiseService("base/move_sequence_task", &BaseRobotServices::MoveSequenceTask, this);
 	m_serviceDuplicateMapping = m_node_handle.advertiseService("base/duplicate_mapping", &BaseRobotServices::DuplicateMapping, this);
 	m_serviceDuplicateMap = m_node_handle.advertiseService("base/duplicate_map", &BaseRobotServices::DuplicateMap, this);
 	m_serviceSetControllerConfiguration = m_node_handle.advertiseService("base/set_controller_configuration", &BaseRobotServices::SetControllerConfiguration, this);
 	m_serviceGetControllerConfiguration = m_node_handle.advertiseService("base/get_controller_configuration", &BaseRobotServices::GetControllerConfiguration, this);
 	m_serviceGetAllControllerConfigurations = m_node_handle.advertiseService("base/get_all_controller_configurations", &BaseRobotServices::GetAllControllerConfigurations, this);
+	m_serviceComputeForwardKinematics = m_node_handle.advertiseService("base/compute_forward_kinematics", &BaseRobotServices::ComputeForwardKinematics, this);
+	m_serviceComputeInverseKinematics = m_node_handle.advertiseService("base/compute_inverse_kinematics", &BaseRobotServices::ComputeInverseKinematics, this);
+	m_serviceValidateWaypointList = m_node_handle.advertiseService("base/validate_waypoint_list", &BaseRobotServices::ValidateWaypointList, this);
 }
 
 bool BaseRobotServices::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
@@ -2172,8 +2176,9 @@ void BaseRobotServices::cb_MappingInfoTopic(Kinova::Api::Base::MappingInfoNotifi
 	m_pub_MappingInfoTopic.publish(ros_msg);
 }
 
-bool BaseRobotServices::OnNotificationControlModeTopic(kortex_driver::OnNotificationControlModeTopic::Request  &req, kortex_driver::OnNotificationControlModeTopic::Response &res)
+bool BaseRobotServices::Base_OnNotificationControlModeTopic(kortex_driver::Base_OnNotificationControlModeTopic::Request  &req, kortex_driver::Base_OnNotificationControlModeTopic::Response &res)
 {
+	ROS_WARN("The base/activate_publishing_of_control_mode_topic service is now deprecated and will be removed in a future release.");
 	
 	// If the notification is already activated, don't activate multiple times
 	if (m_is_activated_ControlModeTopic)
@@ -2213,7 +2218,7 @@ bool BaseRobotServices::OnNotificationControlModeTopic(kortex_driver::OnNotifica
 }
 void BaseRobotServices::cb_ControlModeTopic(Kinova::Api::Base::ControlModeNotification notif)
 {
-	kortex_driver::ControlModeNotification ros_msg;
+	kortex_driver::Base_ControlModeNotification ros_msg;
 	ToRosData(notif, ros_msg);
 	m_pub_ControlModeTopic.publish(ros_msg);
 }
@@ -2542,6 +2547,7 @@ void BaseRobotServices::cb_RobotEventTopic(Kinova::Api::Base::RobotEventNotifica
 
 bool BaseRobotServices::PlayCartesianTrajectory(kortex_driver::PlayCartesianTrajectory::Request  &req, kortex_driver::PlayCartesianTrajectory::Response &res)
 {
+	ROS_WARN("The base/play_cartesian_trajectory service is now deprecated and will be removed in a future release.");
 	
 	Kinova::Api::Base::ConstrainedPose input;
 	ToProtoData(req.input, &input);
@@ -2574,6 +2580,7 @@ bool BaseRobotServices::PlayCartesianTrajectory(kortex_driver::PlayCartesianTraj
 
 bool BaseRobotServices::PlayCartesianTrajectoryPosition(kortex_driver::PlayCartesianTrajectoryPosition::Request  &req, kortex_driver::PlayCartesianTrajectoryPosition::Response &res)
 {
+	ROS_WARN("The base/play_cartesian_trajectory_position service is now deprecated and will be removed in a future release.");
 	
 	Kinova::Api::Base::ConstrainedPosition input;
 	ToProtoData(req.input, &input);
@@ -2606,6 +2613,7 @@ bool BaseRobotServices::PlayCartesianTrajectoryPosition(kortex_driver::PlayCarte
 
 bool BaseRobotServices::PlayCartesianTrajectoryOrientation(kortex_driver::PlayCartesianTrajectoryOrientation::Request  &req, kortex_driver::PlayCartesianTrajectoryOrientation::Response &res)
 {
+	ROS_WARN("The base/play_cartesian_trajectory_orientation service is now deprecated and will be removed in a future release.");
 	
 	Kinova::Api::Base::ConstrainedOrientation input;
 	ToProtoData(req.input, &input);
@@ -2829,6 +2837,7 @@ bool BaseRobotServices::SendTwistCommand(kortex_driver::SendTwistCommand::Reques
 
 bool BaseRobotServices::PlayJointTrajectory(kortex_driver::PlayJointTrajectory::Request  &req, kortex_driver::PlayJointTrajectory::Response &res)
 {
+	ROS_WARN("The base/play_joint_trajectory service is now deprecated and will be removed in a future release.");
 	
 	Kinova::Api::Base::ConstrainedJointAngles input;
 	ToProtoData(req.input, &input);
@@ -2861,6 +2870,7 @@ bool BaseRobotServices::PlayJointTrajectory(kortex_driver::PlayJointTrajectory::
 
 bool BaseRobotServices::PlaySelectedJointTrajectory(kortex_driver::PlaySelectedJointTrajectory::Request  &req, kortex_driver::PlaySelectedJointTrajectory::Response &res)
 {
+	ROS_WARN("The base/play_selected_joint_trajectory service is now deprecated and will be removed in a future release.");
 	
 	Kinova::Api::Base::ConstrainedJointAngle input;
 	ToProtoData(req.input, &input);
@@ -3181,6 +3191,7 @@ bool BaseRobotServices::Base_ClearFaults(kortex_driver::Base_ClearFaults::Reques
 
 bool BaseRobotServices::Base_GetControlMode(kortex_driver::Base_GetControlMode::Request  &req, kortex_driver::Base_GetControlMode::Response &res)
 {
+	ROS_WARN("The base/get_control_mode service is now deprecated and will be removed in a future release.");
 	
 	Kinova::Api::Base::ControlModeInformation output;
 	
@@ -4947,6 +4958,38 @@ bool BaseRobotServices::GetFirmwareBundleVersions(kortex_driver::GetFirmwareBund
 	return true;
 }
 
+bool BaseRobotServices::ExecuteWaypointTrajectory(kortex_driver::ExecuteWaypointTrajectory::Request  &req, kortex_driver::ExecuteWaypointTrajectory::Response &res)
+{
+	
+	Kinova::Api::Base::WaypointList input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->ExecuteWaypointTrajectory(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
 bool BaseRobotServices::MoveSequenceTask(kortex_driver::MoveSequenceTask::Request  &req, kortex_driver::MoveSequenceTask::Response &res)
 {
 	
@@ -5126,6 +5169,111 @@ bool BaseRobotServices::GetAllControllerConfigurations(kortex_driver::GetAllCont
 	try
 	{
 		output = m_base->GetAllControllerConfigurations(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseRobotServices::ComputeForwardKinematics(kortex_driver::ComputeForwardKinematics::Request  &req, kortex_driver::ComputeForwardKinematics::Response &res)
+{
+	
+	Kinova::Api::Base::JointAngles input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::Base::Pose output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->ComputeForwardKinematics(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseRobotServices::ComputeInverseKinematics(kortex_driver::ComputeInverseKinematics::Request  &req, kortex_driver::ComputeInverseKinematics::Response &res)
+{
+	
+	Kinova::Api::Base::IKData input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::Base::JointAngles output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->ComputeInverseKinematics(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseRobotServices::ValidateWaypointList(kortex_driver::ValidateWaypointList::Request  &req, kortex_driver::ValidateWaypointList::Response &res)
+{
+	
+	Kinova::Api::Base::WaypointList input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::Base::WaypointValidationReport output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->ValidateWaypointList(input, m_current_device_id, m_api_options);
 	}
 
 	catch (Kinova::Api::KDetailedException& ex)

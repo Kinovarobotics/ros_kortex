@@ -22,7 +22,7 @@ int ToRosData(Kinova::Api::DeviceManager::DeviceHandles input, kortex_driver::De
 	output.device_handle.clear();
 	for(int i = 0; i < input.device_handle_size(); i++)
 	{
-		kortex_driver::DeviceHandle temp;
+		decltype(output.device_handle)::value_type temp;
 		ToRosData(input.device_handle(i), temp);
 		output.device_handle.push_back(temp);
 	}

@@ -46,7 +46,7 @@ int ToRosData(Kinova::Api::InterconnectConfig::GPIOIdentification input, kortex_
 	
 	return 0;
 }
-int ToRosData(Kinova::Api::InterconnectConfig::GPIOConfiguration input, kortex_driver::GPIOConfiguration &output)
+int ToRosData(Kinova::Api::InterconnectConfig::GPIOConfiguration input, kortex_driver::InterconnectConfig_GPIOConfiguration &output)
 {
 	
 	output.identifier = input.identifier();
