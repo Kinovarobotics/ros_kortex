@@ -52,6 +52,8 @@ ControlConfigRobotServices::ControlConfigRobotServices(ros::NodeHandle& node_han
 	m_pub_Error = m_node_handle.advertise<kortex_driver::KortexError>("kortex_error", 1000);
 	m_pub_ControlConfigurationTopic = m_node_handle.advertise<kortex_driver::ControlConfigurationNotification>("control_configuration_topic", 1000);
 	m_is_activated_ControlConfigurationTopic = false;
+	m_pub_ControlModeTopic = m_node_handle.advertise<kortex_driver::ControlConfig_ControlModeNotification>("control_mode_topic", 1000);
+	m_is_activated_ControlModeTopic = false;
 
 	m_serviceSetDeviceID = m_node_handle.advertiseService("control_config/set_device_id", &ControlConfigRobotServices::SetDeviceID, this);
 	m_serviceSetApiOptions = m_node_handle.advertiseService("control_config/set_api_options", &ControlConfigRobotServices::SetApiOptions, this);
@@ -85,6 +87,7 @@ ControlConfigRobotServices::ControlConfigRobotServices(ros::NodeHandle& node_han
 	m_serviceResetTwistLinearSoftLimit = m_node_handle.advertiseService("control_config/reset_twist_linear_soft_limit", &ControlConfigRobotServices::ResetTwistLinearSoftLimit, this);
 	m_serviceResetTwistAngularSoftLimit = m_node_handle.advertiseService("control_config/reset_twist_angular_soft_limit", &ControlConfigRobotServices::ResetTwistAngularSoftLimit, this);
 	m_serviceResetJointAccelerationSoftLimits = m_node_handle.advertiseService("control_config/reset_joint_acceleration_soft_limits", &ControlConfigRobotServices::ResetJointAccelerationSoftLimits, this);
+	m_serviceControlConfig_OnNotificationControlModeTopic = m_node_handle.advertiseService("control_config/activate_publishing_of_control_mode_topic", &ControlConfigRobotServices::ControlConfig_OnNotificationControlModeTopic, this);
 }
 
 bool ControlConfigRobotServices::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
@@ -1068,4 +1071,50 @@ bool ControlConfigRobotServices::ResetJointAccelerationSoftLimits(kortex_driver:
 	}
 	ToRosData(output, res.output);
 	return true;
+}
+
+bool ControlConfigRobotServices::ControlConfig_OnNotificationControlModeTopic(kortex_driver::ControlConfig_OnNotificationControlModeTopic::Request  &req, kortex_driver::ControlConfig_OnNotificationControlModeTopic::Response &res)
+{
+	
+	// If the notification is already activated, don't activate multiple times
+	if (m_is_activated_ControlModeTopic)
+		return true;
+	Kinova::Api::Common::NotificationOptions input;
+	ToProtoData(req.input, &input);
+	Kinova::Api::Common::NotificationHandle output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		std::function< void (Kinova::Api::ControlConfig::ControlModeNotification) > callback = std::bind(&ControlConfigRobotServices::cb_ControlModeTopic, this, std::placeholders::_1);
+		output = m_controlconfig->OnNotificationControlModeTopic(callback, input, m_current_device_id);
+		m_is_activated_ControlModeTopic = true;
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+void ControlConfigRobotServices::cb_ControlModeTopic(Kinova::Api::ControlConfig::ControlModeNotification notif)
+{
+	kortex_driver::ControlConfig_ControlModeNotification ros_msg;
+	ToRosData(notif, ros_msg);
+	m_pub_ControlModeTopic.publish(ros_msg);
 }

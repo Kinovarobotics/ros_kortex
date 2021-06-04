@@ -54,11 +54,13 @@ foreach(sub_dir ${srv_generated_dir_list})
     add_service_files(DIRECTORY srv/generated/${sub_dir})
 endforeach()
 
+add_action_files(DIRECTORY action/non_generated)
+
 ## generate added messages and services
-generate_messages(DEPENDENCIES std_msgs)
+generate_messages(DEPENDENCIES std_msgs actionlib_msgs)
 
 ## declare a catkin package
-catkin_package()
+catkin_package(CATKIN_DEPENDS actionlib_msgs)
 
 if(USE_CONAN)
   # Include conan.cmake module and download Kortex API from artifactory

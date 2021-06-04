@@ -29,7 +29,7 @@
 	m_pub_Error = m_node_handle.advertise<kortex_driver::KortexError>("kortex_error", 1000);
 {%- for method in package.methods -%}
 {%- if method.is_notification_rpc %}
-	m_pub_{{method.name}} = m_node_handle.advertise<kortex_driver::{{method_prepend_rpc_package_name}}{{method.name|replace("Topic", "")}}Notification>("{{method.name_lowercase_with_underscores}}", 1000);
+	m_pub_{{method.name}} = m_node_handle.advertise<kortex_driver::{{method.prepend_rpc_package_name}}{{method.name|replace("Topic", "")}}Notification>("{{method.name_lowercase_with_underscores}}", 1000);
 	m_is_activated_{{method.name}} = false;
 {%- endif -%}
 {%- endfor %}
@@ -125,7 +125,7 @@ bool {{package.short_name}}RobotServices::{{method.prepend_rpc_package_name}}{{m
 {%- if method.is_notification_rpc %}
 void {{package.short_name}}RobotServices::cb_{{method.name}}({{method.notification_message_cpp_namespace}}::{{method.name|replace("Topic", "")}}Notification notif)
 {
-	kortex_driver::{{method.name|replace("Topic", "")}}Notification ros_msg;
+	kortex_driver::{{method.prepend_rpc_package_name}}{{method.name|replace("Topic", "")}}Notification ros_msg;
 	ToRosData(notif, ros_msg);
 	m_pub_{{method.name}}.publish(ros_msg);
 }

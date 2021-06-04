@@ -28,4 +28,4 @@ See the `kortex_description/grippers` folder for a list of supported Kinova Kort
 Upon launching the main launch file of a `move_it_config` package, `move_group.launch` (normally launched from the real arm driver's launch file and the simulation launch file), the [C++](http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/move_group_interface/move_group_interface_tutorial.html) and [Python](http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/move_group_python_interface/move_group_python_interface_tutorial.html) interfaces for MoveIt will be enabled. 
 You will be able to use motion planning, configure the planning scene, send trajectories and send pose goals to the simulated robot from your own ROS nodes.
 
-You can take a look at our [MoveIt! Python example](../kortex_examples/src/move_it/example_move_it_trajectories.py) for a concrete example.  
+You can take a look at our [MoveIt! Python example](../kortex_examples/python/move_it/example_move_it_trajectories.py) for a concrete example.  

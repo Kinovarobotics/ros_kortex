@@ -203,7 +203,7 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     rpc MappingInfoTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=99 @PUB_SUB=MappingInfoNotification
 
     // Subscribes to control mode topic for notifications
-    rpc ControlModeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=100 @PUB_SUB=ControlModeNotification
+    rpc ControlModeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=100 @PUB_SUB=ControlModeNotification @DEPRECATED="This function may be removed in a future release. It has been moved to ControlConfig service."
 
     // Subscribes to operating mode topic for notifications
     rpc OperatingModeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=101 @PUB_SUB=OperatingModeNotification
@@ -226,14 +226,17 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Subscribes to robot event topic for notifications
     rpc RobotEventTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=107 @PUB_SUB=RobotEventNotification
 
-    // Moves robot to the specified tool pose (position and orientation) while imposing specified constraints.
-    rpc PlayCartesianTrajectory (ConstrainedPose) returns (Kinova.Api.Common.Empty);//@RPC_ID=109
+    // Moves robot to the specifed tool pose (position and orientation) while imposing specified constraints.
+    // This RPC will be deprecated in a future version and will be replaced by ExecuteWaypointTrajectory.
+    rpc PlayCartesianTrajectory (ConstrainedPose) returns (Kinova.Api.Common.Empty);//@RPC_ID=109 @DEPRECATED
 
-    // Moves robot to the specified position while imposing specified constraints.
-    rpc PlayCartesianTrajectoryPosition (ConstrainedPosition) returns (Kinova.Api.Common.Empty);//@RPC_ID=110
+    // Moves robot to the specifed position while imposing specified constraints.
+    // This RPC will be deprecated in a future version and will be replaced by ExecuteWaypointTrajectory.
+    rpc PlayCartesianTrajectoryPosition (ConstrainedPosition) returns (Kinova.Api.Common.Empty);//@RPC_ID=110 @DEPRECATED
 
-    // Moves to the specified orientation while imposing specified constraints.
-    rpc PlayCartesianTrajectoryOrientation (ConstrainedOrientation) returns (Kinova.Api.Common.Empty);//@RPC_ID=111
+    // Moves to the specifed orientation while imposing specified constraints.
+    // This RPC will be deprecated in a future version and will be replaced by ExecuteWaypointTrajectory.
+    rpc PlayCartesianTrajectoryOrientation (ConstrainedOrientation) returns (Kinova.Api.Common.Empty);//@RPC_ID=111 @DEPRECATED
 
     // Stops robot movement
     rpc Stop (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=112
@@ -260,10 +263,12 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     rpc SendTwistCommand (TwistCommand) returns (Kinova.Api.Common.Empty);//@RPC_ID=121
 
     // Moves joints to the specified joint angles while imposing specified constraints.
-    rpc PlayJointTrajectory (ConstrainedJointAngles) returns (Kinova.Api.Common.Empty);//@RPC_ID=124
+    // This RPC will be deprecated in a future version and will be replaced by ExecuteWaypointTrajectory.
+    rpc PlayJointTrajectory (ConstrainedJointAngles) returns (Kinova.Api.Common.Empty);//@RPC_ID=124 @DEPRECATED
 
     // Moves specifed joint to the specifed joint angle while imposing specified constraints.
-    rpc PlaySelectedJointTrajectory (ConstrainedJointAngle) returns (Kinova.Api.Common.Empty);//@RPC_ID=125
+    // This RPC will be deprecated in a future version and will be replaced by ExecuteWaypointTrajectory.
+    rpc PlaySelectedJointTrajectory (ConstrainedJointAngle) returns (Kinova.Api.Common.Empty);//@RPC_ID=125 @DEPRECATED
 
     // Retrieves the currently measured joint angles for each joint
     rpc GetMeasuredJointAngles (Kinova.Api.Common.Empty) returns (JointAngles);//@RPC_ID=126
@@ -296,7 +301,7 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     rpc ClearFaults (Kinova.Api.Common.Empty) returns (Kinova.Api.Common.Empty);//@RPC_ID=146
 
     // Retrieves current control mode
-    rpc GetControlMode (Kinova.Api.Common.Empty) returns (ControlModeInformation);//@RPC_ID=150
+    rpc GetControlMode (Kinova.Api.Common.Empty) returns (ControlModeInformation);//@RPC_ID=150 @DEPRECATED="This function may be removed in a future release. It has been moved to ControlConfig service."
 
     // Retrieves current operating mode
     rpc GetOperatingMode (Kinova.Api.Common.Empty) returns (OperatingModeInformation);//@RPC_ID=151
@@ -464,6 +469,9 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
     // Retrieves current firmware bundle versions
     rpc GetFirmwareBundleVersions (Kinova.Api.Common.Empty) returns (FirmwareBundleVersions);//@RPC_ID=224
 
+    // Executes a trajectory defined by a series of waypoints in joint space or in Cartesian space
+    rpc ExecuteWaypointTrajectory (WaypointList) returns (Kinova.Api.Common.Empty);//@RPC_ID=226
+
     // Move task to new index in a sequence
     rpc MoveSequenceTask (SequenceTasksPair) returns (Kinova.Api.Common.Empty);//@RPC_ID=227
 
@@ -481,6 +489,46 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
 
     // Retrieves all controller configurations
     rpc GetAllControllerConfigurations (Kinova.Api.Common.Empty) returns (ControllerConfigurationList);//@RPC_ID=232
+    
+    // Get the forward kinematics given specified angular positions of actuators
+    rpc ComputeForwardKinematics (JointAngles) returns (Pose);//@RPC_ID=233
+
+    // Get the inverse kinematics given a specified cartesian pose and guess of joint angles
+    rpc ComputeInverseKinematics (IKData) returns (JointAngles);//@RPC_ID=234
+
+    /* 
+     * Validate a waypoint list, returns an empty trajectory error report list if the waypoint list is valid.
+     * If the use_optimal_blending option is true, a waypoint list with optimal blending will be return. 
+     */
+    rpc ValidateWaypointList (WaypointList) returns (WaypointValidationReport);//@RPC_ID=235
+}
+
+// List of GPIO port configurations
+message GpioConfigurationList {
+    repeated GpioConfiguration port_configurations = 1;   // Port configuration list
+}
+
+// GPIO port configuration information
+message GpioConfiguration {
+    uint32 port_number = 1;                                 // Port number (Base extension port is port 0)
+    repeated GpioPinConfiguration pin_configurations = 2;   // Pin configuration list
+}
+
+// GPIO pin configuration information
+message GpioPinConfiguration {
+    uint32 pin_id = 1;                      // Pin identifier
+    GpioPinPropertyFlags pin_property = 2;  // Pin property (read only)
+    bool output_enable = 3;                 // Pin is configured as output if set to TRUE. If output is enabled, input events are masked.
+    bool default_output_value = 4;          // Default output pin value. This is the value set when pin is initialized (TRUE == high / FALSE == low).
+}
+
+// Admissible gpio pin properties
+enum GpioPinPropertyFlags
+{
+    GPIOPROPERTY_UNKNOWN = 0;
+    GPIOPROPERTY_INPUT = 1;     // 0x1 : Pin can be used as digital input
+    GPIOPROPERTY_OUTPUT = 2;    // 0x2 : Pin can be used as digital output
+    GPIOPROPERTY_ANALOG = 4;    // 0x4 : Pin can be used as analog input
 }
 
 // Identifies Base service current version
@@ -621,8 +669,8 @@ message Action {
         TwistCommand send_twist_command = 4;                            // Control the tool in velocity
         WrenchCommand send_wrench_command = 5;                          // Control the tool in force (EXPERIMENTAL)
         JointSpeeds send_joint_speeds = 7;                              // Action to control each joint speed
-        ConstrainedPose reach_pose = 9;                                 // Reach a pose given Cartesian constraints.
-        ConstrainedJointAngles reach_joint_angles = 10;                 // Reach a series of joint angles given angular constraints.
+        ConstrainedPose reach_pose = 9;                                 // Reach a pose given Cartesian constraints. This action will be deprecated in a future version and will be replaced by execute_waypoint_list.
+        ConstrainedJointAngles reach_joint_angles = 10;                 // Reach a series of joint angles given angular constraints. This action will be deprecated in a future version and will be replaced by execute_waypoint_list.
         AdmittanceMode toggle_admittance_mode = 16;                     // Enable or disable the admittance mode
         Snapshot snapshot = 17;                                         // Take a snapshot of current robot position
         SwitchControlMapping switch_control_mapping = 19;               // Switch the active controller map
@@ -636,8 +684,11 @@ message Action {
         Delay delay = 34;                                               // Apply a delay
         ActionHandle execute_action = 35;                               // Execute an existing action
         GripperCommand send_gripper_command = 36;                       // Send a gripper command
+        GpioCommand send_gpio_command = 37;                             // Send a gpio command (not implemented yet)
         Stop stop_action = 38;                                          // Stop movement
         PreComputedJointTrajectory play_pre_computed_trajectory = 39;   // Play a pre-computed joint trajectory
+        SequenceHandle execute_sequence = 40;                           // Execute an existing sequence
+        WaypointList execute_waypoint_list = 41;                        // Execute a trajectory defined by a series of waypoints
     }
 }
 
@@ -662,8 +713,11 @@ enum ActionType {
     TIME_DELAY = 31;                    // Apply a delay
     EXECUTE_ACTION = 32;                // Execute an existing action
     SEND_GRIPPER_COMMAND = 33;          // Send a gripper command
+    SEND_GPIO_COMMAND = 34;             // Send a gpio command (not implemented yet)
     STOP_ACTION = 35;                   // Stop robot movement
     PLAY_PRE_COMPUTED_TRAJECTORY = 39;  // Play a pre-computed trajectory
+    EXECUTE_SEQUENCE = 40;              // Execute an existing sequence
+    EXECUTE_WAYPOINT_LIST = 41;         // Execute a trajectory defined by a series of waypoints
 }
 
 // Admissible types of snapshots
@@ -744,11 +798,11 @@ message CommunicationInterfaceConfiguration {
 
 // Admissible network types
 enum NetworkType {
-    UNSPECIFIED_NETWORK_TYPE = 0;   // Unspecified network type
-    WIFI = 1;                       // Wi-Fi network
-    WIRED_ETHERNET = 2;             // Wired Ethernet network
-    WIRED_MICROUSB = 3;             // Wired Ethernet over USB network (RNDIS)
-    WIRED_USB = 4;                  // Wired Ethernet over USB network
+    UNSPECIFIED_NETWORK_TYPE = 0;    // Unspecified network type
+    WIFI = 1;                        // Wi-Fi network
+    WIRED_ETHERNET = 2;              // Wired Ethernet network
+    WIRED_MICROUSB = 3;              // Wired Ethernet over USB network (RNDIS)
+    WIRED_USB = 4 [deprecated=true]; // This enum value is deprecated and will be removed in a future release.
 }
 
 // Reference to a network
@@ -1144,7 +1198,8 @@ enum ControllerType {
     XBOX_CONTROLLER = 1;                // Xbox gamepad
     WRIST_CONTROLLER = 2;               // Wrist buttons
     BASIC_JOYSTICK_CONTROLLER = 3;      // Simplified joystick connected to Kinova robot base
-    BASE_GPIO_CONTROLLER = 4;           // GPIO Controller (not implemented yet)
+    BASE_GPIO_CONTROLLER = 4;           // GPIO Controller
+    GPIO_JOYSTICK = 5;                  // TEMP, will be deleted
 }
 
 // Reference to a specific controller device
@@ -1220,6 +1275,7 @@ enum ActionEvent {
     ACTION_POSTPROCESS_START = 8;   // Action post-process started
     ACTION_POSTPROCESS_ABORT = 9;   // Action post-process aborted
     ACTION_POSTPROCESS_END = 10;    // Action post-process ended
+    ACTION_FEEDBACK = 11;           // Action feedback received
 }
 
 // Notification about a single action event
@@ -1230,7 +1286,15 @@ message ActionNotification {
     Kinova.Api.Common.UserProfileHandle user_handle = 4;    // User that caused the action event
     SubErrorCodes abort_details = 5;                        // Details if action_event is equal to ACTION_ABORT
     Kinova.Api.Common.Connection connection = 6;            // Connection that caused the action event
+    repeated TrajectoryInfo trajectory_info = 7;            // Additional information from the current action
 }
+
+// Additional trajectory information
+message TrajectoryInfo {
+    TrajectoryInfoType trajectory_info_type = 1;    // Trajectory information type
+    uint32 waypoint_index = 2;                      // Waypoint index (if applicable)
+    uint32 joint_index = 3;                         // Joint index (if applicable)
+} 
 
 // Indicates the execution state of an action (not implemented yet)
 message ActionExecutionState {
@@ -1401,7 +1465,7 @@ message ControllerEvent {
     uint32 input_identifier = 3;        // Controller input that caused the event
 }
 
-// A GPIO event (not implemented yet)
+// A GPIO event
 message GpioEvent {
     ControllerInputType input_type = 1;  // Type of controller input that caused the event_identifier
     GpioBehavior behavior = 2;           // GPIO behavior that occured
@@ -1412,7 +1476,7 @@ message GpioEvent {
 message MapEvent {
     oneof events {
         SafetyEvent safety_event = 1;           // Mapped safety event (not implemented yet)
-        GpioEvent gpio_event = 2;               // Mapped GPIO event (not implemented yet)
+        GpioEvent gpio_event = 2;               // Mapped GPIO event
         ControllerEvent controller_event = 3;   // Mapped controller event
     }
     string name = 4;                            // Map event friendly name
@@ -1774,6 +1838,22 @@ message Finger {
     float value = 2;
 }
 
+// A command to control expansion port's GPIO
+message GpioCommand {
+    uint32 port_identifier = 1;     // Gpio port identifier (0 == base expansion port)
+    uint32 pin_identifier = 2;      // Gpio pin identifier
+    GpioAction action = 3;          // Action to perform on gpio
+    uint32 period = 4;              // Period, in ms, of GPIO action (applicable only for pulse commands)
+}
+
+// Admissible GPIO actions
+enum GpioAction {
+    UNSPECIFIED_GPIO_ACTION = 0;            // Unspecified gpio action
+    GPIOACTION_SET = 1;                     // Set GPIO output
+    GPIOACTION_CLEAR = 2;                   // Clear GPIO output
+    GPIOACTION_PULSE_HIGH = 3;              // Pulse high GPIO output with specified period
+    GPIOACTION_PULSE_LOW = 4;               // Pulse low GPIO output with specified period
+}
 
 // Admissible map navigation directions
 enum NavigationDirection {
@@ -1806,16 +1886,17 @@ enum LedState {
     LED_ON = 3;                 // LED is one
 }
 
-// Admissible GPIO behavior (not implemented yet)
+// Admissible GPIO behavior
 enum GpioBehavior {
     UNSPECIFIED_GPIO_BEHAVIOR = 0; // Unspecified GPIO behavior
     GPIO_FALLING = 1;              // Falling edge
     GPIO_RISING = 2;               // Rising edge
     GPIO_PULSE_LOW = 3;            // Sequence of HIGH - LOW - HIGH
     GPIO_PULSE_HIGH = 4;           // Sequence of LOW - HIGH - LOW
+    GPIO_ANALOG_CHANGE = 5;        // Analog input value change
 }
 
-// Available GPIO PIN (not implemented yet)
+// Available GPIO PIN (See the user guide at section Base expansion connector)
 enum Gen3GpioPinId {
     UNSPECIFIED_PIN = 0;  // Unspecified PIN ID
     GPIO_PIN_B = 1;       // GPIO PIN B
@@ -2015,55 +2096,132 @@ enum TrajectoryContinuityMode
 // Trajectory validation error types
 enum TrajectoryErrorType
 {
+    option allow_alias = true;
     TRAJECTORY_ERROR_TYPE_UNSPECIFIED             = 0;   // Unspecified error type
-    TRAJECTORY_ERROR_TYPE_OUTSIDE_WORKSPACE       = 1;   // The trajectory point is outside robot workspace
-    TRAJECTORY_ERROR_TYPE_ACTUATOR_COUNT_MISMATCH = 2;   // There is an actuator count mismatch with the robot
-    TRAJECTORY_ERROR_TYPE_INVALID_DURATION        = 3;   // The trajectory has an invalid duration
-    TRAJECTORY_ERROR_TYPE_ZERO_DISTANCE           = 4;   // The trajectory does not move the robot because the delta is either zero or too small
-    TRAJECTORY_ERROR_TYPE_INVALID_SPEED           = 5;   // The speed for a trajectory point for an actuator is invalid
-    TRAJECTORY_ERROR_TYPE_LARGE_SPEED             = 6;   // The speed for a trajectory point for an actuator exceeds its limit
-    TRAJECTORY_ERROR_TYPE_INVALID_ACCELERATION    = 7;   // The acceleration for a trajectory point for an actuator is invalid
-    TRAJECTORY_ERROR_TYPE_INVALID_TIME_STEP       = 8;   // The time step for a trajectory point is invalid
-    TRAJECTORY_ERROR_TYPE_LARGE_SIZE              = 9;   // The trajectory is too large
-    TRAJECTORY_ERROR_TYPE_WRONG_MODE              = 10;  // The robot is not currently in Trajectory Control mode
-    TRAJECTORY_ERROR_TYPE_JOINT_POSITION_LIMIT    = 11;  // The position limit for a trajectory point for an actuator is exceeded
-    TRAJECTORY_ERROR_TYPE_FILE_ERROR              = 12;  // An internal file error was encountered
-    TRAJECTORY_ERROR_TYPE_NO_FILE_IN_MEMORY       = 13;  // An internal file memory error was encountered
-    TRAJECTORY_ERROR_TYPE_INDEX_OUT_OF_TRAJ       = 14;  // The index for a trajectory point is invalid
-    TRAJECTORY_ERROR_TYPE_ALREADY_RUNNING         = 15;  // A trajectory is already running
-    TRAJECTORY_ERROR_TYPE_WRONG_STARTING_POINT    = 16;  // The difference between the trajectory's starting point and the current position is too large
-    TRAJECTORY_ERROR_TYPE_CARTESIAN_CANNOT_START  = 17;  // The cartesian trajectory is not able to start
-    TRAJECTORY_ERROR_TYPE_WRONG_STARTING_SPEED    = 18;  // The difference between the trajectory's starting speed and the current speed is too large
-    TRAJECTORY_ERROR_TYPE_INVALID_POSITION        = 19;  // The position for a trajectory point for an actuator is invalid
+    TRAJECTORY_ERROR_TYPE_OUTSIDE_WORKSPACE       = 1;   // The desired pose is outside robot workspace
+    TRAJECTORY_ERROR_TYPE_ACTUATOR_COUNT_MISMATCH = 2;   // The provided number of joint values does not match robot's number of actuators
+    TRAJECTORY_ERROR_TYPE_INVALID_DURATION        = 3;   // The duration exceeds a limit or is invalid
+    
+    TRAJECTORY_ERROR_TYPE_JOINT_NO_MOTION         = 4; // The robot's actuators are already at the targeted configuration
+    TRAJECTORY_ERROR_TYPE_ZERO_DISTANCE           = 4  [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    
+    TRAJECTORY_ERROR_TYPE_INVALID_JOINT_SPEED     = 5; // The joint speed exceeds a limit, initial speed does not match current robot speed or is invalid
+    TRAJECTORY_ERROR_TYPE_INVALID_SPEED           = 5  [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    TRAJECTORY_ERROR_TYPE_LARGE_SPEED             = 6  [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    
+    TRAJECTORY_ERROR_TYPE_INVALID_JOINT_ACCELERATION = 7; // The joint acceleration exceeds a limit or is invalid
+    TRAJECTORY_ERROR_TYPE_INVALID_ACCELERATION       = 7  [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    
+    TRAJECTORY_ERROR_TYPE_INVALID_TIME_STEP       = 8;   // The time step does not match robot time step or is invalid
+    
+    TRAJECTORY_ERROR_TYPE_INVALID_TRAJECTORY_SIZE = 9;  // The trajectory size is outside the limits or is invalid
+    TRAJECTORY_ERROR_TYPE_LARGE_SIZE              = 9  [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    
+    TRAJECTORY_ERROR_TYPE_WRONG_MODE             = 10 [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    
+    TRAJECTORY_ERROR_TYPE_INVALID_JOINT_POSITION = 11; // The joint position exceeds a limit, initial joint position does not match current robot joint position or is invalid
+    TRAJECTORY_ERROR_TYPE_JOINT_POSITION_LIMIT   = 11  [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    
+    TRAJECTORY_ERROR_TYPE_FILE_ERROR             = 12 [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    TRAJECTORY_ERROR_TYPE_NO_FILE_IN_MEMORY      = 13 [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    TRAJECTORY_ERROR_TYPE_INDEX_OUT_OF_TRAJ      = 14 [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    
+    TRAJECTORY_ERROR_TYPE_TRAJECTORY_ALREADY_RUNNING = 15; // The new trajectory cannot start because another trajectory is being played
+    TRAJECTORY_ERROR_TYPE_ALREADY_RUNNING            = 15  [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+
+    TRAJECTORY_ERROR_TYPE_WRONG_STARTING_POINT   = 16 [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    TRAJECTORY_ERROR_TYPE_CARTESIAN_CANNOT_START = 17 [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    TRAJECTORY_ERROR_TYPE_WRONG_STARTING_SPEED   = 18 [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    TRAJECTORY_ERROR_TYPE_INVALID_POSITION       = 19 [deprecated=true];  // This enum value is deprecated and will be removed in a future release.
+    
+    
+    TRAJECTORY_ERROR_TYPE_INVALID_CARTESIAN_POSITION            = 20;   // The cartesian position exceeds a limit, initial pose does not match current robot pose or is invalid
+    TRAJECTORY_ERROR_TYPE_INVALID_CARTESIAN_ORIENTATION         = 21;  // The cartesian orientation exceeds a limit, initial orientation does not match current robot orientation or is invalid
+    TRAJECTORY_ERROR_TYPE_INVALID_CARTESIAN_LINEAR_VELOCITY     = 22;  // The cartesian linear velocity exceeds a limit or is invalid
+    TRAJECTORY_ERROR_TYPE_INVALID_CARTESIAN_ANGULAR_VELOCITY    = 23;  // The cartesian angular velocity exceeds a limit or is invalid
+    TRAJECTORY_ERROR_TYPE_INVALID_JOINT_TORQUE                  = 24;  // The joint torque exceeds a limit or is invalid
+    TRAJECTORY_ERROR_TYPE_MULTIPLE_WAYPOINT_TYPE_LIST           = 25;  // The waypoints in a trajectory must be all of the same type (cartesian or angular)
+    TRAJECTORY_ERROR_TYPE_INITIAL_WAYPOINT_NO_STOP              = 26;  // The first waypoint must not have blending (currently unused)
+    TRAJECTORY_ERROR_TYPE_FINAL_WAYPOINT_NO_STOP                = 27;  // The last waypoint must not have blending
+    TRAJECTORY_ERROR_TYPE_INVALID_BLENDING_RADIUS               = 28;  // The blending radius must be positive and not overlap other blendings or waypoint or is invalid
+    TRAJECTORY_ERROR_TYPE_INVALID_REFERENCE_FRAME               = 29;  // The reference frame is invalid or not supported
+    TRAJECTORY_ERROR_TYPE_NUMERICAL_ERROR_IMPOSSIBLE_TRAJECTORY = 30;  // The conditions (points, velocities) of the trajectory lead to numerical errors that make the computation impossible
 }
 
-// Trajectory validation error identifiers
+// This enum is deprecated and will be removed in a future release
 enum TrajectoryErrorIdentifier
 {
-    TRAJECTORY_ERROR_IDENTIFIER_UNSPECIFIED   = 0;   // Unspecified error identifier
-    TRAJECTORY_ERROR_IDENTIFIER_UNAPPLICABLE  = 1;   // No identifier required for this error
-    TRAJECTORY_ERROR_IDENTIFIER_TIME          = 2;   // Time validation failed
-    TRAJECTORY_ERROR_IDENTIFIER_POSITION      = 3;   // Position validation failed
-    TRAJECTORY_ERROR_IDENTIFIER_VELOCITY      = 4;   // Velocity validation failed
-    TRAJECTORY_ERROR_IDENTIFIER_ACCELERATION  = 5;   // Acceleration validation failed
+    TRAJECTORY_ERROR_IDENTIFIER_UNSPECIFIED   = 0;   // Unspecified error identifier. This enum is deprecated.
+    TRAJECTORY_ERROR_IDENTIFIER_UNAPPLICABLE  = 1;   // No identifier required for this error. This enum is deprecated.
+    TRAJECTORY_ERROR_IDENTIFIER_TIME          = 2;   // Time validation failed. This enum is deprecated.
+    TRAJECTORY_ERROR_IDENTIFIER_POSITION      = 3;   // Position validation failed. This enum is deprecated.
+    TRAJECTORY_ERROR_IDENTIFIER_VELOCITY      = 4;   // Velocity validation failed. This enum is deprecated.
+    TRAJECTORY_ERROR_IDENTIFIER_ACCELERATION  = 5;   // Acceleration validation failed. This enum is deprecated.
 }
 
 // Details for a single trajectory validation error 
 message TrajectoryErrorElement
 {
     TrajectoryErrorType       error_type = 1;         // Error type
-    TrajectoryErrorIdentifier error_identifier = 2;   // Error identifier
-    float   error_value = 3; // Erroneous value
-    float   min_value = 4;   // Minimum permitted value
-    float   max_value = 5;   // Maximum permitted value
-    uint32  index = 6;       // Actuator index
-    string  message = 7;     // Clarification message for the error
+    TrajectoryErrorIdentifier error_identifier = 2 [deprecated = true]; // This field is deprecated and will be removed in a future release.
+    float   error_value = 3;        // Erroneous value
+    float   min_value = 4;          // Minimum permitted value
+    float   max_value = 5;          // Maximum permitted value
+    uint32  index = 6;              // Actuator index
+    string  message = 7;            // Clarification message for the error
+    uint32  waypoint_index = 8;     // Waypoint index (if it applies)
 }
 
 // Report collecting information on different validation errors for a particular trajectory
 message TrajectoryErrorReport
 {
     repeated TrajectoryErrorElement trajectory_error_elements = 1;
+}
+
+// Waypoint Validation results
+message WaypointValidationReport
+{
+    TrajectoryErrorReport trajectory_error_report = 1;  // Report on the validation, the waypoint list is valid if empty
+    WaypointList optimal_waypoint_list = 2;             // Validated Waypoint List with optimal blending radius if the option was set
+}
+
+// A waypoint describing part of a trajectory.
+message Waypoint {
+    string name = 1; // Waypoint friendly name
+    oneof type_of_waypoint { // Oneof to define the waypoint type
+        AngularWaypoint angular_waypoint = 2;
+        CartesianWaypoint cartesian_waypoint = 3;
+    }
+}
+
+// An angular Waypoint
+message AngularWaypoint {
+    repeated float angles = 1; // Target position (in deg)
+    repeated float maximum_velocities = 2; // Maximum velocities for each actuator (in deg/s) during movement (optional)
+    float duration = 3; // Duration to reach this waypoint from the previous position (in seconds)
+}
+
+// A Cartesian Waypoint
+message CartesianWaypoint {
+    Pose pose = 1; // Target Cartesian Pose
+    Kinova.Api.Common.CartesianReferenceFrame reference_frame = 2; // The reference frame used for the goal Pose
+    float maximum_linear_velocity = 3; //  Maximum linear velocity (in m/s) during movement (optional)
+    float maximum_angular_velocity = 4; // Maximum angular velocity (in deg/s) during movement (optional)
+    float blending_radius = 5; // Blending radius (in m) to use for the movement (if this waypoint is not an endpoint).
+}
+
+// A waypoint list
+message WaypointList {
+    repeated Waypoint waypoints = 1; // Array of waypoints
+    float duration = 2; // Duration of the waypoint list (in seconds). If unspecified or equal to 0, optimal duration is assumed.
+    bool use_optimal_blending = 3; // At validation if this value is true, the waypoint list with optimal blending will be returned.
+}
+
+// Angular and Cartesian kinematic constraints (maximum velocities)
+message KinematicTrajectoryConstraints {
+    repeated float angular_velocities = 1; // Angular velocities for each actuator (in deg/s)
+    float linear_velocity = 2; // Linear velocity (in m/s)
+    float angular_velocity = 3; // Angular velocity (in deg/s)
 }
 
 // Firmware bundle versions including main firmware bundle version and components versions
@@ -2079,4 +2237,30 @@ message FirmwareComponentVersion
     string name = 1; // Name of the component
     string version = 2; // Version of the component
     uint32 device_id = 3; // Device id of the component
+}
+
+// Input needed for the calculation of inverse kinematics
+message IKData
+{
+    Pose cartesian_pose = 1; // Cartesian pose of the end effector used to calculate the corresponding joint angles
+    JointAngles guess = 2; // Initial guess for the joint angles
+}
+
+// Additional trajectory info type
+enum TrajectoryInfoType
+{
+    UNSPECIFIED_TRAJECTORY_INFORMATION      = 0; // No information provided
+    JOINT_ACCELERATION_LIMIT_REACHED        = 1; // Joint acceleration limit reached
+    JOINT_SPEED_LIMIT_REACHED               = 2; // Joint speed limit reached
+    JOINT_POSITION_LIMIT_REACHED            = 3; // Joint position limit reached
+    JOINT_TORQUE_LIMIT_REACHED              = 4; // Joint torque limit reached
+    SINGULARITY_REGION                      = 5; // The arm is inside a singularity region 
+    INVERSE_KINEMATIC_FAILED                = 6; // The inverse kinematic calculation has failed
+    CARTESIAN_ACCELERATION_LIMIT_REACHED    = 7; // Cartesian acceleration limit reached
+    CARTESIAN_SPEED_LIMIT_REACHED           = 8; // Cartesian speed limit reached
+    CARTESIAN_POSITION_LIMIT_REACHED        = 9; // Cartesian position limit reached
+    CARTESIAN_WRENCH_LIMIT_REACHED          = 10; // Cartesian torque limit reached
+    ENTERING_PROTECTION_ZONE                = 11; // The arm is entering a protection zone
+    WAYPOINT_REACHED                        = 12; // Waypoint reached
+    TRAJECTORY_OK                           = 13; // There is more trajectory notification
 }

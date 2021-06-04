@@ -25,7 +25,7 @@ service ControlConfig {//@PROXY_ID=16 @ERROR=Kinova.Api.Error
     // Retrieves global gravity vector
     rpc GetGravityVector (Kinova.Api.Common.Empty) returns (GravityVector);//@RPC_ID=2
 
-    // Sets payload information. This needs to be configured so that the control library can take into account the presence of the payload mass in computing the dynamics of the robot. 
+    // Sets payload information. This needs to be configured so that the control library can take into account the presence of the payload mass in computing the dynamics of the robot.
     rpc SetPayloadInformation (PayloadInformation) returns (Kinova.Api.Common.Empty);//@RPC_ID=3
 
     // Retrieves payload information
@@ -49,7 +49,7 @@ service ControlConfig {//@PROXY_ID=16 @ERROR=Kinova.Api.Error
     // Retrieves the current reference frame used by the twist and wrench commands
     rpc GetCartesianReferenceFrame (Kinova.Api.Common.Empty) returns (CartesianReferenceFrameInfo);//@RPC_ID=10
 
-    // Retrieves current control mode (not implemented yet)
+    // Retrieves current control mode
     rpc GetControlMode (Kinova.Api.Common.Empty) returns (ControlModeInformation);//@RPC_ID=13
 
     // Set the software joint speed limits.
@@ -72,7 +72,7 @@ service ControlConfig {//@PROXY_ID=16 @ERROR=Kinova.Api.Error
 
     // Retrieves the software kinematic limits for all control modes.
     rpc GetAllKinematicSoftLimits (Kinova.Api.Common.Empty) returns (KinematicLimitsList);//@RPC_ID=20
-    
+
     // Set the desired linear twist when using the joystick.
     rpc SetDesiredLinearTwist (LinearTwist) returns (Kinova.Api.Common.Empty);//@RPC_ID=21
 
@@ -85,7 +85,7 @@ service ControlConfig {//@PROXY_ID=16 @ERROR=Kinova.Api.Error
     // Retrieves the desired joystick speeds
     rpc GetDesiredSpeeds (Kinova.Api.Common.Empty) returns (DesiredSpeeds);//@RPC_ID=24
 
-    // Resets gravity vector to default values   
+    // Resets gravity vector to default values
     rpc ResetGravityVector (Kinova.Api.Common.Empty) returns (GravityVector);//@RPC_ID=25
 
     // Resets payload information to default values
@@ -105,6 +105,9 @@ service ControlConfig {//@PROXY_ID=16 @ERROR=Kinova.Api.Error
 
     // Resets joint acceleration soft limits to default values
     rpc ResetJointAccelerationSoftLimits (ControlModeInformation) returns (JointAccelerationSoftLimits);//@RPC_ID=31
+
+    // Subscribes to control mode topic for notifications
+    rpc ControlModeTopic (Kinova.Api.Common.NotificationOptions) returns (Kinova.Api.Common.NotificationHandle);//@RPC_ID=32 @PUB_SUB=ControlModeNotification
 }
 
 // Identifies ControlConfig current version
@@ -201,7 +204,7 @@ message TwistLinearSoftLimit {
 // Software twist angular speed limit
 message TwistAngularSoftLimit {
     ControlMode control_mode = 1;                   // Control mode
-    float twist_angular_soft_limit = 2;             // Software angular twist limit                                   
+    float twist_angular_soft_limit = 2;             // Software angular twist limit
 }
 
 // Software joint speed limits
@@ -221,7 +224,7 @@ message KinematicLimits {
     ControlMode control_mode = 1;                       // Control mode
     float twist_linear = 2;                             // Linear twist limits
     float twist_angular = 3;                            // Angular twist limits
-    repeated float joint_speed_limits = 4;              // Joint speed limits          
+    repeated float joint_speed_limits = 4;              // Joint speed limits
     repeated float joint_acceleration_limits = 5;       // Joint Acceleration limits
 }
 
@@ -230,24 +233,24 @@ message KinematicLimitsList {
     repeated KinematicLimits kinematic_limits_list = 1;     // List of kinematic limits
 }
 
-// Desired Joystick speeds.   
+// Desired Joystick speeds.
 message DesiredSpeeds {
     float linear = 1;                               // Desired linear speed (meters / second)
     float angular = 2;                              // Desired angular speed (degrees / second)
     repeated float joint_speed = 3;                 // Desired joint speeds (degrees / second)
 }
 
-// Desired Joystick linear speed.   
+// Desired Joystick linear speed.
 message LinearTwist {
     float linear = 1;                               // Desired linear speed (meters / second)
 }
 
-// Desired Joystick angular speed.   
+// Desired Joystick angular speed.
 message AngularTwist {
     float angular = 1;                              // Desired angular speed (degrees / second)
 }
 
-// Desired Joystick joint speeds.   
+// Desired Joystick joint speeds.
 message JointSpeeds {
     repeated float joint_speed = 1;                 // Desired joint speeds (degrees / second)
 }
@@ -264,10 +267,19 @@ enum ControlMode {
     NULL_SPACE_ADMITTANCE = 8;              // Null space mode
     FORCE_CONTROL = 10;                     // Force control mode
     FORCE_CONTROL_MOTION_RESTRICTED = 11;   // Force control motion restricted mode
+    CARTESIAN_WAYPOINT_TRAJECTORY = 12;     // Cartesian waypoint trajectory mode
     IDLE = 13;                              // Idle
 };
 
 // Control mode information
 message ControlModeInformation {
     ControlMode control_mode = 1; // Control mode
+}
+
+// Notification about a single control mode event
+message ControlModeNotification {
+    ControlMode control_mode = 1;                           // New control mode
+    Kinova.Api.Common.Timestamp timestamp = 2;              // Event timestamp
+    Kinova.Api.Common.UserProfileHandle user_handle = 3;    // User that caused the control mode event
+    Kinova.Api.Common.Connection connection = 4;            // Connection that caused the control mode event
 }

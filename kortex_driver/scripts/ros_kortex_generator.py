@@ -249,7 +249,7 @@ class DetailedRPC:
     - prepend_on_notification: If the RPC is a Notification RPC, is put to "OnNotification". Otherwise, it is empty [string]
     - notification_message_cpp_namespace: Full C++ namespace of the message that corresponds to the Notification RPC ("SafetyNotification" for the RPC "SafetyTopic") [string]
     '''
-    def __init__(self, rpc, package, is_rpc_duplicated, is_rpc_deprecated, is_input_type_duplicated, is_output_type_duplicated, notification_message=None):
+    def __init__(self, rpc, package, is_rpc_duplicated, is_rpc_deprecated, is_input_type_duplicated, is_output_type_duplicated, notification_message_cpp_namespace=None):
         '''
         Constructor for the DetailedRPC
 
@@ -260,7 +260,6 @@ class DetailedRPC:
         - is_rpc_deprecated: True if the message type is deprecated in the C++ Kortex API [bool]
         - is_input_type_duplicated: True if the input type of the RPC is duplicated in the generation context [bool]
         - is_output_type_duplicated: True if the output type of the RPC is duplicated in the generation context [bool]
-        - notification_message: Protobuf object for the Notification message that corresponds to the Notification RPC (optional) [DescrptorProto]
         '''
         self.name = rpc.name
         self.name_lowercase_with_underscores = '_'.join(re.findall('[A-Z][^A-Z]*', self.name)).lower()
@@ -296,12 +295,17 @@ class DetailedRPC:
 
         # Notifications have the word 'Topic' at the end of the RPC name
         self.is_notification_rpc = re.match(r"\w+Topic", rpc.name)
-        if self.is_notification_rpc:
-            self.prepend_on_notification = "OnNotification"
-            self.notification_message_cpp_namespace = notification_message[0].cpp_namespace
-        else:
-            self.prepend_on_notification = ""
-            self.notification_message_cpp_namespace = ""
+        self.notification_message_cpp_namespace = ""
+        self.prepend_on_notification = "OnNotification" if self.is_notification_rpc else ""
+
+    def set_notification_cpp_namespace(self, notification_message_cpp_namespace):
+        '''
+        Setter for the DetailedRPC's notification namespace
+        
+        Arguments:
+        - notification_message_cpp_namespace: C++ namespace for the Notification message that goes with the Notification RPC (optional) [string]
+        '''
+        self.notification_message_cpp_namespace = notification_message_cpp_namespace
 
 # Jinja2 function to render a file from a template
 def render(tpl_path, context):
@@ -320,15 +324,18 @@ def generate_code(request, response):
     # Create an ordered dictionary for all Protobuf packages 
     packages_dict = OrderedDict()
     
-    # Find the *Notification messages to add them to a list
-    notification_messages_list = []
-    
     # Find Messages and RPC's that have the same name within the proto files because ROS doesn't handle namespaces
     messages_unordered_set = set()
     rpcs_unordered_set = set()
     duplicated_messages_unordered_set = set()
     duplicated_rpcs_unordered_set = set()
     deprecated_rpcs_dict_of_lists = OrderedDict()
+
+    # Find the *Notification messages to match them with their On*Topic RPCs
+    # key example: "Kinova.Api.Package.MyGivenTopic"
+    # value example: "Kinova.Api.Package.MyGivenNotification"
+    notification_messages_map = {}
+
     for filename, proto_file in file_map.items():
         # Traverse proto files with the recursive calls
         for item, package in traverse(proto_file):
@@ -340,13 +347,10 @@ def generate_code(request, response):
             packages_dict[package] = DetailedPackage(package)
             # If the item is a message or an enum
             if not isinstance(item, ServiceDescriptorProto):
-                if item.name not in messages_unordered_set:
-                    messages_unordered_set.add(item.name)
-                    # Add the notifications to a list to match them to their respective RPCs later (because there package may differ from the RPC's)
-                    if re.match(r"\w+Notification", item.name):
-                        notification_messages_list.append(DetailedMessage(item, package, False))
+                if item.name.casefold() not in messages_unordered_set:
+                    messages_unordered_set.add(item.name.casefold())
                 else:
-                    duplicated_messages_unordered_set.add(item.name)
+                    duplicated_messages_unordered_set.add(item.name.casefold())
             # If the item is a Protobuf service (a collection of methods)
             else: 
                 for method in item.method:
@@ -364,9 +368,21 @@ def generate_code(request, response):
         while text_line != "":
             text_line = proto_file_reader.readline()
             if "rpc " in text_line:
+                # Find deprecation tags
                 if re.search(r'@DEPRECATED', text_line):
                     rpc_name = re.sub(RPC_REGULAR_EXPRESSION, r'\1', text_line).strip()
                     deprecated_rpcs_dict_of_lists[filename_without_extension].append(rpc_name)
+                # Find notification tags
+                m = re.search(r"(\w+Topic).*@PUB_SUB=(.*Notification)", text_line)
+                if m:
+                    # Name is already complete
+                    if "." in m.group(2):
+                        notif = m.group(2)
+                    # Name is relative to current package
+                    else:
+                        notif = "{}.{}".format(package, m.group(2))
+                    key = "{}.{}".format(package, m.group(1))
+                    notification_messages_map[key] = notif
 
         # print (deprecated_rpcs_dict_of_lists.items())
 
@@ -398,13 +414,13 @@ def generate_code(request, response):
 
             # If this is an enum
             if isinstance(item, EnumDescriptorProto):
-                is_enum_duplicated = item.name in duplicated_messages_unordered_set
+                is_enum_duplicated = item.name.casefold() in duplicated_messages_unordered_set
                 current_package.addEnum(DetailedMessage(item, package, is_enum_duplicated))
                 
             # If this is a message
             if isinstance(item, DescriptorProto):
-                is_message_duplicated = item.name in duplicated_messages_unordered_set
-                duplicated_fields = filter(lambda x : x.type_name.split(".")[-1] in duplicated_messages_unordered_set, item.field)
+                is_message_duplicated = item.name.casefold() in duplicated_messages_unordered_set
+                duplicated_fields = filter(lambda x : x.type_name.split(".")[-1].casefold() in duplicated_messages_unordered_set, item.field)
                 temp_message = DetailedMessage(item, package, is_message_duplicated, duplicated_fields)
                 # Find if the message contains oneof
                 message_contains_one_of = False
@@ -425,7 +441,7 @@ def generate_code(request, response):
                     for member in item.field:
                         # If a member is part of a one_of, add it to the DetailedOneOf it belongs to
                         if member.HasField("oneof_index"):
-                            is_field_duplicated = member.type_name.split(".")[-1] in duplicated_messages_unordered_set
+                            is_field_duplicated = member.type_name.split(".")[-1].casefold() in duplicated_messages_unordered_set
                             temp_message.one_of_list[member.oneof_index].addField(member, is_field_duplicated)
 
                 current_package.addMessage(temp_message)
@@ -440,14 +456,17 @@ def generate_code(request, response):
                     if rpc.name in FORBIDDEN_RPC_METHODS:
                         continue
                     is_rpc_duplicated = rpc.name in duplicated_rpcs_unordered_set
-                    is_input_type_duplicated = rpc.input_type.split(".")[-1] in duplicated_messages_unordered_set
-                    is_output_type_duplicated = rpc.output_type.split(".")[-1] in duplicated_messages_unordered_set
-                    notification_message = list(filter(lambda x: x.name == rpc.name.replace("Topic", "Notification") , notification_messages_list))
-
-                    # Find out if this RPC is deprecated
+                    is_input_type_duplicated = rpc.input_type.split(".")[-1].casefold() in duplicated_messages_unordered_set
+                    is_output_type_duplicated = rpc.output_type.split(".")[-1].casefold() in duplicated_messages_unordered_set
                     is_rpc_deprecated = True if rpc.name in deprecated_rpcs_in_this_service else False
+                    temp_rpc = DetailedRPC(rpc, package, is_rpc_duplicated, is_rpc_deprecated, is_input_type_duplicated, is_output_type_duplicated)
+                    
+                    # Add Notification C++ namespace to RPC if it is a notification RPC
+                    if temp_rpc.is_notification_rpc:
+                        notification_message = notification_messages_map["{}.{}".format(package, rpc.name)]
+                        notification_message_cpp_namespace = "::".join(notification_message.split('.')[:-1])
+                        temp_rpc.set_notification_cpp_namespace(notification_message_cpp_namespace)
 
-                    temp_rpc = DetailedRPC(rpc, package, is_rpc_duplicated, is_rpc_deprecated, is_input_type_duplicated, is_output_type_duplicated, notification_message)
                     current_package.addRPC(temp_rpc)
 
     ###########################################

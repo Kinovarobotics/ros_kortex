@@ -54,6 +54,8 @@
 #include "kortex_driver/ResetTwistLinearSoftLimit.h"
 #include "kortex_driver/ResetTwistAngularSoftLimit.h"
 #include "kortex_driver/ResetJointAccelerationSoftLimits.h"
+#include "kortex_driver/ControlConfig_OnNotificationControlModeTopic.h"
+#include "kortex_driver/ControlConfig_ControlModeNotification.h"
 
 #include "kortex_driver/KortexError.h"
 #include "kortex_driver/SetDeviceID.h"
@@ -99,12 +101,16 @@ class IControlConfigServices
         virtual bool ResetTwistLinearSoftLimit(kortex_driver::ResetTwistLinearSoftLimit::Request  &req, kortex_driver::ResetTwistLinearSoftLimit::Response &res) = 0;
         virtual bool ResetTwistAngularSoftLimit(kortex_driver::ResetTwistAngularSoftLimit::Request  &req, kortex_driver::ResetTwistAngularSoftLimit::Response &res) = 0;
         virtual bool ResetJointAccelerationSoftLimits(kortex_driver::ResetJointAccelerationSoftLimits::Request  &req, kortex_driver::ResetJointAccelerationSoftLimits::Response &res) = 0;
+        virtual bool ControlConfig_OnNotificationControlModeTopic(kortex_driver::ControlConfig_OnNotificationControlModeTopic::Request  &req, kortex_driver::ControlConfig_OnNotificationControlModeTopic::Response &res) = 0;
+        virtual void cb_ControlModeTopic(Kinova::Api::ControlConfig::ControlModeNotification notif) = 0;
 
 protected:
         ros::NodeHandle m_node_handle;
         ros::Publisher m_pub_Error;
         ros::Publisher m_pub_ControlConfigurationTopic;
         bool m_is_activated_ControlConfigurationTopic;
+        ros::Publisher m_pub_ControlModeTopic;
+        bool m_is_activated_ControlModeTopic;
 
         ros::ServiceServer m_serviceSetDeviceID;
         ros::ServiceServer m_serviceSetApiOptions;
@@ -138,5 +144,6 @@ protected:
 	ros::ServiceServer m_serviceResetTwistLinearSoftLimit;
 	ros::ServiceServer m_serviceResetTwistAngularSoftLimit;
 	ros::ServiceServer m_serviceResetJointAccelerationSoftLimits;
+	ros::ServiceServer m_serviceControlConfig_OnNotificationControlModeTopic;
 };
 #endif

@@ -1,0 +1,15 @@
+#The trajectory to follow
+CartesianWaypoint[] trajectory
+duration goal_time_tolerance
+bool use_optimal_blending
+---
+#result definition
+string error_string
+int32 error_code
+int32 SUCCESSFUL = 0
+int32 INVALID_GOAL = -1
+int32 PATH_TOLERANCE_VIOLATED = -2
+
+---
+#feedback
+CartesianWaypoint actual

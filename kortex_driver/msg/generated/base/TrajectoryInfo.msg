@@ -1,0 +1,4 @@
+
+uint32 trajectory_info_type
+uint32 waypoint_index
+uint32 joint_index

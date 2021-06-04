@@ -87,6 +87,8 @@ KortexArmDriver::~KortexArmDriver()
     {
 
         delete m_action_server_follow_joint_trajectory;
+        delete m_action_server_follow_cartesian_trajectory;
+
         if (m_action_server_gripper_command)
         {
             delete m_action_server_gripper_command;
@@ -337,11 +339,6 @@ void KortexArmDriver::verifyProductConfiguration()
             ROS_ERROR("%s", error_string.c_str());
             throw new std::runtime_error(error_string);
         }
-        // Set Angular Trajectories soft limits to max if the option is true in the launch file
-        if (m_use_hard_limits)
-        {
-            setAngularTrajectorySoftLimitsToMax();   
-        }
     }
     else if (m_arm_name == "gen3_lite")
     {
@@ -517,8 +514,11 @@ void KortexArmDriver::initRosServices()
 void KortexArmDriver::startActionServers()
 {
     // Start Action servers
-    m_action_server_follow_joint_trajectory = new PreComputedJointTrajectoryActionServer(m_arm_name + "_joint_trajectory_controller/follow_joint_trajectory", m_node_handle, m_base, m_base_cyclic);
+    m_action_server_follow_joint_trajectory = new JointTrajectoryActionServer(m_arm_name + "_joint_trajectory_controller/follow_joint_trajectory", m_node_handle, m_base, m_base_cyclic, m_control_config, m_use_hard_limits);
     // Start Gripper Action Server if the arm has a gripper
+    
+    m_action_server_follow_cartesian_trajectory = new CartesianTrajectoryActionServer("cartesian_trajectory_controller/follow_cartesian_trajectory", m_node_handle, m_base, m_base_cyclic);
+    
     m_action_server_gripper_command = nullptr;
     if (isGripperPresent())
     {
@@ -529,40 +529,6 @@ void KortexArmDriver::startActionServers()
 bool KortexArmDriver::isGripperPresent()
 {
     return m_gripper_name != "";
-}
-
-void KortexArmDriver::setAngularTrajectorySoftLimitsToMax()
-{
-    try
-    {
-        auto hard_limits = m_control_config->GetKinematicHardLimits();
-        Kinova::Api::ControlConfig::ControlMode target_control_mode = Kinova::Api::ControlConfig::ANGULAR_TRAJECTORY;
-        
-        // Set Joint Speed limits to max
-        Kinova::Api::ControlConfig::JointSpeedSoftLimits jpsl;
-        jpsl.set_control_mode(target_control_mode);
-        for (auto j : hard_limits.joint_speed_limits())
-        {
-            jpsl.add_joint_speed_soft_limits(j);
-        }
-        m_control_config->SetJointSpeedSoftLimits(jpsl);
-
-        // Set Joint Acceleration limits to max
-        Kinova::Api::ControlConfig::JointAccelerationSoftLimits jasl;
-        jasl.set_control_mode(target_control_mode);
-        for (auto j : hard_limits.joint_acceleration_limits())
-        {
-            jasl.add_joint_acceleration_soft_limits(j);
-        }
-        m_control_config->SetJointAccelerationSoftLimits(jasl);
-    }
-    catch (Kinova::Api::KDetailedException& ex)
-    {
-        ROS_WARN("Kortex exception while getting the base_feedback");
-        ROS_WARN("Error code: %s\n", Kinova::Api::ErrorCodes_Name(ex.getErrorInfo().getError().error_code()).c_str());
-        ROS_WARN("Error sub code: %s\n", Kinova::Api::SubErrorCodes_Name(Kinova::Api::SubErrorCodes(ex.getErrorInfo().getError().error_sub_code())).c_str());
-        ROS_WARN("Error description: %s\n", ex.what());
-    }
 }
 
 void KortexArmDriver::publishRobotFeedback()
@@ -616,7 +582,7 @@ void KortexArmDriver::publishRobotFeedback()
 
         for (int i = 0; i < base_feedback.actuators.size(); i++)
         {
-            joint_state.name[i] = m_arm_joint_names[i];
+            joint_state.name[i] = m_prefix + m_arm_joint_names[i];
             joint_state.position[i] = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(base_feedback.actuators[i].position));
             joint_state.velocity[i] = m_math_util.toRad(base_feedback.actuators[i].velocity);
             joint_state.effort[i] = base_feedback.actuators[i].torque;
@@ -627,7 +593,7 @@ void KortexArmDriver::publishRobotFeedback()
             for (int i = 0; i < base_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor.size(); i++)
             {
                 int joint_state_index = base_feedback.actuators.size() + i;
-                joint_state.name[joint_state_index] = m_gripper_joint_names[i];
+                joint_state.name[joint_state_index] = m_prefix + m_gripper_joint_names[i];
                 // Arm feedback is between 0 and 100, and limits in URDF are specified in gripper_joint_limits_min[i] and gripper_joint_limits_max[i] parameters
                 joint_state.position[joint_state_index] = m_math_util.absolute_position_from_relative(base_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor[i].position / 100.0, m_gripper_joint_limits_min[i], m_gripper_joint_limits_max[i]);
                 joint_state.velocity[joint_state_index] = base_feedback.interconnect.oneof_tool_feedback.gripper_feedback[0].motor[i].velocity;

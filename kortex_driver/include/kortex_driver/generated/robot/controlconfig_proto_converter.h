@@ -59,6 +59,7 @@
 #include "kortex_driver/AngularTwist.h"
 #include "kortex_driver/ControlConfig_JointSpeeds.h"
 #include "kortex_driver/ControlConfig_ControlModeInformation.h"
+#include "kortex_driver/ControlConfig_ControlModeNotification.h"
 
 
 int ToProtoData(kortex_driver::GravityVector input, Kinova::Api::ControlConfig::GravityVector *output);
@@ -79,5 +80,6 @@ int ToProtoData(kortex_driver::LinearTwist input, Kinova::Api::ControlConfig::Li
 int ToProtoData(kortex_driver::AngularTwist input, Kinova::Api::ControlConfig::AngularTwist *output);
 int ToProtoData(kortex_driver::ControlConfig_JointSpeeds input, Kinova::Api::ControlConfig::JointSpeeds *output);
 int ToProtoData(kortex_driver::ControlConfig_ControlModeInformation input, Kinova::Api::ControlConfig::ControlModeInformation *output);
+int ToProtoData(kortex_driver::ControlConfig_ControlModeNotification input, Kinova::Api::ControlConfig::ControlModeNotification *output);
 
 #endif

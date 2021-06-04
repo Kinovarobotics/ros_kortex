@@ -44,7 +44,7 @@
 #include "kortex_driver/EthernetDeviceIdentification.h"
 #include "kortex_driver/EthernetConfiguration.h"
 #include "kortex_driver/GPIOIdentification.h"
-#include "kortex_driver/GPIOConfiguration.h"
+#include "kortex_driver/InterconnectConfig_GPIOConfiguration.h"
 #include "kortex_driver/GPIOState.h"
 #include "kortex_driver/I2CDeviceIdentification.h"
 #include "kortex_driver/I2CConfiguration.h"
@@ -58,7 +58,7 @@
 int ToProtoData(kortex_driver::EthernetDeviceIdentification input, Kinova::Api::InterconnectConfig::EthernetDeviceIdentification *output);
 int ToProtoData(kortex_driver::EthernetConfiguration input, Kinova::Api::InterconnectConfig::EthernetConfiguration *output);
 int ToProtoData(kortex_driver::GPIOIdentification input, Kinova::Api::InterconnectConfig::GPIOIdentification *output);
-int ToProtoData(kortex_driver::GPIOConfiguration input, Kinova::Api::InterconnectConfig::GPIOConfiguration *output);
+int ToProtoData(kortex_driver::InterconnectConfig_GPIOConfiguration input, Kinova::Api::InterconnectConfig::GPIOConfiguration *output);
 int ToProtoData(kortex_driver::GPIOState input, Kinova::Api::InterconnectConfig::GPIOState *output);
 int ToProtoData(kortex_driver::I2CDeviceIdentification input, Kinova::Api::InterconnectConfig::I2CDeviceIdentification *output);
 int ToProtoData(kortex_driver::I2CConfiguration input, Kinova::Api::InterconnectConfig::I2CConfiguration *output);

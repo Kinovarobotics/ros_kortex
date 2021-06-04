@@ -29,7 +29,6 @@
   <!-- <run_depend>warehouse_ros_mongo</run_depend> -->
   <build_depend>kortex_description</build_depend>
   <run_depend>kortex_description</run_depend>
-  <run_depend>industrial_trajectory_filters</run_depend>
 
 
 </package>

@@ -146,8 +146,8 @@ class BaseSimulationServices : public IBaseServices
         std::function<kortex_driver::OnNotificationMappingInfoTopic::Response(const kortex_driver::OnNotificationMappingInfoTopic::Request&)> OnNotificationMappingInfoTopicHandler = nullptr;
         virtual bool OnNotificationMappingInfoTopic(kortex_driver::OnNotificationMappingInfoTopic::Request  &req, kortex_driver::OnNotificationMappingInfoTopic::Response &res) override;
         virtual void cb_MappingInfoTopic(Kinova::Api::Base::MappingInfoNotification notif) override;
-        std::function<kortex_driver::OnNotificationControlModeTopic::Response(const kortex_driver::OnNotificationControlModeTopic::Request&)> OnNotificationControlModeTopicHandler = nullptr;
-        virtual bool OnNotificationControlModeTopic(kortex_driver::OnNotificationControlModeTopic::Request  &req, kortex_driver::OnNotificationControlModeTopic::Response &res) override;
+        std::function<kortex_driver::Base_OnNotificationControlModeTopic::Response(const kortex_driver::Base_OnNotificationControlModeTopic::Request&)> Base_OnNotificationControlModeTopicHandler = nullptr;
+        virtual bool Base_OnNotificationControlModeTopic(kortex_driver::Base_OnNotificationControlModeTopic::Request  &req, kortex_driver::Base_OnNotificationControlModeTopic::Response &res) override;
         virtual void cb_ControlModeTopic(Kinova::Api::Base::ControlModeNotification notif) override;
         std::function<kortex_driver::OnNotificationOperatingModeTopic::Response(const kortex_driver::OnNotificationOperatingModeTopic::Request&)> OnNotificationOperatingModeTopicHandler = nullptr;
         virtual bool OnNotificationOperatingModeTopic(kortex_driver::OnNotificationOperatingModeTopic::Request  &req, kortex_driver::OnNotificationOperatingModeTopic::Response &res) override;
@@ -318,6 +318,8 @@ class BaseSimulationServices : public IBaseServices
         virtual bool TakeSnapshot(kortex_driver::TakeSnapshot::Request  &req, kortex_driver::TakeSnapshot::Response &res) override;
         std::function<kortex_driver::GetFirmwareBundleVersions::Response(const kortex_driver::GetFirmwareBundleVersions::Request&)> GetFirmwareBundleVersionsHandler = nullptr;
         virtual bool GetFirmwareBundleVersions(kortex_driver::GetFirmwareBundleVersions::Request  &req, kortex_driver::GetFirmwareBundleVersions::Response &res) override;
+        std::function<kortex_driver::ExecuteWaypointTrajectory::Response(const kortex_driver::ExecuteWaypointTrajectory::Request&)> ExecuteWaypointTrajectoryHandler = nullptr;
+        virtual bool ExecuteWaypointTrajectory(kortex_driver::ExecuteWaypointTrajectory::Request  &req, kortex_driver::ExecuteWaypointTrajectory::Response &res) override;
         std::function<kortex_driver::MoveSequenceTask::Response(const kortex_driver::MoveSequenceTask::Request&)> MoveSequenceTaskHandler = nullptr;
         virtual bool MoveSequenceTask(kortex_driver::MoveSequenceTask::Request  &req, kortex_driver::MoveSequenceTask::Response &res) override;
         std::function<kortex_driver::DuplicateMapping::Response(const kortex_driver::DuplicateMapping::Request&)> DuplicateMappingHandler = nullptr;
@@ -330,6 +332,12 @@ class BaseSimulationServices : public IBaseServices
         virtual bool GetControllerConfiguration(kortex_driver::GetControllerConfiguration::Request  &req, kortex_driver::GetControllerConfiguration::Response &res) override;
         std::function<kortex_driver::GetAllControllerConfigurations::Response(const kortex_driver::GetAllControllerConfigurations::Request&)> GetAllControllerConfigurationsHandler = nullptr;
         virtual bool GetAllControllerConfigurations(kortex_driver::GetAllControllerConfigurations::Request  &req, kortex_driver::GetAllControllerConfigurations::Response &res) override;
+        std::function<kortex_driver::ComputeForwardKinematics::Response(const kortex_driver::ComputeForwardKinematics::Request&)> ComputeForwardKinematicsHandler = nullptr;
+        virtual bool ComputeForwardKinematics(kortex_driver::ComputeForwardKinematics::Request  &req, kortex_driver::ComputeForwardKinematics::Response &res) override;
+        std::function<kortex_driver::ComputeInverseKinematics::Response(const kortex_driver::ComputeInverseKinematics::Request&)> ComputeInverseKinematicsHandler = nullptr;
+        virtual bool ComputeInverseKinematics(kortex_driver::ComputeInverseKinematics::Request  &req, kortex_driver::ComputeInverseKinematics::Response &res) override;
+        std::function<kortex_driver::ValidateWaypointList::Response(const kortex_driver::ValidateWaypointList::Request&)> ValidateWaypointListHandler = nullptr;
+        virtual bool ValidateWaypointList(kortex_driver::ValidateWaypointList::Request  &req, kortex_driver::ValidateWaypointList::Response &res) override;
 
 };
 #endif

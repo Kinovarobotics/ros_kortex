@@ -87,6 +87,9 @@ class ControlConfigSimulationServices : public IControlConfigServices
         virtual bool ResetTwistAngularSoftLimit(kortex_driver::ResetTwistAngularSoftLimit::Request  &req, kortex_driver::ResetTwistAngularSoftLimit::Response &res) override;
         std::function<kortex_driver::ResetJointAccelerationSoftLimits::Response(const kortex_driver::ResetJointAccelerationSoftLimits::Request&)> ResetJointAccelerationSoftLimitsHandler = nullptr;
         virtual bool ResetJointAccelerationSoftLimits(kortex_driver::ResetJointAccelerationSoftLimits::Request  &req, kortex_driver::ResetJointAccelerationSoftLimits::Response &res) override;
+        std::function<kortex_driver::ControlConfig_OnNotificationControlModeTopic::Response(const kortex_driver::ControlConfig_OnNotificationControlModeTopic::Request&)> ControlConfig_OnNotificationControlModeTopicHandler = nullptr;
+        virtual bool ControlConfig_OnNotificationControlModeTopic(kortex_driver::ControlConfig_OnNotificationControlModeTopic::Request  &req, kortex_driver::ControlConfig_OnNotificationControlModeTopic::Response &res) override;
+        virtual void cb_ControlModeTopic(Kinova::Api::ControlConfig::ControlModeNotification notif) override;
 
 };
 #endif

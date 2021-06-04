@@ -140,7 +140,7 @@ int ToRosData(Kinova::Api::BaseCyclic::CustomData input, kortex_driver::BaseCycl
 	output.actuators_custom_data.clear();
 	for(int i = 0; i < input.actuators_custom_data_size(); i++)
 	{
-		kortex_driver::ActuatorCustomData temp;
+		decltype(output.actuators_custom_data)::value_type temp;
 		ToRosData(input.actuators_custom_data(i), temp);
 		output.actuators_custom_data.push_back(temp);
 	}
@@ -157,7 +157,7 @@ int ToRosData(Kinova::Api::BaseCyclic::Command input, kortex_driver::BaseCyclic_
 	output.actuators.clear();
 	for(int i = 0; i < input.actuators_size(); i++)
 	{
-		kortex_driver::ActuatorCommand temp;
+		decltype(output.actuators)::value_type temp;
 		ToRosData(input.actuators(i), temp);
 		output.actuators.push_back(temp);
 	}
@@ -175,7 +175,7 @@ int ToRosData(Kinova::Api::BaseCyclic::Feedback input, kortex_driver::BaseCyclic
 	output.actuators.clear();
 	for(int i = 0; i < input.actuators_size(); i++)
 	{
-		kortex_driver::ActuatorFeedback temp;
+		decltype(output.actuators)::value_type temp;
 		ToRosData(input.actuators(i), temp);
 		output.actuators.push_back(temp);
 	}

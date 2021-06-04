@@ -6,7 +6,7 @@ add_compile_options(-std=c++11)
 add_definitions(-D_OS_UNIX)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation kortex_driver)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation actionlib_msgs actionlib kortex_driver)
 
 ## Declare a catkin package
 catkin_package()
@@ -35,6 +35,10 @@ add_executable(example_cartesian_poses_with_notifications_cpp src/full_arm/examp
 add_dependencies(example_cartesian_poses_with_notifications_cpp ${catkin_EXPORTED_TARGETS})
 target_link_libraries(example_cartesian_poses_with_notifications_cpp ${catkin_LIBRARIES} )
 
+add_executable(example_waypoint_action_client_cpp src/full_arm/example_waypoint_action_client.cpp)
+add_dependencies(example_waypoint_action_client_cpp ${catkin_EXPORTED_TARGETS})
+target_link_libraries(example_waypoint_action_client_cpp ${catkin_LIBRARIES} )
+
 if(CATKIN_ENABLE_TESTING)
 	find_package(rostest REQUIRED)
 	catkin_add_gtest(kortex_examples_tests src/tests/kortex_examples_tests.cc)
@@ -48,6 +52,7 @@ endif()
 catkin_install_python(PROGRAMS src/actuator_config/example_actuator_configuration.py
                                src/full_arm/example_cartesian_poses_with_notifications.py
                                src/full_arm/example_full_arm_movement.py
+                               src/full_arm/example_waypoint_action_client.py
                                src/move_it/example_move_it_trajectories.py
                                src/vision_config/example_vision_configuration.py 
                       DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
@@ -58,6 +63,7 @@ install(TARGETS
     example_vision_configuration_cpp
     example_full_arm_movement_cpp
     example_cartesian_poses_with_notifications_cpp
+    example_waypoint_action_client_cpp
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

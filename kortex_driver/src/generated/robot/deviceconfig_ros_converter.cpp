@@ -151,7 +151,7 @@ int ToRosData(Kinova::Api::DeviceConfig::SafetyInformationList input, kortex_dri
 	output.information.clear();
 	for(int i = 0; i < input.information_size(); i++)
 	{
-		kortex_driver::SafetyInformation temp;
+		decltype(output.information)::value_type temp;
 		ToRosData(input.information(i), temp);
 		output.information.push_back(temp);
 	}
@@ -198,7 +198,7 @@ int ToRosData(Kinova::Api::DeviceConfig::SafetyConfigurationList input, kortex_d
 	output.configuration.clear();
 	for(int i = 0; i < input.configuration_size(); i++)
 	{
-		kortex_driver::SafetyConfiguration temp;
+		decltype(output.configuration)::value_type temp;
 		ToRosData(input.configuration(i), temp);
 		output.configuration.push_back(temp);
 	}
@@ -250,7 +250,7 @@ int ToRosData(Kinova::Api::DeviceConfig::Calibration input, kortex_driver::Calib
 	output.calibration_parameter.clear();
 	for(int i = 0; i < input.calibration_parameter_size(); i++)
 	{
-		kortex_driver::CalibrationParameter temp;
+		decltype(output.calibration_parameter)::value_type temp;
 		ToRosData(input.calibration_parameter(i), temp);
 		output.calibration_parameter.push_back(temp);
 	}

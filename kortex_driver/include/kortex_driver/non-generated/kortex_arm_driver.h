@@ -53,7 +53,8 @@
 #include "kortex_driver/generated/simulation/visionconfig_services.h"
 #include "kortex_driver/generated/simulation/controlconfig_services.h"
 
-#include "kortex_driver/non-generated/pre_computed_joint_trajectory_action_server.h"
+#include "kortex_driver/non-generated/joint_trajectory_action_server.h"
+#include "kortex_driver/non-generated/cartesian_trajectory_action_server.h"
 #include "kortex_driver/non-generated/robotiq_gripper_command_action_server.h"
 #include "kortex_driver/non-generated/kortex_subscribers.h"
 #include "kortex_driver/non-generated/kortex_arm_simulation.h"
@@ -144,7 +145,8 @@ class KortexArmDriver
     IVisionConfigServices*       m_vision_config_ros_services;
 
     // Action servers
-    PreComputedJointTrajectoryActionServer* m_action_server_follow_joint_trajectory;
+    JointTrajectoryActionServer*       m_action_server_follow_joint_trajectory;
+    CartesianTrajectoryActionServer*   m_action_server_follow_cartesian_trajectory;
     RobotiqGripperCommandActionServer* m_action_server_gripper_command;
 
     // Topic subscribers
@@ -161,7 +163,6 @@ class KortexArmDriver
     
     // Private methods
     bool isGripperPresent();
-    void setAngularTrajectorySoftLimitsToMax();
     void publishRobotFeedback();
     void publishSimulationFeedback();
     void registerSimulationHandlers();

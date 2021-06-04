@@ -8,6 +8,9 @@
   <!-- The joint and link names prefix used in kortex_description -->
   <arg name="prefix" default=""/>
 
+  <!-- Use the slower (default) joint speed and acceleration limits, or the hard limits (fastest) -->
+  <arg name="use_hard_limits" default="false"/>
+
   <!-- Load universal robot description format (URDF) -->
   <param if="$(arg load_robot_description)" name="$(arg robot_description)" command="xacro  '$(find kortex_description)/robots/gen3_lite_gen3_lite_2f.xacro'"/>
 
@@ -20,7 +23,8 @@
     if="$(eval not arg('prefix'))"/>
   <!-- Load updated joint limits (override information from URDF) -->
   <group ns="$(arg robot_description)_planning">
-    <rosparam command="load" file="$(find gen3_lite_gen3_lite_2f_move_it_config)/config/joint_limits.yaml" subst_value="true"/>
+    <rosparam command="load" file="$(find gen3_lite_gen3_lite_2f_move_it_config)/config/default_joint_limits.yaml" unless="$(arg use_hard_limits)" subst_value="true"/>
+    <rosparam command="load" file="$(find gen3_lite_gen3_lite_2f_move_it_config)/config/hard_joint_limits.yaml" if="$(arg use_hard_limits)" subst_value="true"/>
   </group>
 
   <!-- Load default settings for kinematics; these settings are overridden by settings in a node's namespace -->
