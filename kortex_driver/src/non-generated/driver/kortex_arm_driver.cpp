@@ -514,7 +514,7 @@ void KortexArmDriver::initRosServices()
 void KortexArmDriver::startActionServers()
 {
     // Start Action servers
-    m_action_server_follow_joint_trajectory = new JointTrajectoryActionServer(m_arm_name + "_joint_trajectory_controller/follow_joint_trajectory", m_node_handle, m_base, m_base_cyclic, m_control_config, m_use_hard_limits);
+    m_action_server_follow_joint_trajectory = new JointTrajectoryActionServer(m_prefix + m_arm_name + "_joint_trajectory_controller/follow_joint_trajectory", m_node_handle, m_base, m_base_cyclic, m_control_config, m_use_hard_limits);
     // Start Gripper Action Server if the arm has a gripper
     
     m_action_server_follow_cartesian_trajectory = new CartesianTrajectoryActionServer("cartesian_trajectory_controller/follow_cartesian_trajectory", m_node_handle, m_base, m_base_cyclic);
@@ -522,7 +522,7 @@ void KortexArmDriver::startActionServers()
     m_action_server_gripper_command = nullptr;
     if (isGripperPresent())
     {
-        m_action_server_gripper_command = new RobotiqGripperCommandActionServer(m_gripper_name + "_gripper_controller/gripper_cmd", m_gripper_joint_names[0], m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0], m_node_handle, m_base, m_base_cyclic);
+        m_action_server_gripper_command = new RobotiqGripperCommandActionServer(m_prefix + m_gripper_name + "_gripper_controller/gripper_cmd", m_gripper_joint_names[0], m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0], m_node_handle, m_base, m_base_cyclic);
     }
 }
 
