@@ -45,8 +45,7 @@ This package has been tested under ROS Noetic (Ubuntu 20.04).
 For older ROS versions, checkout on corresponding branch : 
 
 - [melodic-devel](https://github.com/Kinovarobotics/ros_kortex/tree/melodic-devel) for ROS Melodic and Ubuntu 18.04 support. 
-- [kinetic-devel](https://github.com/Kinovarobotics/ros_kortex/tree/kinetic-devel) for ROS Kinetic and Ubuntu 16.04 support, but the branch is no longer maintained (the melodic-devel branch might work for this configuration). 
-- [indigo-devel](https://github.com/Kinovarobotics/ros_kortex/tree/indigo-devel) for ROS Indigo and Ubuntu 14.04 support, but the branch is no longer maintained.
+- [kinetic-devel](https://github.com/Kinovarobotics/ros_kortex/tree/kinetic-devel) for ROS Kinetic and Ubuntu 16.04 support, but the branch is no longer maintained (the melodic-devel branch might work for this configuration).
 
 <a id="usage"></a>
 ## Usage

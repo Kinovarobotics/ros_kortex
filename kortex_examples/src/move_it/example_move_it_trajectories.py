@@ -59,7 +59,7 @@ class ExampleMoveItTrajectories(object):
     rospy.init_node('example_move_it_trajectories')
 
     try:
-      self.is_gripper_present = rospy.get_param(rospy.get_namespace() + "is_gripper_present", False) # TODOF, always use default value (with moveit virtual). use /move_group/gripper instead?
+      self.is_gripper_present = rospy.get_param(rospy.get_namespace() + "is_gripper_present", False)
       if self.is_gripper_present:
         gripper_joint_names = rospy.get_param(rospy.get_namespace() + "gripper_joint_names", [])
         self.gripper_joint_name = gripper_joint_names[0]
