@@ -20,7 +20,7 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include <roboticsgroup_gazebo_plugins/mimic_joint_plugin.h>
+#include <roboticsgroup_upatras_gazebo_plugins/mimic_joint_plugin.h>
 
 #if GAZEBO_MAJOR_VERSION >= 8
 namespace math = ignition::math;
@@ -38,7 +38,7 @@ namespace gazebo {
 
     MimicJointPlugin::~MimicJointPlugin()
     {
-        this->updateConnection.reset();
+        update_connection_.reset();
     }
 
     void MimicJointPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
@@ -59,7 +59,6 @@ namespace gazebo {
         }
 
         // Check for robot namespace
-        robot_namespace_ = "";
         if (_sdf->HasElement("robotNamespace")) {
             robot_namespace_ = _sdf->GetElement("robotNamespace")->Get<std::string>();
         }
@@ -132,7 +131,7 @@ namespace gazebo {
         // Set max effort
         if (!has_pid_) {
 #if GAZEBO_MAJOR_VERSION > 2
-            mimic_joint_->SetEffortLimit(0, max_effort_);
+            mimic_joint_->SetParam("fmax", 0, max_effort_);
 #else
             mimic_joint_->SetMaxForce(0, max_effort_);
 #endif
@@ -140,7 +139,7 @@ namespace gazebo {
 
         // Listen to the update event. This event is broadcast every
         // simulation iteration.
-        this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+        update_connection_ = event::Events::ConnectWorldUpdateBegin(
             boost::bind(&MimicJointPlugin::UpdateChild, this));
 
         // Output some confirmation
@@ -191,4 +190,5 @@ namespace gazebo {
     }
 
     GZ_REGISTER_MODEL_PLUGIN(MimicJointPlugin);
-}
+
+}  // namespace gazebo

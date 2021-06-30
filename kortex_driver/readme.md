@@ -40,7 +40,13 @@ The source code is released under a [BSD 3-Clause license](../LICENSE).
 Affiliation: [Kinova inc.](https://www.kinovarobotics.com/)<br />
 Maintainer: Kinova inc. support@kinovarobotics.com**
 
-This package has been tested under ROS Kinetic (Ubuntu 16.04) and ROS Melodic (Ubuntu 18.04).
+This package has been tested under ROS Noetic (Ubuntu 20.04).
+
+For older ROS versions, checkout on corresponding branch : 
+
+- [melodic-devel](https://github.com/Kinovarobotics/ros_kortex/tree/melodic-devel) for ROS Melodic and Ubuntu 18.04 support. 
+- [kinetic-devel](https://github.com/Kinovarobotics/ros_kortex/tree/kinetic-devel) for ROS Kinetic and Ubuntu 16.04 support, but the branch is no longer maintained (the melodic-devel branch might work for this configuration). 
+- [indigo-devel](https://github.com/Kinovarobotics/ros_kortex/tree/indigo-devel) for ROS Indigo and Ubuntu 14.04 support, but the branch is no longer maintained.
 
 <a id="usage"></a>
 ## Usage
@@ -58,7 +64,7 @@ The `kortex_driver` node is the node responsible for the communication between t
 - **username** : The username for the robot connection. The default value is **admin**.
 - **password** : The password for the robot connection. The default value is **admin**.
 - **use_hard_limits** : [**Gen3 only**] If set to **true**, the arm's soft speed and acceleration limits are set to the hard limits and the MoveIt configuration uses those limits for the trajectories. If **false**, the default soft limit values are used. The default value for the parameter is **false**. **Be aware that setting this argument to true will set you arm's speed and acceleration limits to the maximum, so it will move way faster! Be cautious when using it for the first time as it may cause unwanted behaviour.**
-- **cyclic_data_publish_rate** : Publish rate of the *base_feedback* and *joint_state* topics, in Hz. The default value is **100** Hz.
+- **cyclic_data_publish_rate** : Publish rate of the *base_feedback* and *joint_state* topics, in Hz. The default value is **40** Hz.
 - **api_rpc_timeout_ms** : The default X-axis position of the robot in Gazebo. The default value is **0.0**.
 - **api_session_inactivity_timeout_ms** : The duration after which the robot will clean the client session if the client hangs up the connection brutally (should not happen with the ROS driver). The default value is **35000** ms and is not normally changed.
 - **api_connection_inactivity_timeout_ms** : The duration after which a connection is destroyed by the robot if no communication is detected between the client and the robot. The default value is **20000** ms and is not normally changed.

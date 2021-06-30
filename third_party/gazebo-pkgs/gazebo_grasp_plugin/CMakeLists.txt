@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(gazebo_grasp_plugin)
 
-# This is added to remove policy CMP0054 warning (see https://stackoverflow.com/questions/45900159/how-to-use-variables-and-avoid-cmp0054-policy-violations)
-cmake_policy(SET CMP0054 NEW)
-
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -67,10 +64,6 @@ link_directories(
   ${GAZEBO_LIBRARY_DIRS}
 )
 
-# Protobuf 2.6.1 includes were copied in kortex_gazebo/include and are necessary to build Gazebo plugins
-include_directories(BEFORE ../../../kortex_gazebo/include/)
-link_directories(BEFORE ../../../kortex_gazebo/lib/)
-
 ## Declare a cpp library
 add_library(gazebo_grasp_fix SHARED src/GazeboGraspFix.cpp src/GazeboGraspGripper.cpp)
 
@@ -82,9 +75,9 @@ add_dependencies(gazebo_grasp_fix ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
 
 target_link_libraries(gazebo_grasp_fix 
-	${catkin_LIBRARIES}  
-  ${Boost_LIBRARIES}
-  libprotobuf.so
+	${catkin_LIBRARIES} 
+	${GAZEBO_LIBRARIES} 
+	${Boost_LIBRARIES}
 )
 
 #############

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(gen3_lite_gen3_lite_2f_move_it_config)
 
 find_package(catkin REQUIRED)

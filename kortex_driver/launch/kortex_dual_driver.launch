@@ -122,7 +122,6 @@
         <rosparam param="source_list" subst_value="true">
             [$(arg left_robot_name)/base_feedback/joint_state, $(arg right_robot_name)/base_feedback/joint_state]
         </rosparam>
-        <param name="use_gui" value="false"/>
     </node>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
 

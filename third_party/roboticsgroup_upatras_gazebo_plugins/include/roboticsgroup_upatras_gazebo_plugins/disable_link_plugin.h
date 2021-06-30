@@ -20,35 +20,28 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#ifndef ROBOTICSGROUP_GAZEBO_PLUGINS_DISABLE_LINK_PLUGIN
-#define ROBOTICSGROUP_GAZEBO_PLUGINS_DISABLE_LINK_PLUGIN
+#ifndef ROBOTICSGROUP_UPATRAS_GAZEBO_PLUGINS_DISABLE_LINK_PLUGIN
+#define ROBOTICSGROUP_UPATRAS_GAZEBO_PLUGINS_DISABLE_LINK_PLUGIN
 
 // ROS includes
 #include <ros/ros.h>
 
-// Boost includes
-#include <boost/bind.hpp>
-
 // Gazebo includes
 #include <gazebo/common/Plugin.hh>
-#include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
-#include <gazebo/common/common.hh>
 
 namespace gazebo {
+
     class DisableLinkPlugin : public ModelPlugin {
-    public:
+      public:
         DisableLinkPlugin();
-        ~DisableLinkPlugin();
+        virtual ~DisableLinkPlugin() override;
 
-        void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
-        void UpdateChild();
+        virtual void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf) override;
 
-    private:
+      private:
         // Parameters
         std::string link_name_;
-
-        bool kill_sim;
 
         // Pointers to the joints
         physics::LinkPtr link_;
@@ -59,6 +52,7 @@ namespace gazebo {
         // Pointer to the world
         physics::WorldPtr world_;
     };
+
 }
 
-#endif
+#endif  // ROBOTICSGROUP_UPATRAS_GAZEBO_PLUGINS_DISABLE_LINK_PLUGIN

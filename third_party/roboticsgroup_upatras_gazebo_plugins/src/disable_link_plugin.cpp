@@ -20,54 +20,43 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#ifndef ROBOTICSGROUP_GAZEBO_PLUGINS_MIMIC_JOINT_PLUGIN
-#define ROBOTICSGROUP_GAZEBO_PLUGINS_MIMIC_JOINT_PLUGIN
-
-// ROS includes
-#include <ros/ros.h>
-
-// ros_control
-#include <control_toolbox/pid.h>
-
-// Boost includes
-#include <boost/bind.hpp>
-
-// Gazebo includes
-#include <gazebo/common/Plugin.hh>
-#include <gazebo/gazebo.hh>
-#include <gazebo/physics/physics.hh>
-#include <gazebo/common/common.hh>
+#include <roboticsgroup_upatras_gazebo_plugins/disable_link_plugin.h>
 
 namespace gazebo {
-    class MimicJointPlugin : public ModelPlugin {
-    public:
-        MimicJointPlugin();
-        ~MimicJointPlugin();
 
-        void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
-        void UpdateChild();
+    DisableLinkPlugin::DisableLinkPlugin()
+    {
+        link_.reset();
+    }
 
-    private:
-        // Parameters
-        std::string joint_name_, mimic_joint_name_, robot_namespace_;
-        double multiplier_, offset_, sensitiveness_, max_effort_;
-        bool has_pid_;
+    DisableLinkPlugin::~DisableLinkPlugin()
+    {
+    }
 
-        // PID controller if needed
-        control_toolbox::Pid pid_;
+    void DisableLinkPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
+    {
+        model_ = _parent;
+        world_ = model_->GetWorld();
 
-        // Pointers to the joints
-        physics::JointPtr joint_, mimic_joint_;
+        // Check for link element
+        if (!_sdf->HasElement("link")) {
+            ROS_ERROR("No link element present. DisableLinkPlugin could not be loaded.");
+            return;
+        }
 
-        // Pointer to the model
-        physics::ModelPtr model_;
+        link_name_ = _sdf->GetElement("link")->Get<std::string>();
 
-        // Pointer to the world
-        physics::WorldPtr world_;
+        // Get pointers to joints
+        link_ = model_->GetLink(link_name_);
+        if (link_) {
+            link_->SetEnabled(false);
+            // Output some confirmation
+            ROS_INFO_STREAM("DisableLinkPlugin loaded! Link: " << link_name_);
+        }
+        else
+            ROS_ERROR_STREAM("Link " << link_name_ << " not found! DisableLinkPlugin could not be loaded.");
+    }
 
-        // Pointer to the update event connection
-        event::ConnectionPtr updateConnection;
-    };
-}
+    GZ_REGISTER_MODEL_PLUGIN(DisableLinkPlugin);
 
-#endif
+}  // namespace gazebo
