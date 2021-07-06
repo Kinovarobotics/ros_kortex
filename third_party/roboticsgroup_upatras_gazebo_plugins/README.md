@@ -1,9 +1,12 @@
-This ROS package was cloned from https://github.com/roboticsgroup/roboticsgroup_gazebo_plugins into ros_kortex to properly simulate mimic joints in Gazebo for the Robotiq 2f 85 gripper.
-The repository was cloned at commit 4d93ecd86e4415c3fe74d0027fd41c5e3b39ec44.
+This ROS package was cloned from https://github.com/roboticsgroup/roboticsgroup_upatras_gazebo_plugins into ros_kortex to properly simulate mimic joints in Gazebo for the Robotiq 2f 85 gripper.
+The repository was cloned at commit 15187abc17f22dbd3fa720d70ad50de74a668b7c.
+
+Originally, for ROS Melodic and Kinetic, we used the ROS package from https://github.com/roboticsgroup/roboticsgroup_gazebo_plugins at commit : 4d93ecd86e4415c3fe74d0027fd41c5e3b39ec44.
+
 The original readme file follows:
 
-roboticsgroup_gazebo_plugins
-================
+roboticsgroup_upatras_gazebo_plugins
+====================================
 
 Collection of small gazebo plugins
 ----------------------------------
@@ -63,10 +66,10 @@ A simple (Model) plugin for Gazebo that allows you to disable a link in Gazebo's
 Usage
 ------
 
-Standard Gazebo plugin import inside xacro/urdf. Use **libroboticsgroup_gazebo_** prefix. E.g. if you want to import MimicJointPlugin:
+Standard Gazebo plugin import inside xacro/urdf. Use **libroboticsgroup_upatras_gazebo_** prefix. E.g. if you want to import MimicJointPlugin:
 
 ```
-libroboticsgroup_gazebo_mimic_joint_plugin.so
+libroboticsgroup_upatras_gazebo_mimic_joint_plugin.so
 ```
 
 Notes
@@ -78,6 +81,5 @@ License
 ----
 
 BSD
-
 
 Copyright (c) 2014, **Konstantinos Chatzilygeroudis**

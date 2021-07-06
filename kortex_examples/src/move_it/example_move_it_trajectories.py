@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Software License Agreement (BSD License)
 #
@@ -64,7 +64,7 @@ class ExampleMoveItTrajectories(object):
         gripper_joint_names = rospy.get_param(rospy.get_namespace() + "gripper_joint_names", [])
         self.gripper_joint_name = gripper_joint_names[0]
       else:
-        gripper_joint_name = ""
+        self.gripper_joint_name = ""
       self.degrees_of_freedom = rospy.get_param(rospy.get_namespace() + "degrees_of_freedom", 7)
 
       # Create the MoveItInterface necessary objects
@@ -96,9 +96,9 @@ class ExampleMoveItTrajectories(object):
     # Set the target
     arm_group.set_named_target(target)
     # Plan the trajectory
-    planned_path1 = arm_group.plan()
+    (success_flag, trajectory_message, planning_time, error_code) = arm_group.plan()
     # Execute the trajectory and block while it's not finished
-    return arm_group.execute(planned_path1, wait=True)
+    return arm_group.execute(trajectory_message, wait=True)
 
   def reach_joint_angles(self, tolerance):
     arm_group = self.arm_group

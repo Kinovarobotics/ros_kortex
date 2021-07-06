@@ -27,10 +27,16 @@
   
 
   <!-- We do not have a robot connected, so publish fake joint states -->
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-    <param name="use_gui" value="$(arg use_gui)"/>
-    <rosparam param="source_list">[move_group/fake_controller_joint_states]</rosparam>
-  </node>
+  <group if="$(arg use_gui)">
+    <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui">
+      <rosparam param="source_list">[move_group/fake_controller_joint_states]</rosparam>
+    </node>
+  </group>
+  <group unless="$(arg use_gui)">
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+      <rosparam param="source_list">[move_group/fake_controller_joint_states]</rosparam>
+    </node>
+  </group>
 
   <!-- Given the published joint states, publish tf for the robot links -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="true" output="screen" />

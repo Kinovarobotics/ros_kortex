@@ -20,45 +20,52 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT
 OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include <roboticsgroup_gazebo_plugins/disable_link_plugin.h>
+#ifndef ROBOTICSGROUP_UPATRAS_GAZEBO_PLUGINS_MIMIC_JOINT_PLUGIN
+#define ROBOTICSGROUP_UPATRAS_GAZEBO_PLUGINS_MIMIC_JOINT_PLUGIN
+
+// ROS includes
+#include <ros/ros.h>
+
+// ros_control
+#include <control_toolbox/pid.h>
+
+// Gazebo includes
+#include <gazebo/common/Plugin.hh>
+#include <gazebo/physics/physics.hh>
 
 namespace gazebo {
 
-    DisableLinkPlugin::DisableLinkPlugin()
-    {
-        kill_sim = false;
+    class MimicJointPlugin : public ModelPlugin {
+      public:
+        MimicJointPlugin();
+        virtual ~MimicJointPlugin() override;
 
-        link_.reset();
-    }
+        virtual void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf) override;
 
-    DisableLinkPlugin::~DisableLinkPlugin()
-    {
-        kill_sim = true;
-    }
+      private:
+        void UpdateChild();
 
-    void DisableLinkPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
-    {
-        model_ = _parent;
-        world_ = model_->GetWorld();
+        // Parameters
+        std::string joint_name_, mimic_joint_name_, robot_namespace_;
+        double multiplier_, offset_, sensitiveness_, max_effort_;
+        bool has_pid_;
 
-        // Check for link element
-        if (!_sdf->HasElement("link")) {
-            ROS_ERROR("No link element present. DisableLinkPlugin could not be loaded.");
-            return;
-        }
+        // PID controller if needed
+        control_toolbox::Pid pid_;
 
-        link_name_ = _sdf->GetElement("link")->Get<std::string>();
+        // Pointers to the joints
+        physics::JointPtr joint_, mimic_joint_;
 
-        // Get pointers to joints
-        link_ = model_->GetLink(link_name_);
-        if (link_) {
-            link_->SetEnabled(false);
-            // Output some confirmation
-            ROS_INFO_STREAM("DisableLinkPlugin loaded! Link: \"" << link_name_);
-        }
-        else
-            ROS_ERROR_STREAM("Link" << link_name_ << " not found! DisableLinkPlugin could not be loaded.");
-    }
+        // Pointer to the model
+        physics::ModelPtr model_;
 
-    GZ_REGISTER_MODEL_PLUGIN(DisableLinkPlugin);
+        // Pointer to the world
+        physics::WorldPtr world_;
+
+        // Pointer to the update event connection
+        event::ConnectionPtr update_connection_;
+    };
+
 }
+
+#endif  // ROBOTICSGROUP_UPATRAS_GAZEBO_PLUGINS_MIMIC_JOINT_PLUGIN

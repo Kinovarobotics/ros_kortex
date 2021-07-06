@@ -18,7 +18,7 @@ This package contains the URDF (Unified Robot Description Format), STL and confi
 To load the description of a robot, you simply have to load the **ARM.xacro** or the **ARM_GRIPPER.xacro** file, with **ARM** being your arm's name (gen3, gen3_lite), and if you have a gripper, **GRIPPER** being your gripper's name (robotiq_2f_85, gen3_lite_2f).
 
 **Arguments**:
-- **sim** : If this argument is true, the Gazebo-specific files will be loaded. The default value is **false **.
+- **sim** : If this argument is true, the Gazebo-specific files will be loaded. The default value is **false**.
 
 For example:
 

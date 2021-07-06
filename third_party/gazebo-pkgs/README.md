@@ -1,5 +1,8 @@
 These ROS packages were cloned from https://github.com/JenniferBuehler/gazebo-pkgs into ros_kortex to properly simulate grasping in Gazebo for the Robotiq 2f 85 gripper.
-The repository was cloned at commit e54939f6a80982dc1b89c3c2fb288e989f758b20.
+The repository was cloned at commit a7ebecca4393d43393e315d379a876e71820fd96.
+
+note: Some packages were removed since they weren't needed.
+
 The original readme file follows:
 
 # gazebo-pkgs
