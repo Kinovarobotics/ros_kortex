@@ -29,7 +29,7 @@
     <arg name="use_sim_time" default="true"/>
     <arg name="debug" default="false" />
     <arg name="paused" default="true"/>
-    
+
     <!-- Start Gazebo -->
     <include file="$(find kortex_gazebo)/launch/start_gazebo.launch" if="$(arg start_gazebo)">
             <arg name="gui" value="$(arg gazebo_gui)"/>
