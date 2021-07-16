@@ -149,4 +149,10 @@ enum SubErrorCodes {
     CONTROLLER_INVALID_MAPPING = 137;       // Attempting to assign an unsuited mapping to controller
 
     ACTION_IN_USE = 138;                    // Attempting to delete an Action used by another entity
+
+    SEND_FAILED = 139;                      // An error occured when trying to send the message (Transport error)
+
+    CONTROL_WAYPOINT_TRAJECTORY_ABORTED = 140;         // Waypoint trajectory sequence aborted by kontrol library
+    
+    CONTROL_PERMISSION_DENIED = 141;        // Permission to execute a routine from the kontrol interface denied
 }

@@ -14,8 +14,10 @@
 import sys
 import rospy
 import time
+
 from kortex_driver.srv import *
 from kortex_driver.msg import *
+
 
 class ExampleFullArmMovement:
     def __init__(self):
@@ -67,6 +69,10 @@ class ExampleFullArmMovement:
             activate_publishing_of_action_notification_full_name = '/' + self.robot_name + '/base/activate_publishing_of_action_topic'
             rospy.wait_for_service(activate_publishing_of_action_notification_full_name)
             self.activate_publishing_of_action_notification = rospy.ServiceProxy(activate_publishing_of_action_notification_full_name, OnNotificationActionTopic)
+        
+            get_product_configuration_full_name = '/' + self.robot_name + '/base/get_product_configuration'
+            rospy.wait_for_service(get_product_configuration_full_name)
+            self.get_product_configuration = rospy.ServiceProxy(get_product_configuration_full_name, GetProductConfiguration)
         except:
             self.is_init_success = False
         else:
@@ -74,6 +80,22 @@ class ExampleFullArmMovement:
 
     def cb_action_topic(self, notif):
         self.last_action_notif_type = notif.action_event
+    
+    def FillCartesianWaypoint(self, new_x, new_y, new_z, new_theta_x, new_theta_y, new_theta_z, blending_radius):
+        waypoint = Waypoint()
+        cartesianWaypoint = CartesianWaypoint()
+
+        cartesianWaypoint.pose.x = new_x
+        cartesianWaypoint.pose.y = new_y
+        cartesianWaypoint.pose.z = new_z
+        cartesianWaypoint.pose.theta_x = new_theta_x
+        cartesianWaypoint.pose.theta_y = new_theta_y
+        cartesianWaypoint.pose.theta_z = new_theta_z
+        cartesianWaypoint.reference_frame = CartesianReferenceFrame.CARTESIAN_REFERENCE_FRAME_BASE
+        cartesianWaypoint.blending_radius = blending_radius
+        waypoint.oneof_type_of_waypoint.cartesian_waypoint.append(cartesianWaypoint)
+
+        return waypoint
 
     def wait_for_action_end_or_abort(self):
         while not rospy.is_shutdown():
@@ -231,6 +253,40 @@ class ExampleFullArmMovement:
             time.sleep(0.5)
             return True
 
+    def example_cartesian_waypoint_action(self):
+        self.last_action_notif_type = None
+
+        req = ExecuteActionRequest()
+        trajectory = WaypointList()
+
+        config = self.get_product_configuration()
+
+        if config.output.model == ModelId.MODEL_ID_L31:
+        
+            trajectory.waypoints.append(self.FillCartesianWaypoint(0.439,  0.194,  0.448, 90.6, -1.0, 150, 0))
+            trajectory.waypoints.append(self.FillCartesianWaypoint(0.200,  0.150,  0.400, 90.6, -1.0, 150, 0))
+            trajectory.waypoints.append(self.FillCartesianWaypoint(0.350,  0.050,  0.300, 90.6, -1.0, 150, 0))
+        else:
+            trajectory.waypoints.append(self.FillCartesianWaypoint(0.7,  0.0,   0.5,  90, 0, 90, 0))
+            trajectory.waypoints.append(self.FillCartesianWaypoint(0.7,  0.0,   0.33, 90, 0, 90, 0.1))
+            trajectory.waypoints.append(self.FillCartesianWaypoint(0.7,  0.48,  0.33, 90, 0, 90, 0.1))
+            trajectory.waypoints.append(self.FillCartesianWaypoint(0.61, 0.22,  0.4,  90, 0, 90, 0.1))
+            trajectory.waypoints.append(self.FillCartesianWaypoint(0.7,  0.48,  0.33, 90, 0, 90, 0.1))
+            trajectory.waypoints.append(self.FillCartesianWaypoint(0.63, -0.22, 0.45, 90, 0, 90, 0.1))
+            trajectory.waypoints.append(self.FillCartesianWaypoint(0.65, 0.05,  0.45, 90, 0, 90, 0))
+        
+        req.input.oneof_action_parameters.execute_waypoint_list.append(trajectory)
+        
+        # Call the service
+        rospy.loginfo("Executing Kortex action ExecuteWaypointTrajectory...")
+        try:
+            self.execute_action(req)
+        except rospy.ServiceException:
+            rospy.logerr("Failed to call action ExecuteWaypointTrajectory")
+            return False
+        else:
+            return self.wait_for_action_end_or_abort()
+
     def main(self):
         # For testing purposes
         success = self.is_init_success
@@ -288,6 +344,21 @@ class ExampleFullArmMovement:
                 rospy.logwarn("No gripper is present on the arm.")    
             #*******************************************************************************
         
+            #*******************************************************************************
+            # Move the robot to the Home position with an Action
+            success &= self.example_home_the_robot()
+            #*******************************************************************************
+
+            #*******************************************************************************
+            # Example of waypoint
+            # Let's move the arm
+            success &= self.example_cartesian_waypoint_action()
+
+            #*******************************************************************************
+            # Move the robot to the Home position with an Action
+            success &= self.example_home_the_robot()
+            #*******************************************************************************
+
         # For testing purposes
         rospy.set_param("/kortex_examples_test_results/full_arm_movement_python", success)
 

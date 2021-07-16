@@ -9,7 +9,7 @@
   <!-- When determining the expected duration of a trajectory, this multiplicative factor is applied to get the allowed duration of execution -->
   <param name="trajectory_execution/allowed_execution_duration_scaling" value="1.2"/> <!-- default 1.2 -->
   <!-- Allow more than the expected execution time before triggering a trajectory cancel (applied after scaling) -->
-  <param name="trajectory_execution/allowed_goal_duration_margin" value="2.0"/> <!-- default is 0.5 but this needs to be higher before preprocessing in the arm takes time -->
+  <param name="trajectory_execution/allowed_goal_duration_margin" value="2.0"/> <!-- default is 0.5 but this needs to be higher because preprocessing in the arm takes time -->
   <!-- Allowed joint-value tolerance for validation that trajectory's first point matches current robot state -->
   <param name="trajectory_execution/allowed_start_tolerance" value="0.01"/> <!-- default 0.01 -->
 

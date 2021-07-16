@@ -41,6 +41,9 @@
 #include "kortex_driver/generated/robot/visionconfig_ros_converter.h"
 
 
+#include "kortex_driver/GpioConfigurationList.h"
+#include "kortex_driver/Base_GpioConfiguration.h"
+#include "kortex_driver/GpioPinConfiguration.h"
 #include "kortex_driver/FullUserProfile.h"
 #include "kortex_driver/UserProfile.h"
 #include "kortex_driver/UserProfileList.h"
@@ -99,7 +102,7 @@
 #include "kortex_driver/ConfigurationChangeNotification.h"
 #include "kortex_driver/MappingInfoNotification.h"
 #include "kortex_driver/Base_ControlModeInformation.h"
-#include "kortex_driver/ControlModeNotification.h"
+#include "kortex_driver/Base_ControlModeNotification.h"
 #include "kortex_driver/ServoingModeInformation.h"
 #include "kortex_driver/OperatingModeInformation.h"
 #include "kortex_driver/OperatingModeNotification.h"
@@ -116,6 +119,7 @@
 #include "kortex_driver/ControllerState.h"
 #include "kortex_driver/ControllerElementState.h"
 #include "kortex_driver/ActionNotification.h"
+#include "kortex_driver/TrajectoryInfo.h"
 #include "kortex_driver/ActionExecutionState.h"
 #include "kortex_driver/RobotEventNotification.h"
 #include "kortex_driver/FactoryNotification.h"
@@ -176,6 +180,7 @@
 #include "kortex_driver/GripperRequest.h"
 #include "kortex_driver/Gripper.h"
 #include "kortex_driver/Finger.h"
+#include "kortex_driver/GpioCommand.h"
 #include "kortex_driver/SystemTime.h"
 #include "kortex_driver/ControllerConfigurationMode.h"
 #include "kortex_driver/ControllerConfiguration.h"
@@ -193,10 +198,20 @@
 #include "kortex_driver/PreComputedJointTrajectoryElement.h"
 #include "kortex_driver/TrajectoryErrorElement.h"
 #include "kortex_driver/TrajectoryErrorReport.h"
+#include "kortex_driver/WaypointValidationReport.h"
+#include "kortex_driver/Waypoint.h"
+#include "kortex_driver/AngularWaypoint.h"
+#include "kortex_driver/CartesianWaypoint.h"
+#include "kortex_driver/WaypointList.h"
+#include "kortex_driver/KinematicTrajectoryConstraints.h"
 #include "kortex_driver/FirmwareBundleVersions.h"
 #include "kortex_driver/FirmwareComponentVersion.h"
+#include "kortex_driver/IKData.h"
 
 
+int ToRosData(Kinova::Api::Base::GpioConfigurationList input, kortex_driver::GpioConfigurationList &output);
+int ToRosData(Kinova::Api::Base::GpioConfiguration input, kortex_driver::Base_GpioConfiguration &output);
+int ToRosData(Kinova::Api::Base::GpioPinConfiguration input, kortex_driver::GpioPinConfiguration &output);
 int ToRosData(Kinova::Api::Base::FullUserProfile input, kortex_driver::FullUserProfile &output);
 int ToRosData(Kinova::Api::Base::UserProfile input, kortex_driver::UserProfile &output);
 int ToRosData(Kinova::Api::Base::UserProfileList input, kortex_driver::UserProfileList &output);
@@ -255,7 +270,7 @@ int ToRosData(Kinova::Api::Base::Query input, kortex_driver::Query &output);
 int ToRosData(Kinova::Api::Base::ConfigurationChangeNotification input, kortex_driver::ConfigurationChangeNotification &output);
 int ToRosData(Kinova::Api::Base::MappingInfoNotification input, kortex_driver::MappingInfoNotification &output);
 int ToRosData(Kinova::Api::Base::ControlModeInformation input, kortex_driver::Base_ControlModeInformation &output);
-int ToRosData(Kinova::Api::Base::ControlModeNotification input, kortex_driver::ControlModeNotification &output);
+int ToRosData(Kinova::Api::Base::ControlModeNotification input, kortex_driver::Base_ControlModeNotification &output);
 int ToRosData(Kinova::Api::Base::ServoingModeInformation input, kortex_driver::ServoingModeInformation &output);
 int ToRosData(Kinova::Api::Base::OperatingModeInformation input, kortex_driver::OperatingModeInformation &output);
 int ToRosData(Kinova::Api::Base::OperatingModeNotification input, kortex_driver::OperatingModeNotification &output);
@@ -272,6 +287,7 @@ int ToRosData(Kinova::Api::Base::ControllerList input, kortex_driver::Controller
 int ToRosData(Kinova::Api::Base::ControllerState input, kortex_driver::ControllerState &output);
 int ToRosData(Kinova::Api::Base::ControllerElementState input, kortex_driver::ControllerElementState &output);
 int ToRosData(Kinova::Api::Base::ActionNotification input, kortex_driver::ActionNotification &output);
+int ToRosData(Kinova::Api::Base::TrajectoryInfo input, kortex_driver::TrajectoryInfo &output);
 int ToRosData(Kinova::Api::Base::ActionExecutionState input, kortex_driver::ActionExecutionState &output);
 int ToRosData(Kinova::Api::Base::RobotEventNotification input, kortex_driver::RobotEventNotification &output);
 int ToRosData(Kinova::Api::Base::FactoryNotification input, kortex_driver::FactoryNotification &output);
@@ -332,6 +348,7 @@ int ToRosData(Kinova::Api::Base::GripperCommand input, kortex_driver::GripperCom
 int ToRosData(Kinova::Api::Base::GripperRequest input, kortex_driver::GripperRequest &output);
 int ToRosData(Kinova::Api::Base::Gripper input, kortex_driver::Gripper &output);
 int ToRosData(Kinova::Api::Base::Finger input, kortex_driver::Finger &output);
+int ToRosData(Kinova::Api::Base::GpioCommand input, kortex_driver::GpioCommand &output);
 int ToRosData(Kinova::Api::Base::SystemTime input, kortex_driver::SystemTime &output);
 int ToRosData(Kinova::Api::Base::ControllerConfigurationMode input, kortex_driver::ControllerConfigurationMode &output);
 int ToRosData(Kinova::Api::Base::ControllerConfiguration input, kortex_driver::ControllerConfiguration &output);
@@ -349,7 +366,14 @@ int ToRosData(Kinova::Api::Base::PreComputedJointTrajectory input, kortex_driver
 int ToRosData(Kinova::Api::Base::PreComputedJointTrajectoryElement input, kortex_driver::PreComputedJointTrajectoryElement &output);
 int ToRosData(Kinova::Api::Base::TrajectoryErrorElement input, kortex_driver::TrajectoryErrorElement &output);
 int ToRosData(Kinova::Api::Base::TrajectoryErrorReport input, kortex_driver::TrajectoryErrorReport &output);
+int ToRosData(Kinova::Api::Base::WaypointValidationReport input, kortex_driver::WaypointValidationReport &output);
+int ToRosData(Kinova::Api::Base::Waypoint input, kortex_driver::Waypoint &output);
+int ToRosData(Kinova::Api::Base::AngularWaypoint input, kortex_driver::AngularWaypoint &output);
+int ToRosData(Kinova::Api::Base::CartesianWaypoint input, kortex_driver::CartesianWaypoint &output);
+int ToRosData(Kinova::Api::Base::WaypointList input, kortex_driver::WaypointList &output);
+int ToRosData(Kinova::Api::Base::KinematicTrajectoryConstraints input, kortex_driver::KinematicTrajectoryConstraints &output);
 int ToRosData(Kinova::Api::Base::FirmwareBundleVersions input, kortex_driver::FirmwareBundleVersions &output);
 int ToRosData(Kinova::Api::Base::FirmwareComponentVersion input, kortex_driver::FirmwareComponentVersion &output);
+int ToRosData(Kinova::Api::Base::IKData input, kortex_driver::IKData &output);
 
 #endif

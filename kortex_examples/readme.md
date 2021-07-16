@@ -70,9 +70,9 @@ There are a couple ways to use a Kortex arm with ROS, may it be in simulation or
 
     ![](./img/moveit.png)
 
-    **With a real arm**, the FollowJointTrajectory Action Server uses the Kortex API `PlayPreComputedJointTrajectory`. This call expects a full joint trajectory interpolated at a 1ms timestep, because the arm takes the trajectory as is, verifies it respects all velocity and acceleration constraints and then executes it as a low-level trajectory. Because of this timestep constraint, the MoveIt OMPL planning pipeline has an additional step which uses the `industrial_trajectory_filters/UniformSampleFilter` to interpolate the MoveIt output with a 1ms-timestep. Any timestep that provides a wrong velocity or acceleration causes the whole trajectory to be rejected. The velocity and acceleration limits in the configuration files have been tuned so no trajectory should yield such values, but if you experience trajectory rejection problems, you can tune down those parameters.
+    **With a real arm**, the FollowJointTrajectory Action Server uses the Kortex API `ExecuteWaypointTrajectory`. This call takes as input Angular Waypoints each with their own duration. Any waypoint that yields an invalid velocity or acceleration in its segment causes the whole trajectory to be rejected. The velocity and acceleration limits in the configuration files have been tuned so no trajectory should yield such values, but if you experience trajectory rejection problems, you can tune down those parameters.
 
-    **In simulation**, the FollowJointTrajectory and GripperCommand Action Servers are the ones spawned by the ros_controllers used with Gazebo. They don't need 1ms-timestep, but no option was added in MoveIt to switch between simulated or real action servers, so the same interpolator is used in simulation although it is not required. The Gen3 Intel Realsense camera is not simulated.
+    **In simulation**, the FollowJointTrajectory and GripperCommand Action Servers are the ones spawned by the ros_controllers used with Gazebo. The Gen3 Intel Realsense camera is not simulated.
 
 3. Low-level control
 

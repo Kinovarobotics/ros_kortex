@@ -44,7 +44,7 @@
 #include "kortex_driver/EthernetDeviceIdentification.h"
 #include "kortex_driver/EthernetConfiguration.h"
 #include "kortex_driver/GPIOIdentification.h"
-#include "kortex_driver/GPIOConfiguration.h"
+#include "kortex_driver/InterconnectConfig_GPIOConfiguration.h"
 #include "kortex_driver/GPIOState.h"
 #include "kortex_driver/I2CDeviceIdentification.h"
 #include "kortex_driver/I2CConfiguration.h"
@@ -58,7 +58,7 @@
 int ToRosData(Kinova::Api::InterconnectConfig::EthernetDeviceIdentification input, kortex_driver::EthernetDeviceIdentification &output);
 int ToRosData(Kinova::Api::InterconnectConfig::EthernetConfiguration input, kortex_driver::EthernetConfiguration &output);
 int ToRosData(Kinova::Api::InterconnectConfig::GPIOIdentification input, kortex_driver::GPIOIdentification &output);
-int ToRosData(Kinova::Api::InterconnectConfig::GPIOConfiguration input, kortex_driver::GPIOConfiguration &output);
+int ToRosData(Kinova::Api::InterconnectConfig::GPIOConfiguration input, kortex_driver::InterconnectConfig_GPIOConfiguration &output);
 int ToRosData(Kinova::Api::InterconnectConfig::GPIOState input, kortex_driver::GPIOState &output);
 int ToRosData(Kinova::Api::InterconnectConfig::I2CDeviceIdentification input, kortex_driver::I2CDeviceIdentification &output);
 int ToRosData(Kinova::Api::InterconnectConfig::I2CConfiguration input, kortex_driver::I2CConfiguration &output);

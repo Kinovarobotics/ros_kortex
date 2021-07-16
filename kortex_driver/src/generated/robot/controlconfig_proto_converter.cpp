@@ -195,3 +195,13 @@ int ToProtoData(kortex_driver::ControlConfig_ControlModeInformation input, Kinov
 	
 	return 0;
 }
+int ToProtoData(kortex_driver::ControlConfig_ControlModeNotification input, Kinova::Api::ControlConfig::ControlModeNotification *output)
+{
+	
+	output->set_control_mode((Kinova::Api::ControlConfig::ControlMode)input.control_mode); 
+	ToProtoData(input.timestamp, output->mutable_timestamp()); 
+	ToProtoData(input.user_handle, output->mutable_user_handle()); 
+	ToProtoData(input.connection, output->mutable_connection());
+	
+	return 0;
+}

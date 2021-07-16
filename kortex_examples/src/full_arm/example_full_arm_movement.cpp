@@ -13,6 +13,7 @@
 #include <atomic>
 
 #include "ros/ros.h"
+
 #include <kortex_driver/Base_ClearFaults.h>
 #include <kortex_driver/PlayCartesianTrajectory.h>
 #include <kortex_driver/CartesianSpeed.h>
@@ -27,6 +28,9 @@
 #include <kortex_driver/ActionNotification.h>
 #include <kortex_driver/ActionEvent.h>
 #include <kortex_driver/OnNotificationActionTopic.h>
+#include <kortex_driver/ExecuteWaypointTrajectory.h>
+#include <kortex_driver/GetProductConfiguration.h>
+#include <kortex_driver/ModelId.h>
 
 #define HOME_ACTION_IDENTIFIER 2
 
@@ -53,11 +57,29 @@ bool wait_for_action_end_or_abort()
     }
     ros::spinOnce();
   }
+  return false;
 }
 
+kortex_driver::Waypoint FillCartesianWaypoint(float new_x, float new_y, float new_z, float new_theta_x, float new_theta_y, float new_theta_z, float blending_radius)
+{
+  kortex_driver::Waypoint waypoint;
+  kortex_driver::CartesianWaypoint cartesianWaypoint;
 
+  cartesianWaypoint.pose.x = new_x;
+  cartesianWaypoint.pose.y = new_y;
+  cartesianWaypoint.pose.z = new_z;
+  cartesianWaypoint.pose.theta_x = new_theta_x;
+  cartesianWaypoint.pose.theta_y = new_theta_y;
+  cartesianWaypoint.pose.theta_z = new_theta_z;
+  cartesianWaypoint.reference_frame = kortex_driver::CartesianReferenceFrame::CARTESIAN_REFERENCE_FRAME_BASE;
+  cartesianWaypoint.blending_radius = blending_radius;
 
-bool example_clear_faults(ros::NodeHandle n, std::string robot_name)
+  waypoint.oneof_type_of_waypoint.cartesian_waypoint.push_back(cartesianWaypoint);
+
+  return waypoint;
+}
+
+bool example_clear_faults(ros::NodeHandle n, const std::string &robot_name)
 {
   ros::ServiceClient service_client_clear_faults = n.serviceClient<kortex_driver::Base_ClearFaults>("/" + robot_name + "/base/clear_faults");
   kortex_driver::Base_ClearFaults service_clear_faults;
@@ -75,7 +97,7 @@ bool example_clear_faults(ros::NodeHandle n, std::string robot_name)
   return true;
 }
 
-bool example_home_the_robot(ros::NodeHandle n, std::string robot_name)
+bool example_home_the_robot(ros::NodeHandle n, const std::string &robot_name)
 {
   ros::ServiceClient service_client_read_action = n.serviceClient<kortex_driver::ReadAction>("/" + robot_name + "/base/read_action");
   kortex_driver::ReadAction service_read_action;
@@ -111,7 +133,7 @@ bool example_home_the_robot(ros::NodeHandle n, std::string robot_name)
   return wait_for_action_end_or_abort();
 }
 
-bool example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_name)
+bool example_set_cartesian_reference_frame(ros::NodeHandle n, const std::string &robot_name)
 {
   // Initialize the ServiceClient
   ros::ServiceClient service_client_set_cartesian_reference_frame = n.serviceClient<kortex_driver::SetCartesianReferenceFrame>("/" + robot_name + "/control_config/set_cartesian_reference_frame");
@@ -131,7 +153,7 @@ bool example_set_cartesian_reference_frame(ros::NodeHandle n, std::string robot_
   return true;
 }
 
-bool example_send_cartesian_pose(ros::NodeHandle n, std::string robot_name)
+bool example_send_cartesian_pose(ros::NodeHandle n, const std::string &robot_name)
 {
   last_action_notification_event = 0;
   // Get the actual cartesian pose to increment it
@@ -181,7 +203,7 @@ bool example_send_cartesian_pose(ros::NodeHandle n, std::string robot_name)
   return wait_for_action_end_or_abort();
 }
 
-bool example_send_joint_angles(ros::NodeHandle n, std::string robot_name, int degrees_of_freedom)
+bool example_send_joint_angles(ros::NodeHandle n, const std::string &robot_name, int degrees_of_freedom)
 {
   last_action_notification_event = 0;
   // Initialize the ServiceClient
@@ -216,7 +238,7 @@ bool example_send_joint_angles(ros::NodeHandle n, std::string robot_name, int de
   return wait_for_action_end_or_abort();
 }
 
-bool example_send_gripper_command(ros::NodeHandle n, std::string robot_name, double value)
+bool example_send_gripper_command(ros::NodeHandle n, const std::string &robot_name, double value)
 {
   // Initialize the ServiceClient
   ros::ServiceClient service_client_send_gripper_command = n.serviceClient<kortex_driver::SendGripperCommand>("/" + robot_name + "/base/send_gripper_command");
@@ -243,6 +265,57 @@ bool example_send_gripper_command(ros::NodeHandle n, std::string robot_name, dou
   return true;
 }
 
+bool example_cartesian_waypoint(ros::NodeHandle n, const std::string &robot_name)
+{
+  
+  ros::ServiceClient service_client_execute_waypoints_trajectory = n.serviceClient<kortex_driver::ExecuteWaypointTrajectory>("/" + robot_name + "/base/execute_waypoint_trajectory");
+  ros::ServiceClient service_client_get_config = n.serviceClient<kortex_driver::GetProductConfiguration>("/" + robot_name + "/base/get_product_configuration");
+
+  kortex_driver::ExecuteWaypointTrajectory service_execute_waypoints_trajectory;
+  kortex_driver::GetProductConfiguration service_get_config;
+  
+  last_action_notification_event = 0;
+
+  if (!service_client_get_config.call(service_get_config))
+  {
+    std::string error_string = "Failed to call GetProductConfiguration";
+    ROS_ERROR("%s", error_string.c_str());
+    return false;
+  }
+
+  auto product_config = service_get_config.response.output;
+
+  if(product_config.model == kortex_driver::ModelId::MODEL_ID_L31) //If the robot is a GEN3-LITE use this trajectory.
+  {
+    service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(0.439,  0.194,  0.448, 90.6, -1.0, 150, 0));
+    service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(0.200,  0.150,  0.400, 90.6, -1.0, 150, 0));
+    service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(0.350,  0.050,  0.300, 90.6, -1.0, 150, 0));
+  }
+  else
+  {
+    service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(0.7,  0.0,   0.5,  90, 0, 90, 0));
+    service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(0.7,  0.0,   0.33, 90, 0, 90, 0.1));
+    service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(0.7,  0.48,  0.33, 90, 0, 90, 0.1));
+    service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(0.61, 0.22,  0.4,  90, 0, 90, 0.1));
+    service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(0.7,  0.48,  0.33, 90, 0, 90, 0.1));
+    service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(0.63, -0.22, 0.45, 90, 0, 90, 0.1));
+    service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(0.65, 0.05,  0.45, 90, 0, 90, 0));
+  }
+  
+
+  service_execute_waypoints_trajectory.request.input.duration = 0;
+  service_execute_waypoints_trajectory.request.input.use_optimal_blending = 0;
+  
+  if (!service_client_execute_waypoints_trajectory.call(service_execute_waypoints_trajectory))
+  {
+    std::string error_string = "Failed to call ExecuteWaypointTrajectory";
+    ROS_ERROR("%s", error_string.c_str());
+    return false;
+  }
+
+  return wait_for_action_end_or_abort();
+}
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "full_arm_movement_example_cpp");
@@ -255,8 +328,11 @@ int main(int argc, char **argv)
   //*******************************************************************************
   // ROS Parameters
   ros::NodeHandle n;
+
   std::string robot_name = "my_gen3";
+
   int degrees_of_freedom = 7;
+
   bool is_gripper_present = false;
 
   // Parameter robot_name
@@ -354,6 +430,21 @@ int main(int argc, char **argv)
   {
     success &= example_send_gripper_command(n, robot_name, 0.5);
   }
+  //*******************************************************************************
+
+  //*******************************************************************************
+  // Move the robot to the Home position again with an Action
+  success &= example_home_the_robot(n, robot_name);
+  //*******************************************************************************
+
+  //*******************************************************************************
+  // Move the robot using Cartesian waypoint.
+  success &= example_cartesian_waypoint(n, robot_name);
+  //*******************************************************************************
+
+  //*******************************************************************************
+  // Move the robot to the Home position one last time.
+  success &= example_home_the_robot(n, robot_name);
   //*******************************************************************************
 
   // Report success for testing purposes

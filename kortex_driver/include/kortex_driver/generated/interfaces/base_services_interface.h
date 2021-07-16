@@ -84,8 +84,8 @@
 #include "kortex_driver/ConfigurationChangeNotification.h"
 #include "kortex_driver/OnNotificationMappingInfoTopic.h"
 #include "kortex_driver/MappingInfoNotification.h"
-#include "kortex_driver/OnNotificationControlModeTopic.h"
-#include "kortex_driver/ControlModeNotification.h"
+#include "kortex_driver/Base_OnNotificationControlModeTopic.h"
+#include "kortex_driver/Base_ControlModeNotification.h"
 #include "kortex_driver/OnNotificationOperatingModeTopic.h"
 #include "kortex_driver/OperatingModeNotification.h"
 #include "kortex_driver/OnNotificationSequenceInfoTopic.h"
@@ -176,12 +176,16 @@
 #include "kortex_driver/DeleteAllSequenceTasks.h"
 #include "kortex_driver/TakeSnapshot.h"
 #include "kortex_driver/GetFirmwareBundleVersions.h"
+#include "kortex_driver/ExecuteWaypointTrajectory.h"
 #include "kortex_driver/MoveSequenceTask.h"
 #include "kortex_driver/DuplicateMapping.h"
 #include "kortex_driver/DuplicateMap.h"
 #include "kortex_driver/SetControllerConfiguration.h"
 #include "kortex_driver/GetControllerConfiguration.h"
 #include "kortex_driver/GetAllControllerConfigurations.h"
+#include "kortex_driver/ComputeForwardKinematics.h"
+#include "kortex_driver/ComputeInverseKinematics.h"
+#include "kortex_driver/ValidateWaypointList.h"
 
 #include "kortex_driver/KortexError.h"
 #include "kortex_driver/SetDeviceID.h"
@@ -257,7 +261,7 @@ class IBaseServices
         virtual void cb_ConfigurationChangeTopic(Kinova::Api::Base::ConfigurationChangeNotification notif) = 0;
         virtual bool OnNotificationMappingInfoTopic(kortex_driver::OnNotificationMappingInfoTopic::Request  &req, kortex_driver::OnNotificationMappingInfoTopic::Response &res) = 0;
         virtual void cb_MappingInfoTopic(Kinova::Api::Base::MappingInfoNotification notif) = 0;
-        virtual bool OnNotificationControlModeTopic(kortex_driver::OnNotificationControlModeTopic::Request  &req, kortex_driver::OnNotificationControlModeTopic::Response &res) = 0;
+        virtual bool Base_OnNotificationControlModeTopic(kortex_driver::Base_OnNotificationControlModeTopic::Request  &req, kortex_driver::Base_OnNotificationControlModeTopic::Response &res) = 0;
         virtual void cb_ControlModeTopic(Kinova::Api::Base::ControlModeNotification notif) = 0;
         virtual bool OnNotificationOperatingModeTopic(kortex_driver::OnNotificationOperatingModeTopic::Request  &req, kortex_driver::OnNotificationOperatingModeTopic::Response &res) = 0;
         virtual void cb_OperatingModeTopic(Kinova::Api::Base::OperatingModeNotification notif) = 0;
@@ -349,12 +353,16 @@ class IBaseServices
         virtual bool DeleteAllSequenceTasks(kortex_driver::DeleteAllSequenceTasks::Request  &req, kortex_driver::DeleteAllSequenceTasks::Response &res) = 0;
         virtual bool TakeSnapshot(kortex_driver::TakeSnapshot::Request  &req, kortex_driver::TakeSnapshot::Response &res) = 0;
         virtual bool GetFirmwareBundleVersions(kortex_driver::GetFirmwareBundleVersions::Request  &req, kortex_driver::GetFirmwareBundleVersions::Response &res) = 0;
+        virtual bool ExecuteWaypointTrajectory(kortex_driver::ExecuteWaypointTrajectory::Request  &req, kortex_driver::ExecuteWaypointTrajectory::Response &res) = 0;
         virtual bool MoveSequenceTask(kortex_driver::MoveSequenceTask::Request  &req, kortex_driver::MoveSequenceTask::Response &res) = 0;
         virtual bool DuplicateMapping(kortex_driver::DuplicateMapping::Request  &req, kortex_driver::DuplicateMapping::Response &res) = 0;
         virtual bool DuplicateMap(kortex_driver::DuplicateMap::Request  &req, kortex_driver::DuplicateMap::Response &res) = 0;
         virtual bool SetControllerConfiguration(kortex_driver::SetControllerConfiguration::Request  &req, kortex_driver::SetControllerConfiguration::Response &res) = 0;
         virtual bool GetControllerConfiguration(kortex_driver::GetControllerConfiguration::Request  &req, kortex_driver::GetControllerConfiguration::Response &res) = 0;
         virtual bool GetAllControllerConfigurations(kortex_driver::GetAllControllerConfigurations::Request  &req, kortex_driver::GetAllControllerConfigurations::Response &res) = 0;
+        virtual bool ComputeForwardKinematics(kortex_driver::ComputeForwardKinematics::Request  &req, kortex_driver::ComputeForwardKinematics::Response &res) = 0;
+        virtual bool ComputeInverseKinematics(kortex_driver::ComputeInverseKinematics::Request  &req, kortex_driver::ComputeInverseKinematics::Response &res) = 0;
+        virtual bool ValidateWaypointList(kortex_driver::ValidateWaypointList::Request  &req, kortex_driver::ValidateWaypointList::Response &res) = 0;
 
 protected:
         ros::NodeHandle m_node_handle;
@@ -449,7 +457,7 @@ protected:
 	ros::ServiceServer m_serviceBase_Unsubscribe;
 	ros::ServiceServer m_serviceOnNotificationConfigurationChangeTopic;
 	ros::ServiceServer m_serviceOnNotificationMappingInfoTopic;
-	ros::ServiceServer m_serviceOnNotificationControlModeTopic;
+	ros::ServiceServer m_serviceBase_OnNotificationControlModeTopic;
 	ros::ServiceServer m_serviceOnNotificationOperatingModeTopic;
 	ros::ServiceServer m_serviceOnNotificationSequenceInfoTopic;
 	ros::ServiceServer m_serviceOnNotificationProtectionZoneTopic;
@@ -529,11 +537,15 @@ protected:
 	ros::ServiceServer m_serviceDeleteAllSequenceTasks;
 	ros::ServiceServer m_serviceTakeSnapshot;
 	ros::ServiceServer m_serviceGetFirmwareBundleVersions;
+	ros::ServiceServer m_serviceExecuteWaypointTrajectory;
 	ros::ServiceServer m_serviceMoveSequenceTask;
 	ros::ServiceServer m_serviceDuplicateMapping;
 	ros::ServiceServer m_serviceDuplicateMap;
 	ros::ServiceServer m_serviceSetControllerConfiguration;
 	ros::ServiceServer m_serviceGetControllerConfiguration;
 	ros::ServiceServer m_serviceGetAllControllerConfigurations;
+	ros::ServiceServer m_serviceComputeForwardKinematics;
+	ros::ServiceServer m_serviceComputeInverseKinematics;
+	ros::ServiceServer m_serviceValidateWaypointList;
 };
 #endif

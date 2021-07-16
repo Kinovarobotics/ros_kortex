@@ -10,17 +10,23 @@
 *
 */
 
-#include "kortex_driver/non-generated/pre_computed_joint_trajectory_action_server.h"
+#include "kortex_driver/non-generated/joint_trajectory_action_server.h"
 #include <sstream>
 #include <fstream>
 
-PreComputedJointTrajectoryActionServer::PreComputedJointTrajectoryActionServer(const std::string& server_name, ros::NodeHandle& nh, Kinova::Api::Base::BaseClient* base, Kinova::Api::BaseCyclic::BaseCyclicClient* base_cyclic):
+namespace {
+    constexpr float STARTING_POINT_ARBITRARY_DURATION = 0.5f;
+}
+
+JointTrajectoryActionServer::JointTrajectoryActionServer(const std::string& server_name, ros::NodeHandle& nh, Kinova::Api::Base::BaseClient* base, Kinova::Api::BaseCyclic::BaseCyclicClient* base_cyclic, Kinova::Api::ControlConfig::ControlConfigClient* control_config, bool use_hard_limits):
     m_server_name(server_name),
     m_node_handle(nh),
-    m_server(nh, server_name, boost::bind(&PreComputedJointTrajectoryActionServer::goal_received_callback, this, _1), boost::bind(&PreComputedJointTrajectoryActionServer::preempt_received_callback, this, _1), false),
+    m_server(nh, server_name, boost::bind(&JointTrajectoryActionServer::goal_received_callback, this, _1), boost::bind(&JointTrajectoryActionServer::preempt_received_callback, this, _1), false),
     m_base(base),
     m_base_cyclic(base_cyclic),
-    m_server_state(ActionServerState::INITIALIZING)
+    m_control_config(control_config),
+    m_server_state(ActionServerState::INITIALIZING),
+    m_use_hard_limits(use_hard_limits)
 {
     // Get the ROS params
     if (!ros::param::get("~default_goal_time_tolerance", m_default_goal_time_tolerance))
@@ -45,21 +51,24 @@ PreComputedJointTrajectoryActionServer::PreComputedJointTrajectoryActionServer(c
         ROS_ERROR("%s", error_string.c_str());
         throw new std::runtime_error(error_string);
     }
+
+    // Get the hard limits
+    m_hard_limits = m_control_config->GetKinematicHardLimits();
     
     // Subscribe to the arm's Action Notifications
-    m_sub_action_notif_handle = m_base->OnNotificationActionTopic(std::bind(&PreComputedJointTrajectoryActionServer::action_notif_callback, this, std::placeholders::_1), Kinova::Api::Common::NotificationOptions());
+    m_sub_action_notif_handle = m_base->OnNotificationActionTopic(std::bind(&JointTrajectoryActionServer::action_notif_callback, this, std::placeholders::_1), Kinova::Api::Common::NotificationOptions());
 
     // Ready to receive goal
     m_server.start();
     set_server_state(ActionServerState::IDLE);
 }
 
-PreComputedJointTrajectoryActionServer::~PreComputedJointTrajectoryActionServer()
+JointTrajectoryActionServer::~JointTrajectoryActionServer()
 {
     m_base->Unsubscribe(m_sub_action_notif_handle);
 }
 
-void PreComputedJointTrajectoryActionServer::goal_received_callback(actionlib::ActionServer<control_msgs::FollowJointTrajectoryAction>::GoalHandle new_goal_handle)
+void JointTrajectoryActionServer::goal_received_callback(actionlib::ActionServer<control_msgs::FollowJointTrajectoryAction>::GoalHandle new_goal_handle)
 {
     ROS_INFO("New goal received.");
     if (!is_goal_acceptable(new_goal_handle))
@@ -76,70 +85,96 @@ void PreComputedJointTrajectoryActionServer::goal_received_callback(actionlib::A
         stop_all_movement();
     }
 
-    // Make sure to clear the faults before moving the robot
-    m_base->ClearFaults();
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
     // Accept the goal
     ROS_INFO("Joint Trajectory Goal is accepted.");
     m_goal = new_goal_handle;
     m_goal.setAccepted();
 
-    // Check if we are already there physically
-    if (is_goal_tolerance_respected(false, false))
-    {
-        ROS_INFO("We already reached the goal position : nothing to do.");
-        m_goal.setSucceeded();
-        return;
-    }
-
     // Construct the Protobuf object trajectory
-    trajectory_msgs::JointTrajectory ros_trajectory = m_goal.getGoal()->trajectory;
+    Kinova::Api::Base::WaypointList proto_trajectory;
 
-    Kinova::Api::Base::PreComputedJointTrajectory proto_trajectory;
-
-    // For logging purposes
-    std::ofstream myfile;
-    myfile.open ("moveit_trajectory.csv");
-
-    // Set the continuity mode
-    proto_trajectory.set_mode(Kinova::Api::Base::TrajectoryContinuityMode::TRAJECTORY_CONTINUITY_MODE_POSITION);
+    // Uncomment for logging purposes
+    // std::ofstream myfile;
+    // myfile.open ("/tmp/moveit_trajectory.csv");
+    // for (unsigned int i = 0; i < new_goal_handle.getGoal()->trajectory.points.size(); i++)
+    // {
+    //     myfile << new_goal_handle.getGoal()->trajectory.points[i].time_from_start.toSec() << ",";
+    //     for (auto position : new_goal_handle.getGoal()->trajectory.points[i].positions)
+    //     {
+    //         myfile << position << ",";
+    //     }
+    //     myfile << "\n";
+    // }
+    // myfile.close();
 
     // Copy the trajectory points from the ROS structure to the Protobuf structure
-    for (auto traj_point : m_goal.getGoal()->trajectory.points)
+    for (unsigned int i = 0; i < new_goal_handle.getGoal()->trajectory.points.size(); i++)
     {
-        Kinova::Api::Base::PreComputedJointTrajectoryElement* proto_element = proto_trajectory.add_trajectory_elements();
-        myfile << traj_point.time_from_start.toSec() << ",";
+        // Create the waypoint
+        Kinova::Api::Base::Waypoint* proto_waypoint = proto_trajectory.add_waypoints();
+        proto_waypoint->set_name("waypoint_" + std::to_string(i));
+        auto angular_waypoint = proto_waypoint->mutable_angular_waypoint();
+        
+        // Calculate the duration of this waypoint
+        const auto traj_point = new_goal_handle.getGoal()->trajectory.points.at(i);
+        float waypoint_duration;
+        // FIXME We have to include the starting point for the trajectory as the first waypoint AND since optimal durations are not
+        //       supported yet, we also have to give it a non-zero duration. Putting something too small gives errors so I've put 
+        //       an arbitrary value of 500ms here for now.
+        if (i == 0)
+        {
+            waypoint_duration = STARTING_POINT_ARBITRARY_DURATION;
+        }
+        else
+        {
+            auto previous_wp_duration = new_goal_handle.getGoal()->trajectory.points.at(i-1).time_from_start.toSec();
+            waypoint_duration = traj_point.time_from_start.toSec() - previous_wp_duration;
+            // Very small durations are rejected so we cap them
+            if (waypoint_duration < 0.01)
+            {
+                waypoint_duration = 0.01f;
+            }
+        }
+        
+        // Fill the waypoint
         for (auto position : traj_point.positions)
         {
-            proto_element->add_joint_angles(m_math_util.toDeg(position));
-            myfile << position << ",";
+            angular_waypoint->add_angles(KortexMathUtil::toDeg(position));
         }
-        for (auto velocity : traj_point.velocities)
-        {
-            proto_element->add_joint_speeds(m_math_util.toDeg(velocity));
-            myfile << velocity << ",";
-        }
-        for (auto acceleration : traj_point.accelerations)
-        {
-            proto_element->add_joint_accelerations(m_math_util.toDeg(acceleration));
-            myfile << acceleration << ",";
-        }
-        myfile << "\n";
-        proto_element->set_time_from_start(traj_point.time_from_start.toSec());
+        angular_waypoint->set_duration(waypoint_duration);
     }
 
-    myfile.close();
+    // If the hard limits are used for the trajectory
+    if (m_use_hard_limits)
+    {
+        // Get the soft limits
+        m_soft_limits = getAngularTrajectorySoftLimits();
 
-    // Send the trajectory to the robot
+        // Set the soft limits to hard limits
+        setAngularTrajectorySoftLimitsToMax();
+    }
+
     try
     {
-        m_base->PlayPreComputedJointTrajectory(proto_trajectory);
-        set_server_state(ActionServerState::PRE_PROCESSING_PENDING);
+        // Validate the waypoints and reject the goal if they fail validation
+        auto report = m_base->ValidateWaypointList(proto_trajectory);
+
+        if (report.trajectory_error_report().trajectory_error_elements_size() > 0)
+        {
+            ROS_ERROR("Joint Trajectory failed validation in the arm.");
+            // Go through report and print errors
+            for (unsigned int i = 0; i < report.trajectory_error_report().trajectory_error_elements_size(); i++)
+            {
+                ROS_ERROR("Error %i : %s", i+1, report.trajectory_error_report().trajectory_error_elements(i).message().c_str());
+            }
+            setAngularTrajectorySoftLimits(m_soft_limits);
+            new_goal_handle.setAborted();
+            return;
+        }
     }
     catch (Kinova::Api::KDetailedException& ex)
     {
-        ROS_ERROR("Kortex exception while sending the trajectory");
+        ROS_ERROR("Kortex exception while validating the trajectory");
         ROS_ERROR("Error code: %s\n", Kinova::Api::ErrorCodes_Name(ex.getErrorInfo().getError().error_code()).c_str());
         ROS_ERROR("Error sub code: %s\n", Kinova::Api::SubErrorCodes_Name(Kinova::Api::SubErrorCodes(ex.getErrorInfo().getError().error_sub_code())).c_str());
         ROS_ERROR("Error description: %s\n", ex.what());
@@ -157,10 +192,45 @@ void PreComputedJointTrajectoryActionServer::goal_received_callback(actionlib::A
         ROS_ERROR("%s", ex_future.what());
         m_goal.setAborted();
     }
+    
+    try
+    {
+        // Make sure to clear the faults before moving the robot
+        m_base->ClearFaults();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        // Send the trajectory to the robot
+        m_base->ExecuteWaypointTrajectory(proto_trajectory);
+        set_server_state(ActionServerState::PRE_PROCESSING_PENDING);
+    }
+    catch (Kinova::Api::KDetailedException& ex)
+    {
+        ROS_ERROR("Kortex exception while sending the trajectory");
+        ROS_ERROR("Error code: %s\n", Kinova::Api::ErrorCodes_Name(ex.getErrorInfo().getError().error_code()).c_str());
+        ROS_ERROR("Error sub code: %s\n", Kinova::Api::SubErrorCodes_Name(Kinova::Api::SubErrorCodes(ex.getErrorInfo().getError().error_sub_code())).c_str());
+        ROS_ERROR("Error description: %s\n", ex.what());
+        setAngularTrajectorySoftLimits(m_soft_limits);
+        m_goal.setAborted();
+    }
+    catch (std::runtime_error& ex_runtime)
+    {
+        ROS_ERROR("Runtime exception detected while sending the trajectory");
+        ROS_ERROR("%s", ex_runtime.what());
+        setAngularTrajectorySoftLimits(m_soft_limits);
+        m_goal.setAborted();
+    }
+    catch (std::future_error& ex_future)
+    {
+        ROS_ERROR("Future exception detected while getting feedback");
+        ROS_ERROR("%s", ex_future.what());
+        setAngularTrajectorySoftLimits(m_soft_limits);
+        m_goal.setAborted();
+    }
 }
 
 // Called in a separate thread when a preempt request comes in from the Action Client
-void PreComputedJointTrajectoryActionServer::preempt_received_callback(actionlib::ActionServer<control_msgs::FollowJointTrajectoryAction>::GoalHandle goal_handle)
+void JointTrajectoryActionServer::preempt_received_callback(actionlib::ActionServer<control_msgs::FollowJointTrajectoryAction>::GoalHandle goal_handle)
 {
     if (m_server_state == ActionServerState::TRAJECTORY_EXECUTION_IN_PROGRESS)
     {
@@ -169,7 +239,7 @@ void PreComputedJointTrajectoryActionServer::preempt_received_callback(actionlib
 }
 
 // Called in a separate thread when a notification comes in
-void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::Base::ActionNotification notif)
+void JointTrajectoryActionServer::action_notif_callback(Kinova::Api::Base::ActionNotification notif)
 {
     Kinova::Api::Base::ActionEvent event = notif.action_event();
     Kinova::Api::Base::ActionHandle handle = notif.handle();
@@ -180,7 +250,7 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
     control_msgs::FollowJointTrajectoryResult result;
     std::ostringstream oss;
 
-    if (type == Kinova::Api::Base::ActionType::PLAY_PRE_COMPUTED_TRAJECTORY)
+    if (type == Kinova::Api::Base::ActionType::EXECUTE_WAYPOINT_LIST)
     {
         switch (event)
         {
@@ -195,7 +265,7 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
             // We should not have received that
             else
             {
-                ROS_ERROR("Notification mismatch : received ACTION_PREPROCESS_START but we are in %s", actionServerStateNames[int(m_server_state)]);
+                ROS_DEBUG("Notification mismatch : received ACTION_PREPROCESS_START but we are in %s", actionServerStateNames[int(m_server_state)]);
             }
             break;
 
@@ -219,7 +289,7 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
             // We should not have received that
             else
             {
-                ROS_ERROR("Notification mismatch : received ACTION_PREPROCESS_END but we are in %s", actionServerStateNames[int(m_server_state)]);
+                ROS_DEBUG("Notification mismatch : received ACTION_PREPROCESS_END but we are in %s", actionServerStateNames[int(m_server_state)]);
             }
             break;
 
@@ -241,7 +311,6 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
                     oss << "-----------------------------" << std::endl;
                     oss << "Error #" << i << std::endl;
                     oss << "Type : " << Kinova::Api::Base::TrajectoryErrorType_Name(error_element.error_type()) << std::endl;
-                    oss << "Identifier : " << Kinova::Api::Base::TrajectoryErrorIdentifier_Name(error_element.error_identifier()) << std::endl;
                     oss << "Actuator : " << error_element.index()+1 << std::endl;
                     oss << "Erroneous value is " << error_element.error_value() << " but minimum permitted is " << error_element.min_value() << " and maximum permitted is " << error_element.max_value() << std::endl;
                     if (error_element.message() != "")
@@ -263,7 +332,7 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
             // We should not have received that
             else
             {
-                ROS_ERROR("Notification mismatch : received ACTION_PREPROCESS_ABORT but we are in %s", actionServerStateNames[int(m_server_state)]);
+                ROS_DEBUG("Notification mismatch : received ACTION_PREPROCESS_ABORT but we are in %s", actionServerStateNames[int(m_server_state)]);
             }
             break;
 
@@ -290,9 +359,23 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
             // We should not have received that
             else
             {
-                ROS_ERROR("Notification mismatch : received ACTION_START but we are in %s", actionServerStateNames[int(m_server_state)]);
+                ROS_DEBUG("Notification mismatch : received ACTION_START but we are in %s", actionServerStateNames[int(m_server_state)]);
             }
             break;
+
+        case Kinova::Api::Base::ActionEvent::ACTION_FEEDBACK:
+        {
+            // debug trace to indicate we've reached waypoints
+            for (unsigned int i = 0; i < notif.trajectory_info_size(); i++)
+            {
+                auto info = notif.trajectory_info(i);
+                if (info.trajectory_info_type() == Kinova::Api::Base::TrajectoryInfoType::WAYPOINT_REACHED)
+                {
+                    ROS_DEBUG("Waypoint %d reached", info.waypoint_index());
+                }
+            }
+            break;
+        }   
 
         // The action was started in the arm, but it aborted
         case Kinova::Api::Base::ActionEvent::ACTION_ABORT:
@@ -331,7 +414,7 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
             // We should not have received that
             else
             {
-                ROS_ERROR("Notification mismatch : received ACTION_ABORT but we are in %s", actionServerStateNames[int(m_server_state)]);
+                ROS_DEBUG("Notification mismatch : received ACTION_ABORT but we are in %s", actionServerStateNames[int(m_server_state)]);
             }
             break;
 
@@ -343,6 +426,11 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
             {
                 ROS_INFO("Trajectory has finished in the arm.");
                 m_trajectory_end_time = std::chrono::system_clock::now();
+                // When going at full speed we have to stabilize a bit before checking the final position
+                if (m_use_hard_limits)
+                {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                }
                 bool is_tolerance_respected = is_goal_tolerance_respected(true, true);
                 if (is_tolerance_respected)
                 {
@@ -364,17 +452,17 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
             // We should not have received that
             else
             {
-                ROS_ERROR("Notification mismatch : received ACTION_END but we are in %s", actionServerStateNames[int(m_server_state)]);
+                ROS_DEBUG("Notification mismatch : received ACTION_END but we are in %s", actionServerStateNames[int(m_server_state)]);
             }
             break;
         }
 
         case Kinova::Api::Base::ActionEvent::ACTION_PAUSE:
-            ROS_WARN("Action pause event was just received and this should never happen.");
+            ROS_DEBUG("Action pause event was just received and this should never happen.");
             break;
 
         default:
-            ROS_WARN("Unknown action event was just received and this should never happen.");
+            ROS_DEBUG("Unknown action event was just received and this should never happen.");
             break;
         }
     }
@@ -387,7 +475,7 @@ void PreComputedJointTrajectoryActionServer::action_notif_callback(Kinova::Api::
     oss.flush();
 }
 
-bool PreComputedJointTrajectoryActionServer::is_goal_acceptable(actionlib::ActionServer<control_msgs::FollowJointTrajectoryAction>::GoalHandle goal_handle)
+bool JointTrajectoryActionServer::is_goal_acceptable(actionlib::ActionServer<control_msgs::FollowJointTrajectoryAction>::GoalHandle goal_handle)
 {
     // First check if goal is valid
     if (!goal_handle.isValid())
@@ -424,38 +512,34 @@ bool PreComputedJointTrajectoryActionServer::is_goal_acceptable(actionlib::Actio
         std::cout << std::endl;
         return false;
     }
-
-    // Goal needs to have 1msec timesteps intervals between all trajectory points to not be rejected
-    double difference = 0.0;
-    bool result = true;
-    trajectory_msgs::JointTrajectoryPoint traj_point;
-    for (int i = 1; i < goal->trajectory.points.size() && result; i++)
-    {
-        difference = goal->trajectory.points.at(i).time_from_start.toSec() - goal->trajectory.points.at(i-1).time_from_start.toSec();
-        if (i > 0 && i < goal->trajectory.points.size()-1)
-        {
-            result = (fabs(difference-0.001) < 10.0*FLT_EPSILON);
-        }
-    }
-    if(!result)
-    {
-      ROS_ERROR("Insufficient point spacing.");
-    }
-    return result;
+    
+    return true;
 }
 
-bool PreComputedJointTrajectoryActionServer::is_goal_tolerance_respected(bool enable_prints, bool check_time_tolerance)
+bool JointTrajectoryActionServer::is_goal_tolerance_respected(bool enable_prints, bool check_time_tolerance)
 {
-    // Get feedback from arm
+    // Get feedback from arm (retry if timeouts occur)
     bool is_goal_respected = true;
-    Kinova::Api::BaseCyclic::Feedback feedback = m_base_cyclic->RefreshFeedback();
+    Kinova::Api::BaseCyclic::Feedback feedback;
+    bool got_feedback = true;
+    while (!got_feedback)
+    {
+        try
+        {
+            feedback = m_base_cyclic->RefreshFeedback();
+            got_feedback = true;
+        }
+        catch(const std::exception& e)
+        {
+        }
+    }
     auto goal = m_goal.getGoal();
 
     // Check the goal_time_tolerance for trajectory execution
     if (check_time_tolerance)
     {
         double actual_trajectory_duration = std::chrono::duration<double>(m_trajectory_end_time - m_trajectory_start_time).count();
-        double desired_trajectory_duration = goal->trajectory.points.at(goal->trajectory.points.size()-1).time_from_start.toSec();
+        double desired_trajectory_duration = goal->trajectory.points.at(goal->trajectory.points.size()-1).time_from_start.toSec() + STARTING_POINT_ARBITRARY_DURATION;
         double time_tolerance = goal->goal_time_tolerance.toSec() == 0.0 ? m_default_goal_time_tolerance : goal->goal_time_tolerance.toSec();
         if (actual_trajectory_duration > desired_trajectory_duration + time_tolerance )
         {
@@ -495,7 +579,7 @@ bool PreComputedJointTrajectoryActionServer::is_goal_tolerance_respected(bool en
     for (auto act: feedback.actuators())
     {
         double actual_position = act.position(); // in degrees
-        double desired_position = m_math_util.wrapDegreesFromZeroTo360(m_math_util.toDeg(goal->trajectory.points.at(goal->trajectory.points.size()-1).positions[current_index]));
+        double desired_position = KortexMathUtil::wrapDegreesFromZeroTo360(KortexMathUtil::toDeg(goal->trajectory.points.at(goal->trajectory.points.size()-1).positions[current_index]));
         double tolerance = 0.0;
 
         if (goal_tolerances[current_index] == -1.0)
@@ -505,10 +589,10 @@ bool PreComputedJointTrajectoryActionServer::is_goal_tolerance_respected(bool en
         }
         else
         {
-            tolerance = m_math_util.toDeg(goal_tolerances[current_index]);
+            tolerance = KortexMathUtil::toDeg(goal_tolerances[current_index]);
         }
 
-        double error = m_math_util.wrapDegreesFromZeroTo360(std::min(fabs(actual_position - desired_position), fabs(fabs(actual_position - desired_position) - 360.0)));
+        double error = KortexMathUtil::wrapDegreesFromZeroTo360(std::min(fabs(actual_position - desired_position), fabs(fabs(actual_position - desired_position) - 360.0)));
         if (error > tolerance)
         {
             is_goal_respected = false;
@@ -521,7 +605,7 @@ bool PreComputedJointTrajectoryActionServer::is_goal_tolerance_respected(bool en
     return is_goal_respected;
 }
 
-void PreComputedJointTrajectoryActionServer::stop_all_movement()
+void JointTrajectoryActionServer::stop_all_movement()
 {
     ROS_INFO("Calling Stop on the robot.");
     try
@@ -534,10 +618,99 @@ void PreComputedJointTrajectoryActionServer::stop_all_movement()
     }
 }
 
-void PreComputedJointTrajectoryActionServer::set_server_state(ActionServerState s)
+void JointTrajectoryActionServer::set_server_state(ActionServerState s)
 {
     std::lock_guard<std::mutex> guard(m_server_state_lock);
     ActionServerState old_state = m_server_state;
     m_server_state = s;
+    // If we're going to IDLE, set back the soft limits
+    if (s == ActionServerState::IDLE)
+    {
+        setAngularTrajectorySoftLimits(m_soft_limits);
+    }
     ROS_INFO("State changed from %s to %s\n", actionServerStateNames[int(old_state)], actionServerStateNames[int(s)]);
+}
+
+AngularTrajectorySoftLimits JointTrajectoryActionServer::getAngularTrajectorySoftLimits()
+{
+    const Kinova::Api::ControlConfig::ControlMode target_control_mode = Kinova::Api::ControlConfig::ANGULAR_TRAJECTORY;
+
+    Kinova::Api::ControlConfig::ControlModeInformation info;
+    info.set_control_mode(target_control_mode);
+    auto soft_limits = m_control_config->GetKinematicSoftLimits(info);
+
+    // Set Joint Speed limits to max
+    Kinova::Api::ControlConfig::JointSpeedSoftLimits vel;
+    vel.set_control_mode(target_control_mode);
+    for (auto j : soft_limits.joint_speed_limits())
+    {
+        vel.add_joint_speed_soft_limits(j);
+    }
+
+    // Set Joint Acceleration limits to max
+    Kinova::Api::ControlConfig::JointAccelerationSoftLimits acc;
+    acc.set_control_mode(target_control_mode);
+    for (auto j : soft_limits.joint_acceleration_limits())
+    {
+        acc.add_joint_acceleration_soft_limits(j);
+    }
+
+    return AngularTrajectorySoftLimits(vel, acc);
+}
+
+void JointTrajectoryActionServer::setAngularTrajectorySoftLimitsToMax()
+{
+    ROS_DEBUG("Setting soft limits to hard");
+    try
+    {
+        const Kinova::Api::ControlConfig::ControlMode target_control_mode = Kinova::Api::ControlConfig::ANGULAR_TRAJECTORY;
+        
+        // Set Joint Speed limits to max
+        Kinova::Api::ControlConfig::JointSpeedSoftLimits jpsl;
+        jpsl.set_control_mode(target_control_mode);
+        for (auto j : m_hard_limits.joint_speed_limits())
+        {
+            jpsl.add_joint_speed_soft_limits(j);
+        }
+        m_control_config->SetJointSpeedSoftLimits(jpsl);
+
+        // Set Joint Acceleration limits to max
+        Kinova::Api::ControlConfig::JointAccelerationSoftLimits jasl;
+        jasl.set_control_mode(target_control_mode);
+        for (auto j : m_hard_limits.joint_acceleration_limits())
+        {
+            jasl.add_joint_acceleration_soft_limits(j);
+        }
+        m_control_config->SetJointAccelerationSoftLimits(jasl);
+    }
+    catch (Kinova::Api::KDetailedException& ex)
+    {
+        ROS_WARN("Kortex exception while setting the angular soft limits");
+        ROS_WARN("Error code: %s\n", Kinova::Api::ErrorCodes_Name(ex.getErrorInfo().getError().error_code()).c_str());
+        ROS_WARN("Error sub code: %s\n", Kinova::Api::SubErrorCodes_Name(Kinova::Api::SubErrorCodes(ex.getErrorInfo().getError().error_sub_code())).c_str());
+        ROS_WARN("Error description: %s\n", ex.what());
+    }
+}
+
+void JointTrajectoryActionServer::setAngularTrajectorySoftLimits(const AngularTrajectorySoftLimits& limits)
+{
+    ROS_DEBUG("Setting back soft limits");
+    if (!limits.empty())
+    {
+        try
+        {
+            // Set Joint Speed limits
+            m_control_config->SetJointSpeedSoftLimits(limits.m_vel);
+
+            // Set Joint Acceleration limits to max
+            m_control_config->SetJointAccelerationSoftLimits(limits.m_acc);
+        }
+        catch (Kinova::Api::KDetailedException& ex)
+        {
+            ROS_WARN("Kortex exception while setting the angular soft limits");
+            ROS_WARN("Error code: %s\n", Kinova::Api::ErrorCodes_Name(ex.getErrorInfo().getError().error_code()).c_str());
+            ROS_WARN("Error sub code: %s\n", Kinova::Api::SubErrorCodes_Name(Kinova::Api::SubErrorCodes(ex.getErrorInfo().getError().error_sub_code())).c_str());
+            ROS_WARN("Error description: %s\n", ex.what());
+        }
+    }
 }

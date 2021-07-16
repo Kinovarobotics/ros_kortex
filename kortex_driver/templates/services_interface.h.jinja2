@@ -28,7 +28,7 @@
 {%- for method in package.methods %}
 #include "kortex_driver/{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}.h"
 {%- if method.is_notification_rpc %}
-#include "kortex_driver/{{method_prepend_rpc_package_name}}{{method.name|replace("Topic", "")}}Notification.h"
+#include "kortex_driver/{{method.prepend_rpc_package_name}}{{method.name|replace("Topic", "")}}Notification.h"
 {%- endif %}
 {%- endfor %}
 
@@ -49,7 +49,7 @@ class I{{package.short_name}}Services
 {%- for method in package.methods %}
         virtual bool {{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}(kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Request  &req, kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Response &res) = 0;
 {%- if method.is_notification_rpc %}
-        virtual void cb_{{method.name}}({{method.notification_message_cpp_namespace}}::{{method.prepend_rpc_package_name}}{{method.name|replace("Topic", "")}}Notification notif) = 0;
+        virtual void cb_{{method.name}}({{method.notification_message_cpp_namespace}}::{{method.name|replace("Topic", "")}}Notification notif) = 0;
 {%- endif %}
 {%- endfor %}
 

@@ -59,6 +59,7 @@
 #include "kortex_driver/AngularTwist.h"
 #include "kortex_driver/ControlConfig_JointSpeeds.h"
 #include "kortex_driver/ControlConfig_ControlModeInformation.h"
+#include "kortex_driver/ControlConfig_ControlModeNotification.h"
 
 
 int ToRosData(Kinova::Api::ControlConfig::GravityVector input, kortex_driver::GravityVector &output);
@@ -79,5 +80,6 @@ int ToRosData(Kinova::Api::ControlConfig::LinearTwist input, kortex_driver::Line
 int ToRosData(Kinova::Api::ControlConfig::AngularTwist input, kortex_driver::AngularTwist &output);
 int ToRosData(Kinova::Api::ControlConfig::JointSpeeds input, kortex_driver::ControlConfig_JointSpeeds &output);
 int ToRosData(Kinova::Api::ControlConfig::ControlModeInformation input, kortex_driver::ControlConfig_ControlModeInformation &output);
+int ToRosData(Kinova::Api::ControlConfig::ControlModeNotification input, kortex_driver::ControlConfig_ControlModeNotification &output);
 
 #endif

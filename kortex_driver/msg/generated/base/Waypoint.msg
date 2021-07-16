@@ -1,0 +1,3 @@
+
+string name
+Waypoint_type_of_waypoint oneof_type_of_waypoint

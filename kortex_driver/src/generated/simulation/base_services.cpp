@@ -50,7 +50,7 @@ BaseSimulationServices::BaseSimulationServices(ros::NodeHandle& node_handle):
 	m_is_activated_ConfigurationChangeTopic = false;
 	m_pub_MappingInfoTopic = m_node_handle.advertise<kortex_driver::MappingInfoNotification>("mapping_info_topic", 1000);
 	m_is_activated_MappingInfoTopic = false;
-	m_pub_ControlModeTopic = m_node_handle.advertise<kortex_driver::ControlModeNotification>("control_mode_topic", 1000);
+	m_pub_ControlModeTopic = m_node_handle.advertise<kortex_driver::Base_ControlModeNotification>("control_mode_topic", 1000);
 	m_is_activated_ControlModeTopic = false;
 	m_pub_OperatingModeTopic = m_node_handle.advertise<kortex_driver::OperatingModeNotification>("operating_mode_topic", 1000);
 	m_is_activated_OperatingModeTopic = false;
@@ -136,7 +136,7 @@ BaseSimulationServices::BaseSimulationServices(ros::NodeHandle& node_handle):
 	m_serviceBase_Unsubscribe = m_node_handle.advertiseService("base/unsubscribe", &BaseSimulationServices::Base_Unsubscribe, this);
 	m_serviceOnNotificationConfigurationChangeTopic = m_node_handle.advertiseService("base/activate_publishing_of_configuration_change_topic", &BaseSimulationServices::OnNotificationConfigurationChangeTopic, this);
 	m_serviceOnNotificationMappingInfoTopic = m_node_handle.advertiseService("base/activate_publishing_of_mapping_info_topic", &BaseSimulationServices::OnNotificationMappingInfoTopic, this);
-	m_serviceOnNotificationControlModeTopic = m_node_handle.advertiseService("base/activate_publishing_of_control_mode_topic", &BaseSimulationServices::OnNotificationControlModeTopic, this);
+	m_serviceBase_OnNotificationControlModeTopic = m_node_handle.advertiseService("base/activate_publishing_of_control_mode_topic", &BaseSimulationServices::Base_OnNotificationControlModeTopic, this);
 	m_serviceOnNotificationOperatingModeTopic = m_node_handle.advertiseService("base/activate_publishing_of_operating_mode_topic", &BaseSimulationServices::OnNotificationOperatingModeTopic, this);
 	m_serviceOnNotificationSequenceInfoTopic = m_node_handle.advertiseService("base/activate_publishing_of_sequence_info_topic", &BaseSimulationServices::OnNotificationSequenceInfoTopic, this);
 	m_serviceOnNotificationProtectionZoneTopic = m_node_handle.advertiseService("base/activate_publishing_of_protection_zone_topic", &BaseSimulationServices::OnNotificationProtectionZoneTopic, this);
@@ -216,12 +216,16 @@ BaseSimulationServices::BaseSimulationServices(ros::NodeHandle& node_handle):
 	m_serviceDeleteAllSequenceTasks = m_node_handle.advertiseService("base/delete_all_sequence_tasks", &BaseSimulationServices::DeleteAllSequenceTasks, this);
 	m_serviceTakeSnapshot = m_node_handle.advertiseService("base/take_snapshot", &BaseSimulationServices::TakeSnapshot, this);
 	m_serviceGetFirmwareBundleVersions = m_node_handle.advertiseService("base/get_firmware_bundle_versions", &BaseSimulationServices::GetFirmwareBundleVersions, this);
+	m_serviceExecuteWaypointTrajectory = m_node_handle.advertiseService("base/execute_waypoint_trajectory", &BaseSimulationServices::ExecuteWaypointTrajectory, this);
 	m_serviceMoveSequenceTask = m_node_handle.advertiseService("base/move_sequence_task", &BaseSimulationServices::MoveSequenceTask, this);
 	m_serviceDuplicateMapping = m_node_handle.advertiseService("base/duplicate_mapping", &BaseSimulationServices::DuplicateMapping, this);
 	m_serviceDuplicateMap = m_node_handle.advertiseService("base/duplicate_map", &BaseSimulationServices::DuplicateMap, this);
 	m_serviceSetControllerConfiguration = m_node_handle.advertiseService("base/set_controller_configuration", &BaseSimulationServices::SetControllerConfiguration, this);
 	m_serviceGetControllerConfiguration = m_node_handle.advertiseService("base/get_controller_configuration", &BaseSimulationServices::GetControllerConfiguration, this);
 	m_serviceGetAllControllerConfigurations = m_node_handle.advertiseService("base/get_all_controller_configurations", &BaseSimulationServices::GetAllControllerConfigurations, this);
+	m_serviceComputeForwardKinematics = m_node_handle.advertiseService("base/compute_forward_kinematics", &BaseSimulationServices::ComputeForwardKinematics, this);
+	m_serviceComputeInverseKinematics = m_node_handle.advertiseService("base/compute_inverse_kinematics", &BaseSimulationServices::ComputeInverseKinematics, this);
+	m_serviceValidateWaypointList = m_node_handle.advertiseService("base/validate_waypoint_list", &BaseSimulationServices::ValidateWaypointList, this);
 }
 
 bool BaseSimulationServices::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
@@ -1121,14 +1125,15 @@ void BaseSimulationServices::cb_MappingInfoTopic(Kinova::Api::Base::MappingInfoN
 	m_pub_MappingInfoTopic.publish(ros_msg);
 }
 
-bool BaseSimulationServices::OnNotificationControlModeTopic(kortex_driver::OnNotificationControlModeTopic::Request  &req, kortex_driver::OnNotificationControlModeTopic::Response &res)
+bool BaseSimulationServices::Base_OnNotificationControlModeTopic(kortex_driver::Base_OnNotificationControlModeTopic::Request  &req, kortex_driver::Base_OnNotificationControlModeTopic::Response &res)
 {
+	ROS_WARN("The base/activate_publishing_of_control_mode_topic service is now deprecated and will be removed in a future release.");
 	
 	m_is_activated_ControlModeTopic = true;
 	
-	if (OnNotificationControlModeTopicHandler)
+	if (Base_OnNotificationControlModeTopicHandler)
 	{
-		res = OnNotificationControlModeTopicHandler(req);
+		res = Base_OnNotificationControlModeTopicHandler(req);
 	}
 	else
 	{
@@ -1138,7 +1143,7 @@ bool BaseSimulationServices::OnNotificationControlModeTopic(kortex_driver::OnNot
 }
 void BaseSimulationServices::cb_ControlModeTopic(Kinova::Api::Base::ControlModeNotification notif)
 {
-	kortex_driver::ControlModeNotification ros_msg;
+	kortex_driver::Base_ControlModeNotification ros_msg;
 	ToRosData(notif, ros_msg);
 	m_pub_ControlModeTopic.publish(ros_msg);
 }
@@ -1299,6 +1304,7 @@ void BaseSimulationServices::cb_RobotEventTopic(Kinova::Api::Base::RobotEventNot
 
 bool BaseSimulationServices::PlayCartesianTrajectory(kortex_driver::PlayCartesianTrajectory::Request  &req, kortex_driver::PlayCartesianTrajectory::Response &res)
 {
+	ROS_WARN("The base/play_cartesian_trajectory service is now deprecated and will be removed in a future release.");
 	
 	
 	if (PlayCartesianTrajectoryHandler)
@@ -1314,6 +1320,7 @@ bool BaseSimulationServices::PlayCartesianTrajectory(kortex_driver::PlayCartesia
 
 bool BaseSimulationServices::PlayCartesianTrajectoryPosition(kortex_driver::PlayCartesianTrajectoryPosition::Request  &req, kortex_driver::PlayCartesianTrajectoryPosition::Response &res)
 {
+	ROS_WARN("The base/play_cartesian_trajectory_position service is now deprecated and will be removed in a future release.");
 	
 	
 	if (PlayCartesianTrajectoryPositionHandler)
@@ -1329,6 +1336,7 @@ bool BaseSimulationServices::PlayCartesianTrajectoryPosition(kortex_driver::Play
 
 bool BaseSimulationServices::PlayCartesianTrajectoryOrientation(kortex_driver::PlayCartesianTrajectoryOrientation::Request  &req, kortex_driver::PlayCartesianTrajectoryOrientation::Response &res)
 {
+	ROS_WARN("The base/play_cartesian_trajectory_orientation service is now deprecated and will be removed in a future release.");
 	
 	
 	if (PlayCartesianTrajectoryOrientationHandler)
@@ -1434,6 +1442,7 @@ bool BaseSimulationServices::SendTwistCommand(kortex_driver::SendTwistCommand::R
 
 bool BaseSimulationServices::PlayJointTrajectory(kortex_driver::PlayJointTrajectory::Request  &req, kortex_driver::PlayJointTrajectory::Response &res)
 {
+	ROS_WARN("The base/play_joint_trajectory service is now deprecated and will be removed in a future release.");
 	
 	
 	if (PlayJointTrajectoryHandler)
@@ -1449,6 +1458,7 @@ bool BaseSimulationServices::PlayJointTrajectory(kortex_driver::PlayJointTraject
 
 bool BaseSimulationServices::PlaySelectedJointTrajectory(kortex_driver::PlaySelectedJointTrajectory::Request  &req, kortex_driver::PlaySelectedJointTrajectory::Response &res)
 {
+	ROS_WARN("The base/play_selected_joint_trajectory service is now deprecated and will be removed in a future release.");
 	
 	
 	if (PlaySelectedJointTrajectoryHandler)
@@ -1599,6 +1609,7 @@ bool BaseSimulationServices::Base_ClearFaults(kortex_driver::Base_ClearFaults::R
 
 bool BaseSimulationServices::Base_GetControlMode(kortex_driver::Base_GetControlMode::Request  &req, kortex_driver::Base_GetControlMode::Response &res)
 {
+	ROS_WARN("The base/get_control_mode service is now deprecated and will be removed in a future release.");
 	
 	
 	if (Base_GetControlModeHandler)
@@ -2413,6 +2424,21 @@ bool BaseSimulationServices::GetFirmwareBundleVersions(kortex_driver::GetFirmwar
 	return true;
 }
 
+bool BaseSimulationServices::ExecuteWaypointTrajectory(kortex_driver::ExecuteWaypointTrajectory::Request  &req, kortex_driver::ExecuteWaypointTrajectory::Response &res)
+{
+	
+	
+	if (ExecuteWaypointTrajectoryHandler)
+	{
+		res = ExecuteWaypointTrajectoryHandler(req);
+	}
+	else
+	{
+		ROS_WARN_ONCE("The simulation handler for base/execute_waypoint_trajectory is not implemented, so the service calls will return the default response.");
+	}
+	return true;
+}
+
 bool BaseSimulationServices::MoveSequenceTask(kortex_driver::MoveSequenceTask::Request  &req, kortex_driver::MoveSequenceTask::Response &res)
 {
 	
@@ -2499,6 +2525,51 @@ bool BaseSimulationServices::GetAllControllerConfigurations(kortex_driver::GetAl
 	else
 	{
 		ROS_WARN_ONCE("The simulation handler for base/get_all_controller_configurations is not implemented, so the service calls will return the default response.");
+	}
+	return true;
+}
+
+bool BaseSimulationServices::ComputeForwardKinematics(kortex_driver::ComputeForwardKinematics::Request  &req, kortex_driver::ComputeForwardKinematics::Response &res)
+{
+	
+	
+	if (ComputeForwardKinematicsHandler)
+	{
+		res = ComputeForwardKinematicsHandler(req);
+	}
+	else
+	{
+		ROS_WARN_ONCE("The simulation handler for base/compute_forward_kinematics is not implemented, so the service calls will return the default response.");
+	}
+	return true;
+}
+
+bool BaseSimulationServices::ComputeInverseKinematics(kortex_driver::ComputeInverseKinematics::Request  &req, kortex_driver::ComputeInverseKinematics::Response &res)
+{
+	
+	
+	if (ComputeInverseKinematicsHandler)
+	{
+		res = ComputeInverseKinematicsHandler(req);
+	}
+	else
+	{
+		ROS_WARN_ONCE("The simulation handler for base/compute_inverse_kinematics is not implemented, so the service calls will return the default response.");
+	}
+	return true;
+}
+
+bool BaseSimulationServices::ValidateWaypointList(kortex_driver::ValidateWaypointList::Request  &req, kortex_driver::ValidateWaypointList::Response &res)
+{
+	
+	
+	if (ValidateWaypointListHandler)
+	{
+		res = ValidateWaypointListHandler(req);
+	}
+	else
+	{
+		ROS_WARN_ONCE("The simulation handler for base/validate_waypoint_list is not implemented, so the service calls will return the default response.");
 	}
 	return true;
 }

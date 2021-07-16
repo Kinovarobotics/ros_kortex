@@ -134,12 +134,13 @@ enum SafetyLimitType
 // Admissible control modes 
 enum ControlMode
 {
-    NONE     = 0;                     // None
-    POSITION = 1;                     // Position mode
-    VELOCITY = 2;                     // Velocity mode
-    TORQUE   = 3;                     // Torque mode
-    CURRENT  = 4;                     // Current mode
-    CUSTOM   = 5;                     // Custom mode
+    NONE                 = 0;         // None
+    POSITION             = 1;         // Position mode
+    VELOCITY             = 2;         // Velocity mode
+    TORQUE               = 3;         // Torque mode
+    CURRENT              = 4;         // Current mode
+    CUSTOM               = 5;         // Custom mode
+    TORQUE_HIGH_VELOCITY = 6;         // High velocity torque mode
 }
 
 // Admissible command modes 
@@ -156,13 +157,14 @@ enum CommandMode
 // Admissible control loop selections
 enum ControlLoopSelection
 {
-    RESERVED            = 0;    // 0x0 - Reserved (internal use only)
-    JOINT_POSITION      = 1;    // 0x1 - Joint position control (if available)
-    MOTOR_POSITION      = 2;    // 0x2 - Motor position control
-    JOINT_VELOCITY      = 4;    // 0x4 - Joint velocity control (if available)
-    MOTOR_VELOCITY      = 8;    // 0x8 - Motor velocity control
-    JOINT_TORQUE        = 16;   // 0x10 - Joint torque control
-    MOTOR_CURRENT       = 32;   // 0x20 - Motor current control
+    RESERVED                    = 0;    // 0x0 - Reserved (internal use only)
+    JOINT_POSITION              = 1;    // 0x1 - Joint position control (if available)
+    MOTOR_POSITION              = 2;    // 0x2 - Motor position control
+    JOINT_VELOCITY              = 4;    // 0x4 - Joint velocity control (if available)
+    MOTOR_VELOCITY              = 8;    // 0x8 - Motor velocity control
+    JOINT_TORQUE                = 16;   // 0x10 - Joint torque control
+    MOTOR_CURRENT               = 32;   // 0x20 - Motor current control
+    JOINT_TORQUE_HIGH_VELOCITY  = 64;   // 0x30 - High velocity joint torque control
 }
 
 // Admissable cogging feedforward modes
@@ -176,14 +178,14 @@ enum CoggingFeedforwardMode
 // Axis position
 message AxisPosition
 {
-    float position = 1;                // Axis position (meters)
+    float position = 1;                // Axis position (degrees)
 }
 
 // Axis offsets
 message AxisOffsets
 {
-    float absolute_offset = 1;         // Absolute offset value (meters)
-    float relative_offset = 2;         // Relative offset value (meters)
+    float absolute_offset = 1;         // Absolute offset value (degrees)
+    float relative_offset = 2;         // Relative offset value (degrees)
 }
 
 // Torque calibration settings

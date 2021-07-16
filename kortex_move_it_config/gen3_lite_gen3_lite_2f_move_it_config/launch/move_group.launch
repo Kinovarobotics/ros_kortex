@@ -1,7 +1,6 @@
 <launch>
 
   <!-- The number of degrees of freedom of the arm and the hard_limits speed and acceleration configuration -->
-  <!-- Both unused for now on Gen3 lite -->
   <arg name="dof" default="6"/>
   <arg name="use_hard_limits" default="false"/>
 
@@ -9,6 +8,7 @@
   <arg name="prefix" default=""/>
 
   <include file="$(find gen3_lite_gen3_lite_2f_move_it_config)/launch/planning_context.launch">
+    <arg name="use_hard_limits" value="$(arg use_hard_limits)"/>
     <arg name="prefix" value="$(arg prefix)"/>
   </include>
 

@@ -40,7 +40,7 @@ int ToProtoData(kortex_driver::GPIOIdentification input, Kinova::Api::Interconne
 	
 	return 0;
 }
-int ToProtoData(kortex_driver::GPIOConfiguration input, Kinova::Api::InterconnectConfig::GPIOConfiguration *output)
+int ToProtoData(kortex_driver::InterconnectConfig_GPIOConfiguration input, Kinova::Api::InterconnectConfig::GPIOConfiguration *output)
 {
 	
 	output->set_identifier((Kinova::Api::InterconnectConfig::GPIOIdentifier)input.identifier);

@@ -41,6 +41,9 @@
 #include "kortex_driver/generated/robot/visionconfig_proto_converter.h"
 
 
+#include "kortex_driver/GpioConfigurationList.h"
+#include "kortex_driver/Base_GpioConfiguration.h"
+#include "kortex_driver/GpioPinConfiguration.h"
 #include "kortex_driver/FullUserProfile.h"
 #include "kortex_driver/UserProfile.h"
 #include "kortex_driver/UserProfileList.h"
@@ -99,7 +102,7 @@
 #include "kortex_driver/ConfigurationChangeNotification.h"
 #include "kortex_driver/MappingInfoNotification.h"
 #include "kortex_driver/Base_ControlModeInformation.h"
-#include "kortex_driver/ControlModeNotification.h"
+#include "kortex_driver/Base_ControlModeNotification.h"
 #include "kortex_driver/ServoingModeInformation.h"
 #include "kortex_driver/OperatingModeInformation.h"
 #include "kortex_driver/OperatingModeNotification.h"
@@ -116,6 +119,7 @@
 #include "kortex_driver/ControllerState.h"
 #include "kortex_driver/ControllerElementState.h"
 #include "kortex_driver/ActionNotification.h"
+#include "kortex_driver/TrajectoryInfo.h"
 #include "kortex_driver/ActionExecutionState.h"
 #include "kortex_driver/RobotEventNotification.h"
 #include "kortex_driver/FactoryNotification.h"
@@ -176,6 +180,7 @@
 #include "kortex_driver/GripperRequest.h"
 #include "kortex_driver/Gripper.h"
 #include "kortex_driver/Finger.h"
+#include "kortex_driver/GpioCommand.h"
 #include "kortex_driver/SystemTime.h"
 #include "kortex_driver/ControllerConfigurationMode.h"
 #include "kortex_driver/ControllerConfiguration.h"
@@ -193,10 +198,20 @@
 #include "kortex_driver/PreComputedJointTrajectoryElement.h"
 #include "kortex_driver/TrajectoryErrorElement.h"
 #include "kortex_driver/TrajectoryErrorReport.h"
+#include "kortex_driver/WaypointValidationReport.h"
+#include "kortex_driver/Waypoint.h"
+#include "kortex_driver/AngularWaypoint.h"
+#include "kortex_driver/CartesianWaypoint.h"
+#include "kortex_driver/WaypointList.h"
+#include "kortex_driver/KinematicTrajectoryConstraints.h"
 #include "kortex_driver/FirmwareBundleVersions.h"
 #include "kortex_driver/FirmwareComponentVersion.h"
+#include "kortex_driver/IKData.h"
 
 
+int ToProtoData(kortex_driver::GpioConfigurationList input, Kinova::Api::Base::GpioConfigurationList *output);
+int ToProtoData(kortex_driver::Base_GpioConfiguration input, Kinova::Api::Base::GpioConfiguration *output);
+int ToProtoData(kortex_driver::GpioPinConfiguration input, Kinova::Api::Base::GpioPinConfiguration *output);
 int ToProtoData(kortex_driver::FullUserProfile input, Kinova::Api::Base::FullUserProfile *output);
 int ToProtoData(kortex_driver::UserProfile input, Kinova::Api::Base::UserProfile *output);
 int ToProtoData(kortex_driver::UserProfileList input, Kinova::Api::Base::UserProfileList *output);
@@ -255,7 +270,7 @@ int ToProtoData(kortex_driver::Query input, Kinova::Api::Base::Query *output);
 int ToProtoData(kortex_driver::ConfigurationChangeNotification input, Kinova::Api::Base::ConfigurationChangeNotification *output);
 int ToProtoData(kortex_driver::MappingInfoNotification input, Kinova::Api::Base::MappingInfoNotification *output);
 int ToProtoData(kortex_driver::Base_ControlModeInformation input, Kinova::Api::Base::ControlModeInformation *output);
-int ToProtoData(kortex_driver::ControlModeNotification input, Kinova::Api::Base::ControlModeNotification *output);
+int ToProtoData(kortex_driver::Base_ControlModeNotification input, Kinova::Api::Base::ControlModeNotification *output);
 int ToProtoData(kortex_driver::ServoingModeInformation input, Kinova::Api::Base::ServoingModeInformation *output);
 int ToProtoData(kortex_driver::OperatingModeInformation input, Kinova::Api::Base::OperatingModeInformation *output);
 int ToProtoData(kortex_driver::OperatingModeNotification input, Kinova::Api::Base::OperatingModeNotification *output);
@@ -272,6 +287,7 @@ int ToProtoData(kortex_driver::ControllerList input, Kinova::Api::Base::Controll
 int ToProtoData(kortex_driver::ControllerState input, Kinova::Api::Base::ControllerState *output);
 int ToProtoData(kortex_driver::ControllerElementState input, Kinova::Api::Base::ControllerElementState *output);
 int ToProtoData(kortex_driver::ActionNotification input, Kinova::Api::Base::ActionNotification *output);
+int ToProtoData(kortex_driver::TrajectoryInfo input, Kinova::Api::Base::TrajectoryInfo *output);
 int ToProtoData(kortex_driver::ActionExecutionState input, Kinova::Api::Base::ActionExecutionState *output);
 int ToProtoData(kortex_driver::RobotEventNotification input, Kinova::Api::Base::RobotEventNotification *output);
 int ToProtoData(kortex_driver::FactoryNotification input, Kinova::Api::Base::FactoryNotification *output);
@@ -332,6 +348,7 @@ int ToProtoData(kortex_driver::GripperCommand input, Kinova::Api::Base::GripperC
 int ToProtoData(kortex_driver::GripperRequest input, Kinova::Api::Base::GripperRequest *output);
 int ToProtoData(kortex_driver::Gripper input, Kinova::Api::Base::Gripper *output);
 int ToProtoData(kortex_driver::Finger input, Kinova::Api::Base::Finger *output);
+int ToProtoData(kortex_driver::GpioCommand input, Kinova::Api::Base::GpioCommand *output);
 int ToProtoData(kortex_driver::SystemTime input, Kinova::Api::Base::SystemTime *output);
 int ToProtoData(kortex_driver::ControllerConfigurationMode input, Kinova::Api::Base::ControllerConfigurationMode *output);
 int ToProtoData(kortex_driver::ControllerConfiguration input, Kinova::Api::Base::ControllerConfiguration *output);
@@ -349,7 +366,14 @@ int ToProtoData(kortex_driver::PreComputedJointTrajectory input, Kinova::Api::Ba
 int ToProtoData(kortex_driver::PreComputedJointTrajectoryElement input, Kinova::Api::Base::PreComputedJointTrajectoryElement *output);
 int ToProtoData(kortex_driver::TrajectoryErrorElement input, Kinova::Api::Base::TrajectoryErrorElement *output);
 int ToProtoData(kortex_driver::TrajectoryErrorReport input, Kinova::Api::Base::TrajectoryErrorReport *output);
+int ToProtoData(kortex_driver::WaypointValidationReport input, Kinova::Api::Base::WaypointValidationReport *output);
+int ToProtoData(kortex_driver::Waypoint input, Kinova::Api::Base::Waypoint *output);
+int ToProtoData(kortex_driver::AngularWaypoint input, Kinova::Api::Base::AngularWaypoint *output);
+int ToProtoData(kortex_driver::CartesianWaypoint input, Kinova::Api::Base::CartesianWaypoint *output);
+int ToProtoData(kortex_driver::WaypointList input, Kinova::Api::Base::WaypointList *output);
+int ToProtoData(kortex_driver::KinematicTrajectoryConstraints input, Kinova::Api::Base::KinematicTrajectoryConstraints *output);
 int ToProtoData(kortex_driver::FirmwareBundleVersions input, Kinova::Api::Base::FirmwareBundleVersions *output);
 int ToProtoData(kortex_driver::FirmwareComponentVersion input, Kinova::Api::Base::FirmwareComponentVersion *output);
+int ToProtoData(kortex_driver::IKData input, Kinova::Api::Base::IKData *output);
 
 #endif

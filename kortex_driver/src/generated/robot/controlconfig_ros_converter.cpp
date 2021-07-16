@@ -169,7 +169,7 @@ int ToRosData(Kinova::Api::ControlConfig::KinematicLimitsList input, kortex_driv
 	output.kinematic_limits_list.clear();
 	for(int i = 0; i < input.kinematic_limits_list_size(); i++)
 	{
-		kortex_driver::KinematicLimits temp;
+		decltype(output.kinematic_limits_list)::value_type temp;
 		ToRosData(input.kinematic_limits_list(i), temp);
 		output.kinematic_limits_list.push_back(temp);
 	}
@@ -228,6 +228,18 @@ int ToRosData(Kinova::Api::ControlConfig::ControlModeInformation input, kortex_d
 {
 	
 	output.control_mode = input.control_mode();
+
+	
+	
+	return 0;
+}
+int ToRosData(Kinova::Api::ControlConfig::ControlModeNotification input, kortex_driver::ControlConfig_ControlModeNotification &output)
+{
+	
+	output.control_mode = input.control_mode();
+	ToRosData(input.timestamp(), output.timestamp);
+	ToRosData(input.user_handle(), output.user_handle);
+	ToRosData(input.connection(), output.connection);
 
 	
 	

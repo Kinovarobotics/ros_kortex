@@ -45,7 +45,7 @@ int ToRosData(Kinova::Api::GripperCyclic::Command input, kortex_driver::GripperC
 	output.motor_cmd.clear();
 	for(int i = 0; i < input.motor_cmd_size(); i++)
 	{
-		kortex_driver::MotorCommand temp;
+		decltype(output.motor_cmd)::value_type temp;
 		ToRosData(input.motor_cmd(i), temp);
 		output.motor_cmd.push_back(temp);
 	}
@@ -80,7 +80,7 @@ int ToRosData(Kinova::Api::GripperCyclic::Feedback input, kortex_driver::Gripper
 	output.motor.clear();
 	for(int i = 0; i < input.motor_size(); i++)
 	{
-		kortex_driver::MotorFeedback temp;
+		decltype(output.motor)::value_type temp;
 		ToRosData(input.motor(i), temp);
 		output.motor.push_back(temp);
 	}
@@ -121,7 +121,7 @@ int ToRosData(Kinova::Api::GripperCyclic::CustomData input, kortex_driver::Gripp
 	output.motor_custom_data.clear();
 	for(int i = 0; i < input.motor_custom_data_size(); i++)
 	{
-		kortex_driver::CustomDataUnit temp;
+		decltype(output.motor_custom_data)::value_type temp;
 		ToRosData(input.motor_custom_data(i), temp);
 		output.motor_custom_data.push_back(temp);
 	}

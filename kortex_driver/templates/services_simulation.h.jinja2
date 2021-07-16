@@ -32,7 +32,7 @@ class {{package.short_name}}SimulationServices : public I{{package.short_name}}S
         std::function<kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Response(const kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Request&)> {{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}Handler = nullptr;
         virtual bool {{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}(kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Request  &req, kortex_driver::{{method.prepend_rpc_package_name}}{{method.prepend_on_notification}}{{method.name}}::Response &res) override;
 {%- if method.is_notification_rpc %}
-        virtual void cb_{{method.name}}({{method.notification_message_cpp_namespace}}::{{method.prepend_rpc_package_name}}{{method.name|replace("Topic", "")}}Notification notif) override;
+        virtual void cb_{{method.name}}({{method.notification_message_cpp_namespace}}::{{method.name|replace("Topic", "")}}Notification notif) override;
 {%- endif %}
 {%- endfor %}
 
