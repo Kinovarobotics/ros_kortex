@@ -588,7 +588,7 @@ void KortexArmSimulation::CreateDefaultActions()
         kortex_driver::JointAngle a;
         a.joint_identifier = i;
         auto named_target = m_moveit_arm_interface->getNamedTargetValues("retract");
-        double moveit_angle = named_target["joint_"+std::to_string(i+1)]; // rad
+        double moveit_angle = named_target[m_prefix + "joint_"+std::to_string(i+1)]; // rad
         a.value = m_math_util.wrapDegreesFromZeroTo360(m_math_util.toDeg(moveit_angle));
         retract_angles.joint_angles.joint_angles.push_back(a);
     }
@@ -603,7 +603,7 @@ void KortexArmSimulation::CreateDefaultActions()
         kortex_driver::JointAngle a;
         a.joint_identifier = i;
         auto named_target = m_moveit_arm_interface->getNamedTargetValues("home");
-        double moveit_angle = named_target["joint_"+std::to_string(i+1)]; // rad
+        double moveit_angle = named_target[m_prefix + "joint_"+std::to_string(i+1)]; // rad
         a.value = m_math_util.wrapDegreesFromZeroTo360(m_math_util.toDeg(moveit_angle));
         home_angles.joint_angles.joint_angles.push_back(a);
     }
@@ -618,7 +618,7 @@ void KortexArmSimulation::CreateDefaultActions()
         kortex_driver::JointAngle a;
         a.joint_identifier = i;
         auto named_target = m_moveit_arm_interface->getNamedTargetValues("vertical");
-        double moveit_angle = named_target["joint_"+std::to_string(i+1)]; // rad
+        double moveit_angle = named_target[m_prefix + "joint_"+std::to_string(i+1)]; // rad
         a.value = m_math_util.wrapDegreesFromZeroTo360(m_math_util.toDeg(moveit_angle));
         zero_angles.joint_angles.joint_angles.push_back(a);
     }
