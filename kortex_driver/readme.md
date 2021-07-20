@@ -104,7 +104,7 @@ You can publish on those topics for joint or Cartesian velocity control of the r
     ```
     rostopic pub /my_gen3/in/joint_velocity kortex_driver/Base_JointSpeeds "joint_speeds:
     - joint_identifier: 0
-      value: 0.57
+      value: -0.57
       duration: 0" 
     ```
 
