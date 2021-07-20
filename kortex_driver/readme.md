@@ -102,10 +102,10 @@ You can publish on those topics for joint or Cartesian velocity control of the r
 
     From the command line, with your robot name being "my_gen3", you can publish a joint velocity to joint 0 to this topic like so:
     ```
-    rostopic pub /my_gen3/in/joint_velocity kortex_driver/JointSpeeds "joint_speeds:
+    rostopic pub /my_gen3/in/joint_velocity kortex_driver/Base_JointSpeeds "joint_speeds:
     - joint_identifier: 0
-    value: 0.57
-    duration: 0" 
+      value: -0.57
+      duration: 0" 
     ```
 
 * **`/your_robot_name/in/cartesian_velocity`**
