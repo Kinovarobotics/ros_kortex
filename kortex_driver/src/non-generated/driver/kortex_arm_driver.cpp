@@ -49,6 +49,7 @@ KortexArmDriver::KortexArmDriver(ros::NodeHandle nh):   m_node_handle(nh),
     if (m_is_real_robot)
     {
         m_publish_feedback_thread = std::thread(&KortexArmDriver::publishRobotFeedback, this);
+        moveArmWithinJointLimits();
     }
     else
     {
@@ -524,6 +525,58 @@ void KortexArmDriver::startActionServers()
     {
         m_action_server_gripper_command = new RobotiqGripperCommandActionServer(m_prefix + m_gripper_name + "_gripper_controller/gripper_cmd", m_gripper_joint_names[0], m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0], m_node_handle, m_base, m_base_cyclic);
     }
+}
+
+void KortexArmDriver::moveArmWithinJointLimits()
+{
+    auto joint_angles = m_base->GetMeasuredJointAngles();
+
+    std::map<int, float> limited_joints;
+    if (m_degrees_of_freedom == 6)
+    {
+        // We add angle limitations for joints 1,2 and 4 on 6 dof
+        limited_joints[1] = 128.9;
+        limited_joints[2] = 147.8;
+        limited_joints[4] = 120.3;
+    } 
+    else 
+    {
+        // We add angle limitations for joints 1,3 and 5 on 7 dof
+        limited_joints[1] = 128.9;
+        limited_joints[3] = 147.8;
+        limited_joints[5] = 120.3;
+    }
+
+    Kinova::Api::Base::WaypointList list = Kinova::Api::Base::WaypointList();
+    Kinova::Api::Base::Waypoint *waypoint = list.add_waypoints();
+    Kinova::Api::Base::AngularWaypoint *angularWaypoint = waypoint->mutable_angular_waypoint();
+
+    float angle;
+    for (unsigned int i = 0; i < m_degrees_of_freedom; i++)
+    {
+        angle = joint_angles.joint_angles(i).value();
+
+        // Angles received by GetMeasuredJointAngles are in range [0,360], but waypoints are in range [-180, 180]
+        angle = m_math_util.toDeg(m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(angle)));
+
+        if(limited_joints.find(i) != limited_joints.end()) 
+        {
+            // Joint contains an angle limition
+            angle = m_math_util.wrapValueWithinLimits(angle, -1*limited_joints.at(i), limited_joints.at(i));
+        }
+
+        angularWaypoint->add_angles(angle);
+        angularWaypoint->add_maximum_velocities(10);
+    }
+    
+    // movement shouldn't take more than 5s, even at slow speed
+    angularWaypoint->set_duration(5);
+
+    list.set_duration(0);
+    list.set_use_optimal_blending(false);
+	
+    // Send robot within bounds
+    m_base->ExecuteWaypointTrajectory(list);
 }
 
 bool KortexArmDriver::isGripperPresent()

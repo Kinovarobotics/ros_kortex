@@ -88,6 +88,28 @@ double KortexMathUtil::wrapDegreesFromZeroTo360(double deg_not_wrapped, int& num
     return deg_not_wrapped;
 }
 
+double KortexMathUtil::wrapValueWithinLimits(double value, double bottom_limit, double top_limit)
+{
+    double final_value; 
+    if (value > top_limit) 
+    {
+        // Wrap to top limit
+        final_value = top_limit;
+    }
+    else if (value < bottom_limit) 
+    {
+        // Wrap to top limit
+        final_value = bottom_limit;
+    }
+    else
+    {
+        // value within limits already
+        final_value = value;
+    }
+
+    return final_value;
+}
+
 double KortexMathUtil::relative_position_from_absolute(double absolute_position, double min_value, double max_value)
 {
     double range = max_value - min_value;
