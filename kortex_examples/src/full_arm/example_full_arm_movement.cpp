@@ -27,6 +27,7 @@
 #include <kortex_driver/ActionEvent.h>
 #include <kortex_driver/OnNotificationActionTopic.h>
 #include <kortex_driver/ExecuteWaypointTrajectory.h>
+#include <kortex_driver/ValidateWaypointList.h>
 #include <kortex_driver/GetProductConfiguration.h>
 #include <kortex_driver/ModelId.h>
 
@@ -201,21 +202,74 @@ bool example_send_joint_angles(ros::NodeHandle n, const std::string &robot_name,
   ros::ServiceClient service_client_execute_waypoints_trajectory = n.serviceClient<kortex_driver::ExecuteWaypointTrajectory>("/" + robot_name + "/base/execute_waypoint_trajectory");
   kortex_driver::ExecuteWaypointTrajectory service_execute_waypoints_trajectory;
 
+  ros::ServiceClient service_client_validate_waypoint_list = n.serviceClient<kortex_driver::ValidateWaypointList>("/" + robot_name + "/base/validate_waypoint_list");
+  kortex_driver::ValidateWaypointList service_validate_waypoint_list;
+
+  kortex_driver::WaypointList trajectory;
   kortex_driver::Waypoint waypoint;
   kortex_driver::AngularWaypoint angularWaypoint;
+
+  // Angles to send the arm to vertical position (all zeros)
   for (unsigned int i = 0; i < degrees_of_freedom; i++)
   {
     angularWaypoint.angles.push_back(0.0);
   }
-  angularWaypoint.duration = 20; // Arbitrary 20s to reach position
+
+
+  // The duration parameter for an angularWaypoint must be long enough for the arm to reach its position
+  // so a duration of 0 won't work and ValidateWaypointList will return an error
+  int angular_duration = 0;
+  angularWaypoint.duration = angular_duration;
 
   // Initialize waypoint
   waypoint.oneof_type_of_waypoint.angular_waypoint.push_back(angularWaypoint);
 
-  // Initialize request
-  service_execute_waypoints_trajectory.request.input.duration = 0; // use optimal duration, is overridden by the angularWaypoint duration parameter
-  service_execute_waypoints_trajectory.request.input.waypoints.push_back(waypoint);
+  // This duration parameter (for a WaypointList object) can be 0, which means will reach its position in an optimal time
+  // However, this parameter is overriden by the AngularWaypoint duration
+  trajectory.duration = 0;
+  trajectory.use_optimal_blending = 0;
+  trajectory.waypoints.push_back(waypoint);
 
+  // ValidateWaypointList will return an error if the robot does not have time to 
+  // reach its position so we can use it to find an almost optimal duration by 
+  // incrementing duration until we do not get any error
+  service_validate_waypoint_list.request.input = trajectory;
+  if (!service_client_validate_waypoint_list.call(service_validate_waypoint_list))
+  {
+    std::string error_string = "Failed to call ValidateWaypointList";
+    ROS_ERROR("%s", error_string.c_str());
+    return false;
+  }
+  
+  int error_number = service_validate_waypoint_list.response.output.trajectory_error_report.trajectory_error_elements.size();
+  
+  while (error_number >= 1 and angular_duration != 30)
+  {
+    angular_duration++;
+    trajectory.waypoints[0].oneof_type_of_waypoint.angular_waypoint[0].duration = angular_duration;
+    
+    service_validate_waypoint_list.request.input = trajectory;
+    if (!service_client_validate_waypoint_list.call(service_validate_waypoint_list))
+    {
+      std::string error_string = "Failed to call ValidateWaypointList";
+      ROS_ERROR("%s", error_string.c_str());
+      return false;
+    }
+    error_number = service_validate_waypoint_list.response.output.trajectory_error_report.trajectory_error_elements.size();
+  }
+
+  if (angular_duration == 30)
+  {
+    // It should be possible to reach position within 30s
+    // WaypointList is invalid (other error than angularWaypoint duration)
+    std::string error_string = "WaypointList is invalid";
+    ROS_ERROR("%s", error_string.c_str());
+    return false;
+  }
+
+  service_execute_waypoints_trajectory.request.input = trajectory;
+
+  // Send the angles
   if (service_client_execute_waypoints_trajectory.call(service_execute_waypoints_trajectory))
   {
     ROS_INFO("The joint angles were sent to the robot.");

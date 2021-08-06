@@ -65,6 +65,10 @@ class ExampleFullArmMovement:
             get_product_configuration_full_name = '/' + self.robot_name + '/base/get_product_configuration'
             rospy.wait_for_service(get_product_configuration_full_name)
             self.get_product_configuration = rospy.ServiceProxy(get_product_configuration_full_name, GetProductConfiguration)
+
+            validate_waypoint_list_full_name = '/' + self.robot_name + '/base/validate_waypoint_list'
+            rospy.wait_for_service(validate_waypoint_list_full_name)
+            self.validate_waypoint_list = rospy.ServiceProxy(validate_waypoint_list_full_name, ValidateWaypointList)
         except:
             self.is_init_success = False
         else:
@@ -208,23 +212,59 @@ class ExampleFullArmMovement:
 
     def example_send_joint_angles(self):
         self.last_action_notif_type = None
-        # Create the list of angles
-        req = ExecuteActionRequest()
-        trajectory = WaypointList()
 
+        req = ExecuteActionRequest()
+
+        trajectory = WaypointList()
         waypoint = Waypoint()
         angularWaypoint = AngularWaypoint()
 
-        # Here the arm is vertical (all zeros)
+        # Angles to send the arm to vertical position (all zeros)
         for _ in range(self.degrees_of_freedom):
             angularWaypoint.angles.append(0.0)
 
-        angularWaypoint.duration = 20 # Arbitrary 20s to reach position
+        # The duration parameter for an angularWaypoint must be long enough for the arm to reach its position
+        # so a duration of 0 won't work and ValidateWaypointList will return an error
+        angular_duration = 0
+        angularWaypoint.duration = angular_duration
+
+        # Initialize Waypoint
         waypoint.oneof_type_of_waypoint.angular_waypoint.append(angularWaypoint)
 
-        trajectory.waypoints.append(waypoint)
+        # This duration parameter (for a WaypointList object) can be 0, which means will reach its position in an optimal time
+        # However, this parameter is overriden by the AngularWaypoint duration
         trajectory.duration = 0
         trajectory.use_optimal_blending = 0
+        trajectory.waypoints.append(waypoint)
+
+        # ValidateWaypointList will return an error if the robot does not have time to 
+        # reach its position so we can use it to find an almost optimal duration by 
+        # incrementing duration until we do not get any error
+        try:
+            res = self.validate_waypoint_list(trajectory)
+        except rospy.ServiceException:
+            rospy.logerr("Failed to call ValidateWaypointList")
+            return False
+        
+        error_number = len(res.output.trajectory_error_report.trajectory_error_elements)
+        
+        while (error_number >= 1 and angular_duration != 30) :
+            angular_duration += 1
+            trajectory.waypoints[0].oneof_type_of_waypoint.angular_waypoint[0].duration = angular_duration
+            
+            try:
+                res = self.validate_waypoint_list(trajectory)
+            except rospy.ServiceException:
+                rospy.logerr("Failed to call ValidateWaypointList")
+                return False
+            
+            error_number = len(res.output.trajectory_error_report.trajectory_error_elements)
+
+        if (angular_duration == 30) :
+            # It should be possible to reach position within 30s
+            # WaypointList is invalid (other error than angularWaypoint duration)
+            rospy.loginfo("WaypointList is invalid")
+            return False
 
         req.input.oneof_action_parameters.execute_waypoint_list.append(trajectory)
         
