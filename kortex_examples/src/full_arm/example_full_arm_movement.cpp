@@ -165,7 +165,6 @@ bool example_send_cartesian_pose(ros::NodeHandle n, const std::string &robot_nam
   kortex_driver::ExecuteWaypointTrajectory service_execute_waypoints_trajectory;
 
   kortex_driver::Waypoint waypoint;
-  kortex_driver::CartesianWaypoint angularWaypoint;
 
   // Initialize input
   float current_x = feedback->base.commanded_tool_pose_x;
@@ -179,7 +178,7 @@ bool example_send_cartesian_pose(ros::NodeHandle n, const std::string &robot_nam
   service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(current_x, current_y,  current_z + 0.10, current_theta_x, current_theta_y, current_theta_z, 0));
 
   service_execute_waypoints_trajectory.request.input.duration = 0;
-  service_execute_waypoints_trajectory.request.input.use_optimal_blending = 0;
+  service_execute_waypoints_trajectory.request.input.use_optimal_blending = false;
   
   if (service_client_execute_waypoints_trajectory.call(service_execute_waypoints_trajectory))
   {
@@ -215,24 +214,18 @@ bool example_send_joint_angles(ros::NodeHandle n, const std::string &robot_name,
     angularWaypoint.angles.push_back(0.0);
   }
 
-
-  // The duration parameter for an angularWaypoint must be long enough for the arm to reach its position
-  // so a duration of 0 won't work and ValidateWaypointList will return an error
+  // Each AngularWaypoint needs a duration and the global duration (from WaypointList) is disregarded. 
+  // If you put 0 to the global duration, the trajectory will be optimal.
+  // If you somehting too small (for either global duration or AngularWaypoint duration), the trajectory will be rejected.
   int angular_duration = 0;
   angularWaypoint.duration = angular_duration;
 
-  // Initialize waypoint
+  // Initialize Waypoint and WaypointList
   waypoint.oneof_type_of_waypoint.angular_waypoint.push_back(angularWaypoint);
-
-  // This duration parameter (for a WaypointList object) can be 0, which means will reach its position in an optimal time
-  // However, this parameter is overriden by the AngularWaypoint duration
   trajectory.duration = 0;
-  trajectory.use_optimal_blending = 0;
+  trajectory.use_optimal_blending = false;
   trajectory.waypoints.push_back(waypoint);
 
-  // ValidateWaypointList will return an error if the robot does not have time to 
-  // reach its position so we can use it to find an almost optimal duration by 
-  // incrementing duration until we do not get any error
   service_validate_waypoint_list.request.input = trajectory;
   if (!service_client_validate_waypoint_list.call(service_validate_waypoint_list))
   {
@@ -242,8 +235,9 @@ bool example_send_joint_angles(ros::NodeHandle n, const std::string &robot_name,
   }
   
   int error_number = service_validate_waypoint_list.response.output.trajectory_error_report.trajectory_error_elements.size();
+  static const int MAX_ANGULAR_DURATION = 30;
   
-  while (error_number >= 1 and angular_duration != 30)
+  while (error_number >= 1 && angular_duration < MAX_ANGULAR_DURATION)
   {
     angular_duration++;
     trajectory.waypoints[0].oneof_type_of_waypoint.angular_waypoint[0].duration = angular_duration;
@@ -258,7 +252,7 @@ bool example_send_joint_angles(ros::NodeHandle n, const std::string &robot_name,
     error_number = service_validate_waypoint_list.response.output.trajectory_error_report.trajectory_error_elements.size();
   }
 
-  if (angular_duration == 30)
+  if (angular_duration >= MAX_ANGULAR_DURATION)
   {
     // It should be possible to reach position within 30s
     // WaypointList is invalid (other error than angularWaypoint duration)

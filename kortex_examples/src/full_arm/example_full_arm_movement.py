@@ -196,7 +196,7 @@ class ExampleFullArmMovement:
         )
 
         trajectory.duration = 0
-        trajectory.use_optimal_blending = 0
+        trajectory.use_optimal_blending = False
 
         req.input.oneof_action_parameters.execute_waypoint_list.append(trajectory)
 
@@ -223,23 +223,18 @@ class ExampleFullArmMovement:
         for _ in range(self.degrees_of_freedom):
             angularWaypoint.angles.append(0.0)
 
-        # The duration parameter for an angularWaypoint must be long enough for the arm to reach its position
-        # so a duration of 0 won't work and ValidateWaypointList will return an error
+        # Each AngularWaypoint needs a duration and the global duration (from WaypointList) is disregarded. 
+        # If you put 0 to the global duration, the trajectory will be optimal.
+        # If you somehting too small (for either global duration or AngularWaypoint duration), the trajectory will be rejected.
         angular_duration = 0
         angularWaypoint.duration = angular_duration
 
-        # Initialize Waypoint
+        # Initialize Waypoint and WaypointList
         waypoint.oneof_type_of_waypoint.angular_waypoint.append(angularWaypoint)
-
-        # This duration parameter (for a WaypointList object) can be 0, which means will reach its position in an optimal time
-        # However, this parameter is overriden by the AngularWaypoint duration
         trajectory.duration = 0
-        trajectory.use_optimal_blending = 0
+        trajectory.use_optimal_blending = False
         trajectory.waypoints.append(waypoint)
 
-        # ValidateWaypointList will return an error if the robot does not have time to 
-        # reach its position so we can use it to find an almost optimal duration by 
-        # incrementing duration until we do not get any error
         try:
             res = self.validate_waypoint_list(trajectory)
         except rospy.ServiceException:
@@ -247,8 +242,9 @@ class ExampleFullArmMovement:
             return False
         
         error_number = len(res.output.trajectory_error_report.trajectory_error_elements)
+        MAX_ANGULAR_DURATION = 30
         
-        while (error_number >= 1 and angular_duration != 30) :
+        while (error_number >= 1 and angular_duration != MAX_ANGULAR_DURATION) :
             angular_duration += 1
             trajectory.waypoints[0].oneof_type_of_waypoint.angular_waypoint[0].duration = angular_duration
             
@@ -260,7 +256,7 @@ class ExampleFullArmMovement:
             
             error_number = len(res.output.trajectory_error_report.trajectory_error_elements)
 
-        if (angular_duration == 30) :
+        if (angular_duration == MAX_ANGULAR_DURATION) :
             # It should be possible to reach position within 30s
             # WaypointList is invalid (other error than angularWaypoint duration)
             rospy.loginfo("WaypointList is invalid")
