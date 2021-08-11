@@ -15,12 +15,10 @@
 #include "ros/ros.h"
 
 #include <kortex_driver/Base_ClearFaults.h>
-#include <kortex_driver/PlayCartesianTrajectory.h>
 #include <kortex_driver/CartesianSpeed.h>
 #include <kortex_driver/BaseCyclic_Feedback.h>
 #include <kortex_driver/ReadAction.h>
 #include <kortex_driver/ExecuteAction.h>
-#include <kortex_driver/PlayJointTrajectory.h>
 #include <kortex_driver/SetCartesianReferenceFrame.h>
 #include <kortex_driver/CartesianReferenceFrame.h>
 #include <kortex_driver/SendGripperCommand.h>
@@ -29,6 +27,7 @@
 #include <kortex_driver/ActionEvent.h>
 #include <kortex_driver/OnNotificationActionTopic.h>
 #include <kortex_driver/ExecuteWaypointTrajectory.h>
+#include <kortex_driver/ValidateWaypointList.h>
 #include <kortex_driver/GetProductConfiguration.h>
 #include <kortex_driver/ModelId.h>
 
@@ -161,9 +160,11 @@ bool example_send_cartesian_pose(ros::NodeHandle n, const std::string &robot_nam
   // Here we only need the latest message in the topic though
   auto feedback = ros::topic::waitForMessage<kortex_driver::BaseCyclic_Feedback>("/" + robot_name + "/base_feedback");
 
-  // Initialize the ServiceClient for the cartesian pose
-  ros::ServiceClient service_client_play_cartesian_trajectory = n.serviceClient<kortex_driver::PlayCartesianTrajectory>("/" + robot_name + "/base/play_cartesian_trajectory");
-  kortex_driver::PlayCartesianTrajectory service_play_cartesian_trajectory;
+  // Initialize the ServiceClient
+  ros::ServiceClient service_client_execute_waypoints_trajectory = n.serviceClient<kortex_driver::ExecuteWaypointTrajectory>("/" + robot_name + "/base/execute_waypoint_trajectory");
+  kortex_driver::ExecuteWaypointTrajectory service_execute_waypoints_trajectory;
+
+  kortex_driver::Waypoint waypoint;
 
   // Initialize input
   float current_x = feedback->base.commanded_tool_pose_x;
@@ -174,28 +175,18 @@ bool example_send_cartesian_pose(ros::NodeHandle n, const std::string &robot_nam
   float current_theta_z = feedback->base.commanded_tool_pose_theta_z;
 
   // Creating the target pose
-  service_play_cartesian_trajectory.request.input.target_pose.x = current_x;
-  service_play_cartesian_trajectory.request.input.target_pose.y = current_y;
-  service_play_cartesian_trajectory.request.input.target_pose.z = current_z + 0.10;
-  service_play_cartesian_trajectory.request.input.target_pose.theta_x = current_theta_x;
-  service_play_cartesian_trajectory.request.input.target_pose.theta_y = current_theta_y;
-  service_play_cartesian_trajectory.request.input.target_pose.theta_z = current_theta_z;
+  service_execute_waypoints_trajectory.request.input.waypoints.push_back(FillCartesianWaypoint(current_x, current_y,  current_z + 0.10, current_theta_x, current_theta_y, current_theta_z, 0));
 
-  kortex_driver::CartesianSpeed poseSpeed;
-  poseSpeed.translation = 0.1;
-  poseSpeed.orientation = 15;
+  service_execute_waypoints_trajectory.request.input.duration = 0;
+  service_execute_waypoints_trajectory.request.input.use_optimal_blending = false;
 
-  // The constraint is a one_of in Protobuf. The one_of concept does not exist in ROS
-  // To specify a one_of, create it and put it in the appropriate vector of the oneof_type member of the ROS object : 
-  service_play_cartesian_trajectory.request.input.constraint.oneof_type.speed.push_back(poseSpeed);
-
-  if (service_client_play_cartesian_trajectory.call(service_play_cartesian_trajectory))
+  if (service_client_execute_waypoints_trajectory.call(service_execute_waypoints_trajectory))
   {
     ROS_INFO("The new cartesian pose was sent to the robot.");
   }
   else
   {
-    std::string error_string = "Failed to call PlayCartesianTrajectory";
+    std::string error_string = "Failed to call ExecuteWaypointTrajectory";
     ROS_ERROR("%s", error_string.c_str());
     return false;
   }
@@ -207,30 +198,79 @@ bool example_send_joint_angles(ros::NodeHandle n, const std::string &robot_name,
 {
   last_action_notification_event = 0;
   // Initialize the ServiceClient
-  ros::ServiceClient service_client_play_joint_trajectory = n.serviceClient<kortex_driver::PlayJointTrajectory>("/" + robot_name + "/base/play_joint_trajectory");
-  kortex_driver::PlayJointTrajectory service_play_joint_trajectory;
+  ros::ServiceClient service_client_execute_waypoints_trajectory = n.serviceClient<kortex_driver::ExecuteWaypointTrajectory>("/" + robot_name + "/base/execute_waypoint_trajectory");
+  kortex_driver::ExecuteWaypointTrajectory service_execute_waypoints_trajectory;
 
-  std::vector<double> angles_to_send;
+  ros::ServiceClient service_client_validate_waypoint_list = n.serviceClient<kortex_driver::ValidateWaypointList>("/" + robot_name + "/base/validate_waypoint_list");
+  kortex_driver::ValidateWaypointList service_validate_waypoint_list;
+
+  kortex_driver::WaypointList trajectory;
+  kortex_driver::Waypoint waypoint;
+  kortex_driver::AngularWaypoint angularWaypoint;
+
+   // Angles to send the arm to vertical position (all zeros)
   for (unsigned int i = 0; i < degrees_of_freedom; i++)
   {
-    angles_to_send.push_back(0.0);
+    angularWaypoint.angles.push_back(0.0);
   }
 
-  for (int i = 0; i < degrees_of_freedom; i++)
+  // Each AngularWaypoint needs a duration and the global duration (from WaypointList) is disregarded. 
+  // If you put 0 to the global duration, the trajectory will be optimal.
+  // If you somehting too small (for either global duration or AngularWaypoint duration), the trajectory will be rejected.
+  int angular_duration = 0;
+  angularWaypoint.duration = angular_duration;
+
+  // Initialize Waypoint and WaypointList
+  waypoint.oneof_type_of_waypoint.angular_waypoint.push_back(angularWaypoint);
+  trajectory.duration = 0;
+  trajectory.use_optimal_blending = false;
+  trajectory.waypoints.push_back(waypoint);
+
+  service_validate_waypoint_list.request.input = trajectory;
+  if (!service_client_validate_waypoint_list.call(service_validate_waypoint_list))
   {
-    kortex_driver::JointAngle temp_angle;
-    temp_angle.joint_identifier = i;
-    temp_angle.value = angles_to_send[i];
-    service_play_joint_trajectory.request.input.joint_angles.joint_angles.push_back(temp_angle);
+    std::string error_string = "Failed to call ValidateWaypointList";
+    ROS_ERROR("%s", error_string.c_str());
+    return false;
   }
 
-  if (service_client_play_joint_trajectory.call(service_play_joint_trajectory))
+  int error_number = service_validate_waypoint_list.response.output.trajectory_error_report.trajectory_error_elements.size();
+  static const int MAX_ANGULAR_DURATION = 30;
+
+  while (error_number >= 1 && angular_duration < MAX_ANGULAR_DURATION)
+  {
+    angular_duration++;
+    trajectory.waypoints[0].oneof_type_of_waypoint.angular_waypoint[0].duration = angular_duration;
+
+    service_validate_waypoint_list.request.input = trajectory;
+    if (!service_client_validate_waypoint_list.call(service_validate_waypoint_list))
+    {
+      std::string error_string = "Failed to call ValidateWaypointList";
+      ROS_ERROR("%s", error_string.c_str());
+      return false;
+    }
+    error_number = service_validate_waypoint_list.response.output.trajectory_error_report.trajectory_error_elements.size();
+  }
+
+  if (angular_duration >= MAX_ANGULAR_DURATION)
+  {
+    // It should be possible to reach position within 30s
+    // WaypointList is invalid (other error than angularWaypoint duration)
+    std::string error_string = "WaypointList is invalid";
+    ROS_ERROR("%s", error_string.c_str());
+    return false;
+  }
+
+  service_execute_waypoints_trajectory.request.input = trajectory;
+
+  // Send the angles
+  if (service_client_execute_waypoints_trajectory.call(service_execute_waypoints_trajectory))
   {
     ROS_INFO("The joint angles were sent to the robot.");
   }
   else
   {
-    std::string error_string = "Failed to call PlayJointTrajectory";
+    std::string error_string = "Failed to call ExecuteWaypointTrajectory";
     ROS_ERROR("%s", error_string.c_str());
     return false;
   }
@@ -276,7 +316,11 @@ bool example_cartesian_waypoint(ros::NodeHandle n, const std::string &robot_name
   
   last_action_notification_event = 0;
 
-  if (!service_client_get_config.call(service_get_config))
+  if (service_client_execute_waypoints_trajectory.call(service_execute_waypoints_trajectory))
+  {
+    ROS_INFO("The WaypointList command was sent to the robot.");
+  }
+  else
   {
     std::string error_string = "Failed to call GetProductConfiguration";
     ROS_ERROR("%s", error_string.c_str());

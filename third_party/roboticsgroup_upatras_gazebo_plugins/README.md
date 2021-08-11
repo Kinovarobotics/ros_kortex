@@ -1,4 +1,4 @@
-This ROS package was cloned from https://github.com/roboticsgroup/roboticsgroup_upatras_gazebo_plugins into ros_kortex to properly simulate mimic joints in Gazebo for the Robotiq 2f 85 gripper.
+This ROS package was cloned from https://github.com/roboticsgroup/roboticsgroup_upatras_gazebo_plugins into ros_kortex to properly simulate mimic joints in Gazebo for the Robotiq 2f 85 gripper the Robotiq 2f 140 gripper.
 The repository was cloned at commit 15187abc17f22dbd3fa720d70ad50de74a668b7c.
 
 Originally, for ROS Melodic and Kinetic, we used the ROS package from https://github.com/roboticsgroup/roboticsgroup_gazebo_plugins at commit : 4d93ecd86e4415c3fe74d0027fd41c5e3b39ec44.
