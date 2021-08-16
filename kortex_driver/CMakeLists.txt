@@ -80,21 +80,21 @@ if(USE_CONAN)
                     BASIC_SETUP CMAKE_TARGETS
                     NO_OUTPUT_DIRS
                     SETTINGS kortex_api_cpp:arch=armv7 kortex_api_cpp:compiler=gcc kortex_api_cpp:compiler.version=5 kortex_api_cpp:compiler.libcxx=libstdc++11
-                    OPTIONS kortex_api_cpp:target=artik710)
+                    ENV TARGET=artik710)
   elseif("${CONAN_TARGET_PLATFORM}" STREQUAL "imx6")
     conan_cmake_run(CONANFILE conanfile.py
                     UPDATE
                     BASIC_SETUP CMAKE_TARGETS
                     NO_OUTPUT_DIRS
                     SETTINGS kortex_api_cpp:arch=armv7 kortex_api_cpp:compiler=gcc kortex_api_cpp:compiler.version=6.4 kortex_api_cpp:compiler.libcxx=libstdc++11
-                    OPTIONS kortex_api_cpp:target=imx6)
+                    ENV TARGET=imx6)
   elseif("${CONAN_TARGET_PLATFORM}" STREQUAL "jetson")
     conan_cmake_run(CONANFILE conanfile.py
                     UPDATE
                     BASIC_SETUP CMAKE_TARGETS
                     NO_OUTPUT_DIRS
                     SETTINGS kortex_api_cpp:arch=armv7 kortex_api_cpp:compiler=gcc kortex_api_cpp:compiler.version=7 kortex_api_cpp:compiler.libcxx=libstdc++11
-                    OPTIONS kortex_api_cpp:target=jetson)
+                    ENV TARGET=jetson)
   endif()
 endif()
 
