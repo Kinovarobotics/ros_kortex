@@ -14,12 +14,10 @@
 
 #include "ros/ros.h"
 #include <kortex_driver/Base_ClearFaults.h>
-#include <kortex_driver/PlayCartesianTrajectory.h>
 #include <kortex_driver/CartesianSpeed.h>
 #include <kortex_driver/BaseCyclic_Feedback.h>
 #include <kortex_driver/ReadAction.h>
 #include <kortex_driver/ExecuteAction.h>
-#include <kortex_driver/PlayJointTrajectory.h>
 #include <kortex_driver/SetCartesianReferenceFrame.h>
 #include <kortex_driver/CartesianReferenceFrame.h>
 #include <kortex_driver/SendGripperCommand.h>
