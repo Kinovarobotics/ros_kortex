@@ -215,7 +215,6 @@ bool example_send_joint_angles(ros::NodeHandle n, const std::string &robot_name,
   }
 
   // Each AngularWaypoint needs a duration and the global duration (from WaypointList) is disregarded. 
-  // If you put 0 to the global duration, the trajectory will be optimal.
   // If you somehting too small (for either global duration or AngularWaypoint duration), the trajectory will be rejected.
   int angular_duration = 0;
   angularWaypoint.duration = angular_duration;

@@ -224,7 +224,6 @@ class ExampleFullArmMovement:
             angularWaypoint.angles.append(0.0)
 
         # Each AngularWaypoint needs a duration and the global duration (from WaypointList) is disregarded. 
-        # If you put 0 to the global duration, the trajectory will be optimal.
         # If you somehting too small (for either global duration or AngularWaypoint duration), the trajectory will be rejected.
         angular_duration = 0
         angularWaypoint.duration = angular_duration
