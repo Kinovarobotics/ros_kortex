@@ -100,6 +100,18 @@ double KortexMathUtil::absolute_position_from_relative(double relative_position,
     return relative_position * range + min_value;
 }
 
+double KortexMathUtil::findDeltaFromBoundaries(double value, double limit)
+{
+    double delta = std::abs(value) - limit;
+
+    if ( delta < 0 )
+    {
+        delta = 0;
+    }
+
+    return delta;
+}
+
 kortex_driver::Twist KortexMathUtil::substractTwists(const kortex_driver::Twist& a, const kortex_driver::Twist& b)
 {
     kortex_driver::Twist c;
