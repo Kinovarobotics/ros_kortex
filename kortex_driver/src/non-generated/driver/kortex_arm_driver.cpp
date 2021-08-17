@@ -547,9 +547,12 @@ void KortexArmDriver::moveArmWithinJointLimits()
         limited_joints[5] = 120.3;
     }
 
-    Kinova::Api::Base::WaypointList list = Kinova::Api::Base::WaypointList();
-    Kinova::Api::Base::Waypoint *waypoint = list.add_waypoints();
-    Kinova::Api::Base::AngularWaypoint *angularWaypoint = waypoint->mutable_angular_waypoint();
+    Kinova::Api::Base::JointSpeeds joint_speeds = Kinova::Api::Base::JointSpeeds();
+    Kinova::Api::Base::JointSpeed* joint_speed = joint_speeds.add_joint_speeds();
+
+    static const int TIME_COMPENSATION = 100;
+    static const int DEFAULT_JOINT_SPEED = 10;
+    static const int TIME_SPEED_RATIO = 1000 / DEFAULT_JOINT_SPEED;
 
     float angle;
     for (unsigned int i = 0; i < m_degrees_of_freedom; i++)
@@ -559,24 +562,32 @@ void KortexArmDriver::moveArmWithinJointLimits()
         // Angles received by GetMeasuredJointAngles are in range [0,360], but waypoints are in range [-180, 180]
         angle = m_math_util.toDeg(m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(angle)));
 
-        if(limited_joints.find(i) != limited_joints.end()) 
+        if(limited_joints.find(i) != limited_joints.end())
         {
-            // Joint contains an angle limition
-            angle = m_math_util.wrapValueWithinLimits(angle, -1*limited_joints.at(i), limited_joints.at(i));
+            float delta = m_math_util.findDeltaFromBoundaries(angle, limited_joints.at(i));
+
+            if (delta != 0)
+            {
+                // we add some time to compensate acceleration
+                int time_ms = delta * TIME_SPEED_RATIO + TIME_COMPENSATION;
+                int speed = DEFAULT_JOINT_SPEED;
+                joint_speed->set_joint_identifier(i);
+
+                if (angle > 0)
+                {
+                    speed *= -1;
+                }
+
+                joint_speed->set_value(speed);
+                m_base->SendJointSpeedsCommand(joint_speeds);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(time_ms));
+                
+                joint_speed->set_value(0);
+                m_base->SendJointSpeedsCommand(joint_speeds);
+            }
         }
-
-        angularWaypoint->add_angles(angle);
-        angularWaypoint->add_maximum_velocities(10);
     }
-    
-    // movement shouldn't take more than 5s, even at slow speed
-    angularWaypoint->set_duration(5);
-
-    list.set_duration(0);
-    list.set_use_optimal_blending(false);
-	
-    // Send robot within bounds
-    m_base->ExecuteWaypointTrajectory(list);
 }
 
 bool KortexArmDriver::isGripperPresent()

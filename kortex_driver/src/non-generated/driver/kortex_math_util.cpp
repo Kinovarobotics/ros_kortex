@@ -88,28 +88,6 @@ double KortexMathUtil::wrapDegreesFromZeroTo360(double deg_not_wrapped, int& num
     return deg_not_wrapped;
 }
 
-double KortexMathUtil::wrapValueWithinLimits(double value, double bottom_limit, double top_limit)
-{
-    double final_value; 
-    if (value > top_limit) 
-    {
-        // Wrap to top limit
-        final_value = top_limit;
-    }
-    else if (value < bottom_limit) 
-    {
-        // Wrap to top limit
-        final_value = bottom_limit;
-    }
-    else
-    {
-        // value within limits already
-        final_value = value;
-    }
-
-    return final_value;
-}
-
 double KortexMathUtil::relative_position_from_absolute(double absolute_position, double min_value, double max_value)
 {
     double range = max_value - min_value;
@@ -120,6 +98,18 @@ double KortexMathUtil::absolute_position_from_relative(double relative_position,
 {
     double range = max_value - min_value;
     return relative_position * range + min_value;
+}
+
+double KortexMathUtil::findDeltaFromBoundaries(double value, double limit)
+{
+    double delta = std::abs(value) - limit;
+
+    if ( delta < 0 )
+    {
+        delta = 0;
+    }
+
+    return delta;
 }
 
 kortex_driver::Twist KortexMathUtil::substractTwists(const kortex_driver::Twist& a, const kortex_driver::Twist& b)
