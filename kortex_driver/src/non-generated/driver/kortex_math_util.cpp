@@ -100,6 +100,18 @@ double KortexMathUtil::absolute_position_from_relative(double relative_position,
     return relative_position * range + min_value;
 }
 
+float KortexMathUtil::findDistanceToBoundary(float value, float limit)
+{
+    float distance = std::abs(value) - limit;
+
+    if ( distance < 0 )
+    {
+        distance = 0;
+    }
+
+    return distance;
+}
+
 kortex_driver::Twist KortexMathUtil::substractTwists(const kortex_driver::Twist& a, const kortex_driver::Twist& b)
 {
     kortex_driver::Twist c;
