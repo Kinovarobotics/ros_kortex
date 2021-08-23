@@ -6,7 +6,6 @@
     <arg name="start_gazebo" default="true"/>
     <arg name="gazebo_gui"   default ="true"/>
     <arg name="start_rviz" default="true"/>
-    <arg name="gpd" default="false"/>
     
     <!-- Initial position in Gazebo -->
     <arg name="x0" default="0"/>
@@ -49,9 +48,6 @@
 
     <!-- testing setting planning_group with param -->
     <param name="planning_group" type="string" value="arm" />
-
-    <!-- Start GPD -->
-    <include file="$(find uml_hri_nerve_pick_and_place)/launch/gpd_gen3.launch" if="$(arg gpd)" />
     <group ns="$(arg robot_name)">
 
         <!-- Load the description for the robot -->
@@ -174,7 +170,7 @@
         </test> 
 
         <!-- Start RViz -->
-        <node name="rviz" pkg="rviz" type="rviz" if="$(arg start_rviz)"/> 
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find uml_hri_nerve_pick_and_place)/rviz/gen3_rviz_config.rviz" if="$(arg start_rviz)"/>
     
     </group>
 </launch>
