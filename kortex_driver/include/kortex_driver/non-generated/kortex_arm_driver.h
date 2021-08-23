@@ -80,6 +80,7 @@ class KortexArmDriver
     void initSubscribers();
     void initRosServices();
     void startActionServers();
+    void moveArmWithinJointLimits();
 
   private:
 

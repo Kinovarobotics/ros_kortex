@@ -49,6 +49,7 @@ KortexArmDriver::KortexArmDriver(ros::NodeHandle nh):   m_node_handle(nh),
     if (m_is_real_robot)
     {
         m_publish_feedback_thread = std::thread(&KortexArmDriver::publishRobotFeedback, this);
+        moveArmWithinJointLimits();
     }
     else
     {
@@ -523,6 +524,75 @@ void KortexArmDriver::startActionServers()
     if (isGripperPresent())
     {
         m_action_server_gripper_command = new RobotiqGripperCommandActionServer(m_prefix + m_gripper_name + "_gripper_controller/gripper_cmd", m_gripper_joint_names[0], m_gripper_joint_limits_min[0], m_gripper_joint_limits_max[0], m_node_handle, m_base, m_base_cyclic);
+    }
+}
+
+void KortexArmDriver::moveArmWithinJointLimits()
+{
+    auto joint_angles = m_base->GetMeasuredJointAngles();
+
+    std::map<int, float> limited_joints;
+    if (m_degrees_of_freedom == 6)
+    {
+        // We add angle limitations for joints 1,2 and 4 on 6 dof (values from User guide)
+        limited_joints[1] = 128.9;
+        limited_joints[2] = 147.8;
+        limited_joints[4] = 120.3;
+    } 
+    else if (m_degrees_of_freedom == 7)
+    {
+        // We add angle limitations for joints 1,3 and 5 on 7 dof (values from User guide)
+        limited_joints[1] = 128.9;
+        limited_joints[3] = 147.8;
+        limited_joints[5] = 120.3;
+    }
+    else 
+    {
+        ROS_WARN("Unsupported number of actuators. Not moving the arm within joint limits");
+        return;
+    }
+
+    Kinova::Api::Base::JointSpeeds joint_speeds = Kinova::Api::Base::JointSpeeds();
+    Kinova::Api::Base::JointSpeed* joint_speed = joint_speeds.add_joint_speeds();
+
+    static const int TIME_COMPENSATION = 100;
+    static const int DEFAULT_JOINT_SPEED = 10;
+    static const int TIME_SPEED_RATIO = 1000 / DEFAULT_JOINT_SPEED;
+    static const float EPSILON = 0.001;
+
+    float angle;
+    for (unsigned int i = 0; i < m_degrees_of_freedom; i++)
+    {
+        angle = joint_angles.joint_angles(i).value();
+
+        // Angles received by GetMeasuredJointAngles are in range [0,360], but waypoints are in range [-180, 180]
+        angle = m_math_util.toDeg(m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(angle)));
+
+        if (limited_joints.count(i))
+        {
+            float delta = m_math_util.findDistanceToBoundary(angle, limited_joints.at(i));
+
+            if (delta > EPSILON)
+            {
+                // we add some time to compensate acceleration
+                int time_ms = delta * TIME_SPEED_RATIO + TIME_COMPENSATION;
+                int speed = DEFAULT_JOINT_SPEED;
+                joint_speed->set_joint_identifier(i);
+
+                if (angle > 0)
+                {
+                    speed *= -1;
+                }
+
+                joint_speed->set_value(speed);
+                m_base->SendJointSpeedsCommand(joint_speeds);
+
+                std::this_thread::sleep_for(std::chrono::milliseconds(time_ms));
+                
+                joint_speed->set_value(0);
+                m_base->SendJointSpeedsCommand(joint_speeds);
+            }
+        }
     }
 }
 
