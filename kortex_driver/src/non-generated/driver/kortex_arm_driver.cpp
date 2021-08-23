@@ -534,17 +534,22 @@ void KortexArmDriver::moveArmWithinJointLimits()
     std::map<int, float> limited_joints;
     if (m_degrees_of_freedom == 6)
     {
-        // We add angle limitations for joints 1,2 and 4 on 6 dof
+        // We add angle limitations for joints 1,2 and 4 on 6 dof (values from User guide)
         limited_joints[1] = 128.9;
         limited_joints[2] = 147.8;
         limited_joints[4] = 120.3;
     } 
-    else 
+    else if (m_degrees_of_freedom == 7)
     {
-        // We add angle limitations for joints 1,3 and 5 on 7 dof
+        // We add angle limitations for joints 1,3 and 5 on 7 dof (values from User guide)
         limited_joints[1] = 128.9;
         limited_joints[3] = 147.8;
         limited_joints[5] = 120.3;
+    }
+    else 
+    {
+        ROS_WARN("Unsupported number of actuators. Not moving the arm within joint limits");
+        return;
     }
 
     Kinova::Api::Base::JointSpeeds joint_speeds = Kinova::Api::Base::JointSpeeds();
@@ -553,6 +558,7 @@ void KortexArmDriver::moveArmWithinJointLimits()
     static const int TIME_COMPENSATION = 100;
     static const int DEFAULT_JOINT_SPEED = 10;
     static const int TIME_SPEED_RATIO = 1000 / DEFAULT_JOINT_SPEED;
+    static const float EPSILON = 0.001;
 
     float angle;
     for (unsigned int i = 0; i < m_degrees_of_freedom; i++)
@@ -562,11 +568,11 @@ void KortexArmDriver::moveArmWithinJointLimits()
         // Angles received by GetMeasuredJointAngles are in range [0,360], but waypoints are in range [-180, 180]
         angle = m_math_util.toDeg(m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(angle)));
 
-        if(limited_joints.find(i) != limited_joints.end())
+        if (limited_joints.count(i))
         {
-            float delta = m_math_util.findDeltaFromBoundaries(angle, limited_joints.at(i));
+            float delta = m_math_util.findDistanceToBoundary(angle, limited_joints.at(i));
 
-            if (delta != 0)
+            if (delta > EPSILON)
             {
                 // we add some time to compensate acceleration
                 int time_ms = delta * TIME_SPEED_RATIO + TIME_COMPENSATION;
