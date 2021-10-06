@@ -32,6 +32,7 @@
 
 #include <set>
 #include <chrono>
+#include <unordered_set>
 
 namespace 
 {
@@ -812,7 +813,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
 
     // Transform kortex structure to trajectory_msgs to fill endpoint structure
     trajectory_msgs::JointTrajectoryPoint endpoint;
-    std::vector<int> limited_joints; // joints limited in range
+    std::unordered_set<int> limited_joints; // joints limited in range
     int degrees_of_freedom = constrained_joint_angles.joint_angles.joint_angles.size();
     if (degrees_of_freedom == 6)
     {
@@ -833,7 +834,7 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
         // If the current actuator has turned on itself many times, we need the endpoint to follow that trend too
         int n_turns = 0;
         double rad_wrapped_goal;
-        if (std::count (limited_joints.begin(), limited_joints.end(), i))
+        if (limited_joints.count(i))
         {
             rad_wrapped_goal = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(constrained_joint_angles.joint_angles.joint_angles[i].value));
         }
