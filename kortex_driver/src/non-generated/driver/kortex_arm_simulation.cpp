@@ -32,6 +32,7 @@
 
 #include <set>
 #include <chrono>
+#include <unordered_set>
 
 namespace 
 {
@@ -812,12 +813,35 @@ kortex_driver::KortexError KortexArmSimulation::ExecuteReachJointAngles(const ko
 
     // Transform kortex structure to trajectory_msgs to fill endpoint structure
     trajectory_msgs::JointTrajectoryPoint endpoint;
+    std::unordered_set<int> limited_joints; // joints limited in range
+    int degrees_of_freedom = constrained_joint_angles.joint_angles.joint_angles.size();
+    if (degrees_of_freedom == 6)
+    {
+        limited_joints = {1,2,4};
+    }
+    else if (degrees_of_freedom == 7)
+    {
+        limited_joints = {1,3,5};
+    }
+    else 
+    {
+        return FillKortexError(kortex_driver::ErrorCodes::ERROR_DEVICE,
+                                kortex_driver::SubErrorCodes::INVALID_PARAM,
+                                "Unsupported number of joints, expected 6 or 7");
+    }
     for (int i = 0; i < constrained_joint_angles.joint_angles.joint_angles.size(); i++)
     {
         // If the current actuator has turned on itself many times, we need the endpoint to follow that trend too
         int n_turns = 0;
-        m_math_util.wrapRadiansFromMinusPiToPi(current.position[m_first_arm_joint_index + i], n_turns);
-        const double rad_wrapped_goal = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(constrained_joint_angles.joint_angles.joint_angles[i].value));
+        double rad_wrapped_goal;
+        if (limited_joints.count(i))
+        {
+            rad_wrapped_goal = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(constrained_joint_angles.joint_angles.joint_angles[i].value));
+        }
+        else
+        {
+            rad_wrapped_goal = m_math_util.wrapRadiansFromMinusPiToPi(m_math_util.toRad(constrained_joint_angles.joint_angles.joint_angles[i].value), n_turns);
+        }
         endpoint.positions.push_back(rad_wrapped_goal + double(n_turns) * 2.0 * M_PI);
         endpoint.velocities.push_back(0.0);
         endpoint.accelerations.push_back(0.0);
