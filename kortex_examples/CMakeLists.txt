@@ -10,7 +10,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation
 
 ## Declare a catkin package
 catkin_package()
-catkin_python_setup()
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 include_directories(include ${PROJECT_SOURCE_DIR}/src)
