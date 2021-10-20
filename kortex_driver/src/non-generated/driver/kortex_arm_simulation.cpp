@@ -81,6 +81,10 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     
     // Gripper information
     ros::param::get("~gripper", m_gripper_name);
+
+    std::string arm_planning_group(ARM_PLANNING_GROUP);
+    ros::param::get("~arm_planning_group", arm_planning_group);
+
     if (IsGripperPresent())
     {
         ros::param::get("~gripper_joint_names", m_gripper_joint_names);
@@ -140,7 +144,7 @@ KortexArmSimulation::KortexArmSimulation(ros::NodeHandle& node_handle): m_node_h
     }
 
     // Start MoveIt client
-    m_moveit_arm_interface.reset(new moveit::planning_interface::MoveGroupInterface(ARM_PLANNING_GROUP));
+    m_moveit_arm_interface.reset(new moveit::planning_interface::MoveGroupInterface(arm_planning_group));
     if (IsGripperPresent())
     {
         m_moveit_gripper_interface.reset(new moveit::planning_interface::MoveGroupInterface(GRIPPER_PLANNING_GROUP));   
