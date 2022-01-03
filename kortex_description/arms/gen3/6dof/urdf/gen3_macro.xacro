@@ -240,7 +240,7 @@
       <axis
         xyz="0 0 0" />
     </joint>
-    <!-- <xacro:if value="${vision}">
+    <xacro:if value="${vision}">
       <link name="${prefix}camera_link" />
       <joint name="${prefix}camera_module" type="fixed">
         <origin xyz="0 0.05639 -0.00305" rpy="3.14159265358979 3.14159265358979 0" />
@@ -259,6 +259,6 @@
         <parent link="${prefix}end_effector_link" />
         <child  link="${prefix}camera_color_frame" />
       </joint>
-    </xacro:if> -->
+    </xacro:if>
   </xacro:macro>
 </robot>
