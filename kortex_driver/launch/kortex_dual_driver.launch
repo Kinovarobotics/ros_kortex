@@ -76,45 +76,43 @@
     />
 
     <!-- Start the left arm kortex_driver node -->
-    <node name="$(arg left_robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver" output="screen" ns="$(arg left_robot_name)"> launch-prefix="gdb -ex run args"
-        <param name="ip_address" value="$(arg left_ip_address)"/>
-        <param name="username" value="$(arg left_username)"/>
-        <param name="password" value="$(arg left_password)"/>
-        <param name="cyclic_data_publish_rate" value="$(arg left_cyclic_data_publish_rate)"/>
-        <param name="api_rpc_timeout_ms" value="$(arg left_api_rpc_timeout_ms)"/>
-        <param name="api_session_inactivity_timeout_ms" value="$(arg left_api_session_inactivity_timeout_ms)"/>
-        <param name="api_connection_inactivity_timeout_ms" value="$(arg left_api_connection_inactivity_timeout_ms)"/>
-        <param name="default_goal_time_tolerance" value="$(arg left_default_goal_time_tolerance)"/>
-        <param name="default_goal_tolerance" value="$(arg left_default_goal_tolerance)"/>
-        <param name="arm" value="$(arg left_arm)"/>
-        <param name="gripper" value="$(arg left_gripper)"/>
-        <param name="dof" value="$(arg left_dof)"/>
-        <param name="prefix" value="$(arg left_prefix)"/>
-        <param name="robot_name" value="$(arg left_robot_name)"/>
-        <rosparam command="load" file="$(find kortex_description)/arms/$(arg left_arm)/$(arg left_dof)dof/config/joint_limits.yaml" subst_value="true"/>
-        <!-- If there is a gripper, load the active joint names for it -->
-        <rosparam command="load" file="$(find kortex_description)/grippers/$(arg left_gripper)/config/joint_limits.yaml" unless="$(eval not arg('left_gripper'))" subst_value="true"/>
-    </node>
+    <include file="$(find kortex_driver)/launch/kortex_arm_driver.launch">
+        <arg name="sim" value="false"/>
+        <arg name="ip_address" value="$(arg left_ip_address)"/>
+        <arg name="username" value="$(arg left_username)"/>
+        <arg name="password" value="$(arg left_password)"/>
+        <arg name="cyclic_data_publish_rate" value="$(arg left_cyclic_data_publish_rate)"/>
+        <arg name="api_rpc_timeout_ms" value="$(arg left_api_rpc_timeout_ms)"/>
+        <arg name="api_session_inactivity_timeout_ms" value="$(arg left_api_session_inactivity_timeout_ms)"/>
+        <arg name="api_connection_inactivity_timeout_ms" value="$(arg left_api_connection_inactivity_timeout_ms)"/>
+        <arg name="default_goal_time_tolerance" value="$(arg left_default_goal_time_tolerance)"/>
+        <arg name="default_goal_tolerance" value="$(arg left_default_goal_tolerance)"/>
+        <arg name="arm" value="$(arg left_arm)"/>
+        <arg name="gripper" value="$(arg left_gripper)"/>
+        <arg name="dof" value="$(arg left_dof)"/>
+        <arg name="prefix" value="$(arg left_prefix)"/>
+        <arg name="robot_name" value="$(arg left_robot_name)"/>
+    </include>
+
+
     <!-- Start the right arm kortex_driver node -->
-    <node name="$(arg right_robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver" output="screen" ns="$(arg right_robot_name)"> launch-prefix="gdb -ex run args"
-        <param name="ip_address" value="$(arg right_ip_address)"/>
-        <param name="username" value="$(arg right_username)"/>
-        <param name="password" value="$(arg right_password)"/>
-        <param name="cyclic_data_publish_rate" value="$(arg right_cyclic_data_publish_rate)"/>
-        <param name="api_rpc_timeout_ms" value="$(arg right_api_rpc_timeout_ms)"/>
-        <param name="api_session_inactivity_timeout_ms" value="$(arg right_api_session_inactivity_timeout_ms)"/>
-        <param name="api_connection_inactivity_timeout_ms" value="$(arg right_api_connection_inactivity_timeout_ms)"/>
-        <param name="default_goal_time_tolerance" value="$(arg right_default_goal_time_tolerance)"/>
-        <param name="default_goal_tolerance" value="$(arg right_default_goal_tolerance)"/>
-        <param name="arm" value="$(arg right_arm)"/>
-        <param name="gripper" value="$(arg right_gripper)"/>
-        <param name="dof" value="$(arg right_dof)"/>
-        <param name="prefix" value="$(arg right_prefix)"/>
-        <param name="robot_name" value="$(arg right_robot_name)"/>
-        <rosparam command="load" file="$(find kortex_description)/arms/$(arg right_arm)/$(arg right_dof)dof/config/joint_limits.yaml" subst_value="true"/>
-        <!-- If there is a gripper, load the active joint names for it -->
-        <rosparam command="load" file="$(find kortex_description)/grippers/$(arg right_gripper)/config/joint_limits.yaml" unless="$(eval not arg('right_gripper'))" subst_value="true"/>
-    </node>
+    <include file="$(find kortex_driver)/launch/kortex_arm_driver.launch">
+        <arg name="sim" value="false"/>
+        <arg name="ip_address" value="$(arg right_ip_address)"/>
+        <arg name="username" value="$(arg right_username)"/>
+        <arg name="password" value="$(arg right_password)"/>
+        <arg name="cyclic_data_publish_rate" value="$(arg right_cyclic_data_publish_rate)"/>
+        <arg name="api_rpc_timeout_ms" value="$(arg right_api_rpc_timeout_ms)"/>
+        <arg name="api_session_inactivity_timeout_ms" value="$(arg right_api_session_inactivity_timeout_ms)"/>
+        <arg name="api_connection_inactivity_timeout_ms" value="$(arg right_api_connection_inactivity_timeout_ms)"/>
+        <arg name="default_goal_time_tolerance" value="$(arg right_default_goal_time_tolerance)"/>
+        <arg name="default_goal_tolerance" value="$(arg right_default_goal_tolerance)"/>
+        <arg name="arm" value="$(arg right_arm)"/>
+        <arg name="gripper" value="$(arg right_gripper)"/>
+        <arg name="dof" value="$(arg right_dof)"/>
+        <arg name="prefix" value="$(arg right_prefix)"/>
+        <arg name="robot_name" value="$(arg right_robot_name)"/>
+    </include>
 
     <!-- Start joint and robot state publisher -->
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
@@ -123,7 +121,7 @@
             [$(arg left_robot_name)/base_feedback/joint_state, $(arg right_robot_name)/base_feedback/joint_state]
         </rosparam>
     </node>
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
     <!-- Start RViz -->
     <node name="rviz" pkg="rviz" type="rviz" output="log" args="world" if="$(arg start_rviz)"/> 
