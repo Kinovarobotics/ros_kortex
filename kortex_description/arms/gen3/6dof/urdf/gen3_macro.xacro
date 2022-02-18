@@ -2,6 +2,7 @@
 
 <robot name="gen3_arm" xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <xacro:include filename="$(find kortex_description)/arms/gen3/6dof/urdf/rgbd_camera.xacro" />
   <!-- Propagate last link name information because it is the gripper's parent link -->
   <xacro:property name="last_arm_link" value="end_effector_link"/>
 
@@ -243,10 +244,11 @@
     <xacro:if value="${vision}">
       <link name="${prefix}camera_link" />
       <joint name="${prefix}camera_module" type="fixed">
-        <origin xyz="0 0.05639 -0.00305" rpy="3.14159265358979 3.14159265358979 0" />
+        <origin xyz="0 0.05639 0.1" rpy="4.71 4.71 0" />  <!--down: "-1.57 -3.14 -3.14" left: "-3.14 -3.14 -3.14" front-left: "-1.57 -1.57 -4.71" -->
         <parent link="${prefix}end_effector_link" />
         <child  link="${prefix}camera_link" />
       </joint>
+      <xacro:depth_cam/> <!--I added this-->
       <link name="${prefix}camera_depth_frame" />
       <joint name="${prefix}depth_module" type="fixed">
         <origin xyz="0.0275 0.066 -0.00305" rpy="3.14159265358979 3.14159265358979 0" />

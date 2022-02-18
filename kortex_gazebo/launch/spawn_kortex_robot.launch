@@ -18,7 +18,7 @@
     <arg name="vision" default="true"/> <!-- True if the arm has a Vision module -->
     
     <!-- Default gripper for Gen3 is none, default gripper for Gen3 lite is gen3_lite_2f -->
-    <arg name="gripper" default="roboticq_2f_85" if="$(eval arg('arm') == 'gen3')"/>
+    <arg name="gripper" default="robotiq_2f_85" if="$(eval arg('arm') == 'gen3')"/>
     <arg name="gripper" default="gen3_lite_2f" if="$(eval arg('arm') == 'gen3_lite')"/>
     
     <arg name="robot_name" default="my_$(arg arm)"/>
@@ -48,7 +48,7 @@
         <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix)"
             if="$(eval not arg('gripper'))"/>
         <!-- With gripper -->
-        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix)"
+        <param name="robot_description" command="$(find xacro)/xacro $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=true prefix:=$(arg prefix)"
             unless="$(eval not arg('gripper'))"/>
 
         <!-- Spawn the robot in Gazebo -->
@@ -163,7 +163,7 @@
         </test> 
 
         <!-- Start RViz -->
-        <node name="rviz" pkg="rviz" type="rviz" if="$(arg start_rviz)"/> 
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find gen3_robotiq_2f_85_move_it_config)/launch/moveit.rviz" if="$(arg start_rviz)"/> 
     
     </group>
 
