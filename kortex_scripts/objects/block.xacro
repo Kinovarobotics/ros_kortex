@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<robot name="grasp_box" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <!-- Colours for RVIZ for geometric elements -->
+    <material name="blue">
+        <color rgba="0 0 0.8 1"/>
+    </material>
+    <material name="red">
+        <color rgba="0.8 0 0 1"/>
+    </material>
+    <material name="green">
+        <color rgba="0 0.8 0 1"/>
+    </material>
+    <material name="grey">
+        <color rgba="0.75 0.75 0.75 1"/>
+    </material>
+    <material name="white">
+        <color rgba="1.0 1.0 1.0 1"/>
+    </material>
+    <material name="black">
+        <color rgba="0 0 0 1"/>
+    </material>
+
+
+	<!-- * * * Link Definitions * * * -->
+    <xacro:macro name="block">
+        <link name="grasp_box_base_link">
+ 	        <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <mass value="0.5" />
+                <inertia ixx="0.000133333333333" ixy="0.0" ixz="0.0" iyy="0.000133333333333" iyz="0.0" izz="0.000133333333333"/>
+            </inertial>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.04 0.04 0.08"/>
+                </geometry>
+            </collision>
+            <visual>
+                <origin rpy="0.0 0 0" xyz="0 0 0"/>
+                <geometry>
+                    <box size="0.04 0.04 0.08"/>
+                </geometry>
+                <material name="red"/>
+            </visual>
+        </link>
+
+        <gazebo reference="grasp_box_base_link">
+            <kp>100000.0</kp>
+            <kd>100.0</kd>
+            <mu1>0.25</mu1>
+            <mu2>0.25</mu2>
+            <material>Gazebo/Red</material>
+        </gazebo>
+    </xacro:macro>
+    
+    <xacro:block/>
+
+</robot>
+<!--xacro block.xacro > tmp.urdf && check_urdf tmp.urdf && rm tmp.urdf-->
