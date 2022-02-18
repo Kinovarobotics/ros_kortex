@@ -2,13 +2,16 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-    <xacro:macro name="load_robot" params="arm gripper dof vision sim prefix">
+    <xacro:macro name="load_robot" params="arm gripper dof vision base sim prefix">
             
         <!-- Files to include -->
         <xacro:include filename="$(find kortex_description)/arms/${arm}/${dof}dof/urdf/${arm}_macro.xacro" />
         <xacro:unless value="${not gripper}">
             <xacro:include filename="$(find kortex_description)/grippers/${gripper}/urdf/${gripper}_macro.xacro" />
         </xacro:unless>
+        <xacro:if value="${base}">
+            <xacro:include filename= "$(find kortex_description)/arms/${arm}/${dof}dof/urdf/base.xacro"/>
+        </xacro:if>
         
         <xacro:if value="${sim}">
             <!-- Arm transmission elements-->
@@ -25,14 +28,14 @@
         <xacro:if value="${sim}">
             <link name="world" />
             <joint name="world_to_root" type="fixed">
-                <child link="${prefix}base_link" />
+                <child link="base_plate" />
                 <parent link="world" />
-                <origin xyz="0 0 0" rpy="0 0 0" />    
+                <origin xyz="0 0 0.01" rpy="0 0 0" />    
             </joint> 
         </xacro:if>
         
         <!-- Load the arm -->
-        <xacro:load_arm parent="" dof="${dof}" vision="${vision}" prefix="${prefix}">
+        <xacro:load_arm parent="" dof="${dof}" vision="${vision}" base="${base}" prefix="${prefix}">
             <origin xyz="0 0 0" rpy="0 0 0"/> 
         </xacro:load_arm>
 

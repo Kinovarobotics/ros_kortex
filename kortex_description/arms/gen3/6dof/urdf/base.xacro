@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:include filename= "$(find kortex_description)/arms/${arm}/${dof}dof/urdf/macros.xacro"/>
+        
+    <xacro:macro name="base_plate">
+        <link name="base_plate">
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <mass value="4" />
+                <xacro:box_inertia mass="4" x="0.6" y="0.2" z="0.01" />
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="0.6 0.2 0.01"/>
+                </geometry>
+                <material name="grey">
+                    <color rgba="0.75 0.75 0.75 1"/>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="0.6 0.2 0.01"/>
+                </geometry>
+            </collision>
+        </link>
+        <joint name="base_plate_joint" type="fixed">
+            <origin xyz="0 0 0.005" rpy="0 0 0" />
+            <parent link="base_plate" />
+            <child link="base_link" />
+            <axis xyz="0 0 0" />
+        </joint>
+    </xacro:macro>
+</robot>
