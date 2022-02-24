@@ -30,7 +30,7 @@
       </collision>
     </link>
     <xacro:if value="${base}">
-      <xacro:base_plate/>
+      <xacro:chair/>
     </xacro:if>
     <link name="${prefix}shoulder_link">
       <inertial>
