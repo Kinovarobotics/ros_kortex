@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<robot name="qr_block" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:include filename= "$(find kortex_scripts)/objects/macros.xacro"/>
+
+    <material name="grey">
+        <color rgba="0.75 0.75 0.75 1"/>
+    </material>
+
+    <xacro:macro name="qr_block">
+      <link name='qr_block_base_link'>
+ 	    <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="10" />
+            <xacro:box_inertia mass="10" x="0.2" y="1" z="2" />
+        </inertial>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.2 1 2"/>
+                </geometry>
+            </collision>
+        <visual>
+            <origin xyz="0 0 -1" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://pkg_cv_ros_tutorial_by_dhanuzch/models/qr_wall/meshes/qr_wall.dae" />
+               <!--
+                <box size="0.2 1 2"/>
+                -->
+            </geometry>
+        </visual>
+        </link>
+
+        <gazebo reference="qr_block_base_link">
+            <kp>100000.0</kp>
+            <kd>100.0</kd>
+            <mu1>0.25</mu1>
+            <mu2>0.25</mu2>
+        </gazebo>
+    </xacro:macro>
+    
+    <xacro:qr_block/>
+
+</robot>
+<!--xacro block.xacro > tmp.urdf && check_urdf tmp.urdf && rm tmp.urdf-->
