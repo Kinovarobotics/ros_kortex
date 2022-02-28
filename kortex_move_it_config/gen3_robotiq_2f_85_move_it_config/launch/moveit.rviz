@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /MotionPlanning1
         - /TF1/Frames1
+        - /OccupancyGrid1
       Splitter Ratio: 0.7425600290298462
     Tree Height: 212
   - Class: rviz/Help
@@ -46,8 +47,8 @@ Visualization Manager:
       Move Group Namespace: ""
       MoveIt_Allow_Approximate_IK: false
       MoveIt_Allow_External_Program: false
-      MoveIt_Allow_Replanning: false
-      MoveIt_Allow_Sensor_Positioning: false
+      MoveIt_Allow_Replanning: true
+      MoveIt_Allow_Sensor_Positioning: true
       MoveIt_Planning_Attempts: 10
       MoveIt_Planning_Time: 5
       MoveIt_Use_Cartesian_Path: false
@@ -76,6 +77,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          base_plate:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           bicep_link:
             Alpha: 1
             Show Axes: false
@@ -98,6 +104,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          chair:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           end_effector_link:
             Alpha: 1
             Show Axes: false
@@ -235,6 +246,11 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          base_plate:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           bicep_link:
             Alpha: 1
             Show Axes: false
@@ -257,6 +273,11 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
+          chair:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           end_effector_link:
             Alpha: 1
             Show Axes: false
@@ -361,7 +382,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0
@@ -376,60 +397,12 @@ Visualization Manager:
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Class: rviz/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        base_link:
-          Value: false
-        bicep_link:
-          Value: false
-        bracelet_link:
-          Value: false
-        camera_color_frame:
-          Value: false
-        camera_depth_frame:
-          Value: false
-        camera_link:
-          Value: true
-        end_effector_link:
-          Value: false
-        forearm_link:
-          Value: false
-        left_inner_finger:
-          Value: false
-        left_inner_finger_pad:
-          Value: false
-        left_inner_knuckle:
-          Value: false
-        left_outer_finger:
-          Value: false
-        left_outer_knuckle:
-          Value: false
-        right_inner_finger:
-          Value: false
-        right_inner_finger_pad:
-          Value: false
-        right_inner_knuckle:
-          Value: false
-        right_outer_finger:
-          Value: false
-        right_outer_knuckle:
-          Value: false
-        robotiq_arg2f_base_link:
-          Value: false
-        shoulder_link:
-          Value: false
-        spherical_wrist_1_link:
-          Value: false
-        spherical_wrist_2_link:
-          Value: false
-        tool_frame:
-          Value: false
-        world:
-          Value: false
       Marker Alpha: 1
       Marker Scale: 1
       Name: TF
@@ -437,40 +410,9 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        world:
-          base_link:
-            shoulder_link:
-              bicep_link:
-                forearm_link:
-                  spherical_wrist_1_link:
-                    spherical_wrist_2_link:
-                      bracelet_link:
-                        end_effector_link:
-                          camera_color_frame:
-                            {}
-                          camera_depth_frame:
-                            {}
-                          camera_link:
-                            {}
-                          robotiq_arg2f_base_link:
-                            left_inner_knuckle:
-                              {}
-                            left_outer_knuckle:
-                              left_outer_finger:
-                                left_inner_finger:
-                                  left_inner_finger_pad:
-                                    {}
-                            right_inner_knuckle:
-                              {}
-                            right_outer_knuckle:
-                              right_outer_finger:
-                                right_inner_finger:
-                                  right_inner_finger_pad:
-                                    {}
-                          tool_frame:
-                            {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Class: rviz/Camera
       Enabled: false
       Image Rendering: background and overlay
@@ -484,10 +426,23 @@ Visualization Manager:
       Visibility:
         Grid: true
         MotionPlanning: true
+        OccupancyGrid: true
         PointCloud2: true
         TF: true
         Value: true
       Zoom Factor: 1
+    - Class: octomap_rviz_plugin/OccupancyGrid
+      Enabled: true
+      Max. Height Display: 3.4028234663852886e+38
+      Max. Octree Depth: 16
+      Min. Height Display: -3.4028234663852886e+38
+      Name: OccupancyGrid
+      Octomap Topic: /my_gen3/move_group/octomap_full
+      Queue Size: 5
+      Value: true
+      Voxel Alpha: 1
+      Voxel Coloring: Z-Axis
+      Voxel Rendering: Occupied Voxels
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -504,7 +459,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 2.7262017726898193
+      Distance: 2.4949021339416504
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -520,9 +475,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3097972273826599
+      Pitch: 0.4897969365119934
       Target Frame: base_link
-      Yaw: 0.40677306056022644
+      Yaw: 5.104956150054932
     Saved: ~
 Window Geometry:
   Camera:
