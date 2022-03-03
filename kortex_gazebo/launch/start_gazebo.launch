@@ -5,6 +5,7 @@
         <arg name="debug" default="false" />
         <arg name="gui" default="true" />
         <arg name="paused" default="true" />
+        <arg name="verbose" default="true"/>
     
         <!-- Launch Gazebo with an empty world -->
         <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -12,6 +13,7 @@
             <arg name="use_sim_time" value="$(arg use_sim_time)"/>
             <arg name="debug" value="$(arg debug)" />
             <arg name="paused" value="$(arg paused)"/>
+            <arg name="verbose" value="true"/>
         </include>
 
     </launch>

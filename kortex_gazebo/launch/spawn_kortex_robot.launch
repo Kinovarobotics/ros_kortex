@@ -29,6 +29,7 @@
     <arg name="use_sim_time" default="true"/>
     <arg name="debug" default="false" />
     <arg name="paused" default="true"/>
+    <arg name="verbose" default="true"/>
 
     <!-- Start Gazebo -->
     <include file="$(find kortex_gazebo)/launch/start_gazebo.launch" if="$(arg start_gazebo)">
@@ -36,6 +37,7 @@
             <arg name="use_sim_time" value="$(arg use_sim_time)"/>
             <arg name="debug" value="$(arg debug)"/>
             <arg name="paused" value="$(arg paused)"/>
+            <arg name="verbose" value="true"/>
     </include>
 
     <!-- Delay before homing the arm -->

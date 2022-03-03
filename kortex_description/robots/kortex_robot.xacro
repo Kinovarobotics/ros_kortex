@@ -10,7 +10,7 @@
             <xacro:include filename="$(find kortex_description)/grippers/${gripper}/urdf/${gripper}_macro.xacro" />
         </xacro:unless>
         <xacro:if value="${base}">
-            <xacro:include filename= "$(find kortex_description)/arms/${arm}/${dof}dof/urdf/base.xacro"/>
+            <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/base.xacro"/>
         </xacro:if>
         
         <xacro:if value="${sim}">

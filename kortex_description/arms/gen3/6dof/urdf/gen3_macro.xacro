@@ -2,7 +2,7 @@
 
 <robot name="gen3_arm" xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:include filename="$(find kortex_description)/arms/gen3/6dof/urdf/rgbd_camera.xacro" />
+  <xacro:include filename="$(find kortex_scripts)/robot_equipment/urdf/rgbd_camera.xacro" />
   <!-- Propagate last link name information because it is the gripper's parent link -->
   <xacro:property name="last_arm_link" value="end_effector_link"/>
 

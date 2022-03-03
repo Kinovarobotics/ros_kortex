@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot name="qr_$(arg type)_block" xmlns:xacro="http://ros.org/wiki/xacro">
 
-    <xacro:include filename= "$(find kortex_scripts)/objects/macros.xacro"/>
+    <xacro:include filename= "$(find kortex_scripts)/objects/urdf/macros.xacro"/>
 
     <xacro:property name="block_lenght" value="0.058"/>
     <xacro:property name="block_width" value="0.058"/>
@@ -27,10 +27,10 @@
             <origin xyz="0 0 -0.05" rpy="0 0 0" />
             <geometry>
                 <xacro:if value="${type == 'tomato'}">
-                    <mesh filename="/home/alex/mor/kinova_dev_alex/catkin_workspace/src/ros_kortex/kortex_scripts/objects/models/tomato_qr_grasp_block.dae" />
+                    <mesh filename="/home/alex/mor/kinova_dev_alex/catkin_workspace/src/ros_kortex/kortex_scripts/objects/meshes/tomato_qr_grasp_block.dae" />
                 </xacro:if>
                 <xacro:if value="${type == 'pepper'}">
-                    <mesh filename="/home/alex/mor/kinova_dev_alex/catkin_workspace/src/ros_kortex/kortex_scripts/objects/models/pepper_qr_grasp_block.dae" />
+                    <mesh filename="/home/alex/mor/kinova_dev_alex/catkin_workspace/src/ros_kortex/kortex_scripts/objects/meshes/pepper_qr_grasp_block.dae" />
                 </xacro:if>
                 <xacro:if value="${type == 'block'}">
                     <box size="${block_lenght} ${block_width} ${block_height}"/>

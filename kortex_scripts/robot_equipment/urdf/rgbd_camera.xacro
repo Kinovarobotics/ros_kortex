@@ -3,36 +3,6 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
     <xacro:macro name="depth_cam">
-    <!--
-        <link name="camera_offset_link">
-            <inertial>
-                <origin xyz="0 0 0" rpy="0 0 0" />
-                <mass value="0" />
-                <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
-            </inertial>
-            <visual>
-                <origin xyz="0 0 0" rpy="0 0 0" />
-                <geometry>
-                    <box size="0.01 0.01 0.01"/>
-                </geometry>
-                <material name="">
-                    <color rgba="0.75294 0.75294 0.75294 1" />
-                </material>
-            </visual>
-            <collision>
-                <origin xyz="0 0 0" rpy="0 0 0" />
-                <geometry>
-                    <box size="0.01 0.01 0.01"/>
-                </geometry>
-            </collision>
-        </link>
-        <joint name="camera_offset_joint" type="fixed">
-            <origin xyz="0 0 0.5" rpy="0 0 0" />
-            <parent link="camera_link" />
-            <child link="camera_offset_link" />
-            <axis xyz="0 0 0" />
-        </joint>
-        -->
 
         <gazebo reference="camera_link">
             <sensor name="camera" type="depth">

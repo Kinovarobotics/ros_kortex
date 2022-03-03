@@ -9,7 +9,7 @@
     <arg name="Y" default="0" />
     <arg name="type" default="tomato" />
     <arg name="object_name" default="qr_tomato_block" />
-    <arg name="xacro_file_path" default="$(find kortex_scripts)/objects/qr_grasp_block.xacro type:=$(arg type)" />
+    <arg name="xacro_file_path" default="$(find kortex_scripts)/objects/urdf/qr_grasp_block.xacro type:=$(arg type)" />
     
     <!-- Load the URDF into the ROS Parameter Server -->
     <param name="object_description" command="$(find xacro)/xacro $(arg xacro_file_path)" />

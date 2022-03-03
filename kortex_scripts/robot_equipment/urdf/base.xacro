@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-    <xacro:include filename= "$(find kortex_description)/arms/${arm}/${dof}dof/urdf/macros.xacro"/>
+    <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/macros.xacro"/>
         
     <xacro:macro name="chair">
         <link name="base_plate">
@@ -44,7 +44,7 @@
             <visual>
                 <origin xyz="-0.075 -.075 -0.45" rpy="1.57 0 1.57" />
                 <geometry>
-                    <mesh filename="package://kortex_description/arms/gen3/${dof}dof/meshes/parametric_chair.STL" />
+                    <mesh filename="package://kortex_scripts/robot_equipment/meshes/parametric_chair.STL" />
                 </geometry>
                 <material name="grey">
                     <color rgba="0.75 0.75 0.75 1"/>
