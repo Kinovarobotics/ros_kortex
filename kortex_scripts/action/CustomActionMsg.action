@@ -1,0 +1,8 @@
+#goal
+string goal
+---
+#result
+string result
+---
+#feedback
+string feedback
