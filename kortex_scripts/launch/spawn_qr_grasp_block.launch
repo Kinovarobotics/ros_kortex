@@ -3,7 +3,7 @@
 
     <arg name="x" default="0" />
     <arg name="y" default="0" />
-    <arg name="z" default="0.15" />
+    <arg name="z" default="0.6" />
     <arg name="R" default="0" />
     <arg name="P" default="0" />
     <arg name="Y" default="0" />

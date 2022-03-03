@@ -28,11 +28,17 @@
         <xacro:if value="${sim}">
             <link name="world" />
             <joint name="world_to_root" type="fixed">
-                <child link="base_plate" />
+                <xacro:if value="${base}">
+                    <child link="worker_body_link" />
+                </xacro:if>
+                <xacro:if value="${not base}">
+                    <child link="base_link" />
+                </xacro:if>
                 <parent link="world" />
                 <origin xyz="0 0 0.01" rpy="0 0 0" />    
             </joint> 
         </xacro:if>
+        
         
         <!-- Load the arm -->
         <xacro:load_arm parent="" dof="${dof}" vision="${vision}" base="${base}" prefix="${prefix}">

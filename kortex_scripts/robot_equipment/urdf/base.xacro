@@ -3,39 +3,20 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
     <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/macros.xacro"/>
-        
-    <xacro:macro name="chair">
-        <link name="base_plate">
-            <inertial>
-                <origin xyz="0 0 0" rpy="0 0 0" />
-                <mass value="4" />
-                <xacro:box_inertia mass="4" x="0.1" y="0.1" z="0.01" />
-            </inertial>
-            <visual>
-                <origin xyz="0 0 0" rpy="0 0 0" />
-                <geometry>
-                    <box size="0.1 0.1 0.01"/>
-                </geometry>
-                <material name="grey">
-                    <color rgba="0.75 0.75 0.75 1"/>
-                </material>
-            </visual>
-            <collision>
-                <origin xyz="0 0 0" rpy="0 0 0" />
-                <geometry>
-                    <box size="0.1 0.1 0.01"/>
-                </geometry>
-            </collision>
-        </link>
+    <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/properties.xacro"/>
+    <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/worker_simple.xacro"/>
 
-        <joint name="base_plate_joint" type="fixed">
-            <origin xyz="0 0 0.005" rpy="0 0 0" />
-            <parent link="base_plate" />
+    <xacro:macro name="chair">
+        <xacro:worker_simple/>
+
+        <joint name="chair-base_joint" type="fixed">
+            <origin xyz="0.16 0 -0.44" rpy="0 0 0" />
+            <parent link="chair_link" />
             <child link="base_link" />
             <axis xyz="0 0 0" />
         </joint>
 
-        <link name="chair">
+        <link name="chair_link">
             <inertial>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <mass value="4" />
@@ -58,11 +39,5 @@
             </collision>
         </link>
 
-        <joint name="chair_joint" type="fixed">
-            <origin xyz="-0.15 0 0.445" rpy="0 0 0" />
-            <parent link="base_plate" />
-            <child link="chair" />
-            <axis xyz="0 0 0" />
-        </joint>
     </xacro:macro>
 </robot>
