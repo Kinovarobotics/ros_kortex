@@ -503,6 +503,12 @@ kortex_driver::SendJointSpeedsCommand::Response KortexArmSimulation::SendJointSp
     kortex_driver::Action action;
     action.name = "SendJointSpeedsCommand";
     action.handle.action_type = kortex_driver::ActionType::SEND_JOINT_SPEEDS;
+
+    // Convert degrees in radians
+    for (unsigned int i = 0; i < joint_speeds.joint_speeds.size(); i++)
+    {
+        joint_speeds.joint_speeds[i].value = KortexMathUtil::toDeg(joint_speeds.joint_speeds[i].value);
+    }
     action.oneof_action_parameters.send_joint_speeds.push_back(joint_speeds);
 
     // Fill the velocity commands vector
