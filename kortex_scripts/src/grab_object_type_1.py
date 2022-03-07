@@ -6,7 +6,11 @@ import rospy
 import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
-import time 
+import time
+import actionlib
+from kortex_scripts.msg import CustomActionMsgGoal, CustomActionMsgResult, CustomActionMsgFeedback, CustomActionMsgAction
+import json
+import string
 
 joint_state_topic = ['joint_states:=/my_gen3/joint_states']
 moveit_commander.roscpp_initialize(joint_state_topic)
@@ -17,6 +21,10 @@ scene = moveit_commander.PlanningSceneInterface(ns="/my_gen3")
 arm = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_description", ns="/my_gen3", name="arm")
 display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory, queue_size=1)
 gripper = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_description", ns="/my_gen3", name="gripper")
+
+client = actionlib.SimpleActionClient('/action_custom_msg_as', CustomActionMsgAction)
+client.wait_for_server()
+print("connected to server")
 
 def gripper_open(joints):
     joints[0] = 0
@@ -39,6 +47,15 @@ x: 0.2699139227195213
     z: 0.00455518964693978
     w: 0.005655258202075091
 """
+
+pose_target = geometry_msgs.msg.Pose()
+pose_target.orientation.w = 0.01112219699181503
+pose_target.orientation.x = -0.00951493622721365
+pose_target.orientation.y = -0.9998928588068303
+pose_target.orientation.z = -0.00018338421950054657
+pose_target.position.x = 0.21870236174029328
+pose_target.position.y = -0.07132525403895153
+pose_target.position.z = 0.8022677259334249
 
 pose_target_1 = geometry_msgs.msg.Pose()
 pose_target_1.position.x = 0.369913922
@@ -66,9 +83,51 @@ pose_list = [pose_target_1_up, pose_target_1, pose_target_1_up, pose_target_2_up
 joints = gripper.get_current_joint_values()
 waypoints = [pose_list[0], pose_list[1]]
 
-arm.set_pose_target(pose_list[3])
+arm.set_pose_target(pose_target)
 arm.plan()
 arm.go(wait=True)
+
+def result_callback(state, result):
+    #print(result)
+    res = json.loads(result.result)
+    x_p_ind = res["pepper"]["polygon"]["point_a"].find(",")
+    x_pepper = int(res["pepper"]["polygon"]["point_a"][:x_p_ind].strip(string.ascii_letters + "()=,"))
+    x_t_ind = res["tomato"]["polygon"]["point_a"].find(",")
+    x_tomato = int(res["tomato"]["polygon"]["point_a"][:x_t_ind].strip(string.ascii_letters + "()=,"))
+    print("pepper: " + str(x_pepper) + ", tomoto: " + str(x_tomato))
+    if (x_pepper < x_tomato):
+        global foo
+        foo = 1
+    else: 
+        foo = 0
+
+
+goal = CustomActionMsgGoal()
+goal.path = "/my_gen3/camera/color/image_raw"
+goal.data = ""
+goal.num_codes = 2
+client.send_goal(goal, done_cb=result_callback)
+client.wait_for_result()
+
+
+print(foo)
+pose_target.position.z = pose_target_1.orientation.z = 0.0045551 + 0.1
+if foo == 1:
+    waypoints = [pose_target, pose_target_1_up, pose_target_1]
+    (plan, fraction) = arm.compute_cartesian_path(
+            waypoints, 0.01, 0.0  # waypoints to follow  # eef_step
+        )  # jump_threshold 
+    arm.execute(plan, wait=True)
+    
+else:
+    waypoints = [pose_target, pose_target_2_up, pose_target_2]
+    (plan, fraction) = arm.compute_cartesian_path(
+            waypoints, 0.01, 0.0  # waypoints to follow  # eef_step
+        )  # jump_threshold 
+    arm.execute(plan, wait=True)
+
+
+
 """
 for x in range(len(pose_list)-1):
     #arm.set_pose_target(x)
