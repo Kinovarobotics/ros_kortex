@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 from cmath import rect
+from enum import unique
 from unittest import result
 import rospy
 import time
@@ -19,12 +20,12 @@ class qr_decoder(object):
   # create messages that are used to publish feedback/result
   _feedback = CustomActionMsgFeedback()
   _result = CustomActionMsgResult()
-  _sucess = False
+  _success = False
   # decoder varriables
   _bridge = CvBridge()
   _thresh = 100
-  _qr_codes_goal = 2
-  #image
+  _qr_codes_goal = 1
+  _target = ""
 
   def __init__(self):
     # creates the action server
@@ -33,6 +34,8 @@ class qr_decoder(object):
     self.ctrl_c = False
 
   def callback(self,data):
+    unique_codes = {"num": 0}
+
     try:
         cv_image = self._bridge.imgmsg_to_cv2(data, "bgr8")
     except CvBridgeError as e:
@@ -60,35 +63,37 @@ class qr_decoder(object):
         resized_image = cv2.putText(resized_image, text, (x[i], y[i] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         self._processed_image = resized_image
 
-    code_data = {"number_of_codes_scanned": len(qr_result)}
     for i in range(len(qr_result)):
-      key = "qr_code_num"
-      numbered_key = key.replace("num", str(len(qr_result)))
-      code_data.update({numbered_key :{
-        "data": str(qr_result[i].data),
-        "rect": { "left": qr_result[i].rect.left,
-                  "top" : qr_result[i].rect.top,
-                  "width" : qr_result[i].rect.width,
-                  "height" : qr_result[i].rect.height
-                },
-        "polygon": {"point_a": str(qr_result[i].polygon[0]),
-                    "point_b": str(qr_result[i].polygon[1]),
-                    "point_c": str(qr_result[i].polygon[2]),
-                    "point_d": str(qr_result[i].polygon[3])
-                   }
-      }})
+      if str(qr_result[i].data)[2:-1] not in unique_codes:
+        unique_codes.update({str(qr_result[i].data)[2:-1] :{
+          "data": str(qr_result[i].data)[2:-1],
+          "rect": { "left": qr_result[i].rect.left,
+                    "top" : qr_result[i].rect.top,
+                    "width" : qr_result[i].rect.width,
+                    "height" : qr_result[i].rect.height
+                  },
+          "polygon": {"point_a": str(qr_result[i].polygon[0]),
+                      "point_b": str(qr_result[i].polygon[1]),
+                      "point_c": str(qr_result[i].polygon[2]),
+                      "point_d": str(qr_result[i].polygon[3])
+                    }
+        }})
+        unique_codes["num"] = (unique_codes.get("num") + 1)
 
-    feedback_string = "found x qr_codes: looking for y qr_codes"
-    feedback_string = feedback_string.replace("x",str(len(qr_result)))
-    feedback_string = feedback_string.replace("y",str(self._qr_codes_goal))
-    self._feedback.feedback = feedback_string
+    key_list = list(unique_codes.keys())
+    key_list.pop(0)
+    if not self._target: 
+      self._feedback.feedback = "found: " + str(unique_codes["num"]) + ", want: " + str(self._qr_codes_goal) + " unique qr codes, data: " + str(key_list)
+    else:
+      self._feedback.feedback  = "found: " + str(key_list) + ", target: " + self._target
     self._as.publish_feedback(self._feedback)
     
-    if len(qr_result) == self._qr_codes_goal:
+    if (unique_codes["num"] == self._qr_codes_goal and not self._target) or self._target in unique_codes:
       cv2.imshow("Camera output", resized_image)
       cv2.waitKey(1000) # not sure why 1000 but just leave it, it works
-      self._result.result = json.dumps(code_data)
-      self._sucess = True
+      print(unique_codes)
+      self._result.result = json.dumps(unique_codes)
+      self._success = True
       self.unsubscribe()
 
   def unsubscribe(self):
@@ -97,25 +102,26 @@ class qr_decoder(object):
     
   def goal_callback(self, goal):
     cv2.destroyAllWindows()
-    # helper variables
+  
+    self.image_sub = rospy.Subscriber(goal.path, Image, self.callback)
+    self._qr_codes_goal = goal.num_codes
+    self._target = goal.data
     
-    success = True
-    
-    #   define the different publishers and messages that will be used
-    self.image_sub = rospy.Subscriber("/my_gen3/camera/color/image_raw", Image, self.callback)
-    
-    #if (goal.goal != "LAND"):
-    # make the drone takeoff
-
     while True:
-      if success:
+      if self._success:
+        break
+      # check that preempt (cancelation) has not been requested by the action client
+      if self._as.is_preempt_requested():
+        self.unsubscribe()
         break
 
-    self._result.result = self._feedback.feedback
-    rospy.loginfo('Success')
-    self._as.set_succeeded(self._result)
-
-
+    if self._success:
+      rospy.loginfo('Success')
+      self._as.set_succeeded(self._result)
+    else:
+      rospy.loginfo('The goal has been cancelled/preempted')
+      self._as.set_preempted()
+    
 if __name__ == '__main__':
   rospy.init_node('action_custom_msg')
   qr_decoder()

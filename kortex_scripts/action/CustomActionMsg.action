@@ -1,5 +1,7 @@
 #goal
-string goal
+string path
+string data
+int32 num_codes
 ---
 #result
 string result
