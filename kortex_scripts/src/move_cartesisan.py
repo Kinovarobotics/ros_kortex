@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /bin/python3
 
 import sys
 import copy

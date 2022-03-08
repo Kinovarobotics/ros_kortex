@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /bin/python3
 
 import rospy
 from gazebo_msgs.srv import DeleteModel, DeleteModelRequest # Import the service message used by the service /gazebo/delete_model

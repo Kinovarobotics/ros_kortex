@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /bin/python3
 from cmath import rect
 from enum import unique
 from unittest import result

@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  roscore:
+    image: osrf/ros:noetic-desktop-full
+    networks:
+      - tbot_net
+    ports:
+      - 11311:11311
+    command: stdbuf -o L roscore
+
+  main:
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: tbot/main:latest
+    #user: ${ID}
+    environment:
+      - DISPLAY=${DISPLAY}
+      - "ROS_MASTER_URI=http://roscore:11311"
+      #- "XAUTHORITY=${XAUTH}"
+      - "QT_X11_NO_MITSHM=1"
+    volumes:
+      #- "/home/${USER}:/home/${USER}:rw"
+      #- "/etc/group:/etc/group:ro"
+      #- "/etc/passwd:/etc/passwd:ro"
+      #- "/etc/shadow:/etc/shadow:ro" 
+      #- "/etc/sudoers.d:/etc/sudoers.d:ro"
+      - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
+      - main_vol:/pkg/ros_kortex
+    networks:
+      - tbot_net
+    runtime: nvidia
+    depends_on:
+      - roscore
+    command: roslaunch kortex_gazebo spawn_kortex_robot.launch
+    
+networks:
+  tbot_net:
+    driver: bridge
+
+volumes:
+  main_vol:
+   driver: local
+   driver_opts:
+    o: bind
+    type: none
+    device: ~/mor/kinova_dev_alex/ros_kortex
