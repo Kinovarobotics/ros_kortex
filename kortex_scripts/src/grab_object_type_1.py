@@ -11,6 +11,7 @@ import actionlib
 from kortex_scripts.msg import CustomActionMsgGoal, CustomActionMsgResult, CustomActionMsgFeedback, CustomActionMsgAction
 import json
 import string
+import random
 
 joint_state_topic = ['joint_states:=/my_gen3/joint_states']
 moveit_commander.roscpp_initialize(joint_state_topic)
@@ -32,10 +33,38 @@ def gripper_open(joints):
     gripper.plan()
     gripper.go(wait=True)
 def gripper_close(joints):
-    joints[0] = 0.8
+    joints[0] = 0.3
     gripper.set_joint_value_target(joints)
     gripper.plan()
     gripper.go(wait=True)
+
+def copy_pose(to_copy, adjustment):
+    new_pose = geometry_msgs.msg.Pose()
+    new_pose.position.x = to_copy.position.x + adjustment["x"]
+    new_pose.position.y = to_copy.position.y + adjustment["y"]
+    new_pose.position.z =to_copy.position.z + adjustment["z"]
+    new_pose.orientation.x = to_copy.orientation.x + adjustment["X"]
+    new_pose.orientation.y = to_copy.orientation.y + adjustment["Y"]
+    new_pose.orientation.z = to_copy.orientation.z + adjustment["Z"]
+    new_pose.orientation.w = to_copy.orientation.w + adjustment["W"]
+    return new_pose
+    
+def make_adjustments(x, y, z, X, Y, Z, W):
+    return {"x": x, "y": y, "z": z, "X": X, "Y": y, "Z": Z, "W": W}
+
+def go_inital_pose():
+    intital_pose = geometry_msgs.msg.Pose()
+    intital_pose.orientation.w = 0.01112219699181503
+    intital_pose.orientation.x = -0.00951493622721365
+    intital_pose.orientation.y = -0.9998928588068303
+    intital_pose.orientation.z = -0.00018338421950054657
+    intital_pose.position.x = 0.21870236174029328
+    intital_pose.position.y = -0.07132525403895153
+    intital_pose.position.z = 0.8022677259334249
+    arm.set_goal_tolerance(0.01)
+    arm.set_pose_target(intital_pose)
+    arm.plan()
+    arm.go(wait=True)   
 """ 
 object 3:
 x: 0.2699139227195213
@@ -48,15 +77,6 @@ x: 0.2699139227195213
     w: 0.005655258202075091
 """
 
-pose_target = geometry_msgs.msg.Pose()
-pose_target.orientation.w = 0.01112219699181503
-pose_target.orientation.x = -0.00951493622721365
-pose_target.orientation.y = -0.9998928588068303
-pose_target.orientation.z = -0.00018338421950054657
-pose_target.position.x = 0.21870236174029328
-pose_target.position.y = -0.07132525403895153
-pose_target.position.z = 0.8022677259334249
-
 pose_target_1 = geometry_msgs.msg.Pose()
 pose_target_1.position.x = 0.369913922
 pose_target_1.position.y = -0.01035380
@@ -65,27 +85,22 @@ pose_target_1.orientation.x = -0.706459
 pose_target_1.orientation.y = -0.707715
 pose_target_1.orientation.z = 0.0045551
 pose_target_1.orientation.w = 0.0056552
-pose_target_1_up = copy.deepcopy(pose_target_1)
-pose_target_1_up.position.z += 0.2
-pose_target_2 = copy.deepcopy(pose_target_1)
-pose_target_2.position.x -= 0.1
-pose_target_2_up = copy.deepcopy(pose_target_2)
-pose_target_2_up.position.z += 0.2
-pose_target_3 = copy.deepcopy(pose_target_2)
-pose_target_3.position.x -= 0.1
-pose_target_3_up = copy.deepcopy(pose_target_3)
-pose_target_3_up.position.z += 0.2
-pose_target_4 = copy.deepcopy(pose_target_3)
-pose_target_4.position.x -= 0.1
-pose_target_4_up = copy.deepcopy(pose_target_4)
-pose_target_4_up.position.z += 0.2
+
+p_z = make_adjustments(0, 0, 0.2, 0, 0, 0, 0)
+n_x = make_adjustments(-0.1, 0, 0, 0, 0, 0, 0)
+
+pose_target_1_up = copy_pose(pose_target_1, p_z)
+pose_target_2 = copy_pose(pose_target_1, n_x)
+pose_target_2_up = copy_pose(pose_target_2, p_z)
+pose_target_3 = copy_pose(pose_target_2, n_x)
+pose_target_3_up = copy_pose(pose_target_3, p_z)
+pose_target_4 = copy_pose(pose_target_3, n_x)
+pose_target_4_up = copy_pose(pose_target_4, p_z)
+
 pose_list = [pose_target_1_up, pose_target_1, pose_target_1_up, pose_target_2_up, pose_target_2, pose_target_2_up, pose_target_3_up, pose_target_3, pose_target_3_up, pose_target_4_up, pose_target_4]
 joints = gripper.get_current_joint_values()
-waypoints = [pose_list[0], pose_list[1]]
-
-arm.set_pose_target(pose_target)
-arm.plan()
-arm.go(wait=True)
+go_inital_pose()
+gripper_open(joints)
 
 def result_callback(state, result):
     #print(result)
@@ -107,41 +122,92 @@ goal.path = "/my_gen3/camera/color/image_raw"
 goal.data = ""
 goal.num_codes = 2
 client.send_goal(goal, done_cb=result_callback)
+print("sent goal")
 client.wait_for_result()
 
-
 print(foo)
-pose_target.position.z = pose_target_1.orientation.z = 0.0045551 + 0.1
+time.sleep(1)
 if foo == 1:
-    waypoints = [pose_target, pose_target_1_up, pose_target_1]
-    (plan, fraction) = arm.compute_cartesian_path(
-            waypoints, 0.01, 0.0  # waypoints to follow  # eef_step
-        )  # jump_threshold 
-    arm.execute(plan, wait=True)
+    #arm.set_pose_target(pose_target_1_up)
+    #arm.plan()
+    #arm.go(wait=True)
+    #time.sleep(1)
+    #arm.set_pose_target(pose_target_1)
+    #arm.plan()
+    #arm.go(wait=True)
     
-else:
-    waypoints = [pose_target, pose_target_2_up, pose_target_2]
-    (plan, fraction) = arm.compute_cartesian_path(
-            waypoints, 0.01, 0.0  # waypoints to follow  # eef_step
+    fraction = 0
+    arm.set_goal_tolerance(0.1)
+    while fraction<1.0:
+        waypoints = [pose_target_1_up, pose_target_1, ]
+        (plan, fraction) = arm.compute_cartesian_path(
+            waypoints, 0.01, 0  # waypoints to follow  # eef_step
         )  # jump_threshold 
+        print("fraction: " + str(fraction))
+
+    print("fraction: " + str(fraction))
     arm.execute(plan, wait=True)
-
-
-
-"""
-for x in range(len(pose_list)-1):
-    #arm.set_pose_target(x)
-    waypoints = [pose_list[x], pose_list[x+1]]
-    (plan, fraction) = arm.compute_cartesian_path(
-            waypoints, 0.01, 0.0  # waypoints to follow  # eef_step
+    time.sleep(1)
+    gripper_close(joints)
+    time.sleep(1)
+    #arm.set_pose_target(pose_target_1_up)
+    #arm.plan()
+    #arm.go(wait=True)
+    #arm.set_pose_target(pose_target_4_up)
+    #arm.plan()
+    #arm.go(wait=True)
+    #arm.set_pose_target(pose_target_4)
+    #arm.plan()
+    #arm.go(wait=True)
+    waypoints = [ pose_target_1_up, pose_target_4_up, pose_target_4]
+    fraction = 0
+    while fraction<1.0:
+        (plan, fraction) = arm.compute_cartesian_path(
+        waypoints, 0.01, 0  # waypoints to follow  # eef_step
         )  # jump_threshold 
-    time.sleep(1) 
-    try:
-        arm.execute(plan, wait=True)
-    except:
-        print("error")
-        x -= 1
-   """ 
-rospy.sleep(5)
+        print("fraction: " + str(fraction))
+    print("fraction: " + str(fraction))
+    arm.execute(plan, wait=True)
+    time.sleep(1)
+    gripper_open(joints)
+
+else:
+    #arm.set_pose_target(pose_target_2_up)
+    #arm.plan()
+    #arm.go(wait=True)
+    #arm.set_pose_target(pose_target_2)
+    #arm.plan()
+    #arm.go(wait=True)
+    waypoints = [pose_target_2_up, pose_target_2]
+    fraction = 0
+    while fraction<1.0:
+        (plan, fraction) = arm.compute_cartesian_path(
+            waypoints, 0.01, 0  # waypoints to follow  # eef_step
+        )  # jump_threshold 
+        print("fraction: " + str(fraction))
+    print("fraction: " + str(fraction))
+    arm.execute(plan, wait=True)
+    time.sleep(1)
+    gripper_close(joints)
+    time.sleep(1)
+    #arm.set_pose_target(pose_target_2_up)
+    #arm.plan()
+    #arm.go(wait=True)
+    #arm.set_pose_target(pose_target_4_up)
+    #arm.plan()
+    #arm.go(wait=True)
+    #arm.set_pose_target(pose_target_4)
+    #arm.plan()
+    #arm.go(wait=True)
+    waypoints = [ pose_target_2_up, pose_target_4_up, pose_target_4]
+    fraction = 0
+    while fraction<1.0:
+       (plan, fraction) = arm.compute_cartesian_path(
+        waypoints, 0.01, 0  # waypoints to follow  # eef_step
+        )  # jump_threshold
+    print("fraction: " + str(fraction))
+    arm.execute(plan, wait=True)
+    time.sleep(1)
+    gripper_open(joints)
 
 moveit_commander.roscpp_shutdown()

@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library path="lib/libgen3_robotiq_2f_85_arm_moveit_ikfast_plugin">
+  <class name="gen3_robotiq_2f_85_arm/IKFastKinematicsPlugin" type="gen3_robotiq_2f_85_arm::IKFastKinematicsPlugin" base_class_type="kinematics::KinematicsBase">
+    <description>IKFast61 plugin for closed-form kinematics of gen3_robotiq_2f_85 arm</description>
+  </class>
+</library>
