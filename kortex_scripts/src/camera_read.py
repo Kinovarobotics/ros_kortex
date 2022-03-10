@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#! /bin/python3
 
 # Tutorial link: https://dhanuzch.medium.com/using-opencv-with-gazebo-in-robot-operating-system-ros-part-1-display-real-time-video-feed-a98c078c708b
 import rospy

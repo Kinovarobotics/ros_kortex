@@ -8,6 +8,7 @@ RUN apt-get -y install ros-noetic-xacro
 RUN apt-get -y install  ros-noetic-ros-controllers ros-noetic-ros-control
 RUN apt-get -y install ros-noetic-octomap-rviz-plugins
 RUN apt-get -y install libzbar0 && pip install pyzbar
+RUN pip install imutils
 
 ENV NVIDIA_VISIBLE_DEVICES \
     ${NVIDIA_VISIBLE_DEVICES:-all}
