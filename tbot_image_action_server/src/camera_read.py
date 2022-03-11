@@ -1,6 +1,7 @@
 #! /bin/python3
 
 # Tutorial link: https://dhanuzch.medium.com/using-opencv-with-gazebo-in-robot-operating-system-ros-part-1-display-real-time-video-feed-a98c078c708b
+from unittest import result
 import rospy
 import cv2
 import numpy as np
@@ -35,6 +36,7 @@ class camera_1:
     image = image.astype(np.uint8)
     image = cv2.bitwise_not(image)
 
+
     cnts = cv2.findContours(image.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
     print(len(cnts))
@@ -43,13 +45,13 @@ class camera_1:
       M = cv2.moments(c)
       cX = int(M["m10"] / M["m00"])
       cY = int(M["m01"] / M["m00"])
-      blurred = cv2.drawContours(blurred, [c], -1, (0, 255, 0), 2)
-      blurred = cv2.circle(blurred, (cX, cY), 7, (255, 255, 255), -1)
-      blurred = cv2.putText(blurred, "center", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+      cv2.drawContours(blurred, [c], -10, (255, 255, 255), 3)
+      cv2.circle(blurred, (cX, cY), 7, (255, 255, 255), -1)
+      cv2.putText(blurred, "center", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
-      cv2.imshow("Camera output normal", blurred)
+    cv2.imshow("Camera output normal", blurred)
       #cv2.imshow("Camera output resized", image)
-      cv2.waitKey(1)
+    cv2.waitKey(1)
 
 def main():
 	camera_1()

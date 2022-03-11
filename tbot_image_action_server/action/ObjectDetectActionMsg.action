@@ -1,10 +1,10 @@
 #goal
 string path
-string data
-int32 num_codes
+int32 num_objects
+float32 time_out
 ---
 #result
-string result
+int32 result
 ---
 #feedback
 string feedback

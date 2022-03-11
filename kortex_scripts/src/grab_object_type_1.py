@@ -8,7 +8,7 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 import time
 import actionlib
-from kortex_scripts.msg import CustomActionMsgGoal, CustomActionMsgResult, CustomActionMsgFeedback, CustomActionMsgAction
+from kortex_scripts.msg import QRScanActionMsgGoal, QRScanActionMsgResult, QRScanActionMsgFeedback, QRScanActionMsgAction
 import json
 import string
 import random
@@ -23,7 +23,7 @@ arm = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_descr
 display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory, queue_size=1)
 gripper = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_description", ns="/my_gen3", name="gripper")
 
-client = actionlib.SimpleActionClient('/action_custom_msg_as', CustomActionMsgAction)
+client = actionlib.SimpleActionClient('/qr_scan_as', QRScanActionMsgAction)
 client.wait_for_server()
 print("connected to server")
 
@@ -104,6 +104,10 @@ gripper_open(joints)
 
 def result_callback(state, result):
     #print(result)
+    global foo
+    if state != 3:
+        foo = 2
+        return
     res = json.loads(result.result)
     x_p_ind = res["pepper"]["polygon"]["point_a"].find(",")
     x_pepper = int(res["pepper"]["polygon"]["point_a"][:x_p_ind].strip(string.ascii_letters + "()=,"))
@@ -111,16 +115,16 @@ def result_callback(state, result):
     x_tomato = int(res["tomato"]["polygon"]["point_a"][:x_t_ind].strip(string.ascii_letters + "()=,"))
     print("pepper: " + str(x_pepper) + ", tomoto: " + str(x_tomato))
     if (x_pepper < x_tomato):
-        global foo
         foo = 1
     else: 
         foo = 0
 
 
-goal = CustomActionMsgGoal()
+goal = QRScanActionMsgGoal()
 goal.path = "/my_gen3/camera/color/image_raw"
 goal.data = ""
 goal.num_codes = 2
+goal.time_out = 10.0
 client.send_goal(goal, done_cb=result_callback)
 print("sent goal")
 client.wait_for_result()
@@ -128,13 +132,6 @@ client.wait_for_result()
 print(foo)
 time.sleep(1)
 if foo == 1:
-    #arm.set_pose_target(pose_target_1_up)
-    #arm.plan()
-    #arm.go(wait=True)
-    #time.sleep(1)
-    #arm.set_pose_target(pose_target_1)
-    #arm.plan()
-    #arm.go(wait=True)
     
     fraction = 0
     arm.set_goal_tolerance(0.1)
@@ -150,15 +147,7 @@ if foo == 1:
     time.sleep(1)
     gripper_close(joints)
     time.sleep(1)
-    #arm.set_pose_target(pose_target_1_up)
-    #arm.plan()
-    #arm.go(wait=True)
-    #arm.set_pose_target(pose_target_4_up)
-    #arm.plan()
-    #arm.go(wait=True)
-    #arm.set_pose_target(pose_target_4)
-    #arm.plan()
-    #arm.go(wait=True)
+    
     waypoints = [ pose_target_1_up, pose_target_4_up, pose_target_4]
     fraction = 0
     while fraction<1.0:
@@ -171,13 +160,8 @@ if foo == 1:
     time.sleep(1)
     gripper_open(joints)
 
-else:
-    #arm.set_pose_target(pose_target_2_up)
-    #arm.plan()
-    #arm.go(wait=True)
-    #arm.set_pose_target(pose_target_2)
-    #arm.plan()
-    #arm.go(wait=True)
+elif foo == 0:
+    
     waypoints = [pose_target_2_up, pose_target_2]
     fraction = 0
     while fraction<1.0:
@@ -190,15 +174,7 @@ else:
     time.sleep(1)
     gripper_close(joints)
     time.sleep(1)
-    #arm.set_pose_target(pose_target_2_up)
-    #arm.plan()
-    #arm.go(wait=True)
-    #arm.set_pose_target(pose_target_4_up)
-    #arm.plan()
-    #arm.go(wait=True)
-    #arm.set_pose_target(pose_target_4)
-    #arm.plan()
-    #arm.go(wait=True)
+    
     waypoints = [ pose_target_2_up, pose_target_4_up, pose_target_4]
     fraction = 0
     while fraction<1.0:
@@ -209,5 +185,10 @@ else:
     arm.execute(plan, wait=True)
     time.sleep(1)
     gripper_open(joints)
+
+else: 
+    print("scan failed aborting to inital state")
+
+    go_inital_pose()
 
 moveit_commander.roscpp_shutdown()

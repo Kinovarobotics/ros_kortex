@@ -3,20 +3,21 @@
 import rospy
 import time
 import actionlib
-from kortex_scripts.msg import CustomActionMsgGoal, CustomActionMsgResult, CustomActionMsgFeedback, CustomActionMsgAction
+from kortex_scripts.msg import QRScanActionMsgGoal, QRScanActionMsgResult, QRScanActionMsgFeedback, QRScanActionMsgAction
 
 def feedback_callback(feedback):
     print(feedback)
 
 rospy.init_node('kortex_action_client')
-client = actionlib.SimpleActionClient('/action_custom_msg_as', CustomActionMsgAction)
+client = actionlib.SimpleActionClient('/qr_scan_as', QRScanActionMsgAction)
 client.wait_for_server()
 print("connected to server")
 
-goal = CustomActionMsgGoal()
+goal = QRScanActionMsgGoal()
 goal.path = "/my_gen3/camera/color/image_raw"
 goal.data = ""
 goal.num_codes = 2
+goal.time_out = 2.0
 
 client.send_goal(goal, feedback_cb=feedback_callback)
 #client.wait_for_result()

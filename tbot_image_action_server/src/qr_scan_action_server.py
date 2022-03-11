@@ -1,11 +1,12 @@
 #! /bin/python3
 from cmath import rect
 from enum import unique
+from tracemalloc import start
 from unittest import result
 import rospy
 import time
 import actionlib
-from kortex_scripts.msg import CustomActionMsgGoal, CustomActionMsgResult, CustomActionMsgFeedback, CustomActionMsgAction
+from kortex_scripts.msg import QRScanActionMsgGoal, QRScanActionMsgResult, QRScanActionMsgFeedback, QRScanActionMsgAction
 from actionlib.msg import TestFeedback, TestResult, TestAction
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Empty
@@ -18,8 +19,8 @@ import json
 class qr_decoder(object):
     
   # create messages that are used to publish feedback/result
-  _feedback = CustomActionMsgFeedback()
-  _result = CustomActionMsgResult()
+  _feedback = QRScanActionMsgFeedback()
+  _result = QRScanActionMsgResult()
   _success = False
   # decoder varriables
   _bridge = CvBridge()
@@ -29,7 +30,7 @@ class qr_decoder(object):
 
   def __init__(self):
     # creates the action server
-    self._as = actionlib.SimpleActionServer("action_custom_msg_as", CustomActionMsgAction, self.goal_callback, False)
+    self._as = actionlib.SimpleActionServer("qr_scan_as", QRScanActionMsgAction, self.goal_callback, False)
     self._as.start()
     self.ctrl_c = False
 
@@ -107,22 +108,26 @@ class qr_decoder(object):
     self._qr_codes_goal = goal.num_codes
     self._target = goal.data
     
+    start_time = time.time()
+    
     while True:
+      end_time = time.time()
       if self._success:
+        rospy.loginfo('Success')
+        self._as.set_succeeded(self._result)
         break
-      # check that preempt (cancelation) has not been requested by the action client
-      if self._as.is_preempt_requested():
+      elif self._as.is_preempt_requested():
+        rospy.loginfo('The goal has been cancelled/preempted')
+        self._as.set_preempted()
         self.unsubscribe()
         break
-
-    if self._success:
-      rospy.loginfo('Success')
-      self._as.set_succeeded(self._result)
-    else:
-      rospy.loginfo('The goal has been cancelled/preempted')
-      self._as.set_preempted()
+      elif end_time-start_time > goal.time_out:
+        rospy.loginfo('Time out reached before reaching goal')
+        self._as.set_aborted()
+        self.unsubscribe()
+        break
     
 if __name__ == '__main__':
-  rospy.init_node('action_custom_msg')
+  rospy.init_node('qr_scan_action_server')
   qr_decoder()
   rospy.spin()

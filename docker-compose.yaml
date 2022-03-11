@@ -45,4 +45,4 @@ volumes:
    driver_opts:
     o: bind
     type: none
-    device: ~/mor/kinova_dev_alex/ros_kortex
+    device: ./
