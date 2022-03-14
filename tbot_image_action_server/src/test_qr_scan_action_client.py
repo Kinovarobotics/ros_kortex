@@ -1,7 +1,6 @@
 #! /bin/python3
 
 import rospy
-import time
 import actionlib
 from kortex_scripts.msg import QRScanActionMsgGoal, QRScanActionMsgResult, QRScanActionMsgFeedback, QRScanActionMsgAction
 

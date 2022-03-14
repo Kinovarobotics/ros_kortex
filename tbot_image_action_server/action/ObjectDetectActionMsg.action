@@ -1,7 +1,7 @@
 #goal
 string path
-int32 num_objects
 float32 time_out
+float32 threshold
 ---
 #result
 int32 result

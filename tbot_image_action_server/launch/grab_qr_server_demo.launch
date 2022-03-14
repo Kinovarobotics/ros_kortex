@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <include file="$(find tbot_image_action_server)/launch/qr_scan_server.launch"/>
+    <include file="$(find tbot_image_action_server)/launch/object_detect_server.launch"/>
+</launch>

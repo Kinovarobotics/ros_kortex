@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <node pkg="tbot_image_action_server" name="object_detect_action_server_node" type="object_detect_action_server.py" output="screen" />
+</launch>

@@ -50,8 +50,8 @@ Visualization Manager:
       MoveIt_Allow_Replanning: true
       MoveIt_Allow_Sensor_Positioning: true
       MoveIt_Planning_Attempts: 10
-      MoveIt_Planning_Time: 5
-      MoveIt_Use_Cartesian_Path: false
+      MoveIt_Planning_Time: 60
+      MoveIt_Use_Cartesian_Path: true
       MoveIt_Use_Constraint_Aware_IK: true
       MoveIt_Workspace:
         Center:

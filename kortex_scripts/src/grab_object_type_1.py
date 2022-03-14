@@ -1,17 +1,15 @@
 #! /bin/python3
 
-import sys
-import copy
 import rospy
 import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
 import time
 import actionlib
-from kortex_scripts.msg import QRScanActionMsgGoal, QRScanActionMsgResult, QRScanActionMsgFeedback, QRScanActionMsgAction
+from tbot_image_action_server.msg import QRScanActionMsgGoal, QRScanActionMsgResult, QRScanActionMsgFeedback, QRScanActionMsgAction
+from tbot_image_action_server.msg import ObjectDetectActionMsgGoal, ObjectDetectActionMsgResult, ObjectDetectActionMsgFeedback, ObjectDetectActionMsgAction
 import json
 import string
-import random
 
 joint_state_topic = ['joint_states:=/my_gen3/joint_states']
 moveit_commander.roscpp_initialize(joint_state_topic)
@@ -23,8 +21,11 @@ arm = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_descr
 display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory, queue_size=1)
 gripper = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_description", ns="/my_gen3", name="gripper")
 
-client = actionlib.SimpleActionClient('/qr_scan_as', QRScanActionMsgAction)
-client.wait_for_server()
+qr_client = actionlib.SimpleActionClient('/qr_scan_as', QRScanActionMsgAction)
+qr_client.wait_for_server()
+print("connected to server")
+od_client = actionlib.SimpleActionClient('/object_detect_as', ObjectDetectActionMsgAction)
+od_client.wait_for_server()
 print("connected to server")
 
 def gripper_open(joints):
@@ -64,18 +65,45 @@ def go_inital_pose():
     arm.set_goal_tolerance(0.01)
     arm.set_pose_target(intital_pose)
     arm.plan()
-    arm.go(wait=True)   
-""" 
-object 3:
-x: 0.2699139227195213
-    y: -0.010353801232182273
-    z: 0.6145134933482234
-  orientation: 
-    x: -0.7064599743347221
-    y: -0.7077157430529102
-    z: 0.00455518964693978
-    w: 0.005655258202075091
-"""
+    arm.go(wait=True)  
+
+def execute_shortest_plan(group, pose_target):
+  group.set_pose_target(pose_target)
+  plans = []
+  points = []
+
+  for i in range(10):
+    plans.append(list(group.plan()))
+    points.append(len(plans[i][1].joint_trajectory.points))
+  
+  shortest_plan =  min(range(len(points)), key=points.__getitem__)
+  print(points)
+  print(shortest_plan)
+
+  group.execute(plans[shortest_plan][1], wait=True) 
+
+def od_result_callback(state, result):
+    if state == 3:
+        qr_goal.num_codes = result.result
+    else:
+        qr_goal.num_codes = 0
+
+def qr_result_callback(state, result):
+    #print(result)
+    global foo
+    if state != 3:
+        foo = 2
+        return
+    res = json.loads(result.result)
+    x_p_ind = res["pepper"]["polygon"]["point_a"].find(",")
+    x_pepper = int(res["pepper"]["polygon"]["point_a"][:x_p_ind].strip(string.ascii_letters + "()=,"))
+    x_t_ind = res["tomato"]["polygon"]["point_a"].find(",")
+    x_tomato = int(res["tomato"]["polygon"]["point_a"][:x_t_ind].strip(string.ascii_letters + "()=,"))
+    print("pepper: " + str(x_pepper) + ", tomoto: " + str(x_tomato))
+    if (x_pepper < x_tomato):
+        foo = 1
+    else: 
+        foo = 0
 
 pose_target_1 = geometry_msgs.msg.Pose()
 pose_target_1.position.x = 0.369913922
@@ -99,96 +127,106 @@ pose_target_4_up = copy_pose(pose_target_4, p_z)
 
 pose_list = [pose_target_1_up, pose_target_1, pose_target_1_up, pose_target_2_up, pose_target_2, pose_target_2_up, pose_target_3_up, pose_target_3, pose_target_3_up, pose_target_4_up, pose_target_4]
 joints = gripper.get_current_joint_values()
-go_inital_pose()
-gripper_open(joints)
 
-def result_callback(state, result):
-    #print(result)
-    global foo
-    if state != 3:
-        foo = 2
-        return
-    res = json.loads(result.result)
-    x_p_ind = res["pepper"]["polygon"]["point_a"].find(",")
-    x_pepper = int(res["pepper"]["polygon"]["point_a"][:x_p_ind].strip(string.ascii_letters + "()=,"))
-    x_t_ind = res["tomato"]["polygon"]["point_a"].find(",")
-    x_tomato = int(res["tomato"]["polygon"]["point_a"][:x_t_ind].strip(string.ascii_letters + "()=,"))
-    print("pepper: " + str(x_pepper) + ", tomoto: " + str(x_tomato))
-    if (x_pepper < x_tomato):
-        foo = 1
-    else: 
-        foo = 0
-
-
-goal = QRScanActionMsgGoal()
-goal.path = "/my_gen3/camera/color/image_raw"
-goal.data = ""
-goal.num_codes = 2
-goal.time_out = 10.0
-client.send_goal(goal, done_cb=result_callback)
-print("sent goal")
-client.wait_for_result()
-
-print(foo)
-time.sleep(1)
-if foo == 1:
-    
-    fraction = 0
-    arm.set_goal_tolerance(0.1)
-    while fraction<1.0:
-        waypoints = [pose_target_1_up, pose_target_1, ]
-        (plan, fraction) = arm.compute_cartesian_path(
-            waypoints, 0.01, 0  # waypoints to follow  # eef_step
-        )  # jump_threshold 
-        print("fraction: " + str(fraction))
-
-    print("fraction: " + str(fraction))
-    arm.execute(plan, wait=True)
-    time.sleep(1)
-    gripper_close(joints)
-    time.sleep(1)
-    
-    waypoints = [ pose_target_1_up, pose_target_4_up, pose_target_4]
-    fraction = 0
-    while fraction<1.0:
-        (plan, fraction) = arm.compute_cartesian_path(
-        waypoints, 0.01, 0  # waypoints to follow  # eef_step
-        )  # jump_threshold 
-        print("fraction: " + str(fraction))
-    print("fraction: " + str(fraction))
-    arm.execute(plan, wait=True)
-    time.sleep(1)
-    gripper_open(joints)
-
-elif foo == 0:
-    
-    waypoints = [pose_target_2_up, pose_target_2]
-    fraction = 0
-    while fraction<1.0:
-        (plan, fraction) = arm.compute_cartesian_path(
-            waypoints, 0.01, 0  # waypoints to follow  # eef_step
-        )  # jump_threshold 
-        print("fraction: " + str(fraction))
-    print("fraction: " + str(fraction))
-    arm.execute(plan, wait=True)
-    time.sleep(1)
-    gripper_close(joints)
-    time.sleep(1)
-    
-    waypoints = [ pose_target_2_up, pose_target_4_up, pose_target_4]
-    fraction = 0
-    while fraction<1.0:
-       (plan, fraction) = arm.compute_cartesian_path(
-        waypoints, 0.01, 0  # waypoints to follow  # eef_step
-        )  # jump_threshold
-    print("fraction: " + str(fraction))
-    arm.execute(plan, wait=True)
-    time.sleep(1)
-    gripper_open(joints)
-
-else: 
-    print("scan failed aborting to inital state")
-
+#arm.clear_trajectory_constraints()
+#pcm = moveit_msgs.msg.OrientationConstraint()
+#pcm.link_name = arm.get_end_effector_link()
+#pcm.absolute_x_axis_tolerance = 3.14 # ignore errors in the x-axis
+#pcm.absolute_y_axis_tolerance = 3.14 # ignore errors in the x-axis
+#pcm.absolute_z_axis_tolerance =  1.57 # enforce z-axis orientation
+#pcm.weight = 1000000
+#path_constraints = moveit_msgs.msg.Constraints()
+#path_constraints.orientation_constraints.append(pcm)
+#arm.set_path_constraints(path_constraints)
+while True:
     go_inital_pose()
+    #gripper_open(joints)
+
+    qr_goal = QRScanActionMsgGoal()
+    od_goal = ObjectDetectActionMsgGoal()
+    od_goal.path = "/my_gen3/camera/depth/image_raw"
+    od_goal.time_out = 1.0
+    od_goal.threshold = 0.090
+    od_client.send_goal(od_goal, done_cb=od_result_callback)
+    od_client.wait_for_result()
+
+    qr_goal.path = "/my_gen3/camera/color/image_raw"
+    qr_goal.data = ""
+    qr_goal.time_out = 1.0
+    print(qr_goal.num_codes)
+    qr_client.send_goal(qr_goal, done_cb=qr_result_callback)
+    print("sent goal")
+    qr_client.wait_for_result()
+
+    print(foo)
+    time.sleep(1)
+    if foo == 1:
+        
+        fraction = 0
+        arm.set_goal_tolerance(0.01)
+        # while fraction<1.0:
+        #     waypoints = [pose_target_1_up, pose_target_1, ]
+        #     (plan, fraction) = arm.compute_cartesian_path(
+        #         waypoints, 0.01, 0  # waypoints to follow  # eef_step
+        #     )  # jump_threshold 
+        #     print("fraction: " + str(fraction))
+
+        # print("fraction: " + str(fraction))
+        # arm.execute(plan, wait=True)
+        execute_shortest_plan(arm, pose_target_1_up)
+        execute_shortest_plan(arm, pose_target_1)
+        time.sleep(1)
+        #gripper_close(joints)
+        time.sleep(1)
+        
+        # waypoints = [ pose_target_1_up, pose_target_4_up, pose_target_4]
+        # fraction = 0
+        # while fraction<1.0:
+        #     (plan, fraction) = arm.compute_cartesian_path(
+        #     waypoints, 0.01, 0  # waypoints to follow  # eef_step
+        #     )  # jump_threshold 
+        #     print("fraction: " + str(fraction))
+        # print("fraction: " + str(fraction))
+        # arm.execute(plan, wait=True)
+        execute_shortest_plan(arm, pose_target_1_up)
+        execute_shortest_plan(arm, pose_target_4_up)
+        execute_shortest_plan(arm, pose_target_4)
+        time.sleep(1)
+        #gripper_open(joints)
+
+    elif foo == 0:
+        
+        # waypoints = [pose_target_2_up, pose_target_2]
+        # fraction = 0
+        # while fraction<1.0:
+        #     (plan, fraction) = arm.compute_cartesian_path(
+        #         waypoints, 0.01, 0  # waypoints to follow  # eef_step
+        #     )  # jump_threshold 
+        #     print("fraction: " + str(fraction))
+        # print("fraction: " + str(fraction))
+        # arm.execute(plan, wait=True)
+        execute_shortest_plan(arm, pose_target_2_up)
+        execute_shortest_plan(arm, pose_target_2)
+        time.sleep(1)
+        #gripper_close(joints)
+        time.sleep(1)
+        
+        # waypoints = [ pose_target_2_up, pose_target_4_up, pose_target_4]
+        # fraction = 0
+        # while fraction<1.0:
+        #    (plan, fraction) = arm.compute_cartesian_path(
+        #     waypoints, 0.01, 0  # waypoints to follow  # eef_step
+        #     )  # jump_threshold
+        # print("fraction: " + str(fraction))
+        # arm.execute(plan, wait=True)
+        execute_shortest_plan(arm, pose_target_2_up)
+        execute_shortest_plan(arm, pose_target_4_up)
+        execute_shortest_plan(arm, pose_target_4)
+        time.sleep(1)
+        #gripper_open(joints)
+
+    else: 
+        print("scan failed aborting to inital state")
+
 
 moveit_commander.roscpp_shutdown()

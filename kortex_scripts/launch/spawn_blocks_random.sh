@@ -2,6 +2,7 @@
 
 NUM=$((1 + $RANDOM % 2))
 echo $NUM
+NUM=2
 if (( $NUM == 1));
 then
     echo "pepper, tomato" 
