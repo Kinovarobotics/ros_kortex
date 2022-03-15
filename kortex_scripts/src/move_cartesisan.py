@@ -25,61 +25,63 @@ def execute_shortest_plan(group, pose_target):
   plans = []
   points = []
 
-  for i in range(10):
+  for i in range(1):
     plans.append(list(group.plan()))
     points.append(len(plans[i][1].joint_trajectory.points))
   
   shortest_plan =  min(range(len(points)), key=points.__getitem__)
-  print(points)
-  print(shortest_plan)
+  print("number of waypoints: " + str(points) )
+  print("shortest plan index: " + str(shortest_plan))
 
   group.execute(plans[shortest_plan][1], wait=True)
 
-# group.clear_trajectory_constraints()
-# pcm = moveit_msgs.msg.OrientationConstraint()
-# pcm.link_name = group.get_end_effector_link()
-# pcm.absolute_x_axis_tolerance = 3.14 # ignore errors in the x-axis
-# pcm.absolute_y_axis_tolerance = 3.14 # ignore errors in the x-axis
-# pcm.absolute_z_axis_tolerance =  1.57 # enforce z-axis orientation
-# pcm.weight = 1
-# pcm.orientation.w = 0.0003976815453087705
-# pcm.orientation.x = 0.004293068374565495
-# pcm.orientation.y = 0.9999850315352882
-# pcm.orientation.z = 0.0033686968829585847
-# path_constraints = moveit_msgs.msg.Constraints()
-# path_constraints.name = group.get_end_effector_link()
-# print((path_constraints.name))
-# path_constraints.orientation_constraints.append(pcm)
-# group.set_path_constraints(path_constraints)
 
+planning_time = 3
+x = 0
+#for x in range(5):
+group.clear_trajectory_constraints()
+print("planning time: " + str(planning_time/(x+1)))
+group.set_planning_time(planning_time/(x+1))
+pose_target = geometry_msgs.msg.Pose()
+pose_target.position.x = 0.20228798672323686
+pose_target.position.y = -0.0844410319119024
+pose_target.position.z = 0.8287765803854372
+pose_target.orientation.x = 0.004293068374565495
+pose_target.orientation.y = 0.9999850315352882
+pose_target.orientation.z = 0.0033686968829585847
+pose_target.orientation.w = 0.0003976815453087705
 
-while True:
-  pose_target = geometry_msgs.msg.Pose()
-  pose_target.position.x = 0.20228798672323686
-  pose_target.position.y = -0.0844410319119024
-  pose_target.position.z = 0.8287765803854372
-  pose_target.orientation.x = 0.004293068374565495
-  pose_target.orientation.y = 0.9999850315352882
-  pose_target.orientation.z = 0.0033686968829585847
-  pose_target.orientation.w = 0.0003976815453087705
-  
-  print(type(group))
-  print(type(pose_target))
-  execute_shortest_plan(group, pose_target)
-  
-  #plan_list = list(plan1)
-  #print(dir(plan_list[1].joint_trajectory.points))
-  #print(len(plan_list[1].joint_trajectory.points))
-  
-  pose_target = geometry_msgs.msg.Pose()
-  pose_target.position.x = 0.20228798672323686
-  pose_target.position.y = -0.2844410319119024
-  pose_target.position.z = 0.8287765803854372
-  pose_target.orientation.x = 0.004293068374565495
-  pose_target.orientation.y = 0.9999850315352882
-  pose_target.orientation.z = 0.0033686968829585847
-  pose_target.orientation.w = 0.0003976815453087705
+#print(type(group))
+#print(type(pose_target))
+execute_shortest_plan(group, pose_target)
+group.clear_trajectory_constraints()
+current_pose = group.get_current_pose()
+pcm = moveit_msgs.msg.OrientationConstraint()
+pcm.link_name = group.get_end_effector_link()
+pcm.absolute_x_axis_tolerance = 0.2 # ignore errors in the x-axis
+pcm.absolute_y_axis_tolerance = 0.2 # ignore errors in the x-axis
+pcm.absolute_z_axis_tolerance =  3.14 # enforce z-axis orientation
+pcm.header.frame_id = group.get_planning_frame()
+pcm.weight = 1
+pcm.orientation = current_pose.pose.orientation
+print(pcm.orientation)
+path_constraints = moveit_msgs.msg.Constraints()
+path_constraints.name = group.get_end_effector_link()
+path_constraints.orientation_constraints.append(pcm)
+group.set_path_constraints(path_constraints)
+#plan_list = list(plan1)
+#print(dir(plan_list[1].joint_trajectory.points))
+#print(len(plan_list[1].joint_trajectory.points))
 
-  execute_shortest_plan(group, pose_target)
+pose_target = geometry_msgs.msg.Pose()
+pose_target.position.x = 0.20228798672323686
+pose_target.position.y = -0.2844410319119024
+pose_target.position.z = 0.8287765803854372
+pose_target.orientation.x = 0.004293068374565495
+pose_target.orientation.y = 0.9999850315352882
+pose_target.orientation.z = 0.0033686968829585847
+pose_target.orientation.w = 0.0003976815453087705
+execute_shortest_plan(group, pose_target)
+  #break
 
 moveit_commander.roscpp_shutdown()
