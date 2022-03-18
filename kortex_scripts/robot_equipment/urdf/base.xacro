@@ -10,7 +10,7 @@
         <xacro:worker_simple/>
 
         <joint name="chair-base_joint" type="fixed">
-            <origin xyz="0.16 0 -0.44" rpy="0 0 0" />
+            <origin xyz="0.1 0 0" rpy="0 3.14 0" />
             <parent link="chair_link" />
             <child link="base_link" />
             <axis xyz="0 0 0" />
@@ -20,12 +20,13 @@
             <inertial>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <mass value="4" />
-                <xacro:box_inertia mass="4" x="0.1" y="0.1" z="0.9" />
+                <xacro:box_inertia mass="4" x="0.2" y="0.1" z="0.0125" />
             </inertial>
             <visual>
-                <origin xyz="-0.075 -.075 -0.45" rpy="1.57 0 1.57" />
+                <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="package://kortex_scripts/robot_equipment/meshes/parametric_chair.STL" />
+                    <!-- <mesh filename="package://kortex_scripts/robot_equipment/meshes/parametric_chair.STL" /> -->
+                    <box size="0.2 0.1 0.0125"/>
                 </geometry>
                 <material name="grey">
                     <color rgba="0.75 0.75 0.75 1"/>
@@ -34,7 +35,7 @@
             <collision>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <box size="0.1 0.1 0.9"/>
+                    <box size="0.2 0.1 0.0125"/>
                 </geometry>
             </collision>
         </link>

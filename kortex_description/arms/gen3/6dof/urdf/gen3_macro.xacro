@@ -29,7 +29,7 @@
         </geometry>
       </collision>
     </link>
-    <xacro:if value="${base}">
+    <xacro:if value="${base}"> <!--I added this-->
       <xacro:chair/>
     </xacro:if>
     <link name="${prefix}shoulder_link">
