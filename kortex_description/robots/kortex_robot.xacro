@@ -25,7 +25,7 @@
         <!-- Run the macros -->
 
         <!-- For gazebo-->
-        <xacro:if value="${sim}">
+        <!-- <xacro:if value="${sim}">
             <link name="world" />
             <joint name="world_to_root" type="fixed">
                 <xacro:if value="${base}">
@@ -37,7 +37,7 @@
                 <parent link="world" />
                 <origin xyz="0 0 0.01" rpy="0 0 0" />    
             </joint> 
-        </xacro:if>
+        </xacro:if> -->
         
         
         <!-- Load the arm -->

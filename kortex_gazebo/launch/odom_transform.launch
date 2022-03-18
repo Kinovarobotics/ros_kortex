@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="tf" type="static_transform_publisher" name="odom_world_tf" args="0 0 0 1 0 0 0 world odom 50" /> <!--identity quaternion 1 0 0 0-->
+</launch>

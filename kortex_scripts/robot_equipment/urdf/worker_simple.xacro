@@ -122,6 +122,19 @@
             <child link="chair_link" />
             <axis xyz="0 0 0" />
         </joint>
+        
+        <gazebo>
+            <plugin name="omni_steering" filename="libgazebo_ros_planar_move.so">
+            <commandTopic>cmd_vel</commandTopic>
+            <odometryTopic>odom</odometryTopic>
+            <odometryFrame>odom</odometryFrame>
+            <odometryRate>50.0</odometryRate>
+            <robotBaseFrame>worker_body_link</robotBaseFrame>
+            <publishTF>true</publishTF>
+            <!--<robotNamespace>/bosco</robotNamespace>-->
+            <cmdTimeout>-1.0</cmdTimeout>
+            </plugin>
+        </gazebo>
 
     </xacro:macro>
 </robot>
