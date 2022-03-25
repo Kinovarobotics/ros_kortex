@@ -10,6 +10,15 @@
   <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roslaunch</build_depend>
+
+  <build_depend>controller_manager</build_depend>
+  <build_depend>gazebo_ros</build_depend>
+  <build_depend>joint_state_publisher</build_depend>
+  
+  <run_depend>controller_manager</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <run_depend>joint_state_publisher</run_depend>
+  
   <run_depend>kortex_control</run_depend>
   <run_depend>kortex_driver</run_depend>
   <run_depend>robot_state_publisher</run_depend>
@@ -24,6 +33,9 @@
   <run_depend>moveit_msgs</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>std_srvs</run_depend>
+  
+  <run_depend>ant_worker_description</run_depend>
+
   <export>
     <gazebo_ros gazebo_media_path="${prefix}"/>
     <architecture_independent />

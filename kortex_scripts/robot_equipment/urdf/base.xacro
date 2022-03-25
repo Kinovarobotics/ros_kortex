@@ -4,13 +4,22 @@
 
     <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/macros.xacro"/>
     <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/properties.xacro"/>
-    <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/worker_simple.xacro"/>
+    <!-- <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/worker_simple.xacro"/> -->
+    <xacro:include filename= "$(find ant_worker_description)/urdf/worker.urdf.xacro"/>
 
     <xacro:macro name="chair">
-        <xacro:worker_simple/>
+        <!-- <xacro:worker_simple/> -->
+        <xacro:pls_work/>
+
+        <joint name="elevator_top_joint" type="fixed">
+            <origin xyz="0.1 0 0" rpy="0 3.14 0" />
+            <parent link="elevator_shaft" />
+            <child link="chair_link" />
+            <axis xyz="0 0 0" />
+        </joint>
 
         <joint name="chair-base_joint" type="fixed">
-            <origin xyz="0.1 0 0" rpy="0 3.14 0" />
+            <origin xyz="-0.1 0 0" rpy="0 3.14 0" />
             <parent link="chair_link" />
             <child link="base_link" />
             <axis xyz="0 0 0" />
