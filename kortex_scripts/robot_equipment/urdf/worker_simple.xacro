@@ -131,7 +131,7 @@
             <odometryRate>50.0</odometryRate>
             <robotBaseFrame>worker_body_link</robotBaseFrame>
             <publishTF>true</publishTF>
-            <!--<robotNamespace>/bosco</robotNamespace>-->
+            <!-- <robotNamespace>/bosco</robotNamespace> -->
             <cmdTimeout>-1.0</cmdTimeout>
             </plugin>
         </gazebo>

@@ -25,7 +25,7 @@ def execute_shortest_plan(group, pose_target):
   plans = []
   points = []
 
-  for i in range(1):
+  for i in range(10):
     plans.append(list(group.plan()))
     points.append(len(plans[i][1].joint_trajectory.points))
   
