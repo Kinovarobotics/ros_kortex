@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:macro name="worker_mods">
+
+        <link name="spool_link">
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <mass value="${spool_mass}" />
+                <xacro:cylinder_inertia mass="${spool_mass}" r="${spool_radius}" l="${spool_length} " />
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder radius="${spool_radius}" length="${spool_length}" />
+                </geometry>
+                <material name="grey">
+                    <color rgba="0.75 0.75 0.75 1"/>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder radius="${spool_radius}" length="${spool_length}" />
+                </geometry>
+            </collision>
+        </link>
+
+        <link name="bio_container_link">
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <mass value="${bio_container_mass}" />
+                <xacro:box_inertia mass="${bio_container_mass}" x="${bio_container_length}" y="${bio_container_width}" z="${bio_container_height}" />
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://kortex_scripts/robot_equipment/meshes/linear_bio_holder.STL"/>
+                </geometry>
+                <material name="grey">
+                    <color rgba="0.75 0.75 0.75 1"/>
+                </material>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://kortex_scripts/robot_equipment/meshes/linear_bio_holder.STL"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="worker_body_spool_joint" type="fixed">
+            <origin xyz="-0.38 0.0 0.07" rpy="0 0 0" />
+            <parent link="worker_body_link" />
+            <child link="spool_link" />
+            <axis xyz="0 0 0" />
+        </joint>
+
+        <joint name="worker_body_bio_joint" type="fixed">
+            <origin xyz="0.005 0.065 0.025" rpy="1.57 0 0" />
+            <parent link="worker_body_link" />
+            <child link="bio_container_link" />
+            <axis xyz="0 0 0" />
+        </joint>
+
+    </xacro:macro>
+</robot>

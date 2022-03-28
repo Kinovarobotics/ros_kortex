@@ -10,7 +10,7 @@
     <!-- Initial position in Gazebo -->
     <arg name="x0" default="0"/>
     <arg name="y0" default="0"/>
-    <arg name="z0" default="1"/>
+    <arg name="z0" default="0"/>
 
     <!-- Arm type -->
     <arg name="arm" default="gen3"/>
