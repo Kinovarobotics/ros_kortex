@@ -16,6 +16,4 @@
             <arg name="verbose" value="true"/>
         </include>
 
-        <!-- <include file="$(find kortex_gazebo)/launch/odom_transform.launch"/> -->
-
     </launch>

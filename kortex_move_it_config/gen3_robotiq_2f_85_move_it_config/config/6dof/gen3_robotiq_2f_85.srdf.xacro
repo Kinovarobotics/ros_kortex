@@ -76,7 +76,7 @@
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="gripper" parent_link="base_link" group="gripper"/>
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
-    <virtual_joint name="elevator_chair_link" type="fixed" parent_frame="worker_base_link" child_link="chair_link"/>
+    <!-- <virtual_joint name="elevator_chair_link" type="fixed" parent_frame="worker_base_link" child_link="chair_link"/> -->
     <!--PASSIVE JOINT: Purpose: this element is used to mark joints that are not actuated-->
     <passive_joint name="left_inner_finger_joint"/>
     <passive_joint name="left_inner_knuckle_joint"/>

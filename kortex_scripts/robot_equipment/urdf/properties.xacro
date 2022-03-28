@@ -1,16 +1,6 @@
 <?xml version="1.0"?>
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-    <xacro:property name="worker_length" value="0.95"/>
-    <xacro:property name="worker_width" value="0.55"/>
-    <xacro:property name="worker_height" value="0.5"/>
-    <xacro:property name="worker_mass" value="100"/>
-
-    <xacro:property name="mast_length" value="1.5"/>
-    <xacro:property name="mast_radius" value="0.055"/>
-    <xacro:property name="mast_mass" value="30"/>
-    <xacro:property name="mast_edge_center_distance" value="0.1"/>
-    <xacro:property name="mast_height_offset" value="-0.4"/>
 
     <xacro:property name="spool_length" value="0.1"/>
     <xacro:property name="spool_radius" value="0.2"/>

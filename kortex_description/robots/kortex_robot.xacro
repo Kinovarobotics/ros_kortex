@@ -20,25 +20,25 @@
             <xacro:unless value="${not gripper}">
                 <xacro:include filename="$(find kortex_description)/grippers/${gripper}/urdf/${gripper}_transmission_macro.xacro" />
             </xacro:unless>
+    
+            <xacro:if value="${vision}">
+                <xacro:include filename="$(find kortex_scripts)/robot_equipment/urdf/rgbd_camera.xacro" />
+            </xacro:if>
         </xacro:if>
 
         <!-- Run the macros -->
 
         <!-- For gazebo-->
-        <!-- <xacro:if value="${sim}">
-            <link name="world" />
-            <joint name="world_to_root" type="fixed">
-                <xacro:if value="${base}">
-                    <child link="worker_body_link" />
-                </xacro:if>
-                <xacro:if value="${not base}">
+        <xacro:if value="${not base}">
+            <xacro:if value="${sim}">
+                <link name="world" />
+                <joint name="world_to_root" type="fixed">
                     <child link="base_link" />
-                </xacro:if>
-                <parent link="world" />
-                <origin xyz="0 0 0.01" rpy="0 0 0" />    
-            </joint> 
-        </xacro:if> -->
-        
+                    <parent link="world" />
+                    <origin xyz="0 0 0.01" rpy="0 0 0" />    
+                </joint> 
+            </xacro:if>
+        </xacro:if>
         
         <!-- Load the arm -->
         <xacro:load_arm parent="" dof="${dof}" vision="${vision}" base="${base}" prefix="${prefix}">
