@@ -23,7 +23,7 @@ class object_finder(object):
   _success = False
   # decoder varriables
   _bridge = CvBridge()
-  _thresh = 0.09
+  _thresh = 0.1
 
   def __init__(self):
     # creates the action server

@@ -1,0 +1,4 @@
+<launch>
+    <include file="$(find kortex_gazebo)/launch/spawn_kortex_robot.launch"/>
+    
+</launch>

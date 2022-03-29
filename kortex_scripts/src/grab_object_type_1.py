@@ -63,9 +63,10 @@ def go_inital_pose():
     intital_pose.position.y = -0.07132525403895153
     intital_pose.position.z = 0.8022677259334249
     arm.set_goal_tolerance(0.01)
-    arm.set_pose_target(intital_pose)
-    arm.plan()
-    arm.go(wait=True)  
+    execute_shortest_plan(arm, intital_pose)
+    # arm.set_pose_target(intital_pose)
+    # arm.plan()
+    # arm.go(wait=True)  
 
 def execute_shortest_plan(group, pose_target):
   group.set_pose_target(pose_target)
@@ -108,7 +109,7 @@ def qr_result_callback(state, result):
 pose_target_1 = geometry_msgs.msg.Pose()
 pose_target_1.position.x = 0.369913922
 pose_target_1.position.y = -0.01035380
-pose_target_1.position.z = 0.614513493
+pose_target_1.position.z = 0.514513493
 pose_target_1.orientation.x = -0.706459
 pose_target_1.orientation.y = -0.707715
 pose_target_1.orientation.z = 0.0045551
@@ -146,7 +147,7 @@ while True:
     od_goal = ObjectDetectActionMsgGoal()
     od_goal.path = "/my_gen3/camera/depth/image_raw"
     od_goal.time_out = 1.0
-    od_goal.threshold = 0.090
+    od_goal.threshold = 0.06
     od_client.send_goal(od_goal, done_cb=od_result_callback)
     od_client.wait_for_result()
 
