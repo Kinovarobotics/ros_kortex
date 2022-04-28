@@ -2,7 +2,11 @@ roslaunch kortex_driver kortex_driver.launch 'dof:=6' 'gripper:=robotiq_2f_85'
 roslaunch kinova_vision kinova_vision_rgbd.launch
 
 docker exec -it irl_kortex_main_1 bash -c "source /opt/ros/noetic/setup.bash;
-	cd pkg/catkin_ws;
-	catkin_make;
-        source /pkg/catkin_ws/devel/setup.bash;
-        rosrun kortex_scripts positions_to_file.py"
+        cd catkin_ws;
+        catkin_make;
+        source /catkin_ws/devel/setup.bash;
+        rosrun kortex_scripts positions_from_file.py"
+        
+/ros_kortex/kortex_scripts/position_files/gt4.txt
+
+
