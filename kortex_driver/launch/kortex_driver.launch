@@ -3,7 +3,7 @@
     
     <!-- Arm configuration -->
     <arg name="arm" default="gen3"/>
-    <arg name="dof" default="7" if="$(eval arg('arm') == 'gen3')"/> <!-- Number of degrees of freedom of the arm -->
+    <arg name="dof" default="6" if="$(eval arg('arm') == 'gen3')"/> <!-- Number of degrees of freedom of the arm -->
     <arg name="dof" default="6" if="$(eval arg('arm') == 'gen3_lite')"/> <!-- Number of degrees of freedom of the arm -->
     <arg name="vision" default="true"/> <!-- True if the arm has a Vision module -->
     <arg name="use_hard_limits" default="false"/> <!-- Set soft limits as hard limits (Gen3 only) -->
@@ -38,23 +38,21 @@
         <group if="$(eval not arg('prefix'))">
             <!-- Load the description for the robot -->
             <!-- Without gripper -->
-            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false"
+            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) base:=false sim:=false"
                 if="$(eval not arg('gripper'))"/>
             <!-- With gripper -->
-            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false"
+            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) base:=false sim:=false"
                 unless="$(eval not arg('gripper'))"/>
         </group>
         <group unless="$(eval not arg('prefix'))">
             <!-- Load the description for the robot -->
             <!-- Without gripper -->
-            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false prefix:=$(arg prefix)"
+            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false prefix:=$(arg prefix) base:=false"
                 if="$(eval not arg('gripper'))"/>
             <!-- With gripper -->
-            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false prefix:=$(arg prefix)"
+            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find kortex_description)/robots/$(arg arm)_$(arg gripper).xacro dof:=$(arg dof) vision:=$(arg vision) sim:=false prefix:=$(arg prefix) base:=false"
                 unless="$(eval not arg('gripper'))"/>
         </group>
-
-
 
         <!-- Start the kortex_driver node -->
         <node name="$(arg robot_name)_driver" pkg="kortex_driver" type="kortex_arm_driver" output="screen"> <!--launch-prefix="gdb -ex run args"-->

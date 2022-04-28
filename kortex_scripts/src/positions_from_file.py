@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-from turtle import position
+# from turtle import position
 import rospy
 import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
 import json
+import signal
+import sys
 
 joint_state_topic = ['joint_states:=/my_gen3/joint_states']
 moveit_commander.roscpp_initialize(joint_state_topic)
@@ -15,6 +17,12 @@ scene = moveit_commander.PlanningSceneInterface(ns="/my_gen3")
 arm = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_description", ns="/my_gen3", name="arm")
 display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory, queue_size=1)
 gripper = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_description", ns="/my_gen3", name="gripper")
+
+def signal_handler(sig, frame):
+    print('You pressed Ctrl+C!')
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
 
 def deepcopy_pose(original):
     copy = geometry_msgs.msg.Pose()
@@ -62,10 +70,11 @@ def execute_shortest_plan(group, pose_target):
 
 name = input("enter name of file, ctrl c to quit \n")
 pose_list = get_poses_from_file(name)
-arm.set_goal_tolerance(0.01)
+arm.set_goal_tolerance(0.001)
 arm.set_planner_id("RRTConnect")
-for x in pose_list:
-    execute_shortest_plan(arm, x)
+for i in range(10):
+    for x in pose_list:
+        execute_shortest_plan(arm, x)
 moveit_commander.roscpp_shutdown()
 
 

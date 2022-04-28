@@ -3,10 +3,11 @@ version: '3'
 services:
   roscore:
     image: osrf/ros:noetic-desktop-full
-    networks:
-      - tbot_net
-    ports:
-      - 11311:11311
+    # networks:
+    #   - tbot_net
+    network_mode: host
+    # ports:
+    #   - 11311:11311
     command: stdbuf -o L roscore
 
   main:
@@ -17,7 +18,7 @@ services:
     #user: ${ID}
     environment:
       - DISPLAY=${DISPLAY}
-      - "ROS_MASTER_URI=http://roscore:11311"
+      # - "ROS_MASTER_URI=http://roscore:11311"
       #- "XAUTHORITY=${XAUTH}"
       - "QT_X11_NO_MITSHM=1"
     volumes:
@@ -27,22 +28,60 @@ services:
       #- "/etc/shadow:/etc/shadow:ro" 
       #- "/etc/sudoers.d:/etc/sudoers.d:ro"
       - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
-      - main_vol:/pkg/ros_kortex
-    networks:
-      - tbot_net
+      - ros_kortex_vision:/ros_kortex_vision
+      - ros_kortex:/ros_kortex
+    # networks:
+    #   - tbot_net
+    network_mode: host
     runtime: nvidia
-    depends_on:
-      - roscore
-    command: roslaunch kortex_gazebo spawn_kortex_robot.launch
+    # depends_on:
+    #   - roscore
+    command: roslaunch kortex_driver kortex_driver.launch 'dof:=6' 'gripper:=robotiq_2f_85'
+    # command: tail -F anything
+
+  vision:
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: tbot/vision:latest
+    #user: ${ID}
+    environment:
+      - DISPLAY=${DISPLAY}
+      # - "ROS_MASTER_URI=http://roscore:11311"
+      #- "XAUTHORITY=${XAUTH}"
+      - "QT_X11_NO_MITSHM=1"
+    volumes:
+      #- "/home/${USER}:/home/${USER}:rw"
+      #- "/etc/group:/etc/group:ro"
+      #- "/etc/passwd:/etc/passwd:ro"
+      #- "/etc/shadow:/etc/shadow:ro" 
+      #- "/etc/sudoers.d:/etc/sudoers.d:ro"
+      - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
+      - ros_kortex_vision:/ros_kortex_vision
+      - ros_kortex:/ros_kortex
+    # networks:
+    #   - tbot_net
+    network_mode: host
+    runtime: nvidia
+    # depends_on:
+    #   - main
+    command: roslaunch kinova_vision kinova_vision_rgbd.launch
+    # command: tail -F anything
     
-networks:
-  tbot_net:
-    driver: bridge
+# networks:
+#   tbot_net:
+#     driver: bridge
 
 volumes:
-  main_vol:
+  ros_kortex:
    driver: local
    driver_opts:
     o: bind
     type: none
-    device: ./
+    device: ./ros_kortex
+  ros_kortex_vision:
+   driver: local
+   driver_opts:
+    o: bind
+    type: none
+    device: ./ros_kortex_vision

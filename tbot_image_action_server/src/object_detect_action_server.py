@@ -31,14 +31,17 @@ class object_finder(object):
     self._as.start()
     self.ctrl_c = False
     self._feedback.feedback = "found: 0 objects"
+    print("started server")
 
   def callback(self,data):
+    print("recived request")
     try:
       cv_image = self._bridge.imgmsg_to_cv2(data, desired_encoding="32FC1")
     except CvBridgeError as e:
       rospy.logerr(e)
 
     image = cv_image.copy() #numpy array
+    
     #resized_image = cv2.resize(image, (600, 300))
     cv_image_array = np.array(image, dtype = np.dtype('f8'))
     cv_image_norm = cv2.normalize(cv_image_array, cv_image_array, 0, 1, cv2.NORM_MINMAX)
@@ -47,23 +50,26 @@ class object_finder(object):
     #image = cv2.resize(img_bw, (600, 300))
     color_image = img_bw.astype(np.uint8)
     negative_img = cv2.bitwise_not(color_image)
+    print(str(negative_img.shape))
+    negative_img = negative_img[20:240,80:400]
 
     cnts = cv2.findContours(negative_img.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     cnts = imutils.grab_contours(cnts)
 
     for c in cnts:
       M = cv2.moments(c)
-      cX = int(M["m10"] / M["m00"]) # find center x cord
-      cY = int(M["m01"] / M["m00"]) # find center y cord
-      cv2.drawContours(blurred, [c], -10, (255, 255, 255), 3)
-      cv2.circle(blurred, (cX, cY), 7, (255, 255, 255), -1)
-      cv2.putText(blurred, "center", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+      if M["m00"] != 0:
+        cX = int(M["m10"] / M["m00"]) # find center x cord
+        cY = int(M["m01"] / M["m00"]) # find center y cord
+        cv2.drawContours(blurred, [c], -10, (255, 255, 255), 3)
+        cv2.circle(blurred, (cX, cY), 7, (255, 255, 255), -1)
+        cv2.putText(blurred, "center", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
 
     if len(cnts) >= self._result.result:
         self._feedback.feedback = "found: " + str(len(cnts)) + " objects"
         self._result.result = len(cnts)
         cv2.imshow("Camera output normal", blurred)
-        cv2.waitKey(1000)
+        cv2.waitKey(0)
         self._as.publish_feedback(self._feedback)
 
   def unsubscribe(self):

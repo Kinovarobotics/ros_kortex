@@ -13,9 +13,13 @@ client.wait_for_server()
 print("connected to server")
 
 # goal = ObjectDetectActionMsgGoal()
-# goal.path = "/my_gen3/camera/depth/image_raw"
+# goal.path = "/camera/depth/image_raw"
 # goal.time_out = 1.0
-# goal.threshold = 0.01
+# goal.threshold = 0.025
+# print("seending goal")
+# client.send_goal(goal, feedback_cb=feedback_callback)
+# client.wait_for_result()
+# rospy.loginfo("thesh: "+str(goal.threshold))
 
 
 
@@ -27,8 +31,8 @@ print("connected to server")
 counter = 0
 while True:
     goal = ObjectDetectActionMsgGoal()
-    goal.path = "/my_gen3/camera/depth/image_raw"
-    goal.time_out = 1.0
+    goal.path = "/camera/depth/image_raw"
+    goal.time_out = 3.0
     goal.threshold = 0.01 + 0.01*counter
     print("seending goal")
     client.send_goal(goal, feedback_cb=feedback_callback)

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import sys
-from turtle import position
 import rospy
 import moveit_commander
 import json

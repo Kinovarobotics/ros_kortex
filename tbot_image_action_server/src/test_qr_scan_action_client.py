@@ -13,9 +13,9 @@ client.wait_for_server()
 print("connected to server")
 
 goal = QRScanActionMsgGoal()
-goal.path = "/my_gen3/camera/color/image_raw"
+goal.path = "/camera/color/image_raw"
 goal.data = ""
-goal.num_codes = 2
+goal.num_codes = 1
 goal.time_out = 2.0
 
 client.send_goal(goal, feedback_cb=feedback_callback)
