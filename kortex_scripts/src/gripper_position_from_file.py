@@ -72,7 +72,7 @@ def execute_shortest_plan(group, pose_target):
 
 name = input("enter name of file, ctrl c to quit \n")
 pose_list = get_poses_from_file(name)
-arm.set_goal_tolerance(0.001)
+arm.set_goal_tolerance(0.0005)
 arm.set_planner_id("RRTConnect")
 pub = rospy.Publisher('/chatter', String, queue_size=10)
 rate = rospy.Rate(1) # 10hz
@@ -82,7 +82,7 @@ for i in range(10):
             pub.publish("0")
         else:
             execute_shortest_plan(arm, x)
-            pub.publish("4000")
+            pub.publish("2000")
 moveit_commander.roscpp_shutdown()
 
 
