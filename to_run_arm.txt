@@ -6,7 +6,19 @@ docker exec -it irl_kortex_main_1 bash -c "source /opt/ros/noetic/setup.bash;
         catkin_make;
         source /catkin_ws/devel/setup.bash;
         rosrun kortex_scripts positions_from_file.py"
+
+
+docker exec -it irl_kortex_main_1 bash -c "source /opt/ros/noetic/setup.bash;
+        rostopic list"
         
 /ros_kortex/kortex_scripts/position_files/gt4.txt
+/ros_kortex/kortex_scripts/position_files/santiy_test.txt
 
 
+ros2 run ros1_bridge static_bridge
+
+docker exec -it irl_kortex_main_1 bash -c "source /opt/ros/noetic/setup.bash;
+        cd catkin_ws;
+        catkin_make;
+        source /catkin_ws/devel/setup.bash;
+        rosrun kortex_scripts gripper_position_from_file.py"

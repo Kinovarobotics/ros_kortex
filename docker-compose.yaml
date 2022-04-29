@@ -68,9 +68,9 @@ services:
     command: roslaunch kinova_vision kinova_vision_rgbd.launch
     # command: tail -F anything
     
-# networks:
-#   tbot_net:
-#     driver: bridge
+networks:
+  tbot_net:
+    driver: bridge
 
 volumes:
   ros_kortex:
