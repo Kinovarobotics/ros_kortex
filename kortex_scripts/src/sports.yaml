@@ -1,0 +1,20 @@
+#lists
+
+sports:
+
+  - soccer
+  - football
+  - basketball
+  - cricket
+  - hockey
+  - table tennis
+
+countries:
+
+  - Pakistan
+  - USA
+  - India
+  - China
+  - Germany
+  - France
+  - Spain

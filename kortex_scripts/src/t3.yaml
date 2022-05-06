@@ -1,0 +1,19 @@
+arm:
+  gripper:
+    positions: []
+    states:
+      active: true
+      leading: false
+      num_poses: 0
+  orientation:
+    w: 0.49983181424095124
+    x: 0.5001684996296304
+    y: 0.49976178224018225
+    z: 0.5002377339455326
+  position:
+    x: 0.5733517434141878
+    y: 0.0013534440758175106
+    z: 0.4336153547829898
+states:
+  active: false
+  'sequence:': 1
