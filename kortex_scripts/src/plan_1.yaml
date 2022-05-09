@@ -15,8 +15,15 @@ position_space:
   home : &home
     reference: *base
     coordinate_system: cartesian
-    position: *keep_position
-    orientation: *keep_orientaion
+    position:
+      x: 0.5733623213798791
+      y: 0.0013628390872182
+      z: 0.4336940493210303
+    orientation:
+      x: 0.5001588071242329
+      y: 0.49971039886807134
+      z: 0.5002860851384385
+      w: 0.49984449375384127
 
   pose_1: &pose_1
     reference: *base
@@ -53,6 +60,16 @@ position_space:
       z: 0.3
     orientation: *keep_orientaion
 
+  pose_4: &pose_4
+    reference: *pose_3
+    coordinate_system: cartesisan
+    position: *keep_position
+    orientation:
+      x: 0.200212448
+      y: -0.463748186
+      z: 0.194036261
+      w: -0.45191347
+
 sequence: 
   - move:
       - *pose_1
@@ -62,3 +79,4 @@ sequence:
 
   - move:
       - *pose_3
+      - *pose_4

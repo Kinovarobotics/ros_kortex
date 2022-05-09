@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from copy import copy
 from os.path import exists
 from asyncore import read
 from shutil import move
@@ -23,19 +24,23 @@ class KortexPathPlanner:
         self.group = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_description", ns="/my_gen3", name="arm")
         self.responses = {"q1": "r w a x"}
 
+    def recursive_deepcopy_pose(self, original, copy): #geometry_msgs.msg.Pose()
+        if "reference" in original:
+            self.recursive_deepcopy_pose(original["reference"], copy)
+        copy.position.x += original["position"]["x"]
+        copy.position.y += original["position"]["y"]
+        copy.position.z += original["position"]["z"]
+        copy.orientation.x += original["orientation"]["x"]
+        copy.orientation.y += original["orientation"]["y"]
+        copy.orientation.z += original["orientation"]["z"]
+        copy.orientation.w += original["orientation"]["w"]
+        return copy
+
     def deepcopy_pose_list(self, original):
-        copy_list = []
+        waypoints = []
         for x in original:
-            copy = geometry_msgs.msg.Pose()
-            copy.position.x = x["position"]["x"] + x["reference"]["position"]["x"]
-            copy.position.y = x["position"]["y"] + x["reference"]["position"]["y"]
-            copy.position.z = x["position"]["z"] + x["reference"]["position"]["z"]
-            copy.orientation.x = x["orientation"]["x"] + x["reference"]["orientation"]["x"]
-            copy.orientation.y = x["orientation"]["y"] + x["reference"]["orientation"]["y"]
-            copy.orientation.z = x["orientation"]["z"] + x["reference"]["orientation"]["z"]
-            copy.orientation.w = x["orientation"]["w"] + x["reference"]["orientation"]["w"]
-            copy_list.append(copy)
-        return copy_list
+            waypoints.append(self.recursive_deepcopy_pose(x, geometry_msgs.msg.Pose()))
+        return waypoints
 
     def execute_shortest_plan(self, group, pose_target):
         group.set_pose_target(pose_target)
