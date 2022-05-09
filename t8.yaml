@@ -1,0 +1,36 @@
+- arm:
+  - gripper:
+      positions: null
+      states:
+        active: false
+        leading: false
+        num_poses: 0
+    orientation:
+      w: 0.49983311816593906
+      x: 0.5001693613376302
+      y: 0.49976093822926315
+      z: 0.5002364126928681
+    position:
+      x: 0.573351743682452
+      y: 0.0013509036901594267
+      z: 0.4336153448746312
+  - gripper:
+      positions:
+      - 500
+      - 100
+      states:
+        active: true
+        leading: true
+        num_poses: 2
+    orientation:
+      w: 0.49983199369901904
+      x: 0.5001683159697224
+      y: 0.4997619749506458
+      z: 0.5002375457403282
+    position:
+      x: 0.5733517416076149
+      y: 0.001353444117984091
+      z: 0.4336153483544091
+  states:
+    active: true
+    sequence: 2
