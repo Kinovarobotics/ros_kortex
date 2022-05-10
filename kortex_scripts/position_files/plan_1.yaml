@@ -1,0 +1,98 @@
+--- # T-Bot movement sequence
+
+position_space:
+  base: &base
+    position: &keep_position
+      x: 0
+      y: 0
+      z: 0
+    orientation: &keep_orientaion
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+      
+  home : &home
+    reference: *base
+    coordinate_system: cartesian
+    position:
+      x: 0.5733623213798791
+      y: 0.0013628390872182
+      z: 0.4336940493210303
+    orientation:
+      x: 0.5001588071242329
+      y: 0.49971039886807134
+      z: 0.5002860851384385
+      w: 0.49984449375384127
+
+  pose_1: &pose_1
+    reference: *base
+    coordinate_system: carteisian
+    position: 
+      x: 0.5538713536704086
+      y: 0.14822860287597414
+      z: 0.05064980967246541
+    orientation:
+      x: 0.5165503294621757
+      y: 0.4960243643019245
+      z: 0.5012316519862156
+      w: 0.48569786719581165
+
+  pose_2: &pose_2
+    reference: *base
+    coordiate_system: cartesian
+    position: 
+      x: 0.5545229992959383
+      y: 0.43827810589353405
+      z: 0.06127856099121542
+    orientation:
+      x: 0.515246219735643
+      y: 0.4961917227660027
+      z: 0.5030803542740119
+      w: 0.4850002726289665
+    
+  pose_3: &pose_3
+    reference: *pose_2
+    coordinate_system: cartesian
+    position: 
+      x: 0
+      y: 0
+      z: 0.3
+    orientation: *keep_orientaion
+
+  pose_4: &pose_4
+    reference: *pose_3
+    coordinate_system: cartesisan
+    position: *keep_position
+    orientation:
+      x: 0.200212448
+      y: -0.463748186
+      z: 0.194036261
+      w: -0.45191347
+
+  pose_5: &pose_5
+    reference: *pose_4
+    coordinate_system: cartesisan
+    position:
+      x: 0
+      y: 0
+      z: 0.3
+    orientation: *keep_orientaion
+
+sequence: 
+  - move:
+      - *pose_1
+      - *pose_2
+      - *pose_3
+      - *pose_4
+  
+  - sleep: 2
+
+  - move:
+      - *pose_1
+  - move:
+      - *pose_2
+  - move:
+      - *pose_3
+  - move:
+      - *pose_4

@@ -1,0 +1,16 @@
+--- # T-Bot movement sequence empty example
+
+position_space:
+  base: &base
+    position: &keep_position
+      x: 0
+      y: 0
+      z: 0
+    orientation: &keep_orientaion
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+
+sequence: 
+  -

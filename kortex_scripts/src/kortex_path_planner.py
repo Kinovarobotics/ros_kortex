@@ -5,6 +5,8 @@ from asyncore import read
 from shutil import move
 import sys
 from unittest import loader
+
+from pyrfc3339 import generate
 import rospy
 import moveit_commander
 import signal
@@ -22,7 +24,7 @@ class KortexPathPlanner:
         moveit_commander.roscpp_initialize(self.joint_state_topic)
         self.robot = moveit_commander.RobotCommander(robot_description="/my_gen3/robot_description") 
         self.group = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_description", ns="/my_gen3", name="arm")
-        self.responses = {"q1": "r w a x"}
+        self.responses = {"q1": "r w a x", "primative_functions": "move sleep"}
 
     def recursive_deepcopy_pose(self, original, copy): #geometry_msgs.msg.Pose()
         if "reference" in original:
@@ -42,21 +44,36 @@ class KortexPathPlanner:
             waypoints.append(self.recursive_deepcopy_pose(x, geometry_msgs.msg.Pose()))
         return waypoints
 
-    def execute_shortest_plan(self, group, pose_target):
-        group.set_pose_target(pose_target)
+    def generate_single_point_plan(self, itterations, pose_target):
+        self.group.set_pose_target(pose_target)
         plans = []
         points = []
-
-        for i in range(20):
-            plans.append(list(group.plan()))
+        for i in range(itterations):
+            plans.append(list(self.group.plan()))
             points.append(len(plans[i][1].joint_trajectory.points))
-        
-        shortest_plan =  min(range(len(points)), key=points.__getitem__)
-        print(points)
-        print(shortest_plan)
 
-        group.execute(plans[shortest_plan][1], wait=True)
-            
+        shortest_plan =  min(range(len(points)), key=points.__getitem__)
+        # print(points)
+        # print(shortest_plan)
+        return plans[shortest_plan][1]
+
+    def generate_multi_point_plan(self, waypoints):
+        fraction = 0
+        while fraction<1.0:
+            (plan, fraction) = self.group.compute_cartesian_path(waypoints, 0.01, 0)  # waypoints to follow # eef_step # jump_threshold 
+        #     print("fraction: " + str(fraction))
+        # print("fraction: " + str(fraction))
+        return plan
+
+    def execute_shortest_plan(self, waypoints, itterations):
+        if len(waypoints) == 1:
+            plan = self.generate_single_point_plan(itterations, waypoints[0])
+            self.group.execute(plan, wait=True)
+
+        elif len(waypoints) > 1:
+            plan = self.generate_multi_point_plan(waypoints)
+            self.group.execute(plan, wait=True)
+     
     def read_from_file(self, file_name):
         try:
             with open(file_name, 'r') as file:
@@ -69,22 +86,29 @@ class KortexPathPlanner:
         with open(file_name, 'w') as file:
             documents = yaml.dump(data, file)
 
-    def execute_file(self, file_name):
-        with open(file_name, 'r') as file:
-            contents = yaml.load(file, Loader=yaml.FullLoader)
-            total_actions = len(contents["sequence"])
+    def primative_functions(self, contents):
+        for x in contents:
+            if "move" in iter(x):
+                print("moving")
+                waypoints = self.deepcopy_pose_list(x["move"])
+                # print(waypoints)
+                self.execute_shortest_plan(waypoints, 20)
 
-            for x in contents["sequence"]:
-                if "move" in iter(x):
-                    waypoints = self.deepcopy_pose_list(x["move"])
-                    print(waypoints)
-                    for y in waypoints:
-                        self.execute_shortest_plan(self.group, y)
+            elif "sleep" in iter(x):
+                print("sleeping: " + str(x["sleep"]))
+                time.sleep(x["sleep"])
+                print("woke up")
 
-                elif "sleep" in iter(x):
-                    print("sleeping: " + str(x["sleep"]))
-                    time.sleep(x["sleep"])
-                    print("woke up")
+    def execute_file(self, sequence):
+        for i in range(len(sequence)):
+
+            if "do" in iter(sequence[i]):
+                for k in range(sequence[i]["do"]["count"]):
+                    print("preforming loop: " + str(k+1) + "/" + str(sequence[i]["do"]["count"]))
+                    self.primative_functions(sequence[i]["do"]["loop"])
+            
+            elif "move" in iter(sequence[i]) or "sleep" in iter(sequence[i]):
+                self.primative_functions([sequence[i]])
 
     def append_to_file(self, data, file_name):
         # with open(file_name, 'a') as file:
@@ -117,7 +141,8 @@ class KortexPathPlanner:
             elif "w" in response:
                 print("Not yet implemented: 2")
             elif "x" in response:
-                self.execute_file(file_name)
+                contents = self.read_from_file(file_name)
+                self.execute_file(contents["sequence"])
 
             else:
                 contents = self.append_to_file(file_name)

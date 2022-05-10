@@ -70,13 +70,30 @@ position_space:
       z: 0.194036261
       w: -0.45191347
 
-sequence: 
-  - move:
-      - *pose_1
-      - *pose_2
-  
-  - sleep: 2
+  pose_5: &pose_5
+    reference: *pose_4
+    coordinate_system: cartesisan
+    position:
+      x: 0
+      y: 0
+      z: 0.3
+    orientation: *keep_orientaion
 
+sequence:
+  - loop: &loop
+    - move:
+        - *pose_1
+        - *pose_2
+        - *pose_3
+        - *pose_4
+    
+    - sleep: 1
+  
   - move:
-      - *pose_3
-      - *pose_4
+      - *pose_5
+
+  - do:
+      loop: *loop
+      count: 2
+      
+
