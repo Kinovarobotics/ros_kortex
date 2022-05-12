@@ -1,3 +1,5 @@
+xhost +local:root
+
 roslaunch kortex_driver kortex_driver.launch 'dof:=6' 'gripper:=robotiq_2f_85'
 roslaunch kinova_vision kinova_vision_rgbd.launch
 

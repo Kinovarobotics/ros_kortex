@@ -4,8 +4,7 @@ from os.path import exists
 from asyncore import read
 from shutil import move
 import sys
-from unittest import loader
-
+from std_msgs.msg import String
 from pyrfc3339 import generate
 import rospy
 import moveit_commander
@@ -24,6 +23,8 @@ class KortexPathPlanner:
         moveit_commander.roscpp_initialize(self.joint_state_topic)
         self.robot = moveit_commander.RobotCommander(robot_description="/my_gen3/robot_description") 
         self.group = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_description", ns="/my_gen3", name="arm")
+        self.pub = rospy.Publisher('/chatter', String, queue_size=10)
+        self.rate = rospy.Rate(0.5) # 10hz
         self.responses = {"q1": "r w a x", "primative_functions": "move sleep"}
 
     def recursive_deepcopy_pose(self, original, copy): #geometry_msgs.msg.Pose()
@@ -99,6 +100,13 @@ class KortexPathPlanner:
                 time.sleep(x["sleep"])
                 print("woke up")
 
+            elif "eef" in iter(x):
+                print("eef\n" + str(x))
+                for i in range(len(x["eef"])):
+                    self.rate.sleep()
+                    # print(str(x["eef"][i]))
+                    self.pub.publish(str(x["eef"][i]))
+                    
     def execute_file(self, sequence):
         for i in range(len(sequence)):
 
@@ -107,7 +115,7 @@ class KortexPathPlanner:
                     print("preforming loop: " + str(k+1) + "/" + str(sequence[i]["do"]["count"]))
                     self.primative_functions(sequence[i]["do"]["loop"])
             
-            elif "move" in iter(sequence[i]) or "sleep" in iter(sequence[i]):
+            elif "move" in iter(sequence[i]) or "sleep" in iter(sequence[i]) or "eef" in iter(sequence[i]):
                 self.primative_functions([sequence[i]])
 
     def append_to_file(self, data, file_name):

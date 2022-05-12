@@ -10,23 +10,15 @@ services:
     #   - 11311:11311
     command: stdbuf -o L roscore
 
-  main:
+  driver:
     build:
       context: .
       dockerfile: dockerfile
     image: tbot/main:latest
-    #user: ${ID}
     environment:
       - DISPLAY=${DISPLAY}
-      # - "ROS_MASTER_URI=http://roscore:11311"
-      #- "XAUTHORITY=${XAUTH}"
       - "QT_X11_NO_MITSHM=1"
     volumes:
-      #- "/home/${USER}:/home/${USER}:rw"
-      #- "/etc/group:/etc/group:ro"
-      #- "/etc/passwd:/etc/passwd:ro"
-      #- "/etc/shadow:/etc/shadow:ro" 
-      #- "/etc/sudoers.d:/etc/sudoers.d:ro"
       - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
       - ros_kortex_vision:/ros_kortex_vision
       - ros_kortex:/ros_kortex
@@ -44,18 +36,10 @@ services:
       context: .
       dockerfile: dockerfile
     image: tbot/vision:latest
-    #user: ${ID}
     environment:
       - DISPLAY=${DISPLAY}
-      # - "ROS_MASTER_URI=http://roscore:11311"
-      #- "XAUTHORITY=${XAUTH}"
       - "QT_X11_NO_MITSHM=1"
     volumes:
-      #- "/home/${USER}:/home/${USER}:rw"
-      #- "/etc/group:/etc/group:ro"
-      #- "/etc/passwd:/etc/passwd:ro"
-      #- "/etc/shadow:/etc/shadow:ro" 
-      #- "/etc/sudoers.d:/etc/sudoers.d:ro"
       - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
       - ros_kortex_vision:/ros_kortex_vision
       - ros_kortex:/ros_kortex
@@ -68,9 +52,9 @@ services:
     command: roslaunch kinova_vision kinova_vision_rgbd.launch
     # command: tail -F anything
     
-networks:
-  tbot_net:
-    driver: bridge
+# networks:
+#   tbot_net:
+#     driver: bridge
 
 volumes:
   ros_kortex:

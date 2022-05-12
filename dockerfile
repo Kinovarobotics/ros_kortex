@@ -17,6 +17,12 @@ ENV NVIDIA_VISIBLE_DEVICES \
 ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
+# RUN mkdir catkin_ws
+# RUN mkdir catkin_ws/src
+# ADD ros_kortex /catkin_ws/src
+# RUN source /opt/ros/noetic/setup.bash
+# RUN catkin_make
+
 ADD my_ros_entrypoint.sh /usr/bin/my_ros_entrypoint
 RUN chmod +x /usr/bin/my_ros_entrypoint
 
