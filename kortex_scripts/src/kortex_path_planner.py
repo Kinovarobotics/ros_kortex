@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 from copy import copy
 from os.path import exists
-from asyncore import read
-from shutil import move
 import sys
 from std_msgs.msg import String
-from pyrfc3339 import generate
 import rospy
 import moveit_commander
 import signal

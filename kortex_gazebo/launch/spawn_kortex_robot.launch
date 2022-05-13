@@ -19,7 +19,7 @@
     <arg name="vision" default="true"/> <!-- True if the arm has a Vision module -->
     
     <!-- Default gripper for Gen3 is none, default gripper for Gen3 lite is gen3_lite_2f -->
-    <arg name="gripper" default="robotiq_2f_85" if="$(eval arg('arm') == 'gen3')"/>
+    <arg name="gripper" default="" if="$(eval arg('arm') == 'gen3')"/>
     <arg name="gripper" default="gen3_lite_2f" if="$(eval arg('arm') == 'gen3_lite')"/>
     
     <arg name="robot_name" default="my_$(arg arm)"/>

@@ -21,7 +21,7 @@ services:
   main:
     build:
       context: .
-      dockerfile: arm_dockerfile
+      dockerfile: dockerfile
     image: tbot/main:latest
     environment:
       - DISPLAY=${DISPLAY}
@@ -29,23 +29,36 @@ services:
     volumes:
       - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
       - ros_kortex:/ros_kortex
+      - ros_kortex_vision:/ros_kortex_vision
     # networks:
     #   - tbot_net
     network_mode: host
     runtime: nvidia
-    # depends_on:
-    #   - roscore
-    command: roslaunch kortex_gazebo spawn_kortex_robot.launch 'dof:=6' 'gripper:=robotiq_2f_85' 'base:=false'
+    depends_on:
+      - roscore
+    command: roslaunch kortex_gazebo spawn_kortex_robot.launch 'dof:=6' 'base:=false' --wait
     # command: tail -F anything
 
-networks:
-  tbot_net:
-    driver: bridge
+# networks:
+#   tbot_net:
+#     driver: bridge
 
 volumes:
+  catkin_ws:
+   driver: local
+   driver_opts:
+    o: bind
+    type: none
+    device: ../catkin_ws
   ros_kortex:
    driver: local
    driver_opts:
     o: bind
     type: none
-    device: ./ros_kortex
+    device: ../ros_kortex
+  ros_kortex_vision:
+   driver: local
+   driver_opts:
+    o: bind
+    type: none
+    device: ../ros_kortex_vision
