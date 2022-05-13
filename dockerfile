@@ -17,11 +17,24 @@ ENV NVIDIA_VISIBLE_DEVICES \
 ENV NVIDIA_DRIVER_CAPABILITIES \
     ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
 
-# RUN mkdir catkin_ws
-# RUN mkdir catkin_ws/src
-# ADD ros_kortex /catkin_ws/src
-# RUN source /opt/ros/noetic/setup.bash
-# RUN catkin_make
+SHELL ["/bin/bash", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN mkdir -p /catkin_ws/src
+COPY . /catkin_ws/src/ros_kortex
+
+WORKDIR /catkin_ws
+
+RUN /bin/bash -c "source /opt/ros/noetic/setup.bash \
+        && catkin_make"
+
+# RUN source /opt/ros/noetic/setup.bash \
+#     && catkin config --extend /opt/ros/noetic \
+#     && catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release \
+#     && catkin_make
+
+RUN echo 'source "/opt/ros/noetic/setup.bash"' >> ~/.bashrc \
+    && echo 'source "/catkin_ws/devel/setup.bash"' >> ~/.bashrc
 
 ADD my_ros_entrypoint.sh /usr/bin/my_ros_entrypoint
 RUN chmod +x /usr/bin/my_ros_entrypoint
