@@ -2,8 +2,6 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-    <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/macros.xacro"/>
-    <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/properties.xacro"/>
     <xacro:include filename= "$(find ant_worker_description)/urdf/worker.urdf.xacro"/>
     <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/worker_mods.xacro"/>
 

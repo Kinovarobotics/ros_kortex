@@ -6,6 +6,8 @@
             
         <!-- Files to include -->
         <xacro:include filename="$(find kortex_description)/arms/${arm}/${dof}dof/urdf/${arm}_macro.xacro" />
+        <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/macros.xacro"/>
+        <xacro:include filename= "$(find kortex_scripts)/robot_equipment/urdf/properties.xacro"/>
         <xacro:unless value="${not gripper}">
             <xacro:include filename="$(find kortex_description)/grippers/${gripper}/urdf/${gripper}_macro.xacro" />
         </xacro:unless>
@@ -52,6 +54,7 @@
         </xacro:unless>
         <!-- If no gripper, define tool frame here -->
         <xacro:if value="${not gripper}">
+            <xacro:include filename="$(find kortex_scripts)/robot_equipment/urdf/mag_gripper_end_effector.xacro" />
             <link name="${prefix}tool_frame"/>
             <joint name="${prefix}tool_frame_joint" type="fixed">
                 <origin xyz="0 0 0" rpy="0 0 0" />
@@ -59,6 +62,7 @@
                 <child link="${prefix}tool_frame" />
                 <axis xyz="0 0 0" />
             </joint>
+            <xacro:mag_gripper_end_effector/>
         </xacro:if>
 
         <!-- Load the Gazebo transmissions and gazebo_ros_control plugin -->

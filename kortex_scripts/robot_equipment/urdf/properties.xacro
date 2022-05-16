@@ -10,4 +10,8 @@
     <xacro:property name="bio_container_width" value="0.12"/>
     <xacro:property name="bio_container_height" value="0.05"/>
     <xacro:property name="bio_container_mass" value="0.1"/>
+
+    <xacro:property name="mag_gripper_end_effector_mass" value="0.170"/>
+    <xacro:property name="mag_gripper_end_effector_length" value="0.0865"/>
+    <xacro:property name="mag_gripper_end_effector_radius" value="0.040"/>
 </robot>
