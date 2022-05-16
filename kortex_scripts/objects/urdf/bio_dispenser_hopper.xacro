@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<robot name="dispenser_hopper" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:include filename= "$(find kortex_scripts)/objects/urdf/macros.xacro"/>
+
+    <xacro:property name="lenght" value="0.058"/>
+    <xacro:property name="width" value="0.058"/>
+    <xacro:property name="height" value="0.1"/>
+    <xacro:property name="mass" value="0.1"/>
+
+    <xacro:macro name="dispenser_hopper" params ="" >
+      <link name='hopper_base_link'>
+ 	    <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="${mass}" />
+            <xacro:box_inertia mass="${mass}" x="${lenght}" y="${width}" z="${height}" />
+        </inertial>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${lenght} ${width} ${height}"/>
+                </geometry>
+            </collision>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://kortex_scripts/objects/meshes/bio_dispenser_hopper.dae" />
+            </geometry>
+        </visual>
+        </link>
+
+        <gazebo reference="hopper_base_link">
+            <kp>100000.0</kp>
+            <kd>100.0</kd>
+            <mu1>100</mu1>
+            <mu2>100</mu2>
+        </gazebo>
+    </xacro:macro>
+    
+    <xacro:dispenser_hopper/>
+
+</robot>
+<!--xacro qr_tomato_grasp_block.xacro > tmp.urdf && check_urdf tmp.urdf && rm tmp.urdf-->

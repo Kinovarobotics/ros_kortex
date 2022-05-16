@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+
+    <arg name="x" default="0.26" />
+    <arg name="y" default="0" />
+    <arg name="z" default="0.1" />
+    <arg name="R" default="0" />
+    <arg name="P" default="0" />
+    <arg name="Y" default="0" />
+    <arg name="object_name" default="bio_dispenser_hopper" />
+    <arg name="xacro_file_path" default="$(find kortex_scripts)/objects/urdf/bio_dispenser_hopper.xacro" />
+    
+    <!-- Load the URDF into the ROS Parameter Server -->
+    <param name="object_description" command="$(find xacro)/xacro $(arg xacro_file_path)" />
+    
+    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+        args="-urdf -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y) -model $(arg object_name) -param object_description"/>
+
+</launch>

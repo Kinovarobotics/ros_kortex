@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:macro name = "mag_gripper_end_effector" params = "">
+         <link name="mag_gripper_end_effector">
+ 	        <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <mass value="${mag_gripper_end_effector_mass}" />
+                <xacro:cylinder_inertia mass="${mag_gripper_end_effector_mass}" r="${mag_gripper_end_effector_radius}" l="${mag_gripper_end_effector_length} " />
+            </inertial>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <cylinder radius="${mag_gripper_end_effector_radius}" length="${mag_gripper_end_effector_length}"/>
+                </geometry>
+            </collision>
+            <visual>
+                <origin rpy="0.0 3.14 0" xyz="0 0 0"/>
+                <geometry>
+                    <mesh filename="package://kortex_scripts/robot_equipment/meshes/mag_gripper_eef.dae"/>
+                    <!-- <cylinder radius="${mag_gripper_end_effector_radius}" length="${mag_gripper_end_effector_length}"/> -->
+                </geometry>
+                <!-- <material name="grey">
+                    <color rgba="0.75 0.75 0.75 1"/>
+                </material> -->
+            </visual>
+        </link>
+
+        <joint name="tool_frame_eef_joint" type="fixed">
+                <origin xyz="0 0 0.04325" rpy="0 0 0" />
+                <parent link="${prefix}tool_frame" />
+                <child link="mag_gripper_end_effector" />
+                <axis xyz="0 0 0" />
+        </joint>
+
+        <link name="end_effector">
+            <gravity>0</gravity>
+            <visual>
+                <origin rpy="0 0 0" xyz="0 0 0"/>
+                <geometry>
+                <box size="0.01 0.01 0.01"/>
+                </geometry>
+                <material name="transparent">
+                <color rgba="0 0 0 0"/>
+                </material>
+            </visual>
+            <inertial>
+                <origin rpy="0 0 0" xyz="0.000000 0.000000 0.000000"/>
+                <mass value="0.0001"/>
+                <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
+            </inertial>
+            </link>
+
+            <joint name="end_joint" type="revolute">
+                <parent link="mag_gripper_end_effector" />
+                <child link="end_effector" />
+                <origin rpy="0 0 0" xyz="0 0 0.05325" />
+                <limit effort="30" velocity="1.0" lower="0" upper="0" />
+            </joint>
+            <gazebo>
+                <plugin name="gazebo_ros_vacuum_gripper" filename="libgazebo_ros_vacuum_gripper.so">
+                    <robotNamespace>/my_gen3/mag_gripper</robotNamespace>
+                    <bodyName>end_effector</bodyName>
+                    <topicName>grasping</topicName>
+                </plugin>
+            </gazebo>
+    </xacro:macro>
+
+</robot>

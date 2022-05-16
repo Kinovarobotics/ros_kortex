@@ -1,0 +1,30 @@
+--- # T-Bot movement sequence empty example
+
+position_space:
+  base: &base
+    position: &keep_position
+      x: 0
+      y: 0
+      z: 0
+    orientation: &keep_orientaion
+      x: 0
+      y: 0
+      z: 0
+      w: 0
+
+  home: &home
+    reference: *base
+    coordiante_system: cartesian
+    position: 
+      x: 0.24309303721803524
+      y: 0.0013548267142013788
+      z: 0.5955558598753989
+    orientation: 
+      x: -0.0030582193289425473
+      y: -6.52305214401942e-05
+      z: 0.9999953211681308
+      w: 2.6102926753909144e-05
+
+sequence: 
+  - move: 
+    - *home
