@@ -26,7 +26,7 @@
         <param name="use_gui" value="true"/>
         <param name="rate" value="30" />
     </node>
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
     <!-- Start RViz -->
     <node name="rviz" pkg="rviz" type="rviz" output="log" args="-f base_link" if="$(arg start_rviz)"/> 
