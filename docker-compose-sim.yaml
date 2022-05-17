@@ -29,7 +29,7 @@ services:
     volumes:
       - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
       - ros_kortex:/ros_kortex
-      - ros_kortex_vision:/ros_kortex_vision
+      # - ros_kortex_vision:/ros_kortex_vision
     # networks:
     #   - tbot_net
     network_mode: host
@@ -56,9 +56,9 @@ volumes:
     o: bind
     type: none
     device: ../ros_kortex
-  ros_kortex_vision:
-   driver: local
-   driver_opts:
-    o: bind
-    type: none
-    device: ../ros_kortex_vision
+  # ros_kortex_vision:
+  #  driver: local
+  #  driver_opts:
+  #   o: bind
+  #   type: none
+  #   device: ../ros_kortex_vision

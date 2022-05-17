@@ -1,3 +1,12 @@
+# tbot
+This series of packages has been modified and expanded upon to implement the greenhouse manipulator tbot. Once this repo has been cloned it can be built using docker for simulation or for the real kinova kortex gen 3 manipultor by using the respecitve commands:
+
+        xhost +local:docker
+        docker-compose -f docker-compose-sim.yaml up
+        docker-compose -f docker-compose-real.yaml up 
+
+At the time of writing, all files for the simulation docker-compose file are present and it is functional, However the real arm is dependant on the `ros_kortex_vision` package which has been forked here: https://github.com/ecoation-labs/ros_kortex_vision. Both version have been tested on an Ubuntu 20.04 pc, the real version is a little dated and might be unreliable at time of witing. The Image will take a few minutes to build the first time but once build the container should spin up fast.
+
 # ros_kortex
  ROS Kortex is the official ROS package to interact with Kortex and its related products. It is built upon the Kortex API, documentation for which can be found in the [GitHub Kortex repository](https://github.com/Kinovarobotics/kortex).
 
@@ -61,6 +70,12 @@ As you see, there are instructions to install the Conan package manager. You can
 ## Contents
 
 The following is a description of the packages included in this repository.
+
+### kortex_scripts
+This package contains code to fulfill the primary objectives of TBOT as well as serving as a main repository for experiements.
+
+### tbot_image_action_server
+This package contains the code and interfaces neccesary to utilizes the camera feed provided by the 'ros_kortex_vision' package. Some of the scripts in 'kortex_scripts' interact with this package
 
 ### kortex_control
 This package implements the simulation controllers that control the arm in Gazebo. For more details, please consult the [README](kortex_control/readme.md) from the package subdirectory.
