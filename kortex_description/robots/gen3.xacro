@@ -10,7 +10,7 @@
 
     <xacro:arg name="gripper" default="" />
 
-    <xacro:arg name="sim" default="false" />
+    <xacro:arg name="sim" default="true" />
     <xacro:arg name="prefix" default="" />
 
     <xacro:include filename="$(find kortex_description)/robots/kortex_robot.xacro" />

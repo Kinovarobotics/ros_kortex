@@ -1,3 +1,15 @@
 # The name of this file shouldn't be changed, or else the Setup Assistant won't detect it
 sensors:
-  - {}
+    -   far_clipping_plane_distance: 5.0
+        filtered_cloud_topic: filtered_cloud
+        image_topic: /my_gen3/camera/depth/points
+        max_range: 5.0
+        max_update_rate: 1.0
+        near_clipping_plane_distance: 0.3
+        padding_offset: 0.1
+        padding_scale: 1.0
+        point_cloud_topic: /my_gen3/camera/depth/points
+        point_subsample: 1
+        queue_size: 5
+        sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
+        shadow_threshold: 0.2

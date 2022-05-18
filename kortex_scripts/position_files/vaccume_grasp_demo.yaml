@@ -16,48 +16,94 @@ position_space:
     reference: *base
     coordiante_system: cartesian
     position: 
-      x: 0.24309303721803524
-      y: 0.0013548267142013788
-      z: 0.5955558598753989
+      x: 0.2599373936064211
+      y: -0.06556275180447203
+      z: 0.4281767787097115
     orientation: 
-      x: -0.0030582193289425473
-      y: -6.52305214401942e-05
-      z: 0.9999953211681308
-      w: 2.6102926753909144e-05
+      x: -0.010601392650241575
+      y: -0.9996050745130696
+      z: 0.024279332325628164
+      w: 0.009371206081304675
+
 
   prepare_grab: &prepare_grab
     reference: *base
     coordinate_system: cartesian
     position: 
-      x: 0.2585740583248144
-      y: -0.23466826918294054
-      z: 0.038846908840760926
+      x: 0.2572867906947075
+      y: -0.1551393063469211
+      z: 0.06763479165271269
     orientation: 
-      x: 0.7167868444160087
-      y: -0.0022925527563267428
-      z: 0.0016714271240113765
-      w: 0.6972865768142752
+      x: 0.013953106910462447
+      y: 0.7087513783422827
+      z: 0.7053194892177763
+      w: 0.0011011970920943217
+
 
   grab: &grab
-    reference: *base
+    reference: *prepare_grab
     coordinate_system: cartesian
     position:
-      x: 0.2585740583248144
-      y: -0.18466826918294054
-      z: 0.048846908840760926
-    orientation:
-      x: 0.7167868444160087
-      y: -0.0022925527563267428
-      z: 0.0016714271240113765
-      w: 0.6972865768142752
+      x: 0
+      y: 0.06
+      z: 0
+    orientation: *keep_orientaion
+
+  target_1: &target_1
+    reference: *grab
+    coordinate_system: cartesian
+    position:
+      x: 0
+      y: 0
+      z: 0.5
+    orientation: *keep_orientaion
+
+  target_2: &target_2
+    reference: *base
+    coordinate_system: cartesian
+    position: 
+      x: 0.18358971262312931
+      y: -0.694763985444087
+      z: 0.43379762323929266
+    orientation: 
+      x: 0.7033458382918825
+      y: -0.03508201688623919
+      z: -0.05033442146515984
+      w: 0.7081951213221193
+
+  dispense_10g: &dispense_10g
+    - 1000
+    - 0
+    - 4000
 
 
-sequence: 
+
+sequence:
+  - eef:
+    - false
+
   - move:
     - *home
+    - *prepare_grab
+    - *grab
+
+  - eef:
+    - true
   
   - move:
-    - *prepare_grab
-    
+    - *target_1
+  
   - move:
+    - *target_2
+
+  - eef: *dispense_10g
+
+  - move:
+    - *target_1
     - *grab
+  
+  - eef:
+    - false
+
+  - move:
+    - *home
