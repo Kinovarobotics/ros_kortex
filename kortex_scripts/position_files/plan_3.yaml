@@ -87,7 +87,11 @@ position_space:
 sequence: 
 
   - loop: &loop
-    - eef: *dispense_10g
+    - eef: 
+      - on
+      - off
+      - *dispense_10g
+
 
   - do:
       loop: *loop

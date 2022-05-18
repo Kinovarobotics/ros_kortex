@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-from copy import copy
 from os.path import exists
+from queue import Empty
 import sys
 from std_msgs.msg import String
+from std_srvs.srv import Empty
 import rospy
 import moveit_commander
 import signal
@@ -21,6 +22,8 @@ class KortexPathPlanner:
         self.robot = moveit_commander.RobotCommander(robot_description="/my_gen3/robot_description") 
         self.group = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_description", ns="/my_gen3", name="arm")
         self.pub = rospy.Publisher('/chatter', String, queue_size=10)
+        self.on_srv = rospy.ServiceProxy('/my_gen3/mag_gripper/on', Empty)
+        self.off_srv = rospy.ServiceProxy('/my_gen3/mag_gripper/off', Empty)
         self.rate = rospy.Rate(0.5) # 10hz
         self.responses = {"q1": "r w a x", "primative_functions": "move sleep"}
 
@@ -101,8 +104,14 @@ class KortexPathPlanner:
                 print("eef\n" + str(x))
                 for i in range(len(x["eef"])):
                     self.rate.sleep()
-                    # print(str(x["eef"][i]))
-                    self.pub.publish(str(x["eef"][i]))
+                    if x["eef"][i]:
+                        print("sending on" + str(self.on_srv()))
+                    elif not x["eef"][i]:
+                        print("sending off" + str(self.off_srv()))
+                    else:
+                        # print(str(x["eef"][i]))
+                        self.pub.publish(str(x["eef"][i]))
+                    
                     
     def execute_file(self, sequence):
         for i in range(len(sequence)):

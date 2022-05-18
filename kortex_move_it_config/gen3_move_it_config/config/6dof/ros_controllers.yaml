@@ -13,3 +13,4 @@ controller_list:
       - $(arg prefix)joint_4
       - $(arg prefix)joint_5
       - $(arg prefix)joint_6
+

@@ -94,7 +94,7 @@
 
         <!-- Without gripper -->
         <node name="$(arg prefix)$(arg arm)_trajectory_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-            output="screen" args="$(arg prefix)$(arg arm)_joint_trajectory_controller $(arg prefix)joint_state_controller"
+            output="screen" args="$(arg prefix)$(arg arm)_joint_trajectory_controller $(arg prefix)joint_state_controller "
             if="$(eval not arg('gripper'))"/>
 
         <!-- With gripper -->

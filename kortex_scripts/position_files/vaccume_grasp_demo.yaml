@@ -25,6 +25,39 @@ position_space:
       z: 0.9999953211681308
       w: 2.6102926753909144e-05
 
+  prepare_grab: &prepare_grab
+    reference: *base
+    coordinate_system: cartesian
+    position: 
+      x: 0.2585740583248144
+      y: -0.23466826918294054
+      z: 0.038846908840760926
+    orientation: 
+      x: 0.7167868444160087
+      y: -0.0022925527563267428
+      z: 0.0016714271240113765
+      w: 0.6972865768142752
+
+  grab: &grab
+    reference: *base
+    coordinate_system: cartesian
+    position:
+      x: 0.2585740583248144
+      y: -0.18466826918294054
+      z: 0.048846908840760926
+    orientation:
+      x: 0.7167868444160087
+      y: -0.0022925527563267428
+      z: 0.0016714271240113765
+      w: 0.6972865768142752
+
+
 sequence: 
-  - move: 
+  - move:
     - *home
+  
+  - move:
+    - *prepare_grab
+    
+  - move:
+    - *grab

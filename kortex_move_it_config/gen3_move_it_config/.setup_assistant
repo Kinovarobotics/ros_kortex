@@ -8,4 +8,4 @@ moveit_setup_assistant_config:
   CONFIG:
     author_name: Alexandre Vannobel
     author_email: avannobel@kinova.ca
-    generated_timestamp: 1652726075
+    generated_timestamp: 1652888673
