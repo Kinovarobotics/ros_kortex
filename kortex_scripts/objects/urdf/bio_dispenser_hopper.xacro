@@ -3,10 +3,10 @@
 
     <xacro:include filename= "$(find kortex_scripts)/objects/urdf/macros.xacro"/>
 
-    <xacro:property name="lenght" value="0.058"/>
-    <xacro:property name="width" value="0.058"/>
+    <xacro:property name="lenght" value="0.081"/>
+    <xacro:property name="width" value="0.062"/>
     <xacro:property name="height" value="0.1"/>
-    <xacro:property name="mass" value="0.1"/>
+    <xacro:property name="mass" value="0.160"/>
 
     <xacro:macro name="dispenser_hopper" params ="" >
       <link name='hopper_base_link'>

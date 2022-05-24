@@ -7,7 +7,6 @@ from std_srvs.srv import Empty
 import rospy
 import moveit_commander
 import signal
-import rospy
 import moveit_msgs.msg
 import geometry_msgs.msg
 import yaml
@@ -104,9 +103,10 @@ class KortexPathPlanner:
                 print("eef\n" + str(x))
                 for i in range(len(x["eef"])):
                     self.rate.sleep()
-                    if x["eef"][i]:
+                    print(type(x["eef"][i]))
+                    if x["eef"][i] and type(x["eef"][i]) == bool:
                         print("sending on" + str(self.on_srv()))
-                    elif not x["eef"][i]:
+                    elif not x["eef"][i] and type(x["eef"][i]) == bool:
                         print("sending off" + str(self.off_srv()))
                     else:
                         # print(str(x["eef"][i]))

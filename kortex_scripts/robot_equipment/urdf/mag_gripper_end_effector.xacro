@@ -54,8 +54,8 @@
             <joint name="end_joint" type="revolute">
                 <parent link="mag_gripper_end_effector" />
                 <child link="end_effector" />
-                <origin rpy="0 0 0" xyz="0 0 0.05325" />
-                <limit effort="30" velocity="1.0" lower="0" upper="0" />
+                <origin rpy="0 0 0" xyz="0 0 0.10325" />
+                <limit effort="1000" velocity="1.0" lower="0" upper="0" />
             </joint>
             <gazebo>
                 <plugin name="gazebo_ros_vacuum_gripper" filename="libgazebo_ros_vacuum_gripper.so">
