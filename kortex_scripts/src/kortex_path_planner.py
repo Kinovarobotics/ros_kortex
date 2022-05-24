@@ -7,7 +7,7 @@ from std_srvs.srv import Empty
 import rospy
 import moveit_commander
 import signal
-import moveit_msgs.msg
+from geometry_msgs.msg import PoseStamped
 import geometry_msgs.msg
 import yaml
 import time
@@ -20,11 +20,41 @@ class KortexPathPlanner:
         moveit_commander.roscpp_initialize(self.joint_state_topic)
         self.robot = moveit_commander.RobotCommander(robot_description="/my_gen3/robot_description") 
         self.group = moveit_commander.MoveGroupCommander(robot_description="my_gen3/robot_description", ns="/my_gen3", name="arm")
+        self.scene = moveit_commander.PlanningSceneInterface(ns="/my_gen3")
         self.pub = rospy.Publisher('/chatter', String, queue_size=10)
         self.on_srv = rospy.ServiceProxy('/my_gen3/mag_gripper/on', Empty)
         self.off_srv = rospy.ServiceProxy('/my_gen3/mag_gripper/off', Empty)
         self.rate = rospy.Rate(0.5) # 10hz
         self.responses = {"q1": "r w a x", "primative_functions": "move sleep"}
+
+    def wait_for_state_update(self, box_name, scene, box_is_known=False, box_is_attached=False, timeout=4):
+        start = rospy.get_time()
+        seconds = rospy.get_time()
+        while (seconds - start < timeout) and not rospy.is_shutdown():
+            attached_objects = scene.get_attached_objects([box_name])
+            is_attached = len(attached_objects.keys()) > 0
+            is_known = box_name in scene.get_known_object_names()
+            if (box_is_attached == is_attached) and (box_is_known == is_known):
+                return True
+            rospy.sleep(0.1)
+            seconds = rospy.get_time()
+        return False
+
+    def add_tool_collision_object(self):
+        box_name = 'tool'
+        box_pose = PoseStamped()
+        box_pose.header.frame_id = "mag_gripper_end_effector"
+        box_pose.pose.orientation.w = 1.0
+        box_pose.pose.position.z = 0.1
+
+        eef_link = self.group.get_end_effector_link()
+        grasping_group = 'eef'
+        touch_links = self.robot.get_link_names(group=grasping_group)
+        self.scene.attach_box(eef_link, box_name, touch_links=touch_links, pose=box_pose, size=(0.1, 0.1, 0.1))
+        rospy.loginfo(self.wait_for_state_update(box_name, self.scene, box_is_attached=True, box_is_known=False))
+
+    def remove_tool_colision_object(self):
+        self.scene.remove_attached_object(name = 'tool')
 
     def recursive_deepcopy_pose(self, original, copy): #geometry_msgs.msg.Pose()
         if "reference" in original:
@@ -103,11 +133,13 @@ class KortexPathPlanner:
                 print("eef\n" + str(x))
                 for i in range(len(x["eef"])):
                     self.rate.sleep()
-                    print(type(x["eef"][i]))
+                    # print(type(x["eef"][i]))
                     if x["eef"][i] and type(x["eef"][i]) == bool:
                         print("sending on" + str(self.on_srv()))
+                        self.add_tool_collision_object()
                     elif not x["eef"][i] and type(x["eef"][i]) == bool:
                         print("sending off" + str(self.off_srv()))
+                        self.remove_tool_colision_object()
                     else:
                         # print(str(x["eef"][i]))
                         self.pub.publish(str(x["eef"][i]))
