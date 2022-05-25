@@ -158,15 +158,20 @@ class KortexPathPlanner:
         # print(shortest_plan)
         return plans[shortest_plan][1]
 
-    def generate_multi_point_plan(self, waypoints, itterations):
+    def generate_multi_point_plan(self, waypoints, itterations, timeout):
         plans = []
         points = []
         plan = None
         for i in range(itterations):
             fraction = 0
+            start_time = time.time()
             while fraction<1.0:
                 (plan, fraction) = self.group.compute_cartesian_path(waypoints, 0.01, 0)  # waypoints to follow # eef_step # jump_threshold 
                 # print("fraction: " + str(fraction))
+                end_time = time.time()
+                if end_time-start_time > timeout:
+                    print("Time out: " + str(timeout) + " reached before fraction: " + str(fraction))
+                    break
             
             plans.append(plan)
             points.append(len(plans[i].joint_trajectory.points))
@@ -180,7 +185,7 @@ class KortexPathPlanner:
             self.group.execute(plan, wait=True)
 
         elif len(waypoints) > 1:
-            plan = self.generate_multi_point_plan(waypoints, itterations)
+            plan = self.generate_multi_point_plan(waypoints, itterations, 1)
             self.group.execute(plan, wait=True)
      
     def read_from_file(self, file_name):
