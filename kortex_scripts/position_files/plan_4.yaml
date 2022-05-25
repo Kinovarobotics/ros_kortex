@@ -14,7 +14,7 @@ position_space:
 
   home: &home
     reference: *base
-    coordiante_system: cartesian
+    coordinate_system: cartesian
     position: 
       x: 0.2599373936064211
       y: -0.06556275180447203
@@ -26,61 +26,37 @@ position_space:
       w: 0.009371206081304675
 
 
-  prepare_grab: &prepare_grab
-    reference: *base
-    coordinate_system: cartesian
-    position: 
-      x: 0.2572867906947075
-      y: -0.1551393063469211
-      z: 0.06763479165271269
-    orientation: 
-      x: 0.013953106910462447
-      y: 0.7087513783422827
-      z: 0.7053194892177763
-      w: 0.0011011970920943217
+  twist: &twist
+    reference: *home
+    coordinate_system: joints
+    position:
+      - 1.5
+      - 0
+      - 0
+      - 0
+      - 0
+      - 1.5
 
-
-  grab: &grab
-    reference: *prepare_grab
+  away: &away
+    reference: *twist
     coordinate_system: cartesian
     position:
-      x: 0
-      y: 0.06
+      x: 0.1
+      y: 0
       z: 0
     orientation: *keep_orientaion
-
-  target_1: &target_1
-    reference: *grab
-    coordinate_system: cartesian
-    position:
-      x: 0
-      y: 0
-      z: 0.3
-    orientation: *keep_orientaion
-
-  target_2: &target_2
-    reference: *base
-    coordinate_system: cartesian
-    position: 
-      x: 0.18358971262312931
-      y: -0.694763985444087
-      z: 0.43379762323929266
-    orientation: 
-      x: 0.7033458382918825
-      y: -0.03508201688623919
-      z: -0.05033442146515984
-      w: 0.7081951213221193
-
-  dispense_10g: &dispense_10g
-    - 1000
-    - 0
-    - 4000
-
-
 
 sequence:
   
   - move:
-    - *grab
+    - *home
+
+  - move:
+    - *twist
+
+  - move:
+    - *away
+
+
 
   

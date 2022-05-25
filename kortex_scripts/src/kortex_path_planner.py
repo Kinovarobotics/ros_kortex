@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+from email.headerregistry import Group
 from os.path import exists
 from queue import Empty
+import string
 import sys
+from tokenize import group
+from turtle import position
 from std_msgs.msg import String
 from std_srvs.srv import Empty
 import rospy
@@ -11,6 +15,10 @@ from geometry_msgs.msg import PoseStamped
 import geometry_msgs.msg
 import yaml
 import time
+from moveit_msgs.srv import GetPositionFK, GetPositionFKRequest, GetPositionFKResponse
+from sensor_msgs.msg import JointState
+from moveit_msgs.msg import RobotState, Constraints, PositionIKRequest
+from moveit_msgs.srv import GetPositionIK
 
 class KortexPathPlanner:
 
@@ -24,8 +32,11 @@ class KortexPathPlanner:
         self.pub = rospy.Publisher('/chatter', String, queue_size=10)
         self.on_srv = rospy.ServiceProxy('/my_gen3/mag_gripper/on', Empty)
         self.off_srv = rospy.ServiceProxy('/my_gen3/mag_gripper/off', Empty)
+        self.fk_srv = rospy.ServiceProxy('/my_gen3/compute_fk', GetPositionFK)
+        self.ik_srv = rospy.ServiceProxy('/my_gen3/compute_ik', GetPositionIK)
         self.rate = rospy.Rate(0.5) # 10hz
         self.responses = {"q1": "r w a x", "primative_functions": "move sleep"}
+        self.js_name = ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"]
 
     def wait_for_state_update(self, box_name, scene, box_is_known=False, box_is_attached=False, timeout=4):
         start = rospy.get_time()
@@ -56,20 +67,81 @@ class KortexPathPlanner:
     def remove_tool_colision_object(self):
         self.scene.remove_attached_object(name = 'tool')
 
+    def get_fk(self, joint_state, fk_link, frame_id):
+        """
+        Do an FK call to with.
+        :param sensor_msgs/JointState joint_state: JointState message
+            containing the full state of the robot.
+        :param str or None fk_link: link to compute the forward kinematics for.
+        """
+        req = GetPositionFKRequest()
+        req.header.frame_id = 'base_link'
+        req.fk_link_names = [fk_link]
+        req.robot_state.joint_state = joint_state
+        try:
+            resp = self.fk_srv.call(req)
+            return resp
+        except rospy.ServiceException as e:
+            rospy.logerr("Service exception: " + str(e))
+            resp = GetPositionFKResponse()
+            resp.error_code = 99999  # Failure
+            return resp
+    
+    def get_ik(self, pose):
+        req = PositionIKRequest()
+        ps = PoseStamped()
+        ps.pose = pose
+        ps.header.frame_id = self.group.get_planning_frame()
+        req.group_name = "arm"
+        req.pose_stamped = ps
+        req.robot_state = self.group.get_current_state()
+        req.avoid_collisions = True
+        req.ik_link_name = self.group.get_end_effector_link()
+        req.timeout = rospy.Duration(10)
+        return self.ik_srv(req)
+
+    
+
     def recursive_deepcopy_pose(self, original, copy): #geometry_msgs.msg.Pose()
         if "reference" in original:
-            self.recursive_deepcopy_pose(original["reference"], copy)
-        copy.position.x += original["position"]["x"]
-        copy.position.y += original["position"]["y"]
-        copy.position.z += original["position"]["z"]
-        copy.orientation.x += original["orientation"]["x"]
-        copy.orientation.y += original["orientation"]["y"]
-        copy.orientation.z += original["orientation"]["z"]
-        copy.orientation.w += original["orientation"]["w"]
+            #  print("reference:" + str(original["reference"]))
+            copy = self.recursive_deepcopy_pose(original["reference"], copy)
+        if "coordinate_system" in original and original["coordinate_system"] == "joints":
+             js = self.get_ik(copy)
+             js_list = list(js.solution.joint_state.position)
+            #  print("JS_LIST")
+            #  print(js_list)
+             for i in range(len(original["position"])):
+                js_list[i] += original["position"][i]
+            #  print("JS_LIST2")
+            #  print(js_list)
+             joint_state = JointState()
+             joint_state.name = self.js_name
+             joint_state.position = js_list[:-1]
+            #  print("JOINT_STATE")
+            #  print(joint_state)
+             ik = self.get_fk(joint_state, 'mag_gripper_end_effector', 'base_link')
+            #  print("IK")
+            #  print(ik)
+             copy = ik.pose_stamped[0].pose
+            #  original["coordinate_system"] = "cartesian"
+            #  original["position"] = {"x": ik.pose_stamped[0].pose.position.x, "y": ik.pose_stamped[0].pose.position.y,"z": ik.pose_stamped[0].pose.position.z}
+            #  original.update({"orientation": {"x": ik.pose_stamped[0].pose.orientation.x,"y": ik.pose_stamped[0].pose.orientation.y,"z": ik.pose_stamped[0].pose.orientation.z,"w": ik.pose_stamped[0].pose.orientation.w}})
+            #  print(copy)
+            #  copy = ik.pose_stamped.pose
+        else:
+            copy.position.x += original["position"]["x"]
+            copy.position.y += original["position"]["y"]
+            copy.position.z += original["position"]["z"]
+            copy.orientation.x += original["orientation"]["x"]
+            copy.orientation.y += original["orientation"]["y"]
+            copy.orientation.z += original["orientation"]["z"]
+            copy.orientation.w += original["orientation"]["w"]
         return copy
 
     def deepcopy_pose_list(self, original):
         waypoints = []
+        coordinate_system = []
         for x in original:
             waypoints.append(self.recursive_deepcopy_pose(x, geometry_msgs.msg.Pose()))
         return waypoints
@@ -97,7 +169,7 @@ class KortexPathPlanner:
 
     def execute_shortest_plan(self, waypoints, itterations):
         if len(waypoints) == 1:
-            plan = self.generate_single_point_plan(itterations, waypoints[0])
+            plan = self.generate_single_point_plan(itterations, waypoints[0], )
             self.group.execute(plan, wait=True)
 
         elif len(waypoints) > 1:

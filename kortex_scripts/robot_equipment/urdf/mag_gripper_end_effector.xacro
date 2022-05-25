@@ -54,7 +54,7 @@
             <joint name="end_joint" type="revolute">
                 <parent link="mag_gripper_end_effector" />
                 <child link="end_effector" />
-                <origin rpy="0 0 0" xyz="0 0 0.10325" />
+                <origin rpy="0 0 0" xyz="0 0 0.075" />
                 <limit effort="1000" velocity="1.0" lower="0" upper="0" />
             </joint>
             <gazebo>

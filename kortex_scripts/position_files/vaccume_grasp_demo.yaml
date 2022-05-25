@@ -79,37 +79,43 @@ position_space:
 
 
 sequence:
-  - eef:
-    - false
 
-  - move:
-    - *home
-  
-  - move:
-    - *prepare_grab
-  
-  - move:
-    - *grab
+  - loop: &loop
+    - eef:
+      - false
 
-  - eef:
-    - true
-  
-  - move:
-    - *target_1
-  
-  - move:
-    - *target_2
+    - move:
+      - *home
+    
+    - move:
+      - *prepare_grab
+    
+    - move:
+      - *grab
 
-  - eef: *dispense_10g
+    - eef:
+      - true
+    
+    - move:
+      - *target_1
+    
+    - move:
+      - *target_2
 
-  - move:
-    - *target_1
-  
-  - move:
-    - *grab
-  
-  - eef:
-    - false
+    - eef: *dispense_10g
 
-  - move:
-    - *home
+    - move:
+      - *target_1
+    
+    - move:
+      - *grab
+    
+    - eef:
+      - false
+
+    - move:
+      - *home
+
+  - do:
+      loop: *loop
+      count: 2

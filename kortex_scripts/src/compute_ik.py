@@ -29,6 +29,9 @@ try:
 except rospy.ServiceException as e:
   rospy.logerror("Service call failed: %s"%e)
 
+
+
+
 ps = PoseStamped()
 ps.pose.position.x = 0.20228798672323686
 ps.pose.position.y = -0.0844410319119024

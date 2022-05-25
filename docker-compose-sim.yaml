@@ -36,7 +36,7 @@ services:
     runtime: nvidia
     depends_on:
       - roscore
-    command: roslaunch kortex_gazebo spawn_kortex_robot.launch 'base:=false' --wait
+    command: roslaunch kortex_gazebo start_senario_1.launch --wait
     # command: tail -F anything
 
 # networks:

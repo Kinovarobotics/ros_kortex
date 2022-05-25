@@ -37,12 +37,15 @@ p.pose.position.x = 0.5
 p.pose.position.y = 0.0
 p.pose.position.z = 0.0
 scene.add_box("table", p, (1, 1, 0.01))
+rospy.loginfo(wait_for_state_update("table", scene, box_is_attached=False, box_is_known=False))
 
-# box_name = 'tool'
-# box_pose = PoseStamped()
-# box_pose.header.frame_id = "mag_gripper_end_effector"
-# box_pose.pose.orientation.w = 1.0
-# box_pose.pose.position.z = 0.1
+box_pose = PoseStamped()
+box_pose.header.frame_id = robot.get_planning_frame()
+box_pose.pose.position.x = 0.26
+box_pose.pose.position.y = 0.0
+box_pose.pose.position.z = 0.05
+scene.add_box("tool", box_pose, (0.1, 0.1, 0.1))
+rospy.loginfo(wait_for_state_update("tool", scene, box_is_attached=False, box_is_known=False))
 
 # eef_link = group.get_end_effector_link()
 # grasping_group = 'eef'

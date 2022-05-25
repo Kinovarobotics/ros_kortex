@@ -1,4 +1,7 @@
 <launch>
-    <include file="$(find kortex_gazebo)/launch/spawn_kortex_robot.launch"/>
-    
+    <include file="$(find kortex_gazebo)/launch/spawn_kortex_robot.launch">
+        <arg name = "base" value ="false"/>
+    </include>
+    <include file="$(find kortex_scripts)/launch/spawn_dispenser_hopper.launch"/>
+    <!-- <node name="add_scene_objects" pkg="kortex_scripts" type="add_scene_objects.py" respawn="false" output="screen"/> -->
 </launch>
