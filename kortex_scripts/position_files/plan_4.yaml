@@ -43,18 +43,14 @@ position_space:
     position:
       x: 0.1
       y: 0
-      z: 0
+      z: 0.1
     orientation: *keep_orientaion
 
 sequence:
   
   - move:
     - *home
-
-  - move:
     - *twist
-
-  - move:
     - *away
 
 

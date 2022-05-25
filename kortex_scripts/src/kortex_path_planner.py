@@ -141,7 +141,6 @@ class KortexPathPlanner:
 
     def deepcopy_pose_list(self, original):
         waypoints = []
-        coordinate_system = []
         for x in original:
             waypoints.append(self.recursive_deepcopy_pose(x, geometry_msgs.msg.Pose()))
         return waypoints
@@ -159,13 +158,21 @@ class KortexPathPlanner:
         # print(shortest_plan)
         return plans[shortest_plan][1]
 
-    def generate_multi_point_plan(self, waypoints):
-        fraction = 0
-        while fraction<1.0:
-            (plan, fraction) = self.group.compute_cartesian_path(waypoints, 0.01, 0)  # waypoints to follow # eef_step # jump_threshold 
-        #     print("fraction: " + str(fraction))
-        # print("fraction: " + str(fraction))
-        return plan
+    def generate_multi_point_plan(self, waypoints, itterations):
+        plans = []
+        points = []
+        plan = None
+        for i in range(itterations):
+            fraction = 0
+            while fraction<1.0:
+                (plan, fraction) = self.group.compute_cartesian_path(waypoints, 0.01, 0)  # waypoints to follow # eef_step # jump_threshold 
+                # print("fraction: " + str(fraction))
+            
+            plans.append(plan)
+            points.append(len(plans[i].joint_trajectory.points))
+        
+        shortest_plan =  min(range(len(points)), key=points.__getitem__)
+        return plans[shortest_plan]
 
     def execute_shortest_plan(self, waypoints, itterations):
         if len(waypoints) == 1:
@@ -173,7 +180,7 @@ class KortexPathPlanner:
             self.group.execute(plan, wait=True)
 
         elif len(waypoints) > 1:
-            plan = self.generate_multi_point_plan(waypoints)
+            plan = self.generate_multi_point_plan(waypoints, itterations)
             self.group.execute(plan, wait=True)
      
     def read_from_file(self, file_name):
