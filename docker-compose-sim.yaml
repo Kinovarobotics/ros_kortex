@@ -26,6 +26,7 @@ services:
     environment:
       - DISPLAY=${DISPLAY}
       - "QT_X11_NO_MITSHM=1"
+      # - NVIDIA_VISIBLE_DEVICES=all
     volumes:
       - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
       - ros_kortex:/ros_kortex
@@ -33,7 +34,13 @@ services:
     # networks:
     #   - tbot_net
     network_mode: host
-    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     depends_on:
       - roscore
     command: roslaunch kortex_gazebo start_senario_1.launch --wait
