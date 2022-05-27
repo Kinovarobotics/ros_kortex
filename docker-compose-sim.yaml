@@ -46,23 +46,39 @@ services:
     command: roslaunch kortex_gazebo start_senario_1.launch --wait
     # command: tail -F anything
 
+  # path_planner_service:
+  #   build:
+  #     context: .
+  #     dockerfile: dockerfile
+  #   image: tbot/path_planning_service:latest
+  #   volumes:
+  #     - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
+  #     - ros_kortex:/ros_kortex
+  #   # networks:
+  #   #   - tbot_net
+  #   network_mode: host
+  #   depends_on:
+  #     - roscore
+  #     - main
+  #   command: bash -c "sleep 10; roslaunch tbot_path_planning path_planning_service.launch"
+
 # networks:
 #   tbot_net:
 #     driver: bridge
 
 volumes:
-  catkin_ws:
-   driver: local
-   driver_opts:
-    o: bind
-    type: none
-    device: ../catkin_ws
   ros_kortex:
    driver: local
    driver_opts:
     o: bind
     type: none
     device: ../ros_kortex
+  # tbot_path_planning:
+  #   driver: local
+  #   driver_opts:
+  #     o: bind
+  #     type: none
+  #     device: ./tbot_path_planning
   # ros_kortex_vision:
   #  driver: local
   #  driver_opts:

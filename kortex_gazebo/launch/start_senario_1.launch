@@ -3,5 +3,5 @@
         <arg name = "base" value ="false"/>
     </include>
     <include file="$(find kortex_scripts)/launch/spawn_dispenser_hopper.launch"/>
-    <!-- <node name="add_scene_objects" pkg="kortex_scripts" type="add_scene_objects.py" respawn="false" output="screen"/> -->
+    <include file="$(find tbot_path_planning)/launch/path_planning_service.launch"/>
 </launch>

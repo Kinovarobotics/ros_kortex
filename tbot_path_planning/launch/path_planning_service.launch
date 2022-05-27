@@ -1,0 +1,3 @@
+<launch>
+    <node name="path_planner_service" pkg="tbot_path_planning" type="path_planner_service.py" respawn="false" output="screen"/>
+</launch>

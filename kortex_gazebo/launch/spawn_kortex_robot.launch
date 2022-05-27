@@ -45,7 +45,7 @@
     <rosparam file="$(find ant_worker_description)/config/motor_config_arm.yaml" command="load" if="$(arg base)"/> 
 
     <!-- Delay before homing the arm -->
-    <arg name="start_delay_seconds" default="20"/>
+    <arg name="start_delay_seconds" default="1"/>
 
     <group ns="$(arg robot_name)">
 

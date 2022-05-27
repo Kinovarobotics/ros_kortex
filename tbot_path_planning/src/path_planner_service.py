@@ -36,7 +36,8 @@ class KortexPathPlanner:
             response.sucess = self.execute_file(contents["sequence"])
 
         print("done!")
-        print("r/w/a/x")
+        if len(sys.argv) > 3:
+            print("r/w/a/x")
         return  response # the service Response class, in this case MyCustomServiceMessageResponse
 
     def __init__(self):
@@ -120,8 +121,6 @@ class KortexPathPlanner:
         req.ik_link_name = self.group.get_end_effector_link()
         req.timeout = rospy.Duration(10)
         return self.ik_srv(req)
-
-    
 
     def recursive_deepcopy_pose(self, original, copy): #geometry_msgs.msg.Pose()
         if "reference" in original:
@@ -262,30 +261,33 @@ class KortexPathPlanner:
 
         self.group.set_goal_tolerance(0.0005)
         self.group.set_planner_id("RRTConnect")
-
-        while True:
-            response = input("r/w/a/x \n") 
-            while response not in self.responses["q1"]: # wait for valid response
-                print("ERROR 0: invalid response")
+        # print(len(sys.argv))
+        if len(sys.argv) > 3:
+            while True:
                 response = input("r/w/a/x \n") 
+                while response not in self.responses["q1"]: # wait for valid response
+                    print("ERROR 0: invalid response")
+                    response = input("r/w/a/x \n") 
 
-            file_name = input("file name?\n")
-            while not exists(file_name) and ("r" in response or "x" in response):
-                print("ERROR 2: file does not exist, try again")
                 file_name = input("file name?\n")
-            self.file_name = file_name
+                while not exists(file_name) and ("r" in response or "x" in response):
+                    print("ERROR 2: file does not exist, try again")
+                    file_name = input("file name?\n")
+                self.file_name = file_name
 
-            if "r" in response:
-                contents = self.read_from_file(self.file_name)
-                print(contents["sequence"])
-            elif "w" in response:
-                print("Not yet implemented: 2")
-            elif "x" in response:
-                contents = self.read_from_file(self.file_name)
-                self.execute_file(contents["sequence"])
+                if "r" in response:
+                    contents = self.read_from_file(self.file_name)
+                    print(contents["sequence"])
+                elif "w" in response:
+                    print("Not yet implemented: 2")
+                elif "x" in response:
+                    contents = self.read_from_file(self.file_name)
+                    self.execute_file(contents["sequence"])
 
-            else:
-                contents = self.append_to_file(self.file_name)
+                else:
+                    contents = self.append_to_file(self.file_name)
+        else: 
+            rospy.spin()
 
 if __name__ == "__main__":
     ex = KortexPathPlanner()
