@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from email.headerregistry import Group
-from os.path import exists
+from genericpath import isfile
+from os.path import exists, abspath, realpath
+from os import getcwd
 from queue import Empty
 import sys
 from std_msgs.msg import String
@@ -21,13 +23,21 @@ from tbot_path_planning.srv import tbotPathPlanMessage, tbotPathPlanMessageRespo
 
 class KortexPathPlanner:
     def my_callback(self, request):
-        print("Request Data==> duration="+str(request.path_to_file))
-        my_response = tbotPathPlanMessageResponse()
-        if request.path_to_file:
-            my_response.success = True
+        print("request_to_execute: " + str(request.path_to_file))
+        response = tbotPathPlanMessageResponse()
+        real_path = realpath(__file__)
+        file_path = abspath(real_path+"/../../position_files/"+ str(request.path_to_file))
+        if not isfile(file_path):
+            print("ERROR 3: file does not exist, try again")
+            response.sucess == False
         else:
-            my_response.success = False
-        return  my_response # the service Response class, in this case MyCustomServiceMessageResponse
+            self.file_name = file_path
+            contents = self.read_from_file(self.file_name)
+            response.sucess = self.execute_file(contents["sequence"])
+
+        print("done!")
+        print("r/w/a/x")
+        return  response # the service Response class, in this case MyCustomServiceMessageResponse
 
     def __init__(self):
         rospy.init_node('path_planner_service', anonymous=True)
@@ -45,6 +55,7 @@ class KortexPathPlanner:
         self.rate = rospy.Rate(0.5) # 10hz
         self.responses = {"q1": "r w a x", "primative_functions": "move sleep"}
         self.js_name = ["joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"]
+        self.file_name = None
 
     
 
@@ -114,31 +125,17 @@ class KortexPathPlanner:
 
     def recursive_deepcopy_pose(self, original, copy): #geometry_msgs.msg.Pose()
         if "reference" in original:
-            #  print("reference:" + str(original["reference"]))
             copy = self.recursive_deepcopy_pose(original["reference"], copy)
         if "coordinate_system" in original and original["coordinate_system"] == "joints":
              js = self.get_ik(copy)
              js_list = list(js.solution.joint_state.position)
-            #  print("JS_LIST")
-            #  print(js_list)
              for i in range(len(original["position"])):
                 js_list[i] += original["position"][i]
-            #  print("JS_LIST2")
-            #  print(js_list)
              joint_state = JointState()
              joint_state.name = self.js_name
              joint_state.position = js_list[:-1]
-            #  print("JOINT_STATE")
-            #  print(joint_state)
              ik = self.get_fk(joint_state, 'mag_gripper_end_effector', 'base_link')
-            #  print("IK")
-            #  print(ik)
              copy = ik.pose_stamped[0].pose
-            #  original["coordinate_system"] = "cartesian"
-            #  original["position"] = {"x": ik.pose_stamped[0].pose.position.x, "y": ik.pose_stamped[0].pose.position.y,"z": ik.pose_stamped[0].pose.position.z}
-            #  original.update({"orientation": {"x": ik.pose_stamped[0].pose.orientation.x,"y": ik.pose_stamped[0].pose.orientation.y,"z": ik.pose_stamped[0].pose.orientation.z,"w": ik.pose_stamped[0].pose.orientation.w}})
-            #  print(copy)
-            #  copy = ik.pose_stamped.pose
         else:
             copy.position.x += original["position"]["x"]
             copy.position.y += original["position"]["y"]
@@ -249,6 +246,8 @@ class KortexPathPlanner:
             
             elif "move" in iter(sequence[i]) or "sleep" in iter(sequence[i]) or "eef" in iter(sequence[i]):
                 self.primative_functions([sequence[i]])
+            
+        return True        
 
     def append_to_file(self, data, file_name):
         # with open(file_name, 'a') as file:
@@ -274,18 +273,19 @@ class KortexPathPlanner:
             while not exists(file_name) and ("r" in response or "x" in response):
                 print("ERROR 2: file does not exist, try again")
                 file_name = input("file name?\n")
-                
+            self.file_name = file_name
+
             if "r" in response:
-                contents = self.read_from_file(file_name)
+                contents = self.read_from_file(self.file_name)
                 print(contents["sequence"])
             elif "w" in response:
                 print("Not yet implemented: 2")
             elif "x" in response:
-                contents = self.read_from_file(file_name)
+                contents = self.read_from_file(self.file_name)
                 self.execute_file(contents["sequence"])
 
             else:
-                contents = self.append_to_file(file_name)
+                contents = self.append_to_file(self.file_name)
 
 if __name__ == "__main__":
     ex = KortexPathPlanner()
