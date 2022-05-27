@@ -5,7 +5,7 @@ This series of packages has been modified and expanded upon to implement the gre
         docker-compose -f docker-compose-sim.yaml up
         docker-compose -f docker-compose-real.yaml up 
 
-At the time of writing, all files for the simulation docker-compose file are present and it is functional, However the real arm is dependant on the `ros_kortex_vision` package which has been forked here: https://github.com/ecoation-labs/ros_kortex_vision. The ros_kortex_vision packages should be in the same **parent** direcotry as the ros_kortex packages. Both version have been tested on an Ubuntu 20.04 pc, the real version is a little dated and might be unreliable at time of witing. The Image will take a few minutes to build the first time but once build the container should spin up fast.
+At the time of writing, all files for the simulation docker-compose file are present and it is functional. Both version have been tested on an Ubuntu 20.04 pc, the real version is a little dated and might be unreliable at time of witing. The Image will take a few minutes to build the first time but once build the container should spin up fast.
 
 # ros_kortex
  ROS Kortex is the official ROS package to interact with Kortex and its related products. It is built upon the Kortex API, documentation for which can be found in the [GitHub Kortex repository](https://github.com/Kinovarobotics/kortex).
@@ -76,6 +76,9 @@ This package contains code to fulfill the primary objectives of TBOT as well as 
 
 ### tbot_image_action_server
 This package contains the code and interfaces neccesary to utilizes the camera feed provided by the 'ros_kortex_vision' package. Some of the scripts in 'kortex_scripts' interact with this package
+
+### tbot_path_planning
+This package contains the code and interfaces neccesary to plan paths effectivly in enviroments with obsticals and constraints
 
 ### kortex_control
 This package implements the simulation controllers that control the arm in Gazebo. For more details, please consult the [README](kortex_control/readme.md) from the package subdirectory.
