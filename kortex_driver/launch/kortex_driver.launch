@@ -18,7 +18,7 @@
     <arg name="prefix" default=""/>
 
     <!-- Kortex API options -->
-    <arg name="ip_address" default="192.168.1.10"/>
+    <arg name="ip_address" default="192.168.1.61"/>
     <arg name="username" default="admin"/>
     <arg name="password" default="admin"/>
     <arg name="cyclic_data_publish_rate" default="40"/> <!--Hz-->
