@@ -1,11 +1,11 @@
 joint_names:
-  - $(arg prefix)joint_1
-  - $(arg prefix)joint_2
-  - $(arg prefix)joint_3
-  - $(arg prefix)joint_4
-  - $(arg prefix)joint_5
-  - $(arg prefix)joint_6
-  - $(arg prefix)joint_7
+  - joint_1
+  - joint_2
+  - joint_3
+  - joint_4
+  - joint_5
+  - joint_6
+  - joint_7
 maximum_velocities:
   - 0.8727
   - 0.8727
