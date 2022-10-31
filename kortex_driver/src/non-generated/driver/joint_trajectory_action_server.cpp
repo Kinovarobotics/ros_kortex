@@ -13,6 +13,7 @@
 #include "kortex_driver/non-generated/joint_trajectory_action_server.h"
 #include <sstream>
 #include <fstream>
+#include <thread> // for gcc 11 support
 
 namespace {
     constexpr float STARTING_POINT_ARBITRARY_DURATION = 0.5f;

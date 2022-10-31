@@ -13,6 +13,7 @@
 #include "kortex_driver/non-generated/cartesian_trajectory_action_server.h"
 #include <sstream>
 #include <fstream>
+#include <thread> // for gcc 11 support
 
 CartesianTrajectoryActionServer::CartesianTrajectoryActionServer(const std::string& server_name, ros::NodeHandle& nh, Kinova::Api::Base::BaseClient* base, Kinova::Api::BaseCyclic::BaseCyclicClient* base_cyclic):
     m_server_name(server_name),
