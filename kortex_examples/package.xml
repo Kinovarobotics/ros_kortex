@@ -4,9 +4,7 @@
   <version>2.2.2</version>
   <description>Examples to show usage of core kortex_arm_driver services and topics.</description>
 
-  <author email="hlamontagne@kinova.ca">Hugo Lamontagne</author>
-  <author email="avannobel@kinova.ca">Alexandre Vannobel</author>
-  <maintainer email="avannobel@kinova.ca" />
+  <maintainer email="support@kinova.ca">Kinova Support</maintainer>
 
   <license>BSD</license>
 

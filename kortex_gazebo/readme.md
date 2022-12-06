@@ -21,7 +21,7 @@ The source code is released under a [BSD 3-Clause license](../LICENSE).
 
 **Author: Kinova inc.<br />
 Affiliation: [Kinova inc.](https://www.kinovarobotics.com/)<br />
-Maintainer: Kinova inc. support@kinovarobotics.com**
+Maintainer: Kinova inc. support@kinova.ca**
 
 This package has been tested under ROS Kinetic, Gazebo 7 and Ubuntu 16.04 and under ROS Melodic, Gazebo 9 and Ubuntu 18.04.
 

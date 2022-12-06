@@ -6,6 +6,6 @@ moveit_setup_assistant_config:
   SRDF:
     relative_path: config/gen3_lite_gen3_lite_2f.srdf
   CONFIG:
-    author_name: Alexandre Vannobel
-    author_email: avannobel@kinova.ca
+    author_name: Kinova Support
+    author_email: support@kinova.ca
     generated_timestamp: 1564078352
