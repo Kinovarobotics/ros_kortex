@@ -5,7 +5,7 @@
   <description>
      An automatically generated package with all the configuration and launch files for using the gen3 with the MoveIt! Motion Planning Framework
   </description>
-  <maintainer email="support@kinova.ca"/>Kinova Support</maintainer>
+  <maintainer email="support@kinova.ca">Kinova Support</maintainer>
 
   <license>BSD</license>
 

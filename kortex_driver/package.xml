@@ -4,7 +4,7 @@
   <version>2.2.2</version>
   <description>The package that acts as a robot's driver. Supports simulated and real Kortex robots.</description>
 
-  <maintainer email="support@kinova.ca"/>Kinova Support</maintainer>
+  <maintainer email="support@kinova.ca">Kinova Support</maintainer>
 
   <license>BSD</license>
 
