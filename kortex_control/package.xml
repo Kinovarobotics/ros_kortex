@@ -5,8 +5,7 @@
     <p>Gazebo ROS Control package for simulated Kortex robots</p>
     <p>This package contains configuration files for the gazebo_ros_control controllers for simulation of Kortex arms</p>
   </description>
-  <author email="avannobel@kinova.ca">Alexandre Vannobel</author>
-  <maintainer email="avannobel@kinova.ca" />
+  <maintainer email="support@kinova.ca">Kinova Support</maintainer>
   <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roslaunch</build_depend>
