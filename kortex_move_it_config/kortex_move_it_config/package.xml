@@ -5,8 +5,7 @@
   <description>
      The metapackage for the automatically generated MoveIt configuration packages
   </description>
-  <author email="avannobel@kinova.ca">Alexandre Vannobel</author>
-  <maintainer email="avannobel@kinova.ca" />
+  <maintainer email="support@kinova.ca">Kinova Support</maintainer>
 
   <license>BSD</license>
 

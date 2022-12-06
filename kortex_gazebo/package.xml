@@ -5,8 +5,7 @@
     <p>Gazebo simulation package for Kortex robots</p>
     <p>This package contains launch files to spawn the Kortex robot in Gazebo and visualize it in RViz, as well as configuration files.</p>
   </description>
-  <author email="avannobel@kinova.ca">Alexandre Vannobel</author>
-  <maintainer email="avannobel@kinova.ca" />
+  <maintainer email="support@kinova.ca">Kinova Support</maintainer>
   <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roslaunch</build_depend>
