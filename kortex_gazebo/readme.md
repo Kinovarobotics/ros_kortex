@@ -21,7 +21,7 @@ The source code is released under a [BSD 3-Clause license](../LICENSE).
 
 **Author: Kinova inc.<br />
 Affiliation: [Kinova inc.](https://www.kinovarobotics.com/)<br />
-Maintainer: Kinova inc. support@kinovarobotics.com**
+Maintainer: Kinova inc. support@kinova.ca**
 
 This package has been tested under ROS Noetic with Gazebo 11.
 
