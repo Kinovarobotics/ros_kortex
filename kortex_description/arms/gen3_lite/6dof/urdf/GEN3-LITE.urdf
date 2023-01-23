@@ -8,13 +8,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/BASE.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/base_link.STL" />
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/BASE.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/base_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -27,13 +27,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/SHOULDER.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/shoulder_link.STL" />
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/SHOULDER.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/shoulder_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -56,13 +56,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/ARM.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/arm_link.STL" />
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/ARM.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/arm_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -85,13 +85,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/FOREARM.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/forearm_link.STL" />
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/FOREARM.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/forearm_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -114,13 +114,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/LOWER_WRIST.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/lower_wrist_link.STL" />
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/LOWER_WRIST.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/lower_wrist_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -143,13 +143,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/UPPER_WRIST.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/upper_wrist_link.STL" />
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/gen3_lite/meshes/UPPER_WRIST.STL" />
+        <mesh filename="/Users/juniortchapdieu/Desktop/CubeSat Simulation/ros_kortex-kinetic-devel/kortex_description/arms/gen3_lite/6dof/meshes/upper_wrist_link.STL" />
       </geometry>
     </collision>
   </link>
