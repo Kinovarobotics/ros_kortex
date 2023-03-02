@@ -230,6 +230,8 @@ Many things have been changed in the ros_kortex repository between versions 1.1.
 
 From release 2.2.0 onwards, the Kortex API is automatically downloaded from our Artifactory Conan server. The steps to install and setup Conan have been added to the root readme file. Conan downloads the binaries and header files in the Conan cache, by default situated in the `~/.conan/` directory.
 
+Note that we only provide packages for the Release and Debug configurations. CMake will pick the most appropriate one given the `CMAKE_BUILD_TYPE` of your catkin workspace.
+
 If you want to learn more about Conan, you can read about it [on their website](https://conan.io/).
 
 If you still want to download the ZIP files for the API, you can find the link in the [Kortex repository](https://github.com/Kinovarobotics/kortex).
