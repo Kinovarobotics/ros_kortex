@@ -24,7 +24,7 @@ You can find the instructions to install ROS Kinetic [here](http://wiki.ros.org/
 These are the instructions to run in a terminal to create the workspace, clone the `ros_kortex` repository and install the necessary ROS dependencies:
 
         sudo apt install python3 python3-pip
-        sudo python3 -m pip install conan
+        sudo python3 -m pip install conan==1.59
         conan config set general.revisions_enabled=1
         conan profile new default --detect > /dev/null
         conan profile update settings.compiler.libcxx=libstdc++11 default
@@ -34,7 +34,9 @@ These are the instructions to run in a terminal to create the workspace, clone t
         cd ../
         rosdep install --from-paths src --ignore-src -y
 
-Note : `<branch-name>` corresponds to the branch matching your ROS version (noetic-devel, melodic-devel, kinetic-devel)
+> `<branch-name>` corresponds to the branch matching your ROS version (noetic-devel, melodic-devel, kinetic-devel)
+
+> Instructions are for conan V1.X only and it won't work for versions >=2.0.0
 
 Then, to build and source the workspace:
 
