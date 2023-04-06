@@ -62,6 +62,25 @@ You can also build against one of the ARMv8 builds of the Kortex API with Conan 
 
 As you see, there are instructions to install the Conan package manager. You can learn more about why we use Conan or how to simply download the API and link against it [in this specific section of the kortex_driver readme](kortex_driver/readme.md#conan). You can also decide 
 
+<p><details close>
+<summary>Conan SSL Error</summary>
+
+While running `catkin_make`, you may get a SSL Certificate error similar to this
+
+```sh
+ERROR: HTTPSConnectionPool(host='artifactory.kinovaapps.com', port=443): Max retries exceeded with url: /artifactory/api/conan/conan/v1/ping (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1131)')))
+```
+
+This is because Conan's root certificate expired on 2021-09-30
+
+You can fix this by running
+
+```sh
+conan config install https://github.com/conan-io/conanclientcert.git
+```
+
+ </details></p>
+
 ## Contents
 
 The following is a description of the packages included in this repository.
