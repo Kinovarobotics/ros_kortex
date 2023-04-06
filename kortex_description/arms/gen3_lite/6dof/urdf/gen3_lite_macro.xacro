@@ -61,7 +61,7 @@
       <parent link="${prefix}base_link" />
       <child link="${prefix}shoulder_link" />
       <axis xyz="0 0 1" />
-      <limit lower="-2.69" upper="2.69" effort="10" velocity="1.6" />
+      <limit lower="-2.68" upper="2.68" effort="10" velocity="1.6" />
     </joint>
     <link name="${prefix}arm_link">
       <inertial>
@@ -93,7 +93,7 @@
       <parent link="${prefix}shoulder_link" />
       <child link="${prefix}arm_link" />
       <axis xyz="0 0 1" />
-      <limit lower="-2.69" upper="2.69" effort="14" velocity="1.6" />
+      <limit lower="-2.61" upper="2.61" effort="14" velocity="1.6" />
     </joint>
     <link name="${prefix}forearm_link">
       <inertial>
@@ -125,7 +125,7 @@
       <parent link="${prefix}arm_link" />
       <child link="${prefix}forearm_link" />
       <axis xyz="0 0 1" />
-      <limit lower="-2.69" upper="2.69" effort="10" velocity="1.6" />
+      <limit lower="-2.61" upper="2.61" effort="10" velocity="1.6" />
     </joint>
     <link name="${prefix}lower_wrist_link">
       <inertial>
@@ -157,7 +157,7 @@
       <parent link="${prefix}forearm_link" />
       <child link="${prefix}lower_wrist_link" />
       <axis xyz="0 0 1" />
-      <limit lower="-2.59" upper="2.59" effort="7" velocity="1.6" />
+      <limit lower="-2.6" upper="2.6" effort="7" velocity="1.6" />
     </joint>
     <link name="${prefix}upper_wrist_link">
       <inertial>
@@ -189,7 +189,7 @@
       <parent link="${prefix}lower_wrist_link" />
       <child link="${prefix}upper_wrist_link" />
       <axis xyz="0 0 1" />
-      <limit lower="-2.57" upper="2.57" effort="7" velocity="1.6" />
+      <limit lower="-2.53" upper="2.53" effort="7" velocity="1.6" />
     </joint>
     <link name="${prefix}end_effector_link"/>
     <joint name="${prefix}joint_6" type="revolute">
@@ -197,7 +197,7 @@
       <parent link="${prefix}upper_wrist_link" />
       <child link="${prefix}end_effector_link" />
       <axis xyz="0 0 1" />
-      <limit lower="-2.59" upper="2.59" effort="7" velocity="3.2" />
+      <limit lower="-2.6" upper="2.6" effort="7" velocity="3.2" />
     </joint>
     <link name="${prefix}dummy_link" />
     <joint name="${prefix}end_effector" type="fixed">
