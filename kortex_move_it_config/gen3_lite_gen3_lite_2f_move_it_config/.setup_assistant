@@ -4,7 +4,7 @@ moveit_setup_assistant_config:
     relative_path: robots/gen3_lite_gen3_lite_2f.xacro
     xacro_args: ""
   SRDF:
-    relative_path: config/gen3_lite_gen3_lite_2f.srdf
+    relative_path: config/gen3_lite_gen3_lite_2f.srdf.xacro
   CONFIG:
     author_name: Kinova Support
     author_email: support@kinova.ca

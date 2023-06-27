@@ -2,9 +2,9 @@ moveit_setup_assistant_config:
   URDF:
     package: kortex_description
     relative_path: robots/gen3.xacro
-    xacro_args: arm:=gen3
+    xacro_args: arm:=gen3 dof:=7
   SRDF:
-    relative_path: config/gen3.srdf
+    relative_path: config/7dof/gen3.srdf.xacro
   CONFIG:
     author_name: Kinova Support
     author_email: support@kinova.ca
