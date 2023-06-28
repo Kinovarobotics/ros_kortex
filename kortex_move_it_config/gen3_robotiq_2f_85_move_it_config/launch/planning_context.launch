@@ -10,7 +10,7 @@
 
   <!-- The joint and link names prefix used in kortex_description -->
   <arg name="prefix" default=""/>
-  
+
   <!-- Use the slower (2.0 default) joint speed and acceleration limits, or the hard limits (fastest) -->
   <arg name="use_hard_limits" default="false"/>
 
@@ -19,10 +19,10 @@
 
   <!-- The semantic description that corresponds to the URDF -->
   <!-- With prefix -->
-  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro --inorder $(find gen3_robotiq_2f_85_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_85.srdf.xacro  prefix:=$(arg prefix)"
+  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro $(find gen3_robotiq_2f_85_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_85.srdf.xacro  prefix:=$(arg prefix)"
     unless="$(eval not arg('prefix'))"/>
   <!-- No prefix -->
-  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro --inorder $(find gen3_robotiq_2f_85_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_85.srdf.xacro"
+  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro $(find gen3_robotiq_2f_85_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_85.srdf.xacro"
     if="$(eval not arg('prefix'))"/>
 
   <!-- Load updated joint limits (override information from URDF) -->
