@@ -338,6 +338,14 @@ class BaseSimulationServices : public IBaseServices
         virtual bool ComputeInverseKinematics(kortex_driver::ComputeInverseKinematics::Request  &req, kortex_driver::ComputeInverseKinematics::Response &res) override;
         std::function<kortex_driver::ValidateWaypointList::Response(const kortex_driver::ValidateWaypointList::Request&)> ValidateWaypointListHandler = nullptr;
         virtual bool ValidateWaypointList(kortex_driver::ValidateWaypointList::Request  &req, kortex_driver::ValidateWaypointList::Response &res) override;
+        std::function<kortex_driver::SetWifiEnableState::Response(const kortex_driver::SetWifiEnableState::Request&)> SetWifiEnableStateHandler = nullptr;
+        virtual bool SetWifiEnableState(kortex_driver::SetWifiEnableState::Request  &req, kortex_driver::SetWifiEnableState::Response &res) override;
+        std::function<kortex_driver::GetWifiEnableState::Response(const kortex_driver::GetWifiEnableState::Request&)> GetWifiEnableStateHandler = nullptr;
+        virtual bool GetWifiEnableState(kortex_driver::GetWifiEnableState::Request  &req, kortex_driver::GetWifiEnableState::Response &res) override;
+        std::function<kortex_driver::SetBluetoothEnableState::Response(const kortex_driver::SetBluetoothEnableState::Request&)> SetBluetoothEnableStateHandler = nullptr;
+        virtual bool SetBluetoothEnableState(kortex_driver::SetBluetoothEnableState::Request  &req, kortex_driver::SetBluetoothEnableState::Response &res) override;
+        std::function<kortex_driver::GetBluetoothEnableState::Response(const kortex_driver::GetBluetoothEnableState::Request&)> GetBluetoothEnableStateHandler = nullptr;
+        virtual bool GetBluetoothEnableState(kortex_driver::GetBluetoothEnableState::Request  &req, kortex_driver::GetBluetoothEnableState::Response &res) override;
 
 };
 #endif

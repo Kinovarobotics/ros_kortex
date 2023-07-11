@@ -81,6 +81,9 @@
 #include "kortex_driver/IPv4Configuration.h"
 #include "kortex_driver/IPv4Information.h"
 #include "kortex_driver/FullIPv4Configuration.h"
+#include "kortex_driver/WifiEnableState.h"
+#include "kortex_driver/BluetoothEnableState.h"
+#include "kortex_driver/RFConfiguration.h"
 #include "kortex_driver/WifiInformation.h"
 #include "kortex_driver/WifiInformationList.h"
 #include "kortex_driver/WifiConfiguration.h"
@@ -249,6 +252,9 @@ int ToProtoData(kortex_driver::NetworkHandle input, Kinova::Api::Base::NetworkHa
 int ToProtoData(kortex_driver::IPv4Configuration input, Kinova::Api::Base::IPv4Configuration *output);
 int ToProtoData(kortex_driver::IPv4Information input, Kinova::Api::Base::IPv4Information *output);
 int ToProtoData(kortex_driver::FullIPv4Configuration input, Kinova::Api::Base::FullIPv4Configuration *output);
+int ToProtoData(kortex_driver::WifiEnableState input, Kinova::Api::Base::WifiEnableState *output);
+int ToProtoData(kortex_driver::BluetoothEnableState input, Kinova::Api::Base::BluetoothEnableState *output);
+int ToProtoData(kortex_driver::RFConfiguration input, Kinova::Api::Base::RFConfiguration *output);
 int ToProtoData(kortex_driver::WifiInformation input, Kinova::Api::Base::WifiInformation *output);
 int ToProtoData(kortex_driver::WifiInformationList input, Kinova::Api::Base::WifiInformationList *output);
 int ToProtoData(kortex_driver::WifiConfiguration input, Kinova::Api::Base::WifiConfiguration *output);

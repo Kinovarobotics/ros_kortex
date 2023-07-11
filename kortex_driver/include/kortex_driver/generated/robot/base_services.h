@@ -193,6 +193,10 @@ class BaseRobotServices : public IBaseServices
         virtual bool ComputeForwardKinematics(kortex_driver::ComputeForwardKinematics::Request  &req, kortex_driver::ComputeForwardKinematics::Response &res) override;
         virtual bool ComputeInverseKinematics(kortex_driver::ComputeInverseKinematics::Request  &req, kortex_driver::ComputeInverseKinematics::Response &res) override;
         virtual bool ValidateWaypointList(kortex_driver::ValidateWaypointList::Request  &req, kortex_driver::ValidateWaypointList::Response &res) override;
+        virtual bool SetWifiEnableState(kortex_driver::SetWifiEnableState::Request  &req, kortex_driver::SetWifiEnableState::Response &res) override;
+        virtual bool GetWifiEnableState(kortex_driver::GetWifiEnableState::Request  &req, kortex_driver::GetWifiEnableState::Response &res) override;
+        virtual bool SetBluetoothEnableState(kortex_driver::SetBluetoothEnableState::Request  &req, kortex_driver::SetBluetoothEnableState::Response &res) override;
+        virtual bool GetBluetoothEnableState(kortex_driver::GetBluetoothEnableState::Request  &req, kortex_driver::GetBluetoothEnableState::Response &res) override;
 
 private:
         uint32_t m_current_device_id;

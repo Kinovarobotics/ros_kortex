@@ -1,0 +1,3 @@
+
+WifiEnableState wifi_enable_state
+BluetoothEnableState bluetooth_enable_state

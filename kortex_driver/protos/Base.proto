@@ -501,6 +501,26 @@ service Base {//@PROXY_ID=2 @ERROR=Kinova.Api.Error
      * If the use_optimal_blending option is true, a waypoint list with optimal blending will be return. 
      */
     rpc ValidateWaypointList (WaypointList) returns (WaypointValidationReport);//@RPC_ID=235
+
+    /* 
+     * Enable or disable the wifi capabilities on the arm 
+     */
+    rpc SetWifiEnableState (WifiEnableState) returns (Kinova.Api.Common.Empty);//@RPC_ID=236
+
+    /* 
+     * Get the wifi capabilities state (enabled or disabled)
+     */
+    rpc GetWifiEnableState (Kinova.Api.Common.Empty) returns (WifiEnableState);//@RPC_ID=237
+
+    /* 
+     * Enable or disable the Bluetooth capabilities on the arm 
+     */
+    rpc SetBluetoothEnableState (BluetoothEnableState) returns (Kinova.Api.Common.Empty);//@RPC_ID=238
+
+    /* 
+     * Get the Bluetooth capabilities state (enabled or disabled)
+     */
+    rpc GetBluetoothEnableState (Kinova.Api.Common.Empty) returns (BluetoothEnableState);//@RPC_ID=239
 }
 
 // List of GPIO port configurations
@@ -847,6 +867,19 @@ enum WifiEncryptionType {
     AES_ENCRYPTION = 1;         // AES encryption
     TKIP_ENCRYPTION = 2;        // TKIP encryption
     WEP_ENCRYPTION = 4;         // WEP encryption
+}
+
+message WifiEnableState {
+    bool enabled = 1;
+}
+
+message BluetoothEnableState {
+    bool enabled = 1;
+}
+
+message RFConfiguration {
+    WifiEnableState wifi_enable_state = 1;
+    BluetoothEnableState bluetooth_enable_state = 2;
 }
 
 // Admissible signal quality values
@@ -1355,6 +1388,10 @@ enum NetworkEvent {
     WIFI_AUTH_WRONG_KEY = 8;                // Wi-Fi wrong PSK supplied
     WIFI_AUTH_CONN_FAILED = 9;              // Wi-Fi connection failure during auth
     WIFI_AUTH_FAILED = 10;                  // Wi-Fi authentication failure
+    WIFI_ENABLED = 11;                      // Wi-Fi has been enabled
+    WIFI_DISABLED = 12;                     // Wi-Fi has been disabled
+    BLUETOOTH_ENABLED = 13;                 // Bluetooth has been enabled
+    BLUETOOTH_DISABLED = 14;                // Bluetooth has been disabled
 }
 
 // Notification about a single network event
@@ -1574,7 +1611,7 @@ enum SafetyIdentifier {
     CYCLIC_DATA_JITTER                              = 32;        // 0x20 - Cyclic data jitter (not implemented yet)
     REACHED_MAXIMUM_EVENT_LOGS                      = 64;        // 0x40 - Reached Maximum number of event log entries (not implemented yet)
     NO_KINEMATICS_SUPPORT                           = 128;       // 0x80 - No kinematics support (not implemented yet)
-    ABOVE_MAXIMUM_DOF                               = 256;       // 0x100 - Above maximum DoF
+    BRAKE_REMOVAL_FAILURE                           = 256;       // 0x100 - Based failed to remove brakes from the axis
     NETWORK_ERROR                                   = 512;       // 0x200 - Network error (not implemented yet)
     UNABLE_TO_REACH_POSE                            = 1024;      // 0x400 - Unable to reach pose
     JOINT_DETECTION_ERROR                           = 2048;      // 0x800 - Joint detection error
@@ -1617,7 +1654,7 @@ message TransformationRow {
 
 /*
  * A Cartesian tool pose (position and orientation). 
- * Orientation is defined as a sequence of three Euler angles using z-y-x Tait-Bryan extrinsic convention.
+ * Orientation is defined as a sequence of three Euler angles using x-y-z Tait-Bryan extrinsic convention.
  * That is, rotation around fixed X-axis, then rotation around fixed Y-axis, then rotation around fixed Z-axis.
  */
 message Pose {
@@ -1636,7 +1673,7 @@ message Position {
 }
 
 /*
- * A Cartesian tool orientation. Defines orientation as sequence of three Euler angles using z-y-x Tait-Bryan extrinsic convention.
+ * A Cartesian tool orientation. Defines orientation as sequence of three Euler angles using x-y-z Tait-Bryan extrinsic convention.
  * That is, rotation around fixed X-axis, then rotation around fixed Y-axis, then rotation around fixed Z-axis.
  */
 message Orientation {
@@ -1655,7 +1692,7 @@ enum JointTrajectoryConstraintType {
 // A Cartesian tool speed (translation speed and angular speed)
 message CartesianSpeed {
     float translation = 1; // Translation speed (in meters per second)
-    float orientation = 2; // Orientation speed (in degrees per second)
+    float orientation = 2; // Orientation speed (in degrees per second) (not implemented yet)
 }
 
 // Cartesian trajectory constraint that can be applied when controlling in Cartesian trajectory mode

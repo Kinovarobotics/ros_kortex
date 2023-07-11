@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot
+  name="GEN3-7DOF_BRAKES_NO-VISION_URDF_ARM_V01">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.00075876 -0.00019207 0.096054"
+        rpy="0 0 0" />
+      <mass
+        value="1.7566" />
+      <inertia
+        ixx="0.0056231"
+        ixy="5.96E-06"
+        ixz="6.235E-05"
+        iyy="0.0055152"
+        iyz="6.09E-06"
+        izz="0.0020523" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="shoulder_link">
+    <inertial>
+      <origin
+        xyz="-2.522E-05 -0.0075954 -0.088651"
+        rpy="0 0 0" />
+      <mass
+        value="1.4699" />
+      <inertia
+        ixx="0.0043269"
+        ixy="2.5E-07"
+        ixz="9.4E-07"
+        iyy="0.0044703"
+        iyz="0.0001016"
+        izz="0.0014532" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/shoulder_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.84706 0.8549 0.85098 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/shoulder_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_1"
+    type="continuous">
+    <origin
+      xyz="0 0 0.15643"
+      rpy="3.1416 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="shoulder_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      effort="39"
+      velocity="1.3963" />
+  </joint>
+  <link
+    name="half_arm_1_link">
+    <inertial>
+      <origin
+        xyz="-4.533E-05 -0.12951716 -0.01354356"
+        rpy="0 0 0" />
+      <mass
+        value="1.2357745" />
+      <inertia
+        ixx="0.0115879"
+        ixy="-1.05E-06"
+        ixz="5E-08"
+        iyy="0.00104574"
+        iyz="-0.00096902"
+        izz="0.0116684" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/half_arm_1_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/half_arm_1_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_2"
+    type="revolute">
+    <origin
+      xyz="0 0.005375 -0.12838"
+      rpy="1.5708 0 0" />
+    <parent
+      link="shoulder_link" />
+    <child
+      link="half_arm_1_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-2.24"
+      upper="2.24"
+      effort="39"
+      velocity="1.3963" />
+  </joint>
+  <link
+    name="half_arm_2_link">
+    <inertial>
+      <origin
+        xyz="-4.533E-05 -0.00361448 -0.14407154"
+        rpy="0 0 0" />
+      <mass
+        value="1.2357745" />
+      <inertia
+        ixx="0.01009873"
+        ixy="5.7E-07"
+        ixz="1.89E-06"
+        iyy="0.01017801"
+        iyz="0.00013166"
+        izz="0.00104697" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/half_arm_2_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/half_arm_2_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_3"
+    type="continuous">
+    <origin
+      xyz="0 -0.21038 -0.006375"
+      rpy="-1.5708 0 0" />
+    <parent
+      link="half_arm_1_link" />
+    <child
+      link="half_arm_2_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      effort="39"
+      velocity="1.3963" />
+  </joint>
+  <link
+    name="forearm_link">
+    <inertial>
+      <origin
+        xyz="-0.00030188 -0.104938 -0.01559665"
+        rpy="0 0 0" />
+      <mass
+        value="0.89954802" />
+      <inertia
+        ixx="0.00889854"
+        ixy="1.98E-05"
+        ixz="-2.39E-06"
+        iyy="0.00060297"
+        iyz="-0.00074456"
+        izz="0.00898975" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/forearm_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.84706 0.8549 0.85098 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/forearm_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_4"
+    type="revolute">
+    <origin
+      xyz="0 0.006375 -0.21038"
+      rpy="1.5708 0 0" />
+    <parent
+      link="half_arm_2_link" />
+    <child
+      link="forearm_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-2.57"
+      upper="2.57"
+      effort="39"
+      velocity="1.3963" />
+  </joint>
+  <link
+    name="spherical_wrist_1_link">
+    <inertial>
+      <origin
+        xyz="-0.00035363 -0.00659443 -0.07560343"
+        rpy="0 0 0" />
+      <mass
+        value="0.70588351" />
+      <inertia
+        ixx="0.00145671"
+        ixy="3.35E-06"
+        ixz="7.62E-06"
+        iyy="0.00145189"
+        iyz="0.00012055"
+        izz="0.00039299" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/spherical_wrist_1_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.84706 0.8549 0.85098 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/spherical_wrist_1_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_5"
+    type="continuous">
+    <origin
+      xyz="0 -0.20843 -0.006375"
+      rpy="-1.5708 0 0" />
+    <parent
+      link="forearm_link" />
+    <child
+      link="spherical_wrist_1_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      effort="9"
+      velocity="1.2218" />
+  </joint>
+  <link
+    name="spherical_wrist_2_link">
+    <inertial>
+      <origin
+        xyz="-0.00035547 -0.06159424 -0.00850171"
+        rpy="0 0 0" />
+      <mass
+        value="0.70583924" />
+      <inertia
+        ixx="0.00187208"
+        ixy="6.1E-06"
+        ixz="-2.17E-06"
+        iyy="0.00041077"
+        iyz="-0.00033774"
+        izz="0.0018494" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/spherical_wrist_2_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.84706 0.8549 0.85098 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/spherical_wrist_2_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_6"
+    type="revolute">
+    <origin
+      xyz="0 0.00017505 -0.10593"
+      rpy="1.5708 0 0" />
+    <parent
+      link="spherical_wrist_1_link" />
+    <child
+      link="spherical_wrist_2_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-2.09"
+      upper="2.09"
+      effort="9"
+      velocity="1.2218" />
+  </joint>
+  <link
+    name="bracelet_link">
+    <inertial>
+      <origin
+        xyz="-0.00010337 0.00015804 -0.02874642"
+        rpy="0 0 0" />
+      <mass
+        value="0.31573861" />
+      <inertia
+        ixx="0.00018712"
+        ixy="6E-08"
+        ixz="7.7E-07"
+        iyy="0.00019576"
+        iyz="-1.62E-06"
+        izz="0.0002257" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/bracelet_no_vision_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://kortex_description/arms/gen3/7dof/meshes/bracelet_no_vision_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_7"
+    type="continuous">
+    <origin
+      xyz="0 -0.10593 -0.00017505"
+      rpy="-1.5708 0 0" />
+    <parent
+      link="spherical_wrist_2_link" />
+    <child
+      link="bracelet_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      effort="9"
+      velocity="1.2218" />
+  </joint>
+  <link
+    name="end_effector_link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+  </link>
+  <joint
+    name="end_effector"
+    type="fixed">
+    <origin
+      xyz="0 0 -0.061525"
+      rpy="3.1416 0 0" />
+    <parent
+      link="bracelet_link" />
+    <child
+      link="end_effector_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>

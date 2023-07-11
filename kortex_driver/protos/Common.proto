@@ -138,6 +138,7 @@ enum ArmState
     ARMSTATE_SERVOING_READY                 = 7;    // Arm is ready to be controlled
     ARMSTATE_SERVOING_PLAYING_SEQUENCE      = 8;    // Arm is currently being controlled via a sequence
     ARMSTATE_SERVOING_MANUALLY_CONTROLLED   = 9;    // Arm is currently being controlled manually
+    ARMSTATE_BRAKE_RELEASING                = 10;   // Arm brakes are being released
     ARMSTATE_RESERVED                       = 255;  // For debugging, this state must never be reported outside the base. this means that a state is not mapped correctly
 }
 

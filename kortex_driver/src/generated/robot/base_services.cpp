@@ -230,6 +230,10 @@ BaseRobotServices::BaseRobotServices(ros::NodeHandle& node_handle, Kinova::Api::
 	m_serviceComputeForwardKinematics = m_node_handle.advertiseService("base/compute_forward_kinematics", &BaseRobotServices::ComputeForwardKinematics, this);
 	m_serviceComputeInverseKinematics = m_node_handle.advertiseService("base/compute_inverse_kinematics", &BaseRobotServices::ComputeInverseKinematics, this);
 	m_serviceValidateWaypointList = m_node_handle.advertiseService("base/validate_waypoint_list", &BaseRobotServices::ValidateWaypointList, this);
+	m_serviceSetWifiEnableState = m_node_handle.advertiseService("base/set_wifi_enable_state", &BaseRobotServices::SetWifiEnableState, this);
+	m_serviceGetWifiEnableState = m_node_handle.advertiseService("base/get_wifi_enable_state", &BaseRobotServices::GetWifiEnableState, this);
+	m_serviceSetBluetoothEnableState = m_node_handle.advertiseService("base/set_bluetooth_enable_state", &BaseRobotServices::SetBluetoothEnableState, this);
+	m_serviceGetBluetoothEnableState = m_node_handle.advertiseService("base/get_bluetooth_enable_state", &BaseRobotServices::GetBluetoothEnableState, this);
 }
 
 bool BaseRobotServices::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
@@ -5274,6 +5278,136 @@ bool BaseRobotServices::ValidateWaypointList(kortex_driver::ValidateWaypointList
 	try
 	{
 		output = m_base->ValidateWaypointList(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseRobotServices::SetWifiEnableState(kortex_driver::SetWifiEnableState::Request  &req, kortex_driver::SetWifiEnableState::Response &res)
+{
+	
+	Kinova::Api::Base::WifiEnableState input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->SetWifiEnableState(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseRobotServices::GetWifiEnableState(kortex_driver::GetWifiEnableState::Request  &req, kortex_driver::GetWifiEnableState::Response &res)
+{
+	
+	Kinova::Api::Base::WifiEnableState output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->GetWifiEnableState(m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	ToRosData(output, res.output);
+	return true;
+}
+
+bool BaseRobotServices::SetBluetoothEnableState(kortex_driver::SetBluetoothEnableState::Request  &req, kortex_driver::SetBluetoothEnableState::Response &res)
+{
+	
+	Kinova::Api::Base::BluetoothEnableState input;
+	ToProtoData(req.input, &input);
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		m_base->SetBluetoothEnableState(input, m_current_device_id, m_api_options);
+	}
+
+	catch (Kinova::Api::KDetailedException& ex)
+	{
+		result_error.subCode = ex.getErrorInfo().getError().error_sub_code();
+		result_error.code = ex.getErrorInfo().getError().error_code();
+		result_error.description = ex.toString();
+		m_pub_Error.publish(result_error);
+		ROS_INFO("Kortex exception");
+		ROS_INFO("KINOVA exception error code: %d\n", ex.getErrorInfo().getError().error_code());
+		ROS_INFO("KINOVA exception error sub code: %d\n", ex.getErrorInfo().getError().error_sub_code());
+		ROS_INFO("KINOVA exception description: %s\n", ex.what());
+		return false;
+	}
+	catch (std::runtime_error& ex2)
+	{
+		ROS_INFO("%s", ex2.what());
+		return false;
+	}
+	return true;
+}
+
+bool BaseRobotServices::GetBluetoothEnableState(kortex_driver::GetBluetoothEnableState::Request  &req, kortex_driver::GetBluetoothEnableState::Response &res)
+{
+	
+	Kinova::Api::Base::BluetoothEnableState output;
+	
+	kortex_driver::KortexError result_error;
+	
+	try
+	{
+		output = m_base->GetBluetoothEnableState(m_current_device_id, m_api_options);
 	}
 
 	catch (Kinova::Api::KDetailedException& ex)
