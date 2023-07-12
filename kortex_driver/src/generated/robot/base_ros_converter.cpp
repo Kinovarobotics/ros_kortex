@@ -651,6 +651,34 @@ int ToRosData(Kinova::Api::Base::FullIPv4Configuration input, kortex_driver::Ful
 	
 	return 0;
 }
+int ToRosData(Kinova::Api::Base::WifiEnableState input, kortex_driver::WifiEnableState &output)
+{
+	
+	output.enabled = input.enabled();
+
+	
+	
+	return 0;
+}
+int ToRosData(Kinova::Api::Base::BluetoothEnableState input, kortex_driver::BluetoothEnableState &output)
+{
+	
+	output.enabled = input.enabled();
+
+	
+	
+	return 0;
+}
+int ToRosData(Kinova::Api::Base::RFConfiguration input, kortex_driver::RFConfiguration &output)
+{
+	
+	ToRosData(input.wifi_enable_state(), output.wifi_enable_state);
+	ToRosData(input.bluetooth_enable_state(), output.bluetooth_enable_state);
+
+	
+	
+	return 0;
+}
 int ToRosData(Kinova::Api::Base::WifiInformation input, kortex_driver::WifiInformation &output)
 {
 	

@@ -31,6 +31,7 @@ int ToRosData(Kinova::Api::ProductConfiguration::CompleteProductConfiguration in
 	output.interface_module_type = input.interface_module_type();
 	output.arm_laterality = input.arm_laterality();
 	output.wrist_type = input.wrist_type();
+	output.brake_type = input.brake_type();
 
 	
 	

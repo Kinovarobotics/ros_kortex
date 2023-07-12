@@ -186,6 +186,10 @@
 #include "kortex_driver/ComputeForwardKinematics.h"
 #include "kortex_driver/ComputeInverseKinematics.h"
 #include "kortex_driver/ValidateWaypointList.h"
+#include "kortex_driver/SetWifiEnableState.h"
+#include "kortex_driver/GetWifiEnableState.h"
+#include "kortex_driver/SetBluetoothEnableState.h"
+#include "kortex_driver/GetBluetoothEnableState.h"
 
 #include "kortex_driver/KortexError.h"
 #include "kortex_driver/SetDeviceID.h"
@@ -363,6 +367,10 @@ class IBaseServices
         virtual bool ComputeForwardKinematics(kortex_driver::ComputeForwardKinematics::Request  &req, kortex_driver::ComputeForwardKinematics::Response &res) = 0;
         virtual bool ComputeInverseKinematics(kortex_driver::ComputeInverseKinematics::Request  &req, kortex_driver::ComputeInverseKinematics::Response &res) = 0;
         virtual bool ValidateWaypointList(kortex_driver::ValidateWaypointList::Request  &req, kortex_driver::ValidateWaypointList::Response &res) = 0;
+        virtual bool SetWifiEnableState(kortex_driver::SetWifiEnableState::Request  &req, kortex_driver::SetWifiEnableState::Response &res) = 0;
+        virtual bool GetWifiEnableState(kortex_driver::GetWifiEnableState::Request  &req, kortex_driver::GetWifiEnableState::Response &res) = 0;
+        virtual bool SetBluetoothEnableState(kortex_driver::SetBluetoothEnableState::Request  &req, kortex_driver::SetBluetoothEnableState::Response &res) = 0;
+        virtual bool GetBluetoothEnableState(kortex_driver::GetBluetoothEnableState::Request  &req, kortex_driver::GetBluetoothEnableState::Response &res) = 0;
 
 protected:
         ros::NodeHandle m_node_handle;
@@ -547,5 +555,9 @@ protected:
 	ros::ServiceServer m_serviceComputeForwardKinematics;
 	ros::ServiceServer m_serviceComputeInverseKinematics;
 	ros::ServiceServer m_serviceValidateWaypointList;
+	ros::ServiceServer m_serviceSetWifiEnableState;
+	ros::ServiceServer m_serviceGetWifiEnableState;
+	ros::ServiceServer m_serviceSetBluetoothEnableState;
+	ros::ServiceServer m_serviceGetBluetoothEnableState;
 };
 #endif

@@ -299,6 +299,8 @@ Some source code as well as most of the .MSG and .SRV files in this package are 
 
 The generation process is based on a custom `protoc` plugin. Basically, most of the generation process is in the [scripts/ros_kortex_generator.py](scripts/ros_kortex_generator.py). Before launching the generation ensure that you have the Python JINJA2 module installed.
 
+This scripts works with `protobuf-compiler` (`protoc`) version 3.5.1 (see 3.5.X protobuf [github](https://github.com/protocolbuffers/protobuf/tree/3.5.x)). Script was not tested for other versions.
+
 To launch the generation of this package:
 
 1. Open a terminal window.

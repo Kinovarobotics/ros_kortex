@@ -6,4 +6,4 @@ import time
 class ROSKortexConan(ConanFile):  
 
     def requirements(self):
-        self.requires("kortex_api_cpp/2.3.0-r.34@kortex/stable")
+        self.requires("kortex_api_cpp/2.6.0-r.3@kortex/stable")

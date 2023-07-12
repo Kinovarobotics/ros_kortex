@@ -338,6 +338,8 @@ enum SafetyIdentifierBankA {
     UNRELIABLE_CAPACITIVE_SENSOR                   = 16777216;      // 0x1000000 - Capacitive sensor is unreliable
     UNEXPECTED_GEAR_RATIO                          = 33554432;      // 0x2000000 - Incorrect gear ratio for detected configuration
     HALL_MAGNETIC_MISMATCH                         = 67108864;      // 0x4000000 - Position mismatch between hall and magnetic sensors
+    BRAKE_DRIVE_FAULT                              = 134217728;     // 0x8000000 - Brake driver fault
+    BRAKE_RELEASE_MOTION_OUT_OF_RANGE              = 268435456;     // 0x10000000 - Brake release motion goes out of allowed range
 }
 
 // Custom data options

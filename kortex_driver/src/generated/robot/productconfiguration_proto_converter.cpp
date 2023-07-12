@@ -31,6 +31,7 @@ int ToProtoData(kortex_driver::CompleteProductConfiguration input, Kinova::Api::
 	output->set_interface_module_type((Kinova::Api::ProductConfiguration::InterfaceModuleType)input.interface_module_type);
 	output->set_arm_laterality((Kinova::Api::ProductConfiguration::ArmLaterality)input.arm_laterality);
 	output->set_wrist_type((Kinova::Api::ProductConfiguration::WristType)input.wrist_type);
+	output->set_brake_type((Kinova::Api::ProductConfiguration::BrakeType)input.brake_type);
 	
 	return 0;
 }

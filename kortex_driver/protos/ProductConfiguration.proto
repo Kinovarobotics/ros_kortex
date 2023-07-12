@@ -74,6 +74,14 @@ enum WristType {
    WRIST_TYPE_CURVED = 3;                     // Curved Wrist
 }
 
+// Admissible brake types
+enum BrakeType {
+   BRAKE_TYPE_UNSPECIFIED = 0;                // Unspecified brake type
+   BRAKE_TYPE_NOT_INSTALLED = 1;              // No Brakes Installed
+   BRAKE_TYPE_SPOKE = 2;                     // Spoke Brake Type
+   BRAKE_TYPE_CLUTCH = 3;                     // Clutch Brake Type
+}
+
 // Complete configuration for a given device
 message CompleteProductConfiguration {
    string  kin = 1;                                           // Kinova Identification Number of the device
@@ -88,6 +96,7 @@ message CompleteProductConfiguration {
    InterfaceModuleType interface_module_type = 10;            // Interface module type of the device
    ArmLaterality arm_laterality = 11;                         // Arm laterality of the device
    WristType wrist_type = 12;                                 // Wrist type of the device
+   BrakeType brake_type = 13;                                 // Brake type of the device
 }
 
 // New end-effector installed on arm

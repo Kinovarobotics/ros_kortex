@@ -48,7 +48,7 @@
     <parent link="base_link" />
     <child link="shoulder_link" />
     <axis xyz="0 0 1" />
-    <limit effort="39" velocity="0.8727" />
+    <limit effort="39" velocity="1.3963" />
   </joint>
   <link name="bicep_link">
     <inertial>
@@ -77,7 +77,7 @@
     <parent link="shoulder_link" />
     <child link="bicep_link" />
     <axis xyz="0 0 1" />
-    <limit lower="-2.41" upper="2.41" effort="39" velocity="0.8727" />
+    <limit lower="-2.24" upper="2.24" effort="39" velocity="1.3963" />
   </joint>
   <link name="forearm_link">
     <inertial>
@@ -106,7 +106,7 @@
     <parent link="bicep_link" />
     <child link="forearm_link" />
     <axis xyz="0 0 1" />
-    <limit lower="-2.66" upper="2.66" effort="39" velocity="0.8727" />
+    <limit lower="-2.57" upper="2.57" effort="39" velocity="1.3963" />
   </joint>
   <link name="spherical_wrist_1_link">
     <inertial>
@@ -135,7 +135,7 @@
     <parent link="forearm_link" />
     <child link="spherical_wrist_1_link" />
     <axis xyz="0 0 1" />
-    <limit effort="9" velocity="0.8727" />
+    <limit effort="9" velocity="1.2218" />
   </joint>
   <link name="spherical_wrist_2_link">
     <inertial>
@@ -164,7 +164,7 @@
     <parent link="spherical_wrist_1_link" />
     <child link="spherical_wrist_2_link" />
     <axis xyz="0 0 1" />
-    <limit lower="-2.23" upper="2.23" effort="9" velocity="0.8727" />
+    <limit lower="-2.09" upper="2.09" effort="9" velocity="1.2218" />
   </joint>
   <link name="bracelet_link">
     <inertial>
@@ -193,13 +193,19 @@
     <parent link="spherical_wrist_2_link" />
     <child link="bracelet_link" />
     <axis xyz="0 0 1" />
-    <limit effort="9" velocity="0.8727" />
+    <limit effort="9" velocity="1.2218" />
   </joint>
-  <link name="EndEffector_Link" />
-  <joint name="EndEffector" type="fixed">
+  <link name="end_effector_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <mass value="0" />
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+    </inertial>
+  </link>
+  <joint name="end_effector" type="fixed">
     <origin xyz="0 0 -0.061525" rpy="3.1416 0 -3.1416" />
     <parent link="bracelet_link" />
-    <child link="EndEffector_Link" />
+    <child link="end_effector_link" />
     <axis xyz="0 0 0" />
   </joint>
 </robot>

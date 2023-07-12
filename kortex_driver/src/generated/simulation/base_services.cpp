@@ -226,6 +226,10 @@ BaseSimulationServices::BaseSimulationServices(ros::NodeHandle& node_handle):
 	m_serviceComputeForwardKinematics = m_node_handle.advertiseService("base/compute_forward_kinematics", &BaseSimulationServices::ComputeForwardKinematics, this);
 	m_serviceComputeInverseKinematics = m_node_handle.advertiseService("base/compute_inverse_kinematics", &BaseSimulationServices::ComputeInverseKinematics, this);
 	m_serviceValidateWaypointList = m_node_handle.advertiseService("base/validate_waypoint_list", &BaseSimulationServices::ValidateWaypointList, this);
+	m_serviceSetWifiEnableState = m_node_handle.advertiseService("base/set_wifi_enable_state", &BaseSimulationServices::SetWifiEnableState, this);
+	m_serviceGetWifiEnableState = m_node_handle.advertiseService("base/get_wifi_enable_state", &BaseSimulationServices::GetWifiEnableState, this);
+	m_serviceSetBluetoothEnableState = m_node_handle.advertiseService("base/set_bluetooth_enable_state", &BaseSimulationServices::SetBluetoothEnableState, this);
+	m_serviceGetBluetoothEnableState = m_node_handle.advertiseService("base/get_bluetooth_enable_state", &BaseSimulationServices::GetBluetoothEnableState, this);
 }
 
 bool BaseSimulationServices::SetDeviceID(kortex_driver::SetDeviceID::Request  &req, kortex_driver::SetDeviceID::Response &res)
@@ -2570,6 +2574,66 @@ bool BaseSimulationServices::ValidateWaypointList(kortex_driver::ValidateWaypoin
 	else
 	{
 		ROS_WARN_ONCE("The simulation handler for base/validate_waypoint_list is not implemented, so the service calls will return the default response.");
+	}
+	return true;
+}
+
+bool BaseSimulationServices::SetWifiEnableState(kortex_driver::SetWifiEnableState::Request  &req, kortex_driver::SetWifiEnableState::Response &res)
+{
+	
+	
+	if (SetWifiEnableStateHandler)
+	{
+		res = SetWifiEnableStateHandler(req);
+	}
+	else
+	{
+		ROS_WARN_ONCE("The simulation handler for base/set_wifi_enable_state is not implemented, so the service calls will return the default response.");
+	}
+	return true;
+}
+
+bool BaseSimulationServices::GetWifiEnableState(kortex_driver::GetWifiEnableState::Request  &req, kortex_driver::GetWifiEnableState::Response &res)
+{
+	
+	
+	if (GetWifiEnableStateHandler)
+	{
+		res = GetWifiEnableStateHandler(req);
+	}
+	else
+	{
+		ROS_WARN_ONCE("The simulation handler for base/get_wifi_enable_state is not implemented, so the service calls will return the default response.");
+	}
+	return true;
+}
+
+bool BaseSimulationServices::SetBluetoothEnableState(kortex_driver::SetBluetoothEnableState::Request  &req, kortex_driver::SetBluetoothEnableState::Response &res)
+{
+	
+	
+	if (SetBluetoothEnableStateHandler)
+	{
+		res = SetBluetoothEnableStateHandler(req);
+	}
+	else
+	{
+		ROS_WARN_ONCE("The simulation handler for base/set_bluetooth_enable_state is not implemented, so the service calls will return the default response.");
+	}
+	return true;
+}
+
+bool BaseSimulationServices::GetBluetoothEnableState(kortex_driver::GetBluetoothEnableState::Request  &req, kortex_driver::GetBluetoothEnableState::Response &res)
+{
+	
+	
+	if (GetBluetoothEnableStateHandler)
+	{
+		res = GetBluetoothEnableStateHandler(req);
+	}
+	else
+	{
+		ROS_WARN_ONCE("The simulation handler for base/get_bluetooth_enable_state is not implemented, so the service calls will return the default response.");
 	}
 	return true;
 }
