@@ -1,6 +1,10 @@
 # ros_kortex
 ROS Kortex is the official ROS package to interact with Kortex and its related products. It is built upon the Kortex API, documentation for which can be found in the [GitHub Kortex repository](https://github.com/Kinovarobotics/kortex).
 
+## Important
+
+This branch is no longer maintained as Ubuntu 18.04 Bionic Beaver and ROS Melodic are end-of-life.
+
 ## Download links
 
 You can refer to the [Kortex repository "Download links" section](https://github.com/Kinovarobotics/kortex#download-links) to download the firmware package and the release notes.

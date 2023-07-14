@@ -12,7 +12,11 @@
 
 # Kortex Driver
 
-# **Note:** There have been many changes made between versions 1.1.7 and 2.0.0 of the ROS driver. You can view the changes and learn the steps to follow to adapt your code in [this section](#compatibility).
+# Important 
+
+This branch is no longer maintained as Ubuntu 18.04 Bionic Beaver and ROS Melodic are end-of-life.
+
+There have been many changes made between versions 1.1.7 and 2.0.0 of the ROS driver. You can view the changes and learn the steps to follow to adapt your code in [this section](#compatibility).
 
 <!-- MarkdownTOC -->
 ## Table of contents
