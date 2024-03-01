@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-    <xacro:macro name="load_robot" params="arm gripper dof vision sim prefix parent_link:='world' joint_origin_xyz:='0 0 0' joint_origin_rpy:='0 0 0'">
+    <xacro:macro name="load_robot" params="arm gripper dof vision sim prefix parent_link:='world' origin_xyz:='0 0 0' origin_rpy:='0 0 0'">
             
         <!-- Files to include -->
         <xacro:include filename="$(find kortex_description)/arms/${arm}/${dof}dof/urdf/${arm}_macro.xacro" />
@@ -30,7 +30,7 @@
         <joint name="${prefix}mount_joint" type="fixed">
             <child link="${prefix}base_link" />
             <parent link="${parent_link}" />
-            <origin xyz="${joint_origin_xyz}" rpy="${joint_origin_rpy}"/>
+            <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
         </joint>
 
         <!-- Load the arm -->
