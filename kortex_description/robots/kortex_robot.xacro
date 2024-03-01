@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-    <xacro:macro name="load_robot" params="arm gripper dof vision sim prefix">
+    <xacro:macro name="load_robot" params="arm gripper dof vision sim prefix parent_link:='world' joint_origin_xyz:='0 0 0' joint_origin_rpy:='0 0 0'">
             
         <!-- Files to include -->
         <xacro:include filename="$(find kortex_description)/arms/${arm}/${dof}dof/urdf/${arm}_macro.xacro" />
@@ -19,18 +19,20 @@
             </xacro:unless>
         </xacro:if>
 
-        <!-- Run the macros -->
+        <!-- Run the macros and mount the robot -->
 
-        <!-- For gazebo-->
-        <xacro:if value="${sim}">
+        <!-- For gazebo when parent_link is world -->
+        <xacro:if value="${(sim and parent_link == 'world')}">
             <link name="world" />
-            <joint name="world_to_root" type="fixed">
-                <child link="${prefix}base_link" />
-                <parent link="world" />
-                <origin xyz="0 0 0" rpy="0 0 0" />    
-            </joint> 
         </xacro:if>
         
+        <!-- Mount robot with the world or base robot -->
+        <joint name="${prefix}mount_joint" type="fixed">
+            <child link="${prefix}base_link" />
+            <parent link="${parent_link}" />
+            <origin xyz="${joint_origin_xyz}" rpy="${joint_origin_rpy}"/>
+        </joint>
+
         <!-- Load the arm -->
         <xacro:load_arm parent="" dof="${dof}" vision="${vision}" prefix="${prefix}">
             <origin xyz="0 0 0" rpy="0 0 0"/> 
