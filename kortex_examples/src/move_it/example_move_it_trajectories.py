@@ -38,7 +38,7 @@
 # Modified by Alexandre Vannobel to test the FollowJointTrajectory Action Server for the Kinova Gen3 robot
 
 # To run this node in a given namespace with rosrun (for example 'my_gen3'), start a Kortex driver and then run : 
-# rosrun kortex_examples example_moveit_trajectories.py __ns:=my_gen3
+# rosrun kortex_examples example_move_it_trajectories.py __ns:=my_gen3
 
 import sys
 import time
