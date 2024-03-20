@@ -19,10 +19,10 @@
 
   <!-- The semantic description that corresponds to the URDF -->
   <!-- With prefix -->
-  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro --inorder $(find gen3_robotiq_2f_140_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_140.srdf.xacro prefix:=$(arg prefix)"
+  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro $(find gen3_robotiq_2f_140_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_140.srdf.xacro prefix:=$(arg prefix)"
     unless="$(eval not arg('prefix'))"/>
   <!-- No prefix -->
-  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro --inorder $(find gen3_robotiq_2f_140_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_140.srdf.xacro"
+  <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro $(find gen3_robotiq_2f_140_move_it_config)/config/$(arg dof)dof/gen3_robotiq_2f_140.srdf.xacro"
     if="$(eval not arg('prefix'))"/>
 
   <!-- Load updated joint limits (override information from URDF) -->
