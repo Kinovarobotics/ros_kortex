@@ -52,5 +52,7 @@
         <rosparam command="load" file="$(find kortex_description)/arms/$(arg arm)/$(arg dof)dof/config/joint_limits.yaml" subst_value="true"/>
         <!-- If there is a gripper, load the active joint names for it -->
         <rosparam command="load" file="$(find kortex_description)/grippers/$(arg gripper)/config/joint_limits.yaml" unless="$(eval not arg('gripper'))" subst_value="true"/>
+        <!-- Remap base feedback topic to unique namespace -->
+        <remap from="base_feedback" to="$(arg robot_name)/base_feedback"/>
     </node>
 </launch>

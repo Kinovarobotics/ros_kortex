@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: kortex_description
+    relative_path: multiple_robots/kortex_dual_robots.xacro
+    xacro_args: left_arm:=gen3 left_dof:=7 left_vision:=true left_sim:=false left_prefix:=left_ right_arm:=gen3 right_dof:=7 right_vision:=true right_sim:=false right_prefix:=right_
+  SRDF:
+    relative_path: config/dual_robot.srdf
+  CONFIG:
+    author_name: Abed Al Rahman AL MRAD
+    author_email: aalmrad@kinova.ca
+    generated_timestamp: 1722282132

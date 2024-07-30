@@ -2,7 +2,7 @@
 <launch>
 
     <!-- Namespace -->
-
+<group ns="dual_arm">
     <!-- Automatically start other modules -->
     <arg name="start_rviz" default="true"/>
     <arg name="start_moveit" default="true"/>
@@ -74,56 +74,70 @@
             right_sim:=false
             right_prefix:=$(arg right_prefix)"
     />
-
+    
     <!-- Start the left arm kortex_driver node -->
-    <include file="$(find kortex_driver)/launch/kortex_arm_driver.launch">
-        <arg name="sim" value="false"/>
-        <arg name="ip_address" value="$(arg left_ip_address)"/>
-        <arg name="username" value="$(arg left_username)"/>
-        <arg name="password" value="$(arg left_password)"/>
-        <arg name="cyclic_data_publish_rate" value="$(arg left_cyclic_data_publish_rate)"/>
-        <arg name="api_rpc_timeout_ms" value="$(arg left_api_rpc_timeout_ms)"/>
-        <arg name="api_session_inactivity_timeout_ms" value="$(arg left_api_session_inactivity_timeout_ms)"/>
-        <arg name="api_connection_inactivity_timeout_ms" value="$(arg left_api_connection_inactivity_timeout_ms)"/>
-        <arg name="default_goal_time_tolerance" value="$(arg left_default_goal_time_tolerance)"/>
-        <arg name="default_goal_tolerance" value="$(arg left_default_goal_tolerance)"/>
-        <arg name="arm" value="$(arg left_arm)"/>
-        <arg name="gripper" value="$(arg left_gripper)"/>
-        <arg name="dof" value="$(arg left_dof)"/>
-        <arg name="prefix" value="$(arg left_prefix)"/>
-        <arg name="robot_name" value="$(arg left_robot_name)"/>
-    </include>
+
+        <include file="$(find kortex_driver)/launch/kortex_arm_driver.launch">
+            <arg name="sim" value="false"/>
+            <arg name="ip_address" value="$(arg left_ip_address)"/>
+            <arg name="username" value="$(arg left_username)"/>
+            <arg name="password" value="$(arg left_password)"/>
+            <arg name="cyclic_data_publish_rate" value="$(arg left_cyclic_data_publish_rate)"/>
+            <arg name="api_rpc_timeout_ms" value="$(arg left_api_rpc_timeout_ms)"/>
+            <arg name="api_session_inactivity_timeout_ms" value="$(arg left_api_session_inactivity_timeout_ms)"/>
+            <arg name="api_connection_inactivity_timeout_ms" value="$(arg left_api_connection_inactivity_timeout_ms)"/>
+            <arg name="default_goal_time_tolerance" value="$(arg left_default_goal_time_tolerance)"/>
+            <arg name="default_goal_tolerance" value="$(arg left_default_goal_tolerance)"/>
+            <arg name="arm" value="$(arg left_arm)"/>
+            <arg name="gripper" value="$(arg left_gripper)"/>
+            <arg name="dof" value="$(arg left_dof)"/>
+            <arg name="prefix" value="$(arg left_prefix)"/>
+            <arg name="robot_name" value="$(arg left_robot_name)"/>
+        </include>
 
 
     <!-- Start the right arm kortex_driver node -->
-    <include file="$(find kortex_driver)/launch/kortex_arm_driver.launch">
-        <arg name="sim" value="false"/>
-        <arg name="ip_address" value="$(arg right_ip_address)"/>
-        <arg name="username" value="$(arg right_username)"/>
-        <arg name="password" value="$(arg right_password)"/>
-        <arg name="cyclic_data_publish_rate" value="$(arg right_cyclic_data_publish_rate)"/>
-        <arg name="api_rpc_timeout_ms" value="$(arg right_api_rpc_timeout_ms)"/>
-        <arg name="api_session_inactivity_timeout_ms" value="$(arg right_api_session_inactivity_timeout_ms)"/>
-        <arg name="api_connection_inactivity_timeout_ms" value="$(arg right_api_connection_inactivity_timeout_ms)"/>
-        <arg name="default_goal_time_tolerance" value="$(arg right_default_goal_time_tolerance)"/>
-        <arg name="default_goal_tolerance" value="$(arg right_default_goal_tolerance)"/>
-        <arg name="arm" value="$(arg right_arm)"/>
-        <arg name="gripper" value="$(arg right_gripper)"/>
-        <arg name="dof" value="$(arg right_dof)"/>
-        <arg name="prefix" value="$(arg right_prefix)"/>
-        <arg name="robot_name" value="$(arg right_robot_name)"/>
-    </include>
+
+        <include file="$(find kortex_driver)/launch/kortex_arm_driver.launch">
+            <arg name="sim" value="false"/>
+            <arg name="ip_address" value="$(arg right_ip_address)"/>
+            <arg name="username" value="$(arg right_username)"/>
+            <arg name="password" value="$(arg right_password)"/>
+            <arg name="cyclic_data_publish_rate" value="$(arg right_cyclic_data_publish_rate)"/>
+            <arg name="api_rpc_timeout_ms" value="$(arg right_api_rpc_timeout_ms)"/>
+            <arg name="api_session_inactivity_timeout_ms" value="$(arg right_api_session_inactivity_timeout_ms)"/>
+            <arg name="api_connection_inactivity_timeout_ms" value="$(arg right_api_connection_inactivity_timeout_ms)"/>
+            <arg name="default_goal_time_tolerance" value="$(arg right_default_goal_time_tolerance)"/>
+            <arg name="default_goal_tolerance" value="$(arg right_default_goal_tolerance)"/>
+            <arg name="arm" value="$(arg right_arm)"/>
+            <arg name="gripper" value="$(arg right_gripper)"/>
+            <arg name="dof" value="$(arg right_dof)"/>
+            <arg name="prefix" value="$(arg right_prefix)"/>
+            <arg name="robot_name" value="$(arg right_robot_name)"/>
+        </include>
 
     <!-- Start joint and robot state publisher -->
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
         <param name="rate" value="$(arg cyclic_data_publish_rate)" />
+
         <rosparam param="source_list" subst_value="true">
-            [$(arg left_robot_name)/base_feedback/joint_state, $(arg right_robot_name)/base_feedback/joint_state]
+            [base_feedback/joint_state]
         </rosparam>
+
     </node>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
+        <!-- Start MoveIt! main executable -->
+    <group if="$(arg start_moveit)">
+
+        <!-- TODO Find cleaner way to do that and that will work with other arms -->
+        <!-- Without gripper -->
+        <include file="$(find kortex_description)/../kortex_move_it_config/gen3_7dof_dual_arm_move_it_config/launch/move_group.launch"> 
+        </include>
+
+    </group>
+
     <!-- Start RViz -->
     <node name="rviz" pkg="rviz" type="rviz" output="log" args="world" if="$(arg start_rviz)"/> 
-
+</group>
 </launch>
