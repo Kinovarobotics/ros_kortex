@@ -138,6 +138,8 @@
     </group>
 
     <!-- Start RViz -->
-    <node name="rviz" pkg="rviz" type="rviz" output="log" args="world" if="$(arg start_rviz)"/> 
+    <arg name="rviz_config_file" default="$(find gen3_7dof_dual_arm_move_it_config)/rviz/moveit_config.rviz"/>
+    <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(arg rviz_config_file)" if="$(arg start_rviz)"/> 
+
 </group>
 </launch>
