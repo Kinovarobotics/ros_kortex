@@ -132,13 +132,12 @@
 
         <!-- TODO Find cleaner way to do that and that will work with other arms -->
         <!-- Without gripper -->
-        <include file="$(find kortex_description)/../kortex_move_it_config/gen3_7dof_dual_arm_move_it_config/launch/move_group.launch"> 
-        </include>
+        <include file="$(find kortex_description)/../kortex_move_it_config/gen3_$(arg left_dof)dof_dual_arm_move_it_config/launch/move_group.launch"/>
 
     </group>
 
     <!-- Start RViz -->
-    <arg name="rviz_config_file" default="$(find gen3_7dof_dual_arm_move_it_config)/rviz/moveit_config.rviz"/>
+    <arg name="rviz_config_file" default="$(find gen3_7dof_dual_arm_move_it_config)/rviz/moveit_config.rviz"/> <!-- 6dof dual arm has the same rviz configuration-->
     <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(arg rviz_config_file)" if="$(arg start_rviz)"/> 
 
 </group>
