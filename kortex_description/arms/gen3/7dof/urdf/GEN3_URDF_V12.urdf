@@ -8,7 +8,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/base_link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/base_link.STL" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -17,7 +17,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/base_link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/base_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -30,7 +30,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/Shoulder_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/shoulder_link.STL" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -39,7 +39,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/Shoulder_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/shoulder_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -59,7 +59,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/HalfArm1_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/half_arm_1_link.STL" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -68,7 +68,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/HalfArm1_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/half_arm_1_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -88,7 +88,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/HalfArm2_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/half_arm_2_link.STL" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -97,7 +97,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/HalfArm2_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/half_arm_2_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -117,7 +117,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/ForeArm_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/forearm_link.STL" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -126,7 +126,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/ForeArm_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/forearm_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -146,7 +146,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/SphericalWrist1_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/spherical_wrist_1_link.STL" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -155,7 +155,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/SphericalWrist1_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/spherical_wrist_1_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -175,7 +175,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/SphericalWrist2_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/spherical_wrist_2_link.STL" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -184,7 +184,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/SphericalWrist2_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/spherical_wrist_2_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -204,7 +204,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/Bracelet_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/bracelet_no_vision_link.STL" />
       </geometry>
       <material name="">
         <color rgba="0.75294 0.75294 0.75294 1" />
@@ -213,7 +213,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kortex_description/arms/gen3/meshes/Bracelet_Link.STL" />
+        <mesh filename="package://kortex_description/arms/gen3/7dof/meshes/bracelet_no_vision_link.STL" />
       </geometry>
     </collision>
   </link>
