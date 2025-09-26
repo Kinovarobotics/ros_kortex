@@ -10,7 +10,7 @@
 *
 * -->
 
-# Kortex MoveIt! Config
+# KINOVA KORTEX™ MoveIt! Config
 
 ## Overview
 This folder contains all the auto-generated MoveIt! configuration ROS packages. These packages have been generated using the [MoveIt! Setup Assistant](http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/setup_assistant/setup_assistant_tutorial.html).
@@ -18,12 +18,12 @@ This folder contains all the auto-generated MoveIt! configuration ROS packages. 
 ## Naming
 
 The packages that don't use a gripper are named `ARM_move_it_config`, where "ARM" is the name of the arm you are using. 
-See the `kortex_description/arms` folder for a list of supported Kinova Kortex robots.
+See the `kortex_description/arms` folder for a list of supported Kinova KINOVA KORTEX™ robots.
 
 The packages that use a gripper are named `ARM_GRIPPER_move_it_config`, where "ARM" is the name of the arm you are using and "GRIPPER" is the name of the gripper you are using.  
-See the `kortex_description/grippers` folder for a list of supported Kinova Kortex grippers. 
+See the `kortex_description/grippers` folder for a list of supported Kinova KINOVA KORTEX™ grippers. 
 
-## Using MoveIt! with Kinova Kortex Robots
+## Using MoveIt! with Kinova KINOVA KORTEX™ Robots
 
 Upon launching the main launch file of a `move_it_config` package, `move_group.launch` (normally launched from the real arm driver's launch file and the simulation launch file), the [C++](http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/move_group_interface/move_group_interface_tutorial.html) and [Python](http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/move_group_python_interface/move_group_python_interface_tutorial.html) interfaces for MoveIt will be enabled. 
 You will be able to use motion planning, configure the planning scene, send trajectories and send pose goals to the simulated robot from your own ROS nodes.
