@@ -10,8 +10,8 @@
 *
 * -->
 
-# Kortex Description
-This package contains the URDF (Unified Robot Description Format), STL and configuration files for the Kortex-compatible robots.
+# KINOVA KORTEX™ Description
+This package contains the URDF (Unified Robot Description Format), STL and configuration files for the KINOVA KORTEX™-compatible robots.
 
 ## Usage 
 
