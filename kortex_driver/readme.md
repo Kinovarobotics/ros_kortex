@@ -10,7 +10,7 @@
 *
 * -->
 
-# Kortex Driver
+# KINOVA KORTEX™ Driver
 
 # **Note:** There have been many changes made between versions 1.1.7 and 2.0.0 of the ROS driver. You can view the changes and learn the steps to follow to adapt your code in [this section](#compatibility).
 

@@ -1,9 +1,9 @@
 # ros_kortex
-ROS Kortex is the official ROS package to interact with Kortex and its related products. It is built upon the Kortex API, documentation for which can be found in the [GitHub Kortex repository](https://github.com/Kinovarobotics/kortex).
+ROS KINOVA KORTEX™ is the official ROS package to interact with KINOVA KORTEX™ and its related products. It is built upon the KINOVA KORTEX™ API, documentation for which can be found in the [GitHub Kortex repository](https://github.com/Kinovarobotics/kortex).
 
 ## Download links
 
-You can refer to the [Kortex repository "Download links" section](https://github.com/Kinovarobotics/kortex#download-links) to download the firmware package and the release notes.
+You can refer to the [KINOVA KORTEX™ repository "Download links" section](https://github.com/Kinovarobotics/kortex#download-links) to download the firmware package and the release notes.
 
 ### Accessing the color and depth streams 
 
@@ -17,7 +17,7 @@ To access the color and depth streams, you will need to clone and follow the ins
 This package has been tested under ROS Kinetic (Ubuntu 16.04) and ROS Melodic (Ubuntu 18.04).
 You can find the instructions to install ROS Kinetic [here](http://wiki.ros.org/kinetic/Installation/Ubuntu) and ROS Melodic [here](http://wiki.ros.org/melodic/Installation/Ubuntu).
 
-[Google Protocol Buffers](https://developers.google.com/protocol-buffers/) is used by Kinova to define the Kortex APIs and to automatically generate ROS messages, services and C++ classes from the Kortex API `.proto` files. The installation of Google Protocol Buffers is required by developers implementing new APIs with the robot. However, since we already provide all the necessary generated files on GitHub, this is not required for most end users of the robot.
+[Google Protocol Buffers](https://developers.google.com/protocol-buffers/) is used by Kinova to define the KINOVA KORTEX™ APIs and to automatically generate ROS messages, services and C++ classes from the KINOVA KORTEX™ API `.proto` files. The installation of Google Protocol Buffers is required by developers implementing new APIs with the robot. However, since we already provide all the necessary generated files on GitHub, this is not required for most end users of the robot.
 
 ### Build
 
@@ -39,7 +39,7 @@ Then, to build and source the workspace:
         catkin_make
         source devel/setup.bash
 
-You can also build against one of the ARMv8 builds of the Kortex API with Conan if you specify the `CONAN_TARGET_PLATFORM` CMake argument when using `catkin_make`. The following platforms are supported:
+You can also build against one of the ARMv8 builds of the KINOVA KORTEX™ API with Conan if you specify the `CONAN_TARGET_PLATFORM` CMake argument when using `catkin_make`. The following platforms are supported:
 
 - Artik 710: 
 
@@ -68,7 +68,7 @@ This package implements the simulation controllers that control the arm in Gazeb
 **Note** The `ros_control` controllers for the real arm are not yet implemented and will be in a future release of `ros_kortex`.
 
 ### kortex_description
-This package contains the URDF (Unified Robot Description Format), STL and configuration files for the Kortex-compatible robots. For more details, please consult the [README](kortex_description/readme.md) from the package subdirectory.
+This package contains the URDF (Unified Robot Description Format), STL and configuration files for the KINOVA KORTEX™-compatible robots. For more details, please consult the [README](kortex_description/readme.md) from the package subdirectory.
 
 ### kortex_driver
 This package implements a ROS node that allows communication between a node and a Kinova Gen3 or Gen3 lite robot. For more details, please consult the [README](kortex_driver/readme.md) from the package subdirectory.

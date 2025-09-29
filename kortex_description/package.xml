@@ -2,9 +2,9 @@
   <name>kortex_description</name>
   <version>2.2.2</version>
   <description>
-    <p>URDF and xacro description package for Kortex robots</p>
+    <p>URDF and xacro description package for KINOVA KORTEX™ robots</p>
     <p>This package contains configuration data, 3D models and launch files
-for Kortex arms and supported grippers</p>
+for KINOVA KORTEX™ arms and supported grippers</p>
   </description>
   <author email="avannobel@kinova.ca">Alexandre Vannobel</author>
   <maintainer email="avannobel@kinova.ca" />
